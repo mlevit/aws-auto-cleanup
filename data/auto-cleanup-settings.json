@@ -1,0 +1,84 @@
+{
+    "SETTINGSTABLE": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"dry_run"},
+                    "value": {"S":"true"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"cloudformation_stack_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"dynamodb_table_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"ec2_instance_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"ec2_snapshot_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"ec2_volume_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"lambda_function_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"rds_instance_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"rds_snapshot_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "key": {"S":"s3_bucket_ttl_days"},
+                    "value": {"S":"7"}
+                }
+            }
+        }
+    ]
+}
