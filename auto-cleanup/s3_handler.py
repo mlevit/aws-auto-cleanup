@@ -24,9 +24,12 @@ class S3:
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
-        self.client = boto3.client('s3')
+        try:
+            self.client = boto3.client('s3')
+        except:
+            logging.critical(str(sys.exc_info()))
     
     
     def run(self):
@@ -38,19 +41,24 @@ class S3:
         Deletes Buckets. All Bucket Objects, Versions and Deleted Markers
         are first deleted before the Bucket can be deleted.
         """
-        ttl_days = int(self.settings.get('s3_bucket_ttl_days', 7))
-        resources = self.client.list_buckets()
+
+        ttl_days = int(self.settings.get('resource', {}).get('s3_bucket_ttl_days', 7))
+        try:
+            resources = self.client.list_buckets()
+        except:
+            logging.critical(str(sys.exc_info()))
+            return None
         
         for resource in resources.get('Buckets'):
-            resource_id = resource.get('Name')
-            resource_date = resource.get('CreationDate')
+            try:
+                resource_id = resource.get('Name')
+                resource_date = resource.get('CreationDate')
 
-            if resource_id not in self.whitelist.get('s3', {}).get('bucket', []):
-                delta = self.helper.get_day_delta(resource_date)
-            
-                if delta.days > ttl_days: 
-                    if self.dry_run == 'false':
-                        try:
+                if resource_id not in self.whitelist.get('s3', {}).get('bucket', []):
+                    delta = self.helper.get_day_delta(resource_date)
+                
+                    if delta.days > ttl_days: 
+                        if self.dry_run == 'false':
                             # delete all objects
                             response = self.client.list_objects_v2(Bucket=resource_id)
 
@@ -90,13 +98,13 @@ class S3:
                             
                             # delete bucket
                             self.client.delete_bucket(Bucket=resource_id)
-                        except ValueError as e:
-                            logging.critical(str(e))
-                        except:
-                            logging.critical(str(sys.exc_info()))
-                    
-                    logging.info("S3 Bucket '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                        
+                        logging.info("S3 Bucket '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                    else:
+                        logging.debug("S3 Bucket '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
                 else:
-                    logging.debug("S3 Bucket '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
-            else:
-                logging.debug("S3 Bucket '%s' has been whitelisted and has not been deleted." % (resource_id))
+                    logging.debug("S3 Bucket '%s' has been whitelisted and has not been deleted." % (resource_id))
+            except:
+                logging.critical(str(sys.exc_info()))
+            
+            return None

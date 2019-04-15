@@ -1,104 +1,62 @@
-{
-    "WHITELISTTABLE": [
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"cloudformation:stack:auto-cleanup-dev"},
-                    "comment": {"S":"Auto Cleanup development CloudFormation stack"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"cloudformation:stack:auto-cleanup-production"},
-                    "comment": {"S":"Auto Cleanup production CloudFormation stack"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"dynamodb:table:auto-cleanup-logs-dev"},
-                    "comment": {"S":"DynamoDB development logs table"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"dynamodb:table:auto-cleanup-settings-dev"},
-                    "comment": {"S":"DynamoDB development settings table"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"dynamodb:table:auto-cleanup-whitelist-dev"},
-                    "comment": {"S":"DynamoDB development whitelist table"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"dynamodb:table:auto-cleanup-logs-production"},
-                    "comment": {"S":"DynamoDB production logs table"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"dynamodb:table:auto-cleanup-settings-production"},
-                    "comment": {"S":"DynamoDB production settings table"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"dynamodb:table:auto-cleanup-whitelist-production"},
-                    "comment": {"S":"DynamoDB production whitelist table"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"lambda:function:auto-cleanup-dev"},
-                    "comment": {"S":"Auto Cleanup development Lambda function"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "resource_id": {"S":"lambda:function:auto-cleanup-production"},
-                    "comment": {"S":"Auto Cleanup production Lambda function"},
-                    "expire_at": {"N":"99999999999"},
-                    "owner_email": {"S":"example@email.com"}
-                }
-            }
-        }
-    ]
-}
+[
+    {
+        "resource_id": {"S":"cloudformation:stack:auto-cleanup-dev"},
+        "comment": {"S":"Auto Cleanup development CloudFormation stack"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"cloudformation:stack:auto-cleanup-production"},
+        "comment": {"S":"Auto Cleanup production CloudFormation stack"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"dynamodb:table:auto-cleanup-logs-dev"},
+        "comment": {"S":"DynamoDB development logs table"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"dynamodb:table:auto-cleanup-settings-dev"},
+        "comment": {"S":"DynamoDB development settings table"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"dynamodb:table:auto-cleanup-whitelist-dev"},
+        "comment": {"S":"DynamoDB development whitelist table"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"dynamodb:table:auto-cleanup-logs-production"},
+        "comment": {"S":"DynamoDB production logs table"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"dynamodb:table:auto-cleanup-settings-production"},
+        "comment": {"S":"DynamoDB production settings table"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"dynamodb:table:auto-cleanup-whitelist-production"},
+        "comment": {"S":"DynamoDB production whitelist table"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"lambda:function:auto-cleanup-dev"},
+        "comment": {"S":"Auto Cleanup development Lambda function"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    },
+    {
+        "resource_id": {"S":"lambda:function:auto-cleanup-production"},
+        "comment": {"S":"Auto Cleanup production Lambda function"},
+        "expire_at": {"N":"99999999999"},
+        "owner_email": {"S":"example@email.com"}
+    }
+]

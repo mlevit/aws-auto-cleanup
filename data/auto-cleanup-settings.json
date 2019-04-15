@@ -1,84 +1,157 @@
-{
-    "SETTINGSTABLE": [
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"dry_run"},
-                    "value": {"S":"true"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"cloudformation_stack_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"dynamodb_table_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"ec2_instance_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"ec2_snapshot_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"ec2_volume_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"lambda_function_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"rds_instance_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"rds_snapshot_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        },
-        {
-            "PutRequest": {
-                "Item": {
-                    "key": {"S":"s3_bucket_ttl_days"},
-                    "value": {"S":"7"}
-                }
-            }
-        }
-    ]
-}
+[
+    {
+      "key": {"S": "dry_run"},
+      "value": {"S": "true"},
+      "category": {"S": "general"}
+    },
+    {
+      "key": {"S": "cloudformation_stack_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "dynamodb_table_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "ec2_instance_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "ec2_snapshot_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "ec2_volume_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "lambda_function_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "rds_instance_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "rds_snapshot_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "s3_bucket_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "us-east-2"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "us-east-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "us-west-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "us-west-2"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-south-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-3"},
+      "value": {"S": "false"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-2"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-southeast-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-southeast-2"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ap-northeast-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "ca-central-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "eu-central-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "eu-west-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "eu-west-2"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "eu-west-3"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "eu-north-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "sa-east-1"},
+      "value": {"S": "true"},
+      "category": {"S": "region"}
+    }
+  ]
