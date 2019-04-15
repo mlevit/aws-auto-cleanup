@@ -87,9 +87,13 @@ resources:
         AttributeDefinitions:
           - AttributeName: key
             AttributeType: S
+          - AttributeName: category
+            AttributeType: S
         KeySchema:
           - AttributeName: key
             KeyType: HASH
+          - AttributeName: category
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5

@@ -19,16 +19,19 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class EC2:
-    def __init__(self, helper, whitelist, settings):
+    def __init__(self, helper, whitelist, settings, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         self.account_id = boto3.client('sts').get_caller_identity().get('Account')
         
-        self.client = boto3.client('ec2')
-        self.resource = boto3.resource('ec2')
+        try:
+            self.client = boto3.client('ec2', region_name=region)
+            self.resource = boto3.resource('ec2', region_name=region)
+        except:
+            logging.critical(str(sys.exc_info()))
     
     
     def run(self):
@@ -44,68 +47,70 @@ class EC2:
         If Instance has termination protection enabled, the protection will
         be first disabled and then the Instance will be terminated.
         """
-        ttl_days = int(self.settings.get('ec2_instance_ttl_days', 7))
-        reservations = self.client.describe_instances().get('Reservations')
+
+        ttl_days = int(self.settings.get('resource', {}).get('ec2_instance_ttl_days', 7))
+        try:
+            reservations = self.client.describe_instances().get('Reservations')
+        except:
+            logging.critical(str(sys.exc_info()))
+            return None
 
         for reservation in reservations:
             for resource in reservation.get('Instances'):
-                resource_id = resource.get('InstanceId')
-                resource_date = resource.get('LaunchTime')
-                resource_state = resource.get('State').get('Name')
-                
-                if resource_id not in self.whitelist.get('ec2', {}).get('instance', []):
-                    delta = self.helper.get_day_delta(resource_date)
+                try:
+                    resource_id = resource.get('InstanceId')
+                    resource_date = resource.get('LaunchTime')
+                    resource_state = resource.get('State').get('Name')
+                    
+                    if resource_id not in self.whitelist.get('ec2', {}).get('instance', []):
+                        delta = self.helper.get_day_delta(resource_date)
 
-                    if delta.days > ttl_days:
-                        if resource_state == 'running':
-                            if self.dry_run == 'false':
-                                try:
+                        if delta.days > ttl_days:
+                            if resource_state == 'running':
+                                if self.dry_run == 'false':
                                     self.client.stop_instances(InstanceIds=[resource_id])
-                                except ValueError as e:
-                                    logging.critical(str(e))
-                                except:
-                                    logging.critical(str(sys.exc_info()))
-                            
-                            logging.info("EC2 Instance '%s' in a 'running' state was last launched %d days ago and has been stopped." % (resource_id, delta.days))
-                        elif resource_state == 'stopped':
-                            if self.dry_run == 'false':
-                                # disable termination protection before terminating the instance
-                                resource_protection = self.client.describe_instance_attribute(
-                                    Attribute='disableApiTermination',
-                                    InstanceId=resource_id).get('DisableApiTermination').get('Value')
                                 
-                                if resource_protection:
-                                    try:
+                                logging.info("EC2 Instance '%s' in a 'running' state was last launched %d days ago and has been stopped." % (resource_id, delta.days))
+                            elif resource_state == 'stopped':
+                                if self.dry_run == 'false':
+                                    # disable termination protection before terminating the instance
+                                    resource_protection = self.client.describe_instance_attribute(
+                                        Attribute='disableApiTermination',
+                                        InstanceId=resource_id).get('DisableApiTermination').get('Value')
+                                    
+                                    if resource_protection:
                                         self.client.modify_instance_attribute(
                                             DisableApiTermination={'Value': False},
                                             InstanceId=resource_id)
-                                    except ValueError as e:
-                                        logging.critical(str(e))
-                                    except:
-                                        logging.critical(str(sys.exc_info()))
+                                        
+                                        logging.info("EC2 Instance '%s' had termination protection turned on and now has been turned off." % (resource_id))
                                     
-                                    logging.info("EC2 Instance '%s' had termination protection turned on and now has been turned off." % (resource_id))
-                                
-                                try:
                                     self.client.terminate_instances(InstanceIds=[resource_id])
-                                except ValueError as e:
-                                    logging.critical(str(e))
-                                except:
-                                    logging.critical(str(sys.exc_info()))
-                            
-                            logging.info("EC2 Instance '%s' in a 'stopped' state was last launched %d days ago and has been terminated." % (resource_id, delta.days))
+                                    
+                                
+                                logging.info("EC2 Instance '%s' in a 'stopped' state was last launched %d days ago and has been terminated." % (resource_id, delta.days))
+                        else:
+                            logging.debug("EC2 Instance '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
                     else:
-                        logging.debug("EC2 Instance '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
-                else:
-                    logging.debug("EC2 Instance '%s' has been whitelisted and has not been deleted." % (resource_id))
+                        logging.debug("EC2 Instance '%s' has been whitelisted and has not been deleted." % (resource_id))
+                except:
+                    logging.critical(str(sys.exc_info()))
+                    return None
+                
+                return None
     
     
     def volumes(self):
         """
         Deletes Volumes not attached to an EC2 Instance.
         """
-        ttl_days = int(self.settings.get('ec2_volume_ttl_days', 7))
-        resources = self.client.describe_volumes().get('Volumes')
+
+        ttl_days = int(self.settings.get('resource', {}).get('ec2_volume_ttl_days', 7))
+        try:
+            resources = self.client.describe_volumes().get('Volumes')
+        except:
+            logging.critical(str(sys.exc_info()))
+            return None
         
         for resource in resources:
             try:
@@ -127,18 +132,23 @@ class EC2:
                         logging.debug("EC2 Volume '%s' is attached to an EC2 instance and has not been deleted." % (resource_id))
                 else:
                     logging.debug("EC2 Volume '%s' has been whitelisted and has not been deleted." % (resource_id))
-            except ValueError as e:
-                logging.critical(str(e))
             except:
                 logging.critical(str(sys.exc_info()))
+            
+            return None
     
     
     def snapshots(self):
         """
         Deletes Snapshots not attached to EBS volumes.
         """
-        ttl_days = int(self.settings.get('ec2_snapshot_ttl_days', 7))
-        resources = self.client.describe_snapshots(OwnerIds=[self.account_id])['Snapshots']
+
+        ttl_days = int(self.settings.get('resource', {}).get('ec2_snapshot_ttl_days', 7))
+        try:
+            resources = self.client.describe_snapshots(OwnerIds=[self.account_id])['Snapshots']
+        except:
+            logging.critical(str(sys.exc_info()))
+            return None
         
         for resource in resources:
             try:
@@ -173,18 +183,23 @@ class EC2:
                     else:
                         logging.debug("EC2 Snapshot '%s' is currently used by an AMI and cannot been deleted without deleting the AMI first." % (resource_id))
                 else:
-                    logging.debug("EC2 Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))
-            except ValueError as e:
-                logging.critical(str(e))
+                    logging.debug("EC2 Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))    
             except:
                 logging.critical(str(sys.exc_info()))
+            
+            return None
     
     
     def addresses(self):
         """
         Deletes Addresses not allocated to an EC2 Instance.
         """
-        resources = self.client.describe_addresses().get('Addresses')
+
+        try:
+            resources = self.client.describe_addresses().get('Addresses')
+        except:
+            logging.critical(str(sys.exc_info()))
+            return None
         
         for resource in resources:
             try:
@@ -200,8 +215,8 @@ class EC2:
                         logging.debug("EC2 Address '%s' is associated with an EC2 instance and has not been deleted." % (resource_id))
                 else:
                     logging.debug("EC2 Address '%s' has been whitelisted and has not been deleted." % (resource_id))
-            except ValueError as e:
-                logging.critical(str(e))
             except:
                 logging.critical(str(sys.exc_info()))
+            
+            return None
         
