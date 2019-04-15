@@ -70,22 +70,47 @@ Auto Cleanup uses two Amazon DynamoDB tables `auto-cleanup-settings` and `auto-c
 
 ### Settings
 
-The Settings table contains all key-value pair settings used by Auto Cleanup during runtime. 
+The Settings table contains all key-value pair settings used by Auto Cleanup during runtime.
+
+The **resource** category holds all the time to live settings for each service and resource pair. By default they are all set to 7 days.
+
+The **region** category allows users to turn region scanning on and off to either expand their search or reduce the run-time of Auto Cleanup.
 
 By default, the below settings are automatically inserted the first time Auto Cleanup is run:
 
-| key                           | value |
-| ----------------------------- | ----- |
-| dry_run                       | true  |
-| cloudformation_stack_ttl_days | 7     |
-| dynamodb_table_ttl_days       | 7     |
-| ec2_instance_ttl_days         | 7     |
-| ec2_snapshot_ttl_days         | 7     |
-| ec2_volume_ttl_days           | 7     |
-| lambda_function_ttl_days      | 7     |
-| rds_instance_ttl_days         | 7     |
-| rds_snapshot_ttl_days         | 7     |
-| s3_bucket_ttl_days            | 7     |
+| key                           | category | value |
+| ----------------------------- | -------- | ----- |
+| dry_run                       | general  | true  |
+| cloudformation_stack_ttl_days | resource | 7     |
+| dynamodb_table_ttl_days       | resource | 7     |
+| ec2_instance_ttl_days         | resource | 7     |
+| ec2_snapshot_ttl_days         | resource | 7     |
+| ec2_volume_ttl_days           | resource | 7     |
+| lambda_function_ttl_days      | resource | 7     |
+| rds_instance_ttl_days         | resource | 7     |
+| rds_snapshot_ttl_days         | resource | 7     |
+| s3_bucket_ttl_days            | resource | 7     |
+|us-east-2|region|true|
+|us-east-1|region|true|
+|us-west-1|region|true|
+|us-west-2|region|true|
+|ap-south-1|region|true|
+|ap-northeast-3 *|region|false|
+|ap-northeast-2|region|true|
+|ap-southeast-1|region|true|
+|ap-southeast-2|region|true|
+|ap-northeast-1|region|true|
+|ca-central-1|region|true|
+|eu-central-1|region|true|
+|eu-west-1|region|true|
+|eu-west-2|region|true|
+|eu-west-3|region|true|
+|eu-north-1|region|true|
+|sa-east-1|region|true|
+|us-gov-east-1|region|true|
+|us-gov-west-1|region|true|
+
+\* Osaka Local is only available to select customers
 
 #### Dry Run
 
