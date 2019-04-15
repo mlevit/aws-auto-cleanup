@@ -45,9 +45,7 @@ def handler(event, context):
         
         # build dictionary of settings
         for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
-            setting = record['key']['S']
-            value = record['value']['S']
-            settings[setting] = value
+            settings.setdefault(record['category']['S'], {})[record['key']['S']] = record['value']['S']
         
         helper_class = Helper(settings)
 
@@ -83,34 +81,31 @@ def first_run():
     The first time the function runs it'll insert all the default
     settings and whitelist data into their respective DynamoDB tables.
     """
+
+    client = boto3.client('dynamodb')
     
-    SETTINGSTABLE = boto3.client('dynamodb').describe_table(
-        TableName=os.environ['SETTINGSTABLE'])
+    settings_table_count = len(client.scan(TableName=os.environ['SETTINGSTABLE'])['Items'])
+    whitelist_table_count = len(client.scan(TableName=os.environ['WHITELISTTABLE'])['Items'])
     
-    settings_table_count = SETTINGSTABLE.get('Table').get('ItemCount')
     if settings_table_count == 0:
         try:
             data = open('data/auto-cleanup-settings.json')
-            boto3.client('dynamodb').batch_write_item(
-                RequestItems=json.loads(data.read().replace('SETTINGSTABLE', os.environ['SETTINGSTABLE'])))
-            data.close()
 
+            for setting in json.loads(data.read()):
+                client.put_item(TableName=os.environ['SETTINGSTABLE'], Item=setting)
+            
             logging.info("Settings table is empty and has been populated with default values.")
         except ValueError as e:
             logging.critical(str(e))
         except:
             logging.critical(str(sys.exc_info()))
     
-    WHITELISTTABLE = boto3.client('dynamodb').describe_table(
-        TableName=os.environ['WHITELISTTABLE'])
-    
-    whitelist_table_count = WHITELISTTABLE.get('Table').get('ItemCount')
     if whitelist_table_count == 0:
         try:
             data = open('data/auto-cleanup-whitelist.json')
-            boto3.client('dynamodb').batch_write_item(
-                RequestItems=json.loads(data.read().replace('WHITELISTTABLE', os.environ['WHITELISTTABLE'])))
-            data.close()
+            
+            for whitelist in json.loads(data.read()):
+                client.put_item(TableName=os.environ['WHITELISTTABLE'], Item=whitelist)
 
             logging.info("Whitelist table is empty and has been populated with default values.")
         except ValueError as e:

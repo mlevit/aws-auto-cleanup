@@ -2,7 +2,7 @@ service: auto-cleanup
 provider:
   name: aws
   runtime: python3.7
-  stage: production
+  stage: dev
   region: ap-southeast-2
   profile: saml
   environment:
@@ -73,11 +73,11 @@ functions:
     environment:
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
-      LOGLEVEL: INFO
+      LOGLEVEL: DEBUG
     events:
       - schedule:
           rate: rate(3 days)
-          enabled: true
+          enabled: false
 resources:
   Resources:
     SettingsTable:
@@ -87,9 +87,13 @@ resources:
         AttributeDefinitions:
           - AttributeName: key
             AttributeType: S
+          - AttributeName: category
+            AttributeType: S
         KeySchema:
           - AttributeName: key
             KeyType: HASH
+          - AttributeName: category
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5

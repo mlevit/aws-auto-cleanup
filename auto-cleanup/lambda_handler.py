@@ -23,7 +23,7 @@ class Lambda:
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
         self.client = boto3.client('lambda')
     
@@ -36,7 +36,7 @@ class Lambda:
         """
         Deletes Lambda Functions.
         """
-        ttl_days = int(self.settings.get('lambda_function_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('lambda_function_ttl_days', 7))
         resources = self.client.list_functions().get('Functions')
         
         for resource in resources:

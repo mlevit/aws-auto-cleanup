@@ -24,7 +24,7 @@ class RDS:
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
         self.client = boto3.client('rds')
     
@@ -40,7 +40,7 @@ class RDS:
         protection enabled, the protection will be first disabled 
         and then the Instance will be terminated.
         """
-        ttl_days = int(self.settings.get('rds_instance_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('rds_instance_ttl_days', 7))
         resources = self.client.describe_db_instances().get('DBInstances')
         
         for resource in resources:
@@ -85,7 +85,7 @@ class RDS:
         """
         Deletes RDS Snapshots.
         """
-        ttl_days = int(self.settings.get('rds_snapshots_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('rds_snapshots_ttl_days', 7))
         resources = self.client.describe_db_snapshots().get('DBSnapshots')
         
         for resource in resources:

@@ -24,7 +24,7 @@ class S3:
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
         self.client = boto3.client('s3')
     
@@ -38,7 +38,7 @@ class S3:
         Deletes Buckets. All Bucket Objects, Versions and Deleted Markers
         are first deleted before the Bucket can be deleted.
         """
-        ttl_days = int(self.settings.get('s3_bucket_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('s3_bucket_ttl_days', 7))
         resources = self.client.list_buckets()
         
         for resource in resources.get('Buckets'):

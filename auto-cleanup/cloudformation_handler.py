@@ -24,7 +24,7 @@ class CloudFormation:
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
         self.client = boto3.client('cloudformation')
     
@@ -37,7 +37,7 @@ class CloudFormation:
         """
         Deletes CloudFormation Stacks.
         """
-        ttl_days = int(self.settings.get('cloudformation_stack_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('cloudformation_stack_ttl_days', 7))
         resources = self.client.describe_stacks().get('Stacks')
         
         for resource in resources:

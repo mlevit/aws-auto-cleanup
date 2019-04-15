@@ -24,7 +24,7 @@ class EC2:
         self.whitelist = whitelist
         self.settings = settings
         
-        self.dry_run = settings.get('dry_run', 'true')
+        self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         self.account_id = boto3.client('sts').get_caller_identity().get('Account')
         
         self.client = boto3.client('ec2')
@@ -44,7 +44,7 @@ class EC2:
         If Instance has termination protection enabled, the protection will
         be first disabled and then the Instance will be terminated.
         """
-        ttl_days = int(self.settings.get('ec2_instance_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('ec2_instance_ttl_days', 7))
         reservations = self.client.describe_instances().get('Reservations')
 
         for reservation in reservations:
@@ -104,7 +104,7 @@ class EC2:
         """
         Deletes Volumes not attached to an EC2 Instance.
         """
-        ttl_days = int(self.settings.get('ec2_volume_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('ec2_volume_ttl_days', 7))
         resources = self.client.describe_volumes().get('Volumes')
         
         for resource in resources:
@@ -137,7 +137,7 @@ class EC2:
         """
         Deletes Snapshots not attached to EBS volumes.
         """
-        ttl_days = int(self.settings.get('ec2_snapshot_ttl_days', 7))
+        ttl_days = int(self.settings.get('resource', {}).get('ec2_snapshot_ttl_days', 7))
         resources = self.client.describe_snapshots(OwnerIds=[self.account_id])['Snapshots']
         
         for resource in resources:
