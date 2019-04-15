@@ -76,7 +76,7 @@
     },
     {
       "key": {"S": "ap-northeast-3"},
-      "value": {"S": "true"},
+      "value": {"S": "false"},
       "category": {"S": "region"}
     },
     {
@@ -121,16 +121,6 @@
     },
     {
       "key": {"S": "ca-central-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
-    },
-    {
-      "key": {"S": "cn-north-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
-    },
-    {
-      "key": {"S": "cn-northwest-1"},
       "value": {"S": "true"},
       "category": {"S": "region"}
     },

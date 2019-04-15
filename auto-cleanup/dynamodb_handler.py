@@ -19,14 +19,17 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class DynamoDB:
-    def __init__(self, helper, whitelist, settings):
+    def __init__(self, helper, whitelist, settings, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
-        self.client = boto3.client('dynamodb')
+        try:
+            self.client = boto3.client('dynamodb', region_name=region)
+        except:
+            logging.critical(str(sys.exc_info()))
     
     
     def run(self):
@@ -38,9 +41,14 @@ class DynamoDB:
         Deletes DynamoDB Tables.
         """
         ttl_days = int(self.settings.get('resource', {}).get('dynamodb_table_ttl_days', 7))
-        resources = self.client.list_tables().get('TableNames')
+        try:
+            resources = self.client.list_tables().get('TableNames')
+        except:
+            logging.critical(str(sys.exc_info()))
+            return None
         
         for resource in resources:
+            try:
                 resource_date = self.client.describe_table(TableName=resource).get('Table').get('CreationDateTime')
 
                 if resource not in self.whitelist.get('dynamodb', {}).get('table', []):
@@ -48,15 +56,14 @@ class DynamoDB:
                 
                     if delta.days > ttl_days: 
                         if self.dry_run == 'false':
-                            try:
-                                self.client.delete_table(TableName=resource)
-                            except ValueError as e:
-                                logging.critical(str(e))
-                            except:
-                                logging.critical(str(sys.exc_info()))
+                            self.client.delete_table(TableName=resource)
                         
                         logging.info("DynamoDB Table '%s' was created %d days ago and has been deleted." % (resource, delta.days))
                     else:
                         logging.debug("DynamoDB Table '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource, delta.days))
                 else:
                     logging.debug("DynamoDB Table '%s' has been whitelisted and has not been deleted." % (resource))
+            except:
+                logging.critical(str(sys.exc_info()))
+            
+            return None

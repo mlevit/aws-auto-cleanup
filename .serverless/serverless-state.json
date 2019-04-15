@@ -210,7 +210,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/auto-cleanup/dev/1555304676128-2019-04-15T05:04:36.128Z/auto-cleanup.zip"
+                "S3Key": "serverless/auto-cleanup/dev/1555310902151-2019-04-15T06:48:22.151Z/auto-cleanup.zip"
               },
               "FunctionName": "auto-cleanup-dev",
               "Handler": "auto-cleanup.handler.handler",
@@ -238,14 +238,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "AutoCleanupLambdaVersionxCFEJxdThOsyEcva2jPRhqdVHmmauoVhXc8XaxkwM": {
+          "AutoCleanupLambdaVersionE3iyA0rsXibMkfyU3M4bRnEXKKuslNJdNTnVdpLxo": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AutoCleanupLambdaFunction"
               },
-              "CodeSha256": "WMn0wy0/4Vex6XhPyLqJxYv8vtc+d1e8M5YOFYqI7rE=",
+              "CodeSha256": "GZw0Biyicg+Jbf/rrmBpi9o3mdSQslQ/EB8M391ELDw=",
               "Description": "Auto Cleanup removes unused AWS resources"
             }
           },
@@ -370,7 +370,7 @@
           "AutoCleanupLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AutoCleanupLambdaVersionxCFEJxdThOsyEcva2jPRhqdVHmmauoVhXc8XaxkwM"
+              "Ref": "AutoCleanupLambdaVersionE3iyA0rsXibMkfyU3M4bRnEXKKuslNJdNTnVdpLxo"
             }
           }
         }
@@ -509,7 +509,7 @@
     "artifact": "/Users/maratlevit/Git/ServianPublic/aws-auto-cleanup/.serverless/auto-cleanup.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/auto-cleanup/dev/1555304676128-2019-04-15T05:04:36.128Z",
+    "artifactDirectoryName": "serverless/auto-cleanup/dev/1555310902151-2019-04-15T06:48:22.151Z",
     "artifact": "auto-cleanup.zip"
   }
 }
