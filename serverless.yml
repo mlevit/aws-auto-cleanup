@@ -95,8 +95,8 @@ resources:
           - AttributeName: category
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
     WhitelistTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -115,5 +115,5 @@ resources:
           AttributeName: expire_at
           Enabled: true
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

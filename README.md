@@ -10,7 +10,7 @@ To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
 2. Install AWS CLI `pip3 install awscli --upgrade --user`
 
-3. Clone this repository `git clone` this repo
+3. Clone this repository `git clone https://github.com/servian/aws-auto-cleanup`
 
 4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
 
@@ -24,14 +24,6 @@ To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
 9. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
 
-   ```verilog
-   START RequestId: 97e1ffd7-49c9-422a-bbbd-49ab8b21e819 Version: $LATEST
-   [INFO] Settings table is empty and has been populated with default values. (handler.py, first_run(), line 94)
-   [INFO] Whitelist table is empty and has been populated with default values. (handler.py, first_run(), line 105)
-   END RequestId: 97e1ffd7-49c9-422a-bbbd-49ab8b21e819
-   REPORT RequestId: 97e1ffd7-49c9-422a-bbbd-49ab8b21e819	Duration: 8155.61 ms	Billed Duration: 8200 ms Memory Size: 128 MB	Max Memory Used: 87 MB	
-   ```
-
 ### Removing
 
 Auto Cleanup is deployed using the Serverless Framework which under the hood creates an AWS CloudFormation Stack. This means removal is clean and simple.
@@ -41,9 +33,9 @@ To remove Auto Cleanup from your AWS account, follow the below steps:
 1. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
 2. Remove Auto Cleanup `serverless remove`
 
-### First Run
+### Default Values
 
-The first time Auto Cleanup runs, it will check if either of the Amazon DynamoDB tables `auto-cleanup-settings` or `auto-cleanup-whitelist` are empty. If either of the tables are empty, Auto Cleanup will insert default values into them from `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
+When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
 
 ### Region
 
@@ -101,6 +93,8 @@ By default, the below settings are automatically inserted the first time Auto Cl
 |ap-southeast-2|region|true|
 |ap-northeast-1|region|true|
 |ca-central-1|region|true|
+|cn-north-1 \*|region|false|
+|cn-northwest-1 \*|region|false|
 |eu-central-1|region|true|
 |eu-west-1|region|true|
 |eu-west-2|region|true|
@@ -110,7 +104,7 @@ By default, the below settings are automatically inserted the first time Auto Cl
 |us-gov-east-1|region|true|
 |us-gov-west-1|region|true|
 
-\* Osaka Local is only available to select customers
+\* Regions only available to select customers
 
 #### Dry Run
 
