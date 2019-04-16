@@ -101,6 +101,8 @@ By default, the below settings are automatically inserted the first time Auto Cl
 |ap-southeast-2|region|true|
 |ap-northeast-1|region|true|
 |ca-central-1|region|true|
+|cn-north-1 \*|region|false|
+|cn-northwest-1 \*|region|false|
 |eu-central-1|region|true|
 |eu-west-1|region|true|
 |eu-west-2|region|true|
@@ -110,7 +112,7 @@ By default, the below settings are automatically inserted the first time Auto Cl
 |us-gov-east-1|region|true|
 |us-gov-west-1|region|true|
 
-\* Osaka Local is only available to select customers
+\* Regions only available to select customers
 
 #### Dry Run
 
