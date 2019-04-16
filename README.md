@@ -24,14 +24,6 @@ To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
 9. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
 
-   ```verilog
-   START RequestId: 97e1ffd7-49c9-422a-bbbd-49ab8b21e819 Version: $LATEST
-   [INFO] Settings table is empty and has been populated with default values. (handler.py, first_run(), line 94)
-   [INFO] Whitelist table is empty and has been populated with default values. (handler.py, first_run(), line 105)
-   END RequestId: 97e1ffd7-49c9-422a-bbbd-49ab8b21e819
-   REPORT RequestId: 97e1ffd7-49c9-422a-bbbd-49ab8b21e819	Duration: 8155.61 ms	Billed Duration: 8200 ms Memory Size: 128 MB	Max Memory Used: 87 MB	
-   ```
-
 ### Removing
 
 Auto Cleanup is deployed using the Serverless Framework which under the hood creates an AWS CloudFormation Stack. This means removal is clean and simple.
