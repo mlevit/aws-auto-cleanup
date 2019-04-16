@@ -10,7 +10,7 @@ To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
 2. Install AWS CLI `pip3 install awscli --upgrade --user`
 
-3. Clone this repository `git clone` this repo
+3. Clone this repository `git clone https://github.com/servian/aws-auto-cleanup`
 
 4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
 
