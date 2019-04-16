@@ -125,6 +125,16 @@
       "category": {"S": "region"}
     },
     {
+      "key": {"S": "cn-north-1"},
+      "value": {"S": "false"},
+      "category": {"S": "region"}
+    },
+    {
+      "key": {"S": "cn-northwest-1"},
+      "value": {"S": "false"},
+      "category": {"S": "region"}
+    },
+    {
       "key": {"S": "eu-central-1"},
       "value": {"S": "true"},
       "category": {"S": "region"}

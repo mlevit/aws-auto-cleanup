@@ -210,7 +210,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/auto-cleanup/dev/1555310902151-2019-04-15T06:48:22.151Z/auto-cleanup.zip"
+                "S3Key": "serverless/auto-cleanup/dev/1555374545278-2019-04-16T00:29:05.278Z/auto-cleanup.zip"
               },
               "FunctionName": "auto-cleanup-dev",
               "Handler": "auto-cleanup.handler.handler",
@@ -229,7 +229,7 @@
                   "PYTHONPATH": "/var/task/auto-cleanup:/var/runtime",
                   "SETTINGSTABLE": "auto-cleanup-settings-dev",
                   "WHITELISTTABLE": "auto-cleanup-whitelist-dev",
-                  "LOGLEVEL": "DEBUG"
+                  "LOGLEVEL": "INFO"
                 }
               }
             },
@@ -238,14 +238,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "AutoCleanupLambdaVersionE3iyA0rsXibMkfyU3M4bRnEXKKuslNJdNTnVdpLxo": {
+          "AutoCleanupLambdaVersionWMo7hSvr5bInnxZjdcU2Qx0rpwmVC9SQowV1ErewSnc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AutoCleanupLambdaFunction"
               },
-              "CodeSha256": "GZw0Biyicg+Jbf/rrmBpi9o3mdSQslQ/EB8M391ELDw=",
+              "CodeSha256": "0Orgln5QP5BYZIqySiP1ibdjMBJ2K2q93eguSfjaPt4=",
               "Description": "Auto Cleanup removes unused AWS resources"
             }
           },
@@ -253,7 +253,7 @@
             "Type": "AWS::Events::Rule",
             "Properties": {
               "ScheduleExpression": "rate(3 days)",
-              "State": "DISABLED",
+              "State": "ENABLED",
               "Targets": [
                 {
                   "Arn": {
@@ -321,8 +321,8 @@
                 }
               ],
               "ProvisionedThroughput": {
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
               }
             }
           },
@@ -355,8 +355,8 @@
                 "Enabled": true
               },
               "ProvisionedThroughput": {
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
               }
             }
           }
@@ -370,7 +370,7 @@
           "AutoCleanupLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AutoCleanupLambdaVersionE3iyA0rsXibMkfyU3M4bRnEXKKuslNJdNTnVdpLxo"
+              "Ref": "AutoCleanupLambdaVersionWMo7hSvr5bInnxZjdcU2Qx0rpwmVC9SQowV1ErewSnc"
             }
           }
         }
@@ -421,13 +421,13 @@
         "environment": {
           "SETTINGSTABLE": "auto-cleanup-settings-dev",
           "WHITELISTTABLE": "auto-cleanup-whitelist-dev",
-          "LOGLEVEL": "DEBUG"
+          "LOGLEVEL": "INFO"
         },
         "events": [
           {
             "schedule": {
               "rate": "rate(3 days)",
-              "enabled": false
+              "enabled": true
             }
           }
         ],
@@ -463,8 +463,8 @@
               }
             ],
             "ProvisionedThroughput": {
-              "ReadCapacityUnits": 5,
-              "WriteCapacityUnits": 5
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
             }
           }
         },
@@ -497,8 +497,8 @@
               "Enabled": true
             },
             "ProvisionedThroughput": {
-              "ReadCapacityUnits": 5,
-              "WriteCapacityUnits": 5
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
             }
           }
         }
@@ -509,7 +509,7 @@
     "artifact": "/Users/maratlevit/Git/ServianPublic/aws-auto-cleanup/.serverless/auto-cleanup.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/auto-cleanup/dev/1555310902151-2019-04-15T06:48:22.151Z",
+    "artifactDirectoryName": "serverless/auto-cleanup/dev/1555374545278-2019-04-16T00:29:05.278Z",
     "artifact": "auto-cleanup.zip"
   }
 }

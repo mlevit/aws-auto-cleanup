@@ -1,19 +1,19 @@
-# Logs
+# logs
 logs
 *.log
 
-# Runtime data
+# runtime data
 pids
 *.pid
 *.seed
 dist
 
-# OS STUFF
+# OS stuff
 .DS_Store
 .tmp
 
-# SERVERLESS STUFF
+# serverless stuff
 admin.env
 .env
 _meta
-.serverless
+.serverless/
