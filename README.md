@@ -41,9 +41,9 @@ To remove Auto Cleanup from your AWS account, follow the below steps:
 1. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
 2. Remove Auto Cleanup `serverless remove`
 
-### First Run
+### Default Values
 
-The first time Auto Cleanup runs, it will check if either of the Amazon DynamoDB tables `auto-cleanup-settings` or `auto-cleanup-whitelist` are empty. If either of the tables are empty, Auto Cleanup will insert default values into them from `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
+When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
 
 ### Region
 
