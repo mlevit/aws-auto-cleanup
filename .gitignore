@@ -8,11 +8,11 @@ pids
 *.seed
 dist
 
-# OS stuff
+# OS
 .DS_Store
 .tmp
 
-# serverless stuff
+# serverless
 admin.env
 .env
 _meta
