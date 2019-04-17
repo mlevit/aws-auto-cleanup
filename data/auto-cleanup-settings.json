@@ -40,6 +40,16 @@
       "category": {"S": "resource"}
     },
     {
+      "key": {"S": "redshift_clusters_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
+      "key": {"S": "redshift_snapshots_ttl_days"},
+      "value": {"S": "7"},
+      "category": {"S": "resource"}
+    },
+    {
       "key": {"S": "rds_snapshot_ttl_days"},
       "value": {"S": "7"},
       "category": {"S": "resource"}

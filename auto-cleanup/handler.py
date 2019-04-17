@@ -12,6 +12,7 @@ from dynamodb_handler import *
 from ec2_handler import *
 from lambda_handler import *
 from rds_handler import *
+from redshift_handler import *
 from s3_handler import *
 
 # enable logging
@@ -76,18 +77,20 @@ def handler(event, context):
             # RDS
             rds_class = RDS(helper_class, whitelist, settings, region)
             rds_class.run()
+
+            # Redshift
+            redshift_class = Redshift(helper_class, whitelist, settings, region)
+            redshift_class.run()
         else:
             logging.debug("Skipping region '%s'." % region)
         
-    logging.info("Switching region to 'GLOBAL'.")
+    logging.info("Switching region to 'global'.")
 
     # S3
     s3_class = S3(helper_class, whitelist, settings)
     s3_class.run()
 
     logging.info("Auto Cleanup completed.")
-    
-    # return None
 
 
 def setup():
@@ -96,20 +99,30 @@ def setup():
     into their respective DynamoDB tables.
     """
 
-    client = boto3.client('dynamodb')
-    
     try:
+        client = boto3.client('dynamodb')
+
         data = open('data/auto-cleanup-settings.json')
 
         for setting in json.loads(data.read()):
-            client.put_item(TableName=os.environ['SETTINGSTABLE'], Item=setting)
-    except:
-        logging.critical(str(sys.exc_info()))
+            try:
+                client.put_item(
+                    TableName=os.environ['SETTINGSTABLE'], 
+                    Item=setting,
+                    ConditionExpression='attribute_not_exists(#k) AND attribute_not_exists(category)',
+                    ExpressionAttributeNames={'#k': 'key'})
+            except:
+                continue
     
-    try:
         data = open('data/auto-cleanup-whitelist.json')
         
         for whitelist in json.loads(data.read()):
-            client.put_item(TableName=os.environ['WHITELISTTABLE'], Item=whitelist)
+            try:
+                client.put_item(
+                    TableName=os.environ['WHITELISTTABLE'], 
+                    Item=whitelist,
+                    ConditionExpression='attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)')
+            except:
+                continue
     except:
         logging.critical(str(sys.exc_info()))

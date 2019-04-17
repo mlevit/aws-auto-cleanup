@@ -18,9 +18,12 @@ class Helper:
     
     @staticmethod
     def get_day_delta(resource_date):
-        from_datetime = Helper.convert_to_datetime(str(datetime.datetime.now().isoformat()))
-        to_datetime = Helper.convert_to_datetime(str(resource_date))
-        return from_datetime - to_datetime
+        if resource_date is not None:
+            from_datetime = Helper.convert_to_datetime(str(datetime.datetime.now().isoformat()))
+            to_datetime = Helper.convert_to_datetime(str(resource_date))
+            return from_datetime - to_datetime
+        else:
+            return 0
     
     
     @staticmethod

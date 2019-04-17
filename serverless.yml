@@ -1,4 +1,5 @@
 service: auto-cleanup
+
 provider:
   name: aws
   runtime: python3.7
@@ -54,11 +55,19 @@ provider:
       Resource: "*"
     - Effect: "Allow"
       Action:
+        - "redshift:DeleteCluster"
+        - "redshift:DeleteClusterSnapshot"
+        - "redshift:DescribeClusterSnapshots"
+        - "redshift:DescribeClusters"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
         - "s3:DeleteBucket"
         - "s3:DeleteObject"
         - "s3:DeleteObjectVersion"
         - "s3:List*"
       Resource: "*"
+
 functions:
   AutoCleanup:
     handler: auto-cleanup.handler.handler
@@ -78,6 +87,7 @@ functions:
       - schedule:
           rate: rate(3 days)
           enabled: true
+
 resources:
   Resources:
     SettingsTable:

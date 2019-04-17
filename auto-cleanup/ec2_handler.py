@@ -145,7 +145,7 @@ class EC2:
 
         ttl_days = int(self.settings.get('resource', {}).get('ec2_snapshot_ttl_days', 7))
         try:
-            resources = self.client.describe_snapshots(OwnerIds=[self.account_id])['Snapshots']
+            resources = self.client.describe_snapshots(OwnerIds=[self.account_id]).get('Snapshots')
         except:
             logging.critical(str(sys.exc_info()))
             return None
