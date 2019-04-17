@@ -18,10 +18,12 @@ logging.getLogger('urllib3').setLevel(logging.ERROR)
 logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
 class Lambda:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, resource_map, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.resource_map = resource_map
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         

@@ -30,7 +30,8 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 def handler(event, context):
     setup()
-
+    
+    resource_map = {'AWS': {}}
     whitelist = {}
     settings = {}
     
@@ -59,27 +60,27 @@ def handler(event, context):
             logging.info("Switching region to '%s'." % region)
 
             # CloudFormation
-            cloudformation_class = CloudFormation(helper_class, whitelist, settings, region)
+            cloudformation_class = CloudFormation(helper_class, whitelist, settings, resource_map, region)
             cloudformation_class.run()
 
             # DynamoDB
-            dynamodb_class = DynamoDB(helper_class, whitelist, settings, region)
+            dynamodb_class = DynamoDB(helper_class, whitelist, settings, resource_map, region)
             dynamodb_class.run()
             
             # EC2
-            ec2_class = EC2(helper_class, whitelist, settings, region)
+            ec2_class = EC2(helper_class, whitelist, settings, resource_map, region)
             ec2_class.run()
             
             # Lambda
-            lambda_class = Lambda(helper_class, whitelist, settings, region)
+            lambda_class = Lambda(helper_class, whitelist, settings, resource_map, region)
             lambda_class.run()
             
             # RDS
-            rds_class = RDS(helper_class, whitelist, settings, region)
+            rds_class = RDS(helper_class, whitelist, settings, resource_map, region)
             rds_class.run()
 
             # Redshift
-            redshift_class = Redshift(helper_class, whitelist, settings, region)
+            redshift_class = Redshift(helper_class, whitelist, settings, resource_map, region)
             redshift_class.run()
         else:
             logging.debug("Skipping region '%s'." % region)
@@ -87,10 +88,36 @@ def handler(event, context):
     logging.info("Switching region to 'global'.")
 
     # S3
-    s3_class = S3(helper_class, whitelist, settings)
+    s3_class = S3(helper_class, whitelist, settings, resource_map)
     s3_class.run()
 
     logging.info("Auto Cleanup completed.")
+
+    gen_map(resource_map)
+
+
+def gen_map(resource_map):
+    os.chdir('/tmp')
+    
+    f = open('/tmp/map.csv', 'w')
+    f.write('id,value\n')
+    
+    for aws in resource_map:
+        f.write('%s,\n' % (aws))
+        for region in resource_map.get(aws):
+            f.write('%s.%s,\n' % (aws, region))
+            for service in resource_map.get(aws).get(region):
+                f.write('%s.%s.%s,\n' % (aws, region, service))
+                for resource_type in resource_map.get(aws).get(region).get(service):
+                    f.write('%s.%s.%s.%s,\n' % (aws, region, service, resource_type))
+                    for resource in resource_map.get(aws).get(region).get(service).get(resource_type):
+                        f.write('%s.%s.%s.%s.%s,\n' % (aws, region, service, resource_type, resource))
+
+    f.close()
+
+    client = boto3.client('s3')
+    client.upload_file('/tmp/map.csv', 'auto-cleanup-marat', 'resource_map_%s.csv' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+
 
 
 def setup():

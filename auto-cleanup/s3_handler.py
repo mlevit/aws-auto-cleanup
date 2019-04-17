@@ -19,10 +19,12 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class S3:
-    def __init__(self, helper, whitelist, settings):
+    def __init__(self, helper, whitelist, settings, resource_map):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.resource_map = resource_map
+        self.region = 'global'
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -53,6 +55,11 @@ class S3:
             try:
                 resource_id = resource.get('Name')
                 resource_date = resource.get('CreationDate')
+
+                self.resource_map.get('AWS').setdefault(
+                    self.region, {}).setdefault(
+                        'S3', {}).setdefault(
+                            'Buckets', []).append(resource_id)
 
                 if resource_id not in self.whitelist.get('s3', {}).get('bucket', []):
                     delta = self.helper.get_day_delta(resource_date)

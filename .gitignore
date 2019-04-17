@@ -1,16 +1,25 @@
 # logs
 logs
 *.log
+npm-debug.log
+
+# os
+.DS_Store
+.tmp
+
+# node
+node_modules
+package-lock.json
+
+# python
+*.py[co]
+__pycache__
 
 # runtime data
 pids
 *.pid
 *.seed
 dist
-
-# OS
-.DS_Store
-.tmp
 
 # serverless
 admin.env

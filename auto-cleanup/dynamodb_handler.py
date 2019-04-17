@@ -19,10 +19,12 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class DynamoDB:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, resource_map, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.resource_map = resource_map
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -50,6 +52,11 @@ class DynamoDB:
         for resource in resources:
             try:
                 resource_date = self.client.describe_table(TableName=resource).get('Table').get('CreationDateTime')
+
+                self.resource_map.get('AWS').setdefault(
+                    self.region, {}).setdefault(
+                        'DynamoDB', {}).setdefault(
+                            'Tables', []).append(resource)
 
                 if resource not in self.whitelist.get('dynamodb', {}).get('table', []):
                     delta = self.helper.get_day_delta(resource_date)
