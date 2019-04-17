@@ -105,7 +105,14 @@ def setup():
         data = open('data/auto-cleanup-settings.json')
 
         for setting in json.loads(data.read()):
-            client.put_item(TableName=os.environ['SETTINGSTABLE'], Item=setting)
+            try:
+                client.put_item(
+                    TableName=os.environ['SETTINGSTABLE'], 
+                    Item=setting,
+                    ConditionExpression='attribute_not_exists(#k) AND attribute_not_exists(category)',
+                    ExpressionAttributeNames={'#k': 'key'})
+            except:
+                continue
     
         data = open('data/auto-cleanup-whitelist.json')
         
