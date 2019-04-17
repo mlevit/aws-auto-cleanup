@@ -117,6 +117,12 @@ def setup():
         data = open('data/auto-cleanup-whitelist.json')
         
         for whitelist in json.loads(data.read()):
-            client.put_item(TableName=os.environ['WHITELISTTABLE'], Item=whitelist)
+            try:
+                client.put_item(
+                    TableName=os.environ['WHITELISTTABLE'], 
+                    Item=whitelist,
+                    ConditionExpression='attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)')
+            except:
+                continue
     except:
         logging.critical(str(sys.exc_info()))
