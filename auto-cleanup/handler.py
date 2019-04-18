@@ -5,8 +5,10 @@ import json
 import logging
 import os
 import sys
+import threading
 import uuid
 
+from multiprocessing import Process, Pipe
 from treelib import Node, Tree
 
 from helper import *
@@ -62,29 +64,47 @@ def handler(event, context):
         if settings.get('region').get(region) == 'true':
             logging.info("Switching region to '%s'." % region)
 
+            # create a list to keep all processes
+            processes = []
+
             # CloudFormation
             cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
-            cloudformation_class.run()
+            process = Process(target=cloudformation_class.run, args=())
+            processes.append(process)
 
             # DynamoDB
             dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
-            dynamodb_class.run()
+            process = Process(target=dynamodb_class.run, args=())
+            processes.append(process)
             
             # EC2
             ec2_class = EC2(helper_class, whitelist, settings, tree, region)
-            ec2_class.run()
+            process = Process(target=ec2_class.run, args=())
+            processes.append(process)
             
             # Lambda
             lambda_class = Lambda(helper_class, whitelist, settings, tree, region)
-            lambda_class.run()
+            process = Process(target=lambda_class.run, args=())
+            processes.append(process)
             
             # RDS
             rds_class = RDS(helper_class, whitelist, settings, tree, region)
-            rds_class.run()
+            process = Process(target=rds_class.run, args=())
+            processes.append(process)
 
             # Redshift
             redshift_class = Redshift(helper_class, whitelist, settings, tree, region)
-            redshift_class.run()
+            process = Process(target=redshift_class.run, args=())
+            processes.append(process)
+
+            # start all processes
+            for process in processes:
+                process.start()
+
+            # make sure that all processes have finished
+            for process in processes:
+                process.join()
+
         else:
             logging.debug("Skipping region '%s'." % region)
         
