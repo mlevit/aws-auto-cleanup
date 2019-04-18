@@ -34,7 +34,7 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 def handler(event, context):
     setup()
     
-    resource_map = {'AWS': {}}
+    tree = {'AWS': {}}
     whitelist = {}
     settings = {}
     
@@ -63,27 +63,27 @@ def handler(event, context):
             logging.info("Switching region to '%s'." % region)
 
             # CloudFormation
-            cloudformation_class = CloudFormation(helper_class, whitelist, settings, resource_map, region)
+            cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
             cloudformation_class.run()
 
             # DynamoDB
-            dynamodb_class = DynamoDB(helper_class, whitelist, settings, resource_map, region)
+            dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
             dynamodb_class.run()
             
             # EC2
-            ec2_class = EC2(helper_class, whitelist, settings, resource_map, region)
+            ec2_class = EC2(helper_class, whitelist, settings, tree, region)
             ec2_class.run()
             
             # Lambda
-            lambda_class = Lambda(helper_class, whitelist, settings, resource_map, region)
+            lambda_class = Lambda(helper_class, whitelist, settings, tree, region)
             lambda_class.run()
             
             # RDS
-            rds_class = RDS(helper_class, whitelist, settings, resource_map, region)
+            rds_class = RDS(helper_class, whitelist, settings, tree, region)
             rds_class.run()
 
             # Redshift
-            redshift_class = Redshift(helper_class, whitelist, settings, resource_map, region)
+            redshift_class = Redshift(helper_class, whitelist, settings, tree, region)
             redshift_class.run()
         else:
             logging.debug("Skipping region '%s'." % region)
@@ -91,36 +91,36 @@ def handler(event, context):
     logging.info("Switching region to 'global'.")
 
     # S3
-    s3_class = S3(helper_class, whitelist, settings, resource_map)
+    s3_class = S3(helper_class, whitelist, settings, tree)
     s3_class.run()
 
     
-    gen_map(resource_map)
+    gen_tree(tree)
     
     logging.info("Auto Cleanup completed.")
 
 
-def gen_map(resource_map):
+def gen_tree(tree_dict):
     os.chdir('/tmp')
     tree = Tree()
     
-    for aws in resource_map:
+    for aws in tree_dict:
         aws_key = aws
         tree.create_node(aws, aws_key)
 
-        for region in resource_map.get(aws):
+        for region in tree_dict.get(aws):
             region_key = aws_key + region
             tree.create_node(region, region_key, parent=aws_key)
 
-            for service in resource_map.get(aws).get(region):
+            for service in tree_dict.get(aws).get(region):
                 service_key = region_key + service
                 tree.create_node(service, service_key, parent=region_key)
 
-                for resource_type in resource_map.get(aws).get(region).get(service):
+                for resource_type in tree_dict.get(aws).get(region).get(service):
                     resource_type_key = service_key + resource_type
                     tree.create_node(resource_type, resource_type_key, parent=service_key)
 
-                    for resource in resource_map.get(aws).get(region).get(service).get(resource_type):
+                    for resource in tree_dict.get(aws).get(region).get(service).get(resource_type):
                         resource_key = resource_type_key + resource
                         tree.create_node(resource, resource_key, parent=resource_type_key)
     

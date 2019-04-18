@@ -19,11 +19,11 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class CloudFormation:
-    def __init__(self, helper, whitelist, settings, resource_map, region):
+    def __init__(self, helper, whitelist, settings, tree, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
-        self.resource_map = resource_map
+        self.tree = tree
         self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
@@ -69,7 +69,7 @@ class CloudFormation:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            self.resource_map.get('AWS').setdefault(
+            self.tree.get('AWS').setdefault(
                 self.region, {}).setdefault(
                     'CloudFormation', {}).setdefault(
                         'Stacks', []).append(resource_id)
