@@ -8,7 +8,6 @@ import sys
 import threading
 import uuid
 
-from multiprocessing import Process, Pipe
 from treelib import Node, Tree
 
 from helper import *
@@ -64,47 +63,46 @@ def handler(event, context):
         if settings.get('region').get(region) == 'true':
             logging.info("Switching region to '%s'." % region)
 
-            # create a list to keep all processes
-            processes = []
+            # create a list to keep all threads
+            threads = []
 
             # CloudFormation
             cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
-            process = Process(target=cloudformation_class.run, args=())
-            processes.append(process)
+            thread = threading.Thread(target=cloudformation_class.run, args=())
+            threads.append(thread)
 
             # DynamoDB
             dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
-            process = Process(target=dynamodb_class.run, args=())
-            processes.append(process)
+            thread = threading.Thread(target=dynamodb_class.run, args=())
+            threads.append(thread)
             
             # EC2
             ec2_class = EC2(helper_class, whitelist, settings, tree, region)
-            process = Process(target=ec2_class.run, args=())
-            processes.append(process)
+            thread = threading.Thread(target=ec2_class.run, args=())
+            threads.append(thread)
             
             # Lambda
             lambda_class = Lambda(helper_class, whitelist, settings, tree, region)
-            process = Process(target=lambda_class.run, args=())
-            processes.append(process)
+            thread = threading.Thread(target=lambda_class.run, args=())
+            threads.append(thread)
             
             # RDS
             rds_class = RDS(helper_class, whitelist, settings, tree, region)
-            process = Process(target=rds_class.run, args=())
-            processes.append(process)
+            thread = threading.Thread(target=rds_class.run, args=())
+            threads.append(thread)
 
             # Redshift
             redshift_class = Redshift(helper_class, whitelist, settings, tree, region)
-            process = Process(target=redshift_class.run, args=())
-            processes.append(process)
+            thread = threading.Thread(target=redshift_class.run, args=())
+            threads.append(thread)
 
-            # start all processes
-            for process in processes:
-                process.start()
+            # start all threads
+            for thread in threads:
+                thread.start()
 
-            # make sure that all processes have finished
-            for process in processes:
-                process.join()
-
+            # make sure that all threads have finished
+            for thread in threads:
+                thread.join()
         else:
             logging.debug("Skipping region '%s'." % region)
         
