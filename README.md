@@ -63,41 +63,41 @@ The **region** category allows users to turn region scanning on and off to eithe
 
 By default, the below settings are automatically inserted the first time Auto Cleanup is run:
 
-| key                           | category | value |
-| ----------------------------- | -------- | ----- |
-| dry_run                       | general  | true  |
-| cloudformation_stack_ttl_days | resource | 7     |
-| dynamodb_table_ttl_days       | resource | 7     |
-| ec2_instance_ttl_days         | resource | 7     |
-| ec2_snapshot_ttl_days         | resource | 7     |
-| ec2_volume_ttl_days           | resource | 7     |
-| lambda_function_ttl_days      | resource | 7     |
-| rds_instance_ttl_days         | resource | 7     |
-| rds_snapshot_ttl_days         | resource | 7     |
-| redshift_cluster_ttl_days | resource | 7 |
-| redshift_snapshot_ttl_days | resource | 7 |
-| s3_bucket_ttl_days            | resource | 7     |
-|us-east-2|region|true|
-|us-east-1|region|true|
-|us-west-1|region|true|
-|us-west-2|region|true|
-|ap-south-1|region|true|
-|ap-northeast-3 *|region|false|
-|ap-northeast-2|region|true|
-|ap-southeast-1|region|true|
-|ap-southeast-2|region|true|
-|ap-northeast-1|region|true|
-|ca-central-1|region|true|
-|cn-north-1 \*|region|false|
-|cn-northwest-1 \*|region|false|
-|eu-central-1|region|true|
-|eu-west-1|region|true|
-|eu-west-2|region|true|
-|eu-west-3|region|true|
-|eu-north-1|region|true|
-|sa-east-1|region|true|
-|us-gov-east-1|region|true|
-|us-gov-west-1|region|true|
+| key                  | category | value |
+| -------------------- | -------- | ----- |
+| dry_run              | general  | true  |
+| cloudformation_stack | ttl      | 7     |
+| dynamodb_table       | ttl      | 7     |
+| ec2_instance         | ttl      | 7     |
+| ec2_snapshot         | ttl      | 7     |
+| ec2_volume           | ttl      | 7     |
+| lambda_function      | ttl      | 7     |
+| rds_instance         | ttl      | 7     |
+| rds_snapshot         | ttl      | 7     |
+| redshift_cluster     | ttl      | 7     |
+| redshift_snapshot    | ttl      | 7     |
+| s3_bucket            | ttl      | 7     |
+| us-east-2            | region   | true  |
+| us-east-1            | region   | true  |
+| us-west-1            | region   | true  |
+| us-west-2            | region   | true  |
+| ap-south-1           | region   | true  |
+| ap-northeast-3 *     | region   | false |
+| ap-northeast-2       | region   | true  |
+| ap-southeast-1       | region   | true  |
+| ap-southeast-2       | region   | true  |
+| ap-northeast-1       | region   | true  |
+| ca-central-1         | region   | true  |
+| cn-north-1 \*        | region   | false |
+| cn-northwest-1 \*    | region   | false |
+| eu-central-1         | region   | true  |
+| eu-west-1            | region   | true  |
+| eu-west-2            | region   | true  |
+| eu-west-3            | region   | true  |
+| eu-north-1           | region   | true  |
+| sa-east-1            | region   | true  |
+| us-gov-east-1        | region   | true  |
+| us-gov-west-1        | region   | true  |
 
 \* Regions only available to select customers
 

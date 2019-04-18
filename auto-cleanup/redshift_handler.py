@@ -43,7 +43,7 @@ class Redshift:
         Deletes Redshift Clusters.
         """
 
-        ttl_days = int(self.settings.get('resource', {}).get('redshift_clusters_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('redshift_clusters', 7))
         try:
             resources = self.client.describe_clusters().get('Clusters')
         except:
@@ -84,10 +84,10 @@ class Redshift:
     
     def snapshots(self):
         """
-        Deletes Snapshots.
+        Deletes Redshift Snapshots.
         """
 
-        ttl_days = int(self.settings.get('resource', {}).get('redshift_snapshots_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('redshift_snapshots', 7))
         try:
             resources = self.client.describe_cluster_snapshots().get('Snapshots')
         except:

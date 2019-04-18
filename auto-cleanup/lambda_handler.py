@@ -41,7 +41,8 @@ class Lambda:
         """
         Deletes Lambda Functions.
         """
-        ttl_days = int(self.settings.get('resource', {}).get('lambda_function_ttl_days', 7))
+        
+        ttl_days = int(self.settings.get('ttl', {}).get('lambda_function', 7))
         try:
             resources = self.client.list_functions().get('Functions')
         except:
