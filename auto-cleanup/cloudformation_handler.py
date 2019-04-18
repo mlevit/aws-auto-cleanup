@@ -42,7 +42,8 @@ class CloudFormation:
         """
         Deletes CloudFormation Stacks.
         """
-        ttl_days = int(self.settings.get('resource', {}).get('cloudformation_stack_ttl_days', 7))
+        
+        ttl_days = int(self.settings.get('ttl', {}).get('cloudformation_stack', 7))
         try:
             resources = self.client.describe_stacks().get('Stacks')
         except:

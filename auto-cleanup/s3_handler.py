@@ -44,7 +44,7 @@ class S3:
         are first deleted before the Bucket can be deleted.
         """
 
-        ttl_days = int(self.settings.get('resource', {}).get('s3_bucket_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('s3_bucket', 7))
         try:
             resources = self.client.list_buckets()
         except:

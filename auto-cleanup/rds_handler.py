@@ -46,7 +46,7 @@ class RDS:
         and then the Instance will be terminated.
         """
         
-        ttl_days = int(self.settings.get('resource', {}).get('rds_instance_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('rds_instance', 7))
         try:
             resources = self.client.describe_db_instances().get('DBInstances')
         except:
@@ -92,7 +92,8 @@ class RDS:
         """
         Deletes RDS Snapshots.
         """
-        ttl_days = int(self.settings.get('resource', {}).get('rds_snapshots_ttl_days', 7))
+        
+        ttl_days = int(self.settings.get('ttl', {}).get('rds_snapshots', 7))
         try:
             resources = self.client.describe_db_snapshots().get('DBSnapshots')
         except:

@@ -2,7 +2,17 @@
 
 Open source application to programatically clean your AWS resources based on a whitelist and time to live (TTL) settings.
 
-## Deployment
+## Table of Contents
+
+- [Setup](#setup)
+  - [Deployment](#deployment)
+  - [Removal](#removal)
+  - [Configuration](#configuration)
+- [Tables](#tables)
+- [Resource Tree](#resource-tree)
+
+## Setup
+### Deployment
 
 To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
@@ -17,7 +27,7 @@ To deploy this Auto Cleanup to your AWS account, follow the below steps:
 9. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
 10. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
 
-### Removing
+### Removal
 
 Auto Cleanup is deployed using the Serverless Framework which under the hood creates an AWS CloudFormation Stack. This means removal is clean and simple.
 
@@ -26,22 +36,24 @@ To remove Auto Cleanup from your AWS account, follow the below steps:
 1. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
 2. Remove Auto Cleanup `serverless remove`
 
-### Default Values
+### Configuration
+
+#### Default Values
 
 When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
 
-### Region
+#### Region
 
 Within the `serverless.yml` file, under `provider` there is a `region` attribute. Set this attribute to your desired region.
 
 
-### Logging
+#### Logging
 
 Within the `serverless.yml` file, under `functions > AutoCleanup > environment` there is a `LOGLEVEL` attribute. By default, the log level is set to `INFO`. This can be changed to `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `CRITICAL` based on your logging requirements.
 
 Auto Cleanup will output all resource remove logs at the `INFO` level and logs of why resources were **not** removed at the `DEBUG` level.
 
-### Scheduling
+#### Scheduling
 
 Within the `serverless.yml` file, under `functions > AutoCleanup > events > schedule` there is a `RATE`  and `enabled` attributes.
 
@@ -61,43 +73,56 @@ The **resource** category holds all the time to live settings for each service a
 
 The **region** category allows users to turn region scanning on and off to either expand their search or reduce the run-time of Auto Cleanup.
 
-By default, the below settings are automatically inserted the first time Auto Cleanup is run:
+By default, the below settings are automatically inserted when Auto Cleanup is run.
 
-| key                           | category | value |
-| ----------------------------- | -------- | ----- |
-| dry_run                       | general  | true  |
-| cloudformation_stack_ttl_days | resource | 7     |
-| dynamodb_table_ttl_days       | resource | 7     |
-| ec2_instance_ttl_days         | resource | 7     |
-| ec2_snapshot_ttl_days         | resource | 7     |
-| ec2_volume_ttl_days           | resource | 7     |
-| lambda_function_ttl_days      | resource | 7     |
-| rds_instance_ttl_days         | resource | 7     |
-| rds_snapshot_ttl_days         | resource | 7     |
-| redshift_cluster_ttl_days | resource | 7 |
-| redshift_snapshot_ttl_days | resource | 7 |
-| s3_bucket_ttl_days            | resource | 7     |
-|us-east-2|region|true|
-|us-east-1|region|true|
-|us-west-1|region|true|
-|us-west-2|region|true|
-|ap-south-1|region|true|
-|ap-northeast-3 *|region|false|
-|ap-northeast-2|region|true|
-|ap-southeast-1|region|true|
-|ap-southeast-2|region|true|
-|ap-northeast-1|region|true|
-|ca-central-1|region|true|
-|cn-north-1 \*|region|false|
-|cn-northwest-1 \*|region|false|
-|eu-central-1|region|true|
-|eu-west-1|region|true|
-|eu-west-2|region|true|
-|eu-west-3|region|true|
-|eu-north-1|region|true|
-|sa-east-1|region|true|
-|us-gov-east-1|region|true|
-|us-gov-west-1|region|true|
+#### General
+
+| key     | value |
+| ------- | ----- |
+| dry_run | true  |
+
+#### Time to Live (TTL)
+
+| key                  | value |
+| -------------------- | ----- |
+| cloudformation_stack | 7     |
+| dynamodb_table       | 7     |
+| ec2_instance         | 7     |
+| ec2_snapshot         | 7     |
+| ec2_volume           | 7     |
+| ec2_address          | 7     |
+| lambda_function      | 7     |
+| rds_instance         | 7     |
+| rds_snapshot         | 7     |
+| redshift_cluster     | 7     |
+| redshift_snapshot    | 7     |
+| s3_bucket            | 7     |
+
+#### Region
+
+| key               | value |
+| ----------------- | ----- |
+| us-east-2         | true  |
+| us-east-1         | true  |
+| us-west-1         | true  |
+| us-west-2         | true  |
+| ap-south-1        | true  |
+| ap-northeast-3 *  | false |
+| ap-northeast-2    | true  |
+| ap-southeast-1    | true  |
+| ap-southeast-2    | true  |
+| ap-northeast-1    | true  |
+| ca-central-1      | true  |
+| cn-north-1 \*     | false |
+| cn-northwest-1 \* | false |
+| eu-central-1      | true  |
+| eu-west-1         | true  |
+| eu-west-2         | true  |
+| eu-west-3         | true  |
+| eu-north-1        | true  |
+| sa-east-1         | true  |
+| us-gov-east-1     | true  |
+| us-gov-west-1     | true  |
 
 \* Regions only available to select customers
 
@@ -105,7 +130,7 @@ By default, the below settings are automatically inserted the first time Auto Cl
 
 The `dry_run` setting is used to inform Auto Cleanup if it should be removing resources it finds to have overstayed their welcome. By default, `dry_run` is set to `true`. This means that no resource removal will occur, however Auto Cleanup will output relevant logs as if it had removed resources. This allows you inspect the resources Auto Cleanup will be removing as well as giving you ample opportunity to add those that shouldn't be removed to the Whitelist table.
 
-#### Time to Live
+#### Time to Live (TTL)
 
 In order to understand which resources have overstayed their welcome, Auto Cleanup will look at the resources created date time or last modified date time (which ever exists) and compare that to the time to live setting for that particular service resource type. If the resources was created or last modified longer than the number of days for that resources time to live setting, it will be removed.
 
@@ -128,17 +153,19 @@ Adding resources to the Whitelist table will ensure those resources are not remo
 
 The below table lists the resource attribute that should be used for unique identification of resources for whitelisting.
 
-| Resource              | ID Attribute     | Example Value                                 |
-| --------------------- | ---------------- | --------------------------------------------- |
-| CloudFormation Stacks | Stack Name       | `cloudformation:stack:auto-cleanup-dev`       |
-| DynamoDB Tables       | Table Name       | `dynamodb:table:auto-cleanup-logs-dev`        |
-| EC2 Instances         | Instance ID      | `ec2:instance:i-0326701a029dbf9d0`            |
-| EC2 Volumes           | Volume ID        | `ec2:volume:vol-0e1a431b9503a43aa`            |
-| EC2 Snapshots         | Snapshot ID      | `ec2:snapshot:snap-00c8c90db9fdceb3c`         |
-| EC2 Elastic IPs       | Allocation ID    | `ec2:address:eipalloc-03e6c42893296972f`      |
-| Lambda Functions      | Function Name    | `lambda:function:auto-cleanup-prd`            |
-| RDS Instances         | DB Identifier    | `rds:instance:auto-cleanup-db`                |
-| RDS Snapshots         | DB Snapshot Name | `rds:snapshot:rds:auto-cleanup-db-2019-01-01` |
+| Resource              | ID Attribute           | Example Value                                  |
+| --------------------- | ---------------------- | ---------------------------------------------- |
+| CloudFormation Stacks | Stack Name             | `cloudformation:stack:my_cloudformation_stack` |
+| DynamoDB Tables       | Table Name             | `dynamodb:table:my_dynamodb_table`             |
+| EC2 Instances         | Instance ID            | `ec2:instance:i-0326701a029dbf9d0`             |
+| EC2 Volumes           | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
+| EC2 Snapshots         | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
+| EC2 Elastic IPs       | Allocation ID          | `ec2:address:eipalloc-03e6c42893296972f`       |
+| Lambda Functions      | Function Name          | `lambda:function:my_lambda_function`           |
+| Redshift Instances    | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
+| Redshift Snapshots    | DB Snapshot Name       | `redshift:snapshot:my_cluster_snapshot`        |
+| RDS Instances         | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
+| RDS Snapshots         | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 
 ## Resource Tree
 
@@ -146,7 +173,7 @@ An ASCI resource tree (example below) is generated with each invocation of the a
 
 This tree allows users to visualise their AWS resources in a simple fixed width text editor.
 
-```bash
+```
 AWS
 ├── ap-southeast-2
 │   ├── CloudFormation
@@ -197,13 +224,3 @@ AWS
         └── Volumes
             └── vol-0921cdc9b3e6fc85a
 ```
-
-## Todo
-
-- [x] Serverless.com packaging and deployment
-- [ ] CloudFormation
-  - [x] IAM Role for Lambda
-  - [ ] S3 Bucket
-  - [x] DynamoDB tables `auto-cleanup-settings` and `auto-cleanup-whitelist`
-  - [x] DynamoDB default values for settings and whitelist table
-- [ ] Static site (React.js and Lambda) to expose DynamoDB tables for users to add to and remove from and extend the life of their whitelisting

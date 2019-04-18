@@ -50,7 +50,7 @@ class EC2:
         be first disabled and then the Instance will be terminated.
         """
 
-        ttl_days = int(self.settings.get('resource', {}).get('ec2_instance_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('ec2_instance', 7))
         try:
             reservations = self.client.describe_instances().get('Reservations')
         except:
@@ -110,7 +110,7 @@ class EC2:
         Deletes Volumes not attached to an EC2 Instance.
         """
 
-        ttl_days = int(self.settings.get('resource', {}).get('ec2_volume_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('ec2_volume', 7))
         try:
             resources = self.client.describe_volumes().get('Volumes')
         except:
@@ -151,7 +151,7 @@ class EC2:
         Deletes Snapshots not attached to EBS volumes.
         """
 
-        ttl_days = int(self.settings.get('resource', {}).get('ec2_snapshot_ttl_days', 7))
+        ttl_days = int(self.settings.get('ttl', {}).get('ec2_snapshot', 7))
         try:
             resources = self.client.describe_snapshots(OwnerIds=[self.account_id]).get('Snapshots')
         except:

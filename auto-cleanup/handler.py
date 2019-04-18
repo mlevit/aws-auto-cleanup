@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import sys
+import threading
 import uuid
 
 from treelib import Node, Tree
@@ -32,13 +33,13 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 def handler(event, context):
-    setup()
+    setup_dynamodb()
     
     tree = {'AWS': {}}
     whitelist = {}
     settings = {}
     
-    # build list of whitelisted resources
+    # build dictionary of whitelisted resources
     for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
         parsed_resource_id = Helper.parse_resource_id(record['resource_id']['S'])
         
@@ -62,29 +63,46 @@ def handler(event, context):
         if settings.get('region').get(region) == 'true':
             logging.info("Switching region to '%s'." % region)
 
+            # create a list to keep all threads
+            threads = []
+
             # CloudFormation
             cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
-            cloudformation_class.run()
+            thread = threading.Thread(target=cloudformation_class.run, args=())
+            threads.append(thread)
 
             # DynamoDB
             dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
-            dynamodb_class.run()
+            thread = threading.Thread(target=dynamodb_class.run, args=())
+            threads.append(thread)
             
             # EC2
             ec2_class = EC2(helper_class, whitelist, settings, tree, region)
-            ec2_class.run()
+            thread = threading.Thread(target=ec2_class.run, args=())
+            threads.append(thread)
             
             # Lambda
             lambda_class = Lambda(helper_class, whitelist, settings, tree, region)
-            lambda_class.run()
+            thread = threading.Thread(target=lambda_class.run, args=())
+            threads.append(thread)
             
             # RDS
             rds_class = RDS(helper_class, whitelist, settings, tree, region)
-            rds_class.run()
+            thread = threading.Thread(target=rds_class.run, args=())
+            threads.append(thread)
 
             # Redshift
             redshift_class = Redshift(helper_class, whitelist, settings, tree, region)
-            redshift_class.run()
+            thread = threading.Thread(target=redshift_class.run, args=())
+            threads.append(thread)
+
+            # start all threads
+            for thread in threads:
+                thread.start()
+
+            # make sure that all threads have finished
+            for thread in threads:
+                thread.join()
         else:
             logging.debug("Skipping region '%s'." % region)
         
@@ -94,47 +112,58 @@ def handler(event, context):
     s3_class = S3(helper_class, whitelist, settings, tree)
     s3_class.run()
 
-    
-    gen_tree(tree)
+    build_tree(tree)
     
     logging.info("Auto Cleanup completed.")
 
 
-def gen_tree(tree_dict):
-    os.chdir('/tmp')
-    tree = Tree()
-    
-    for aws in tree_dict:
-        aws_key = aws
-        tree.create_node(aws, aws_key)
+def build_tree(tree_dict):
+    """
+    Build ASCI tree and upload to S3.
+    """
 
-        for region in tree_dict.get(aws):
-            region_key = aws_key + region
-            tree.create_node(region, region_key, parent=aws_key)
+    try:
+        os.chdir('/tmp')
+        tree = Tree()
+        
+        for aws in tree_dict:
+            aws_key = aws
+            tree.create_node(aws, aws_key)
 
-            for service in tree_dict.get(aws).get(region):
-                service_key = region_key + service
-                tree.create_node(service, service_key, parent=region_key)
+            for region in tree_dict.get(aws):
+                region_key = aws_key + region
+                tree.create_node(region, region_key, parent=aws_key)
 
-                for resource_type in tree_dict.get(aws).get(region).get(service):
-                    resource_type_key = service_key + resource_type
-                    tree.create_node(resource_type, resource_type_key, parent=service_key)
+                for service in tree_dict.get(aws).get(region):
+                    service_key = region_key + service
+                    tree.create_node(service, service_key, parent=region_key)
 
-                    for resource in tree_dict.get(aws).get(region).get(service).get(resource_type):
-                        resource_key = resource_type_key + resource
-                        tree.create_node(resource, resource_key, parent=resource_type_key)
-    
-    tree.save2file('/tmp/tree.txt')
+                    for resource_type in tree_dict.get(aws).get(region).get(service):
+                        resource_type_key = service_key + resource_type
+                        tree.create_node(resource_type, resource_type_key, parent=service_key)
 
-    client = boto3.client('s3')
-    client.upload_file('/tmp/tree.txt', os.environ['RESOURCETREEBUCKET'], 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+                        for resource in tree_dict.get(aws).get(region).get(service).get(resource_type):
+                            resource_key = resource_type_key + resource
+                            tree.create_node(resource, resource_key, parent=resource_type_key)
+        
+        tree.save2file('/tmp/tree.txt')
+
+        client = boto3.client('s3')
+        bucket = os.environ['RESOURCETREEBUCKET']
+        key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+        client.upload_file('/tmp/tree.txt', bucket, key)
+
+        logging.debug("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+    except:
+        logging.critical(str(sys.exc_info()))
 
 
 
-def setup():
+def setup_dynamodb():
     """
     Inserts all the default settings and whitelist data 
-    into their respective DynamoDB tables.
+    into their respective DynamoDB tables. Records will be
+    skipped if they already exist in the table.
     """
 
     try:
