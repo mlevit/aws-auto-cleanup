@@ -6,7 +6,7 @@ custom:
 provider:
   name: aws
   runtime: python3.7
-  stage: production
+  stage: dev
   region: ap-southeast-2    # change to your region
   profile: saml             # change to your profile
   environment:
@@ -102,13 +102,9 @@ resources:
         AttributeDefinitions:
           - AttributeName: key
             AttributeType: S
-          - AttributeName: category
-            AttributeType: S
         KeySchema:
           - AttributeName: key
             KeyType: HASH
-          - AttributeName: category
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

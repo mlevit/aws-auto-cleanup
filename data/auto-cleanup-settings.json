@@ -5,127 +5,113 @@
     },
     {
       "key": {"S": "general"},
-      "value": {"S": "{\"dry_run\": \"true\"}"}
+      "value": {"M": {
+        "dry_run": {"S": "true"}}}
     },
     {
       "key": {"S": "cloudformation"},
-      "value": {"S": "{\"stacks\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "stacks": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
       "key": {"S": "dynamodb"},
-      "value": {"S": "{\"tables\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "tables": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
       "key": {"S": "ec2"},
-      "value": {"S": "{\"addresses\":{\"ttl\":7,\"clean\":\"true\"},{\"instances\":{\"ttl\":7,\"clean\":\"true\"},{\"snapshots\":{\"ttl\":7,\"clean\":\"true\"},{\"volumes\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "addresses": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}},
+        "instances": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}},
+        "snapshots": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}},
+        "volumes": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
       "key": {"S": "lambda"},
-      "value": {"S": "{\"functions\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "functions": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
       "key": {"S": "rds"},
-      "value": {"S": "{\"instances\":{\"ttl\":7,\"clean\":\"true\"},{\"snapshots\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "instances": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}},
+        "snapshots": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
       "key": {"S": "redshift"},
-      "value": {"S": "{\"clusters\":{\"ttl\":7,\"clean\":\"true\"},{\"snapshots\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "clusters": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}},
+        "snapshots": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
       "key": {"S": "s3"},
-      "value": {"S": "{\"buckets\":{\"ttl\":7,\"clean\":\"true\"}"}
+      "value": {"M": {
+        "buckets": {"M":{
+          "clean": {"S": "true"},
+          "ttl": {"S": "7"}}}}}
     },
     {
-      "key": {"S": "us-east-2"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "us-east-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "us-west-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "us-west-2"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-south-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-northeast-3"},
-      "value": {"S": "{\"clean\": \"false\"}"}
-    },
-    {
-      "key": {"S": "ap-northeast-2"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-southeast-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-southeast-2"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-northeast-1"},
-      "value": {"S": "{\"clean\": \"true\"}"},
-      "category": {"S": "region"}
-    },
-    {
-      "key": {"S": "ap-northeast-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-northeast-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-northeast-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ap-northeast-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "ca-central-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "cn-north-1"},
-      "value": {"S": "{\"clean\": \"false\"}"}
-    },
-    {
-      "key": {"S": "cn-northwest-1"},
-      "value": {"S": "{\"clean\": \"false\"}"}
-    },
-    {
-      "key": {"S": "eu-central-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "eu-west-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "eu-west-2"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "eu-west-3"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "eu-north-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
-    },
-    {
-      "key": {"S": "sa-east-1"},
-      "value": {"S": "{\"clean\": \"true\"}"}
+      "key": {"S": "regions"},
+      "value": {"M": {
+        "us-east-2": {"M":{
+          "clean": {"S": "true"}}},
+        "us-east-1": {"M":{
+          "clean": {"S": "true"}}},
+        "us-west-1": {"M":{
+          "clean": {"S": "true"}}},
+        "us-west-2": {"M":{
+          "clean": {"S": "true"}}},
+        "ap-south-1": {"M":{
+          "clean": {"S": "true"}}},
+        "ap-northeast-3": {"M":{
+          "clean": {"S": "false"}}},
+        "ap-northeast-2": {"M":{
+          "clean": {"S": "true"}}},
+        "ap-southeast-1": {"M":{
+          "clean": {"S": "true"}}},
+        "ap-southeast-2": {"M":{
+          "clean": {"S": "true"}}},
+        "ap-northeast-1": {"M":{
+          "clean": {"S": "true"}}},
+        "ca-central-1": {"M":{
+          "clean": {"S": "true"}}},
+        "cn-north-1": {"M":{
+          "clean": {"S": "false"}}},
+        "cn-northwest-1": {"M":{
+          "clean": {"S": "true"}}},
+        "eu-central-1": {"M":{
+          "clean": {"S": "true"}}},
+        "eu-west-1": {"M":{
+          "clean": {"S": "true"}}},
+        "eu-west-2": {"M":{
+          "clean": {"S": "true"}}},
+        "eu-west-3": {"M":{
+          "clean": {"S": "true"}}},
+        "eu-north-1": {"M":{
+          "clean": {"S": "true"}}},
+        "sa-east-1": {"M":{
+          "clean": {"S": "true"}}}}}
     }
   ]
