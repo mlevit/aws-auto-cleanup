@@ -54,11 +54,6 @@ class CloudFormation:
                 resource_id = resource.get('StackName')
                 resource_date = resource.get('LastUpdatedTime') if resource.get('LastUpdatedTime') is not None else resource.get('CreationTime')
 
-                self.resource_map.get('AWS').setdefault(
-                    self.region, {}).setdefault(
-                        'CloudFormation', {}).setdefault(
-                            'Stacks', []).append(resource_id)
-
                 if resource_id not in self.whitelist.get('cloudformation', {}).get('stack', []):
                     delta = self.helper.get_day_delta(resource_date)
                 
@@ -74,5 +69,8 @@ class CloudFormation:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'CloudFormation', {}).setdefault(
+                        'Stacks', []).append(resource_id)
         

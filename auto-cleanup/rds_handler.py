@@ -82,7 +82,10 @@ class RDS:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'RDS', {}).setdefault(
+                        'Instances', []).append(resource_id)
     
     
     def snapshots(self):
@@ -116,4 +119,7 @@ class RDS:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'RDS', {}).setdefault(
+                        'Snapshots', []).append(resource_id)

@@ -53,11 +53,6 @@ class DynamoDB:
             try:
                 resource_date = self.client.describe_table(TableName=resource).get('Table').get('CreationDateTime')
 
-                self.resource_map.get('AWS').setdefault(
-                    self.region, {}).setdefault(
-                        'DynamoDB', {}).setdefault(
-                            'Tables', []).append(resource)
-
                 if resource not in self.whitelist.get('dynamodb', {}).get('table', []):
                     delta = self.helper.get_day_delta(resource_date)
                 
@@ -73,4 +68,7 @@ class DynamoDB:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'DynamoDB', {}).setdefault(
+                        'Tables', []).append(resource)

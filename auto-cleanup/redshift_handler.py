@@ -76,7 +76,10 @@ class Redshift:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'Redshift', {}).setdefault(
+                        'Clusters', []).append(resource_id)
     
     
     def snapshots(self):
@@ -115,4 +118,7 @@ class Redshift:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'Redshift', {}).setdefault(
+                        'Snapshots', []).append(resource_id)

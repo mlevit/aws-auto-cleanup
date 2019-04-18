@@ -5,6 +5,9 @@ import json
 import logging
 import os
 import sys
+import uuid
+
+from treelib import Node, Tree
 
 from helper import *
 from cloudformation_handler import *
@@ -91,32 +94,40 @@ def handler(event, context):
     s3_class = S3(helper_class, whitelist, settings, resource_map)
     s3_class.run()
 
-    logging.info("Auto Cleanup completed.")
-
+    
     gen_map(resource_map)
+    
+    logging.info("Auto Cleanup completed.")
 
 
 def gen_map(resource_map):
     os.chdir('/tmp')
-    
-    f = open('/tmp/map.csv', 'w')
-    f.write('id,value\n')
+    tree = Tree()
     
     for aws in resource_map:
-        f.write('%s,\n' % (aws))
-        for region in resource_map.get(aws):
-            f.write('%s.%s,\n' % (aws, region))
-            for service in resource_map.get(aws).get(region):
-                f.write('%s.%s.%s,\n' % (aws, region, service))
-                for resource_type in resource_map.get(aws).get(region).get(service):
-                    f.write('%s.%s.%s.%s,\n' % (aws, region, service, resource_type))
-                    for resource in resource_map.get(aws).get(region).get(service).get(resource_type):
-                        f.write('%s.%s.%s.%s.%s,\n' % (aws, region, service, resource_type, resource))
+        aws_key = aws
+        tree.create_node(aws, aws_key)
 
-    f.close()
+        for region in resource_map.get(aws):
+            region_key = aws_key + region
+            tree.create_node(region, region_key, parent=aws_key)
+
+            for service in resource_map.get(aws).get(region):
+                service_key = region_key + service
+                tree.create_node(service, service_key, parent=region_key)
+
+                for resource_type in resource_map.get(aws).get(region).get(service):
+                    resource_type_key = service_key + resource_type
+                    tree.create_node(resource_type, resource_type_key, parent=service_key)
+
+                    for resource in resource_map.get(aws).get(region).get(service).get(resource_type):
+                        resource_key = resource_type_key + resource
+                        tree.create_node(resource, resource_key, parent=resource_type_key)
+    
+    tree.save2file('/tmp/map.txt')
 
     client = boto3.client('s3')
-    client.upload_file('/tmp/map.csv', 'auto-cleanup-marat', 'resource_map_%s.csv' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+    client.upload_file('/tmp/map.txt', 'auto-cleanup-resource-map', 'resource_map_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
 
 
 

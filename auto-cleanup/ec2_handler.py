@@ -99,7 +99,10 @@ class EC2:
                     logging.critical(str(sys.exc_info()))
                     return None
                 
-                return None
+                self.resource_map.get('AWS').setdefault(
+                    self.region, {}).setdefault(
+                        'EC2', {}).setdefault(
+                            'Instances', []).append(resource_id)
     
     
     def volumes(self):
@@ -137,7 +140,10 @@ class EC2:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'EC2', {}).setdefault(
+                        'Volumes', []).append(resource_id)
     
     
     def snapshots(self):
@@ -189,7 +195,10 @@ class EC2:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'EC2', {}).setdefault(
+                        'Snapshots', []).append(resource_id)
     
     
     def addresses(self):
@@ -220,5 +229,8 @@ class EC2:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'EC2', {}).setdefault(
+                        'Addresses', []).append(resource_id)
         

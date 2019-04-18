@@ -56,15 +56,10 @@ class S3:
                 resource_id = resource.get('Name')
                 resource_date = resource.get('CreationDate')
 
-                self.resource_map.get('AWS').setdefault(
-                    self.region, {}).setdefault(
-                        'S3', {}).setdefault(
-                            'Buckets', []).append(resource_id)
-
                 if resource_id not in self.whitelist.get('s3', {}).get('bucket', []):
                     delta = self.helper.get_day_delta(resource_date)
                 
-                    if delta.days > ttl_days: 
+                    if delta.days > ttl_days:
                         if self.dry_run == 'false':
                             # delete all objects
                             response = self.client.list_objects_v2(Bucket=resource_id)
@@ -114,4 +109,9 @@ class S3:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'S3', {}).setdefault(
+                        'Buckets', []).append(resource_id)
+            
+        

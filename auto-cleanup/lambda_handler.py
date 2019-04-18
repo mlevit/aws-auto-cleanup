@@ -68,7 +68,10 @@ class Lambda:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.resource_map.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'Lambda', {}).setdefault(
+                        'Functions', []).append(resource_id)
     
     
     def layers(self):
