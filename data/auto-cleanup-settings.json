@@ -1,177 +1,131 @@
 [
     {
-      "key": {"S": "dry_run"},
-      "value": {"S": "true"},
-      "category": {"S": "general"}
+      "key": {"S": "version"},
+      "value": {"S": "1"}
     },
     {
-      "key": {"S": "cloudformation_stack"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "general"},
+      "value": {"S": "{\"dry_run\": \"true\"}"}
     },
     {
-      "key": {"S": "dynamodb_table"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "cloudformation"},
+      "value": {"S": "{\"stacks\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
-      "key": {"S": "ec2_instance"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "dynamodb"},
+      "value": {"S": "{\"tables\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
-      "key": {"S": "ec2_snapshot"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "ec2"},
+      "value": {"S": "{\"addresses\":{\"ttl\":7,\"clean\":\"true\"},{\"instances\":{\"ttl\":7,\"clean\":\"true\"},{\"snapshots\":{\"ttl\":7,\"clean\":\"true\"},{\"volumes\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
-      "key": {"S": "ec2_volume"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "lambda"},
+      "value": {"S": "{\"functions\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
-      "key": {"S": "lambda_function"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "rds"},
+      "value": {"S": "{\"instances\":{\"ttl\":7,\"clean\":\"true\"},{\"snapshots\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
-      "key": {"S": "rds_instance"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "redshift"},
+      "value": {"S": "{\"clusters\":{\"ttl\":7,\"clean\":\"true\"},{\"snapshots\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
-      "key": {"S": "redshift_clusters"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
-    },
-    {
-      "key": {"S": "redshift_snapshots"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
-    },
-    {
-      "key": {"S": "rds_snapshot"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
-    },
-    {
-      "key": {"S": "s3_bucket"},
-      "value": {"S": "7"},
-      "category": {"S": "ttl"}
+      "key": {"S": "s3"},
+      "value": {"S": "{\"buckets\":{\"ttl\":7,\"clean\":\"true\"}"}
     },
     {
       "key": {"S": "us-east-2"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "us-east-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "us-west-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "us-west-2"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-south-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-northeast-3"},
-      "value": {"S": "false"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"false\"}"}
     },
     {
       "key": {"S": "ap-northeast-2"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-southeast-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-southeast-2"},
-      "value": {"S": "true"},
+      "value": {"S": "{\"clean\": \"true\"}"}
+    },
+    {
+      "key": {"S": "ap-northeast-1"},
+      "value": {"S": "{\"clean\": \"true\"}"},
       "category": {"S": "region"}
     },
     {
       "key": {"S": "ap-northeast-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-northeast-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-northeast-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ap-northeast-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
-    },
-    {
-      "key": {"S": "ap-northeast-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "ca-central-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "cn-north-1"},
-      "value": {"S": "false"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"false\"}"}
     },
     {
       "key": {"S": "cn-northwest-1"},
-      "value": {"S": "false"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"false\"}"}
     },
     {
       "key": {"S": "eu-central-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "eu-west-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "eu-west-2"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "eu-west-3"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "eu-north-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     },
     {
       "key": {"S": "sa-east-1"},
-      "value": {"S": "true"},
-      "category": {"S": "region"}
+      "value": {"S": "{\"clean\": \"true\"}"}
     }
   ]
