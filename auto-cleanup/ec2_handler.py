@@ -19,10 +19,12 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class EC2:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, tree, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.tree = tree
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         self.account_id = boto3.client('sts').get_caller_identity().get('Account')
@@ -97,7 +99,10 @@ class EC2:
                     logging.critical(str(sys.exc_info()))
                     return None
                 
-                return None
+                self.tree.get('AWS').setdefault(
+                    self.region, {}).setdefault(
+                        'EC2', {}).setdefault(
+                            'Instances', []).append(resource_id)
     
     
     def volumes(self):
@@ -135,7 +140,10 @@ class EC2:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'EC2', {}).setdefault(
+                        'Volumes', []).append(resource_id)
     
     
     def snapshots(self):
@@ -187,7 +195,10 @@ class EC2:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'EC2', {}).setdefault(
+                        'Snapshots', []).append(resource_id)
     
     
     def addresses(self):
@@ -218,5 +229,8 @@ class EC2:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'EC2', {}).setdefault(
+                        'Addresses', []).append(resource_id)
         

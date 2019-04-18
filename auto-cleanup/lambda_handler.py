@@ -18,10 +18,12 @@ logging.getLogger('urllib3').setLevel(logging.ERROR)
 logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
 class Lambda:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, tree, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.tree = tree
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -66,7 +68,10 @@ class Lambda:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'Lambda', {}).setdefault(
+                        'Functions', []).append(resource_id)
     
     
     def layers(self):

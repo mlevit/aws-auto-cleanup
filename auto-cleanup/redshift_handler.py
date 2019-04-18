@@ -18,10 +18,12 @@ logging.getLogger('urllib3').setLevel(logging.ERROR)
 logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
 class Redshift:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, tree, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.tree = tree
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -74,7 +76,10 @@ class Redshift:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'Redshift', {}).setdefault(
+                        'Clusters', []).append(resource_id)
     
     
     def snapshots(self):
@@ -113,4 +118,7 @@ class Redshift:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'Redshift', {}).setdefault(
+                        'Snapshots', []).append(resource_id)

@@ -19,10 +19,12 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class DynamoDB:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, tree, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.tree = tree
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -66,4 +68,7 @@ class DynamoDB:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'DynamoDB', {}).setdefault(
+                        'Tables', []).append(resource)

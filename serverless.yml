@@ -1,5 +1,8 @@
 service: auto-cleanup
 
+custom:
+  company: servian
+
 provider:
   name: aws
   runtime: python3.7
@@ -66,6 +69,7 @@ provider:
         - "s3:DeleteObject"
         - "s3:DeleteObjectVersion"
         - "s3:List*"
+        - "s3:PutObject"
       Resource: "*"
 
 functions:
@@ -83,6 +87,7 @@ functions:
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
       LOGLEVEL: INFO
+      RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
     events:
       - schedule:
           rate: rate(3 days)
@@ -127,3 +132,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    ResourceTreeBuckett:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}

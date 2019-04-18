@@ -19,10 +19,12 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class RDS:
-    def __init__(self, helper, whitelist, settings, region):
+    def __init__(self, helper, whitelist, settings, tree, region):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.tree = tree
+        self.region = region
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -80,7 +82,10 @@ class RDS:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'RDS', {}).setdefault(
+                        'Instances', []).append(resource_id)
     
     
     def snapshots(self):
@@ -114,4 +119,7 @@ class RDS:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'RDS', {}).setdefault(
+                        'Snapshots', []).append(resource_id)

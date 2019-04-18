@@ -19,10 +19,12 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 class S3:
-    def __init__(self, helper, whitelist, settings):
+    def __init__(self, helper, whitelist, settings, tree):
         self.helper = helper
         self.whitelist = whitelist
         self.settings = settings
+        self.tree = tree
+        self.region = 'global'
         
         self.dry_run = settings.get('general', {}).get('dry_run', 'true')
         
@@ -57,7 +59,7 @@ class S3:
                 if resource_id not in self.whitelist.get('s3', {}).get('bucket', []):
                     delta = self.helper.get_day_delta(resource_date)
                 
-                    if delta.days > ttl_days: 
+                    if delta.days > ttl_days:
                         if self.dry_run == 'false':
                             # delete all objects
                             response = self.client.list_objects_v2(Bucket=resource_id)
@@ -107,4 +109,9 @@ class S3:
             except:
                 logging.critical(str(sys.exc_info()))
             
-            return None
+            self.tree.get('AWS').setdefault(
+                self.region, {}).setdefault(
+                    'S3', {}).setdefault(
+                        'Buckets', []).append(resource_id)
+            
+        
