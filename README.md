@@ -7,22 +7,15 @@ Open source application to programatically clean your AWS resources based on a w
 To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
 1. Install Serverless `npm install serverless -g`
-
 2. Install AWS CLI `pip3 install awscli --upgrade --user`
-
 3. Clone this repository `git clone https://github.com/servian/aws-auto-cleanup`
-
 4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
-
 5. If you've configure the AWS CLI using a profile, open the `serverless.yml` file and modify the `provider > profile` attribute to match your profile name.
-
-6. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
-
-7. Deploy Auto Cleanup `serverless deploy`
-
-8. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
-
-9. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
+6. Change the custom `company` attribute within the `serverless.yml` file to your company name in order to prevent S3 Bucket name collision
+7. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
+8. Deploy Auto Cleanup `serverless deploy`
+9. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
+10. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
 
 ### Removing
 
@@ -81,6 +74,8 @@ By default, the below settings are automatically inserted the first time Auto Cl
 | lambda_function_ttl_days      | resource | 7     |
 | rds_instance_ttl_days         | resource | 7     |
 | rds_snapshot_ttl_days         | resource | 7     |
+| redshift_cluster_ttl_days | resource | 7 |
+| redshift_snapshot_ttl_days | resource | 7 |
 | s3_bucket_ttl_days            | resource | 7     |
 |us-east-2|region|true|
 |us-east-1|region|true|
@@ -144,6 +139,64 @@ The below table lists the resource attribute that should be used for unique iden
 | Lambda Functions      | Function Name    | `lambda:function:auto-cleanup-prd`            |
 | RDS Instances         | DB Identifier    | `rds:instance:auto-cleanup-db`                |
 | RDS Snapshots         | DB Snapshot Name | `rds:snapshot:rds:auto-cleanup-db-2019-01-01` |
+
+## Resource Tree
+
+An ASCI resource tree (example below) is generated with each invocation of the application. The tree is exported into the `ResourceTreeBuckett` objects within the `serverless.yml` file.
+
+This tree allows users to visualise their AWS resources in a simple fixed width text editor.
+
+```bash
+AWS
+├── ap-southeast-2
+│   ├── CloudFormation
+│   │   └── Stacks
+│   │       ├── auto-cleanup-dev
+│   │       └── auto-cleanup-production
+│   ├── DynamoDB
+│   │   └── Tables
+│   │       ├── auto-cleanup-settings-dev
+│   │       ├── auto-cleanup-settings-production
+│   │       ├── auto-cleanup-whitelist-dev
+│   │       └── auto-cleanup-whitelist-production
+│   ├── EC2
+│   │   ├── Addresses
+│   │   │   ├── eipalloc-03e6c42893296972f
+│   │   │   └── eipalloc-05065c5fa7c5b481d
+│   │   ├── Instances
+│   │   │   ├── i-060698bee8d6f3422
+│   │   │   ├── i-07440be98bfa9a15a
+│   │   ├── Snapshots
+│   │   │   ├── snap-00c8c90db9fdceb3c
+│   │   │   ├── snap-036ea48b4b3105598
+│   │   └── Volumes
+│   │       ├── vol-0652568b9c72f0bb9
+│   │       ├── vol-07e62ab726cb2c520
+│   ├── Lambda
+│   │   └── Functions
+│   │       ├── auto-cleanup-dev
+│   │       └── auto-cleanup-production
+│   └── Redshift
+│       └── Snapshots
+│           ├── redshift-cluster-1-data-loaded-1
+│           └── redshift-cluster-1-snapshot-1
+├── global
+│   └── S3
+│       └── Buckets
+│           ├── auto-cleanup-dev-resourcetreebucket
+│           ├── auto-cleanup-dev-serverlessdeploymentbucket-1g2bp8sh8iqqa
+└── us-east-1
+    ├── CloudFormation
+    │   └── Stacks
+    │       └── cc-iam-stack
+    └── EC2
+        ├── Addresses
+        │   └── eipalloc-0b7a547aba879ec06
+        ├── Instances
+        │   └── i-0cbfb68a0d6e42c99
+        └── Volumes
+            └── vol-0921cdc9b3e6fc85a
+```
 
 ## Todo
 

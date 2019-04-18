@@ -124,10 +124,10 @@ def gen_map(resource_map):
                         resource_key = resource_type_key + resource
                         tree.create_node(resource, resource_key, parent=resource_type_key)
     
-    tree.save2file('/tmp/map.txt')
+    tree.save2file('/tmp/tree.txt')
 
     client = boto3.client('s3')
-    client.upload_file('/tmp/map.txt', 'auto-cleanup-resource-map', 'resource_map_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+    client.upload_file('/tmp/tree.txt', os.environ['RESOURCETREEBUCKET'], 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
 
 
 
