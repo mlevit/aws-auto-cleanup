@@ -33,7 +33,7 @@ logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcNam
 
 
 def handler(event, context):
-    setup()
+    setup_dynamodb()
     
     tree = {'AWS': {}}
     whitelist = {}
@@ -112,47 +112,54 @@ def handler(event, context):
     s3_class = S3(helper_class, whitelist, settings, tree)
     s3_class.run()
 
-    
-    gen_tree(tree)
+    build_tree(tree)
     
     logging.info("Auto Cleanup completed.")
 
 
-def gen_tree(tree_dict):
-    os.chdir('/tmp')
-    tree = Tree()
-    
-    for aws in tree_dict:
-        aws_key = aws
-        tree.create_node(aws, aws_key)
+def build_tree(tree_dict):
+    """
+    Build ASCI tree and upload to S3.
+    """
 
-        for region in tree_dict.get(aws):
-            region_key = aws_key + region
-            tree.create_node(region, region_key, parent=aws_key)
+    try:
+        os.chdir('/tmp')
+        tree = Tree()
+        
+        for aws in tree_dict:
+            aws_key = aws
+            tree.create_node(aws, aws_key)
 
-            for service in tree_dict.get(aws).get(region):
-                service_key = region_key + service
-                tree.create_node(service, service_key, parent=region_key)
+            for region in tree_dict.get(aws):
+                region_key = aws_key + region
+                tree.create_node(region, region_key, parent=aws_key)
 
-                for resource_type in tree_dict.get(aws).get(region).get(service):
-                    resource_type_key = service_key + resource_type
-                    tree.create_node(resource_type, resource_type_key, parent=service_key)
+                for service in tree_dict.get(aws).get(region):
+                    service_key = region_key + service
+                    tree.create_node(service, service_key, parent=region_key)
 
-                    for resource in tree_dict.get(aws).get(region).get(service).get(resource_type):
-                        resource_key = resource_type_key + resource
-                        tree.create_node(resource, resource_key, parent=resource_type_key)
-    
-    tree.save2file('/tmp/tree.txt')
+                    for resource_type in tree_dict.get(aws).get(region).get(service):
+                        resource_type_key = service_key + resource_type
+                        tree.create_node(resource_type, resource_type_key, parent=service_key)
 
-    client = boto3.client('s3')
-    client.upload_file('/tmp/tree.txt', os.environ['RESOURCETREEBUCKET'], 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+                        for resource in tree_dict.get(aws).get(region).get(service).get(resource_type):
+                            resource_key = resource_type_key + resource
+                            tree.create_node(resource, resource_key, parent=resource_type_key)
+        
+        tree.save2file('/tmp/tree.txt')
+
+        client = boto3.client('s3')
+        client.upload_file('/tmp/tree.txt', os.environ['RESOURCETREEBUCKET'], 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+    except:
+        logging.critical(str(sys.exc_info()))
 
 
 
-def setup():
+def setup_dynamodb():
     """
     Inserts all the default settings and whitelist data 
-    into their respective DynamoDB tables.
+    into their respective DynamoDB tables. Records will be
+    skipped if they already exist in the table.
     """
 
     try:

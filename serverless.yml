@@ -1,75 +1,75 @@
 service: auto-cleanup
 
 custom:
-  company: servian
+  company: servian          # change to your company name
 
 provider:
   name: aws
   runtime: python3.7
-  stage: dev
-  region: ap-southeast-2
-  profile: saml
+  stage: production
+  region: ap-southeast-2    # change to your region
+  profile: saml             # change to your profile
   environment:
-    PYTHONPATH: "/var/task/auto-cleanup:/var/runtime" # fixes issue of importing Python files from within a directory
+    PYTHONPATH: "/var/task/auto-cleanup:/var/runtime"
   iamRoleStatements:
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "dynamodb:BatchWriteItem"
-        - "dynamodb:DeleteTable"
-        - "dynamodb:DescribeTable"
-        - "dynamodb:GetItem"
-        - "dynamodb:ListTables"
-        - "dynamodb:PutItem"
-        - "dynamodb:Scan"
+        - cloudformation:DeleteStack
+        - cloudformation:DescribeStacks
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "cloudformation:DeleteStack"
-        - "cloudformation:DescribeStacks"
+        - dynamodb:BatchWriteItem
+        - dynamodb:DeleteTable
+        - dynamodb:DescribeTable
+        - dynamodb:GetItem
+        - dynamodb:ListTables
+        - dynamodb:PutItem
+        - dynamodb:Scan
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "ec2:DeleteSnapshot"
-        - "ec2:DeleteVolume"
-        - "ec2:DescribeAddresses"
-        - "ec2:DescribeImages"
-        - "ec2:DescribeInstanceAttribute"
-        - "ec2:DescribeInstances"
-        - "ec2:DescribeSnapshots"
-        - "ec2:DescribeVolumes"
-        - "ec2:DescribeVolumes"
-        - "ec2:ModifyInstanceAttribute"
-        - "ec2:ReleaseAddress"
-        - "ec2:StopInstances"
-        - "ec2:TerminateInstances"
+        - ec2:DeleteSnapshot
+        - ec2:DeleteVolume
+        - ec2:DescribeAddresses
+        - ec2:DescribeImages
+        - ec2:DescribeInstanceAttribute
+        - ec2:DescribeInstances
+        - ec2:DescribeSnapshots
+        - ec2:DescribeVolumes
+        - ec2:DescribeVolumes
+        - ec2:ModifyInstanceAttribute
+        - ec2:ReleaseAddress
+        - ec2:StopInstances
+        - ec2:TerminateInstances
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "lambda:DeleteFunction"
-        - "lambda:ListFunctions"
+        - lambda:DeleteFunction
+        - lambda:ListFunctions
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "rds:DeleteDBInstance"
-        - "rds:DeleteDBSnapshot"
-        - "rds:DescribeDBInstances"
-        - "rds:DescribeDBSnapshots"
-        - "rds:ModifyDBInstance"
+        - rds:DeleteDBInstance
+        - rds:DeleteDBSnapshot
+        - rds:DescribeDBInstances
+        - rds:DescribeDBSnapshots
+        - rds:ModifyDBInstance
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "redshift:DeleteCluster"
-        - "redshift:DeleteClusterSnapshot"
-        - "redshift:DescribeClusterSnapshots"
-        - "redshift:DescribeClusters"
+        - redshift:DeleteCluster
+        - redshift:DeleteClusterSnapshot
+        - redshift:DescribeClusterSnapshots
+        - redshift:DescribeClusters
       Resource: "*"
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "s3:DeleteBucket"
-        - "s3:DeleteObject"
-        - "s3:DeleteObjectVersion"
-        - "s3:List*"
-        - "s3:PutObject"
+        - s3:DeleteBucket
+        - s3:DeleteObject
+        - s3:DeleteObjectVersion
+        - s3:List*
+        - s3:PutObject
       Resource: "*"
 
 functions:
@@ -84,10 +84,10 @@ functions:
         - auto-cleanup/**
         - data/**
     environment:
+      LOGLEVEL: INFO        # change to DEBUG for testing
+      RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
-      LOGLEVEL: INFO
-      RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
     events:
       - schedule:
           rate: rate(3 days)
