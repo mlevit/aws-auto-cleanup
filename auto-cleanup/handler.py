@@ -39,7 +39,7 @@ def handler(event, context):
     whitelist = {}
     settings = {}
     
-    # build list of whitelisted resources
+    # build dictionary of whitelisted resources
     for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
         parsed_resource_id = Helper.parse_resource_id(record['resource_id']['S'])
         
@@ -149,7 +149,11 @@ def build_tree(tree_dict):
         tree.save2file('/tmp/tree.txt')
 
         client = boto3.client('s3')
-        client.upload_file('/tmp/tree.txt', os.environ['RESOURCETREEBUCKET'], 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
+        bucket = os.environ['RESOURCETREEBUCKET']
+        key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+        client.upload_file('/tmp/tree.txt', bucket, key)
+
+        logging.debug("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
     except:
         logging.critical(str(sys.exc_info()))
 
