@@ -1,117 +1,80 @@
 [
     {
       "key": {"S": "version"},
-      "value": {"S": "1"}
+      "value": {"N": "0.6"}
     },
     {
       "key": {"S": "general"},
       "value": {"M": {
-        "dry_run": {"S": "true"}}}
+        "dry_run": {"BOOL": true}}}
     },
     {
-      "key": {"S": "cloudformation"},
+      "key": {"S": "services"},
       "value": {"M": {
-        "stacks": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
-    },
-    {
-      "key": {"S": "dynamodb"},
-      "value": {"M": {
-        "tables": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
-    },
-    {
-      "key": {"S": "ec2"},
-      "value": {"M": {
-        "addresses": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}},
-        "instances": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}},
-        "snapshots": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}},
-        "volumes": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
-    },
-    {
-      "key": {"S": "lambda"},
-      "value": {"M": {
-        "functions": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
-    },
-    {
-      "key": {"S": "rds"},
-      "value": {"M": {
-        "instances": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}},
-        "snapshots": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
-    },
-    {
-      "key": {"S": "redshift"},
-      "value": {"M": {
-        "clusters": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}},
-        "snapshots": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
-    },
-    {
-      "key": {"S": "s3"},
-      "value": {"M": {
-        "buckets": {"M":{
-          "clean": {"S": "true"},
-          "ttl": {"S": "7"}}}}}
+        "cloudformation": {"M": {
+          "stacks": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}},
+        "dynamodb": {"M": {
+          "tables": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}},
+        "ec2": {"M": {
+          "addresses": {"M":{
+            "clean": {"BOOL": true}}},
+          "instances": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}},
+          "snapshots": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}},
+          "volumes": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}},
+        "lambda": {"M": {
+          "functions": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}},
+        "rds": {"M": {
+          "instances": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}},
+          "snapshots": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}},
+        "redshift": {"M": {
+          "clusters": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}},
+          "snapshots": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}},
+        "s3": {"M": {
+          "buckets": {"M":{
+            "clean": {"BOOL": true},
+            "ttl": {"N": "7"}}}}}}}
     },
     {
       "key": {"S": "regions"},
       "value": {"M": {
-        "us-east-2": {"M":{
-          "clean": {"S": "true"}}},
-        "us-east-1": {"M":{
-          "clean": {"S": "true"}}},
-        "us-west-1": {"M":{
-          "clean": {"S": "true"}}},
-        "us-west-2": {"M":{
-          "clean": {"S": "true"}}},
-        "ap-south-1": {"M":{
-          "clean": {"S": "true"}}},
-        "ap-northeast-3": {"M":{
-          "clean": {"S": "false"}}},
-        "ap-northeast-2": {"M":{
-          "clean": {"S": "true"}}},
-        "ap-southeast-1": {"M":{
-          "clean": {"S": "true"}}},
-        "ap-southeast-2": {"M":{
-          "clean": {"S": "true"}}},
-        "ap-northeast-1": {"M":{
-          "clean": {"S": "true"}}},
-        "ca-central-1": {"M":{
-          "clean": {"S": "true"}}},
-        "cn-north-1": {"M":{
-          "clean": {"S": "false"}}},
-        "cn-northwest-1": {"M":{
-          "clean": {"S": "true"}}},
-        "eu-central-1": {"M":{
-          "clean": {"S": "true"}}},
-        "eu-west-1": {"M":{
-          "clean": {"S": "true"}}},
-        "eu-west-2": {"M":{
-          "clean": {"S": "true"}}},
-        "eu-west-3": {"M":{
-          "clean": {"S": "true"}}},
-        "eu-north-1": {"M":{
-          "clean": {"S": "true"}}},
-        "sa-east-1": {"M":{
-          "clean": {"S": "true"}}}}}
+        "ap-northeast-1": {"M":{"clean": {"BOOL": true}}},
+        "ap-northeast-2": {"M":{"clean": {"BOOL": true}}},
+        "ap-northeast-3": {"M":{"clean": {"BOOL": false}}},
+        "ap-south-1": {"M":{"clean": {"BOOL": true}}},
+        "ap-southeast-1": {"M":{"clean": {"BOOL": true}}},
+        "ap-southeast-2": {"M":{"clean": {"BOOL": true}}},
+        "ca-central-1": {"M":{"clean": {"BOOL": true}}},
+        "cn-north-1": {"M":{"clean": {"BOOL": false}}},
+        "cn-northwest-1": {"M":{"clean": {"BOOL": false}}},
+        "eu-central-1": {"M":{"clean": {"BOOL": true}}},
+        "eu-north-1": {"M":{"clean": {"BOOL": true}}},
+        "eu-west-1": {"M":{"clean": {"BOOL": true}}},
+        "eu-west-2": {"M":{"clean": {"BOOL": true}}},
+        "eu-west-3": {"M":{"clean": {"BOOL": true}}},
+        "sa-east-1": {"M":{"clean": {"BOOL": true}}},
+        "us-east-1": {"M":{"clean": {"BOOL": true}}},
+        "us-east-2": {"M":{"clean": {"BOOL": true}}},
+        "us-west-1": {"M":{"clean": {"BOOL": true}}},
+        "us-west-2": {"M":{"clean": {"BOOL": true}}}}}
     }
   ]

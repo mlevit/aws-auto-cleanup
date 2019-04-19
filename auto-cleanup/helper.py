@@ -4,11 +4,8 @@ import dateutil.parser
 import os
 
 class Helper:
-    def __init__(self, settings_dict):
-        self.settings_dict = settings_dict
-        
-        # problem connecting to DynamoDB
-        self.dynamodb = boto3.client('dynamodb')
+    def __init__(self):
+        pass
     
     
     @staticmethod

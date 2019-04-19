@@ -8,6 +8,7 @@ import sys
 import threading
 import uuid
 
+from dynamodb_json import json_util as dynamodb_json
 from treelib import Node, Tree
 
 from helper import *
@@ -39,80 +40,83 @@ def handler(event, context):
     whitelist = {}
     settings = {}
     
-    # # build dictionary of whitelisted resources
-    # for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
-    #     parsed_resource_id = Helper.parse_resource_id(record['resource_id']['S'])
+    # build dictionary of whitelisted resources
+    for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
+        record_json = dynamodb_json.loads(record, True)
+        parsed_resource_id = Helper.parse_resource_id(record_json.get('resource_id'))
         
-    #     whitelist.setdefault(
-    #         parsed_resource_id.get('service'), {}).setdefault(
-    #             parsed_resource_id.get('resource_type'), []).append(
-    #                 parsed_resource_id.get('resource'))
+        whitelist.setdefault(
+            parsed_resource_id.get('service'), {}).setdefault(
+                parsed_resource_id.get('resource_type'), []).append(
+                    parsed_resource_id.get('resource'))
     
-    # # build dictionary of settings
-    # for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
-    #     settings.setdefault(record['category']['S'], {})[record['key']['S']] = record['value']['S']
+    # build dictionary of settings
+    for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
+        record_json = dynamodb_json.loads(record, True)
+        settings[record_json.get('key')] = record_json.get('value')
     
-    # helper_class = Helper(settings)
+    helper_class = Helper()
 
-    # if settings.get('general', {}).get('dry_run', 'true') == 'true':
-    #     logging.info("Auto Cleanup started in DRY RUN mode.")
-    # else:
-    #     logging.info("Auto Cleanup started in DESTROY mode.")
+    if settings.get('general', {}).get('dry_run', True):
+        logging.info("Auto Cleanup started in DRY RUN mode.")
+    else:
+        logging.info("Auto Cleanup started in DESTROY mode.")
 
-    # for region in settings.get('region'):
-    #     if settings.get('region').get(region) == 'true':
-    #         logging.info("Switching region to '%s'." % region)
+    for region in settings.get('regions'):
+        if settings.get('regions').get(region).get('clean'):
+            logging.info("Switching region to '%s'." % region)
 
-    #         # create a list to keep all threads
-    #         threads = []
+            # threads list
+            threads = []
 
-    #         # CloudFormation
-    #         cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
-    #         thread = threading.Thread(target=cloudformation_class.run, args=())
-    #         threads.append(thread)
+            # CloudFormation
+            # CloudFormation will run before all others as there is a potential
+            # through the removal of CloudFormation Stacks, many of the other resource will be removed
+            cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
+            cloudformation_class.run()
 
-    #         # DynamoDB
-    #         dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
-    #         thread = threading.Thread(target=dynamodb_class.run, args=())
-    #         threads.append(thread)
+            # DynamoDB
+            dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
+            thread = threading.Thread(target=dynamodb_class.run, args=())
+            threads.append(thread)
             
-    #         # EC2
-    #         ec2_class = EC2(helper_class, whitelist, settings, tree, region)
-    #         thread = threading.Thread(target=ec2_class.run, args=())
-    #         threads.append(thread)
+            # EC2
+            ec2_class = EC2(helper_class, whitelist, settings, tree, region)
+            thread = threading.Thread(target=ec2_class.run, args=())
+            threads.append(thread)
             
-    #         # Lambda
-    #         lambda_class = Lambda(helper_class, whitelist, settings, tree, region)
-    #         thread = threading.Thread(target=lambda_class.run, args=())
-    #         threads.append(thread)
+            # Lambda
+            lambda_class = Lambda(helper_class, whitelist, settings, tree, region)
+            thread = threading.Thread(target=lambda_class.run, args=())
+            threads.append(thread)
             
-    #         # RDS
-    #         rds_class = RDS(helper_class, whitelist, settings, tree, region)
-    #         thread = threading.Thread(target=rds_class.run, args=())
-    #         threads.append(thread)
+            # RDS
+            rds_class = RDS(helper_class, whitelist, settings, tree, region)
+            thread = threading.Thread(target=rds_class.run, args=())
+            threads.append(thread)
 
-    #         # Redshift
-    #         redshift_class = Redshift(helper_class, whitelist, settings, tree, region)
-    #         thread = threading.Thread(target=redshift_class.run, args=())
-    #         threads.append(thread)
+            # Redshift
+            redshift_class = Redshift(helper_class, whitelist, settings, tree, region)
+            thread = threading.Thread(target=redshift_class.run, args=())
+            threads.append(thread)
 
-    #         # start all threads
-    #         for thread in threads:
-    #             thread.start()
+            # start all threads
+            for thread in threads:
+                thread.start()
 
-    #         # make sure that all threads have finished
-    #         for thread in threads:
-    #             thread.join()
-    #     else:
-    #         logging.debug("Skipping region '%s'." % region)
+            # make sure that all threads have finished
+            for thread in threads:
+                thread.join()
+        else:
+            logging.debug("Skipping region '%s'." % region)
         
-    # logging.info("Switching region to 'global'.")
+    logging.info("Switching region to 'global'.")
 
-    # # S3
-    # s3_class = S3(helper_class, whitelist, settings, tree)
-    # s3_class.run()
+    # S3
+    s3_class = S3(helper_class, whitelist, settings, tree)
+    s3_class.run()
 
-    # build_tree(tree)
+    build_tree(tree)
     
     logging.info("Auto Cleanup completed.")
 
@@ -153,7 +157,7 @@ def build_tree(tree_dict):
         key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
         client.upload_file('/tmp/tree.txt', bucket, key)
 
-        logging.debug("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+        logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
     except:
         logging.critical(str(sys.exc_info()))
 
@@ -168,22 +172,46 @@ def setup_dynamodb():
 
     try:
         client = boto3.client('dynamodb')
+        settings_data = open('data/auto-cleanup-settings.json')
+        whitelist_data = open('data/auto-cleanup-whitelist.json')
 
-        data = open('data/auto-cleanup-settings.json')
+        settings_json = json.loads(settings_data.read())
+        whitelist_json = json.loads(whitelist_data.read())
 
-        for setting in json.loads(data.read()):
-            try:
-                client.put_item(
-                    TableName=os.environ['SETTINGSTABLE'], 
-                    Item=setting,
-                    ConditionExpression='attribute_not_exists(#k)',
-                    ExpressionAttributeNames={'#k': 'key'})
-            except:
-                continue
-    
-        data = open('data/auto-cleanup-whitelist.json')
+        update_settings = False
         
-        for whitelist in json.loads(data.read()):
+        # get current settings version
+        current_version = client.get_item(
+            TableName=os.environ['SETTINGSTABLE'], 
+            Key={'key': {'S': 'version'}},
+            ConsistentRead=True)
+        
+        # get new settings version
+        new_version = float(settings_json[0].get('value', {}).get('N', 0.0))
+        
+        # check if settings exist and if they're older than current settings
+        if 'Item' in current_version:
+            current_version = float(current_version.get('Item').get('value').get('N'))
+            if current_version < new_version:
+                update_settings = True
+                logging.info("Existing settings with version %f are being updated to version %f in DynamoDB Table '%s'." % (current_version, new_version, os.environ['SETTINGSTABLE']))
+            else:
+                logging.debug("Existing settings are at the lastest version %f in DynamoDB Table '%s'." % (current_version, os.environ['SETTINGSTABLE']))
+        else:
+            update_settings = True
+            logging.info("Settings are being inserted into DynamoDB Table '%s' for the first time." % os.environ['SETTINGSTABLE'])
+
+        if update_settings:
+            for setting in settings_json:
+                try:
+                    client.put_item(
+                        TableName=os.environ['SETTINGSTABLE'], 
+                        Item=setting)
+                except:
+                    logging.critical(str(sys.exc_info()))
+                    continue
+        
+        for whitelist in whitelist_json:
             try:
                 client.put_item(
                     TableName=os.environ['WHITELISTTABLE'], 
@@ -191,5 +219,8 @@ def setup_dynamodb():
                     ConditionExpression='attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)')
             except:
                 continue
+        
+        settings_data.close()
+        whitelist_data.close()
     except:
         logging.critical(str(sys.exc_info()))
