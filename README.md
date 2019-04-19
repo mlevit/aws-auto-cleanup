@@ -48,7 +48,6 @@ When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanu
 
 Within the `serverless.yml` file, under `provider` there is a `region` attribute. Set this attribute to your desired region.
 
-
 #### Logging
 
 Within the `serverless.yml` file, under `functions > AutoCleanup > environment` there is a `LOGLEVEL` attribute. By default, the log level is set to `INFO`. This can be changed to `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `CRITICAL` based on your logging requirements.
@@ -77,56 +76,171 @@ The **region** category allows users to turn region scanning on and off to eithe
 
 By default, the below settings are automatically inserted when Auto Cleanup is run.
 
+#### Version
+
+The version is used to inform Auto Cleanup if new settings exist in the default data file that should be loaded into DynamoDB. If the version present in the default data file is greater than the version in DynamoDB table, the load will commence.
+
+```json
+{
+  "key": "version",
+  "value": x.x
+}
+```
+
 #### General
 
-| key     | value |
-| ------- | ----- |
-| dry_run | true  |
+```json
+{
+  "key": "general",
+  "value": {
+    "dry_run": true
+  }
+}
+```
 
-#### Time to Live (TTL)
+#### Services
 
-| key                  | value |
-| -------------------- | ----- |
-| cloudformation_stack | 7     |
-| dynamodb_table       | 7     |
-| ec2_instance         | 7     |
-| ec2_snapshot         | 7     |
-| ec2_volume           | 7     |
-| ec2_address          | 7     |
-| lambda_function      | 7     |
-| rds_instance         | 7     |
-| rds_snapshot         | 7     |
-| redshift_cluster     | 7     |
-| redshift_snapshot    | 7     |
-| s3_bucket            | 7     |
+Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
+
+```json
+{
+  "key": "services",
+  "value": {
+    "cloudformation": {
+      "stacks": {
+        "clean": true,
+        "ttl": 7
+      }
+    },
+    "dynamodb": {
+      "tables": {
+        "clean": true,
+        "ttl": 7
+      }
+    },
+    "ec2": {
+      "addresses": {
+        "clean": true
+      },
+      "instances": {
+        "clean": true,
+        "ttl": 7
+      },
+      "snapshots": {
+        "clean": true,
+        "ttl": 7
+      },
+      "volumes": {
+        "clean": true,
+        "ttl": 7
+      }
+    },
+    "lambda": {
+      "functions": {
+        "clean": true,
+        "ttl": 7
+      }
+    },
+    "rds": {
+      "instances": {
+        "clean": true,
+        "ttl": 7
+      },
+      "snapshots": {
+        "clean": true,
+        "ttl": 7
+      }
+    },
+    "redshift": {
+      "clusters": {
+        "clean": true,
+        "ttl": 7
+      },
+      "snapshots": {
+        "clean": true,
+        "ttl": 7
+      }
+    },
+    "s3": {
+      "buckets": {
+        "clean": true,
+        "ttl": 7
+      }
+    }
+  }
+}
+```
 
 #### Region
 
-| key               | value |
-| ----------------- | ----- |
-| us-east-2         | true  |
-| us-east-1         | true  |
-| us-west-1         | true  |
-| us-west-2         | true  |
-| ap-south-1        | true  |
-| ap-northeast-3 *  | false |
-| ap-northeast-2    | true  |
-| ap-southeast-1    | true  |
-| ap-southeast-2    | true  |
-| ap-northeast-1    | true  |
-| ca-central-1      | true  |
-| cn-north-1 \*     | false |
-| cn-northwest-1 \* | false |
-| eu-central-1      | true  |
-| eu-west-1         | true  |
-| eu-west-2         | true  |
-| eu-west-3         | true  |
-| eu-north-1        | true  |
-| sa-east-1         | true  |
-| us-gov-east-1     | true  |
-| us-gov-west-1     | true  |
+Table includes the `clean` attribute which informs Auto Cleanup if the region should be cleaned up or not.
 
-\* Regions only available to select customers
+```json
+{
+  "key": "regions",
+  "value": {
+    "ap-northeast-1": {
+      "clean": true
+    },
+    "ap-northeast-2": {
+      "clean": true
+    },
+    "ap-northeast-3": {
+      "clean": false
+    },
+    "ap-south-1": {
+      "clean": true
+    },
+    "ap-southeast-1": {
+      "clean": true
+    },
+    "ap-southeast-2": {
+      "clean": true
+    },
+    "ca-central-1": {
+      "clean": true
+    },
+    "cn-north-1": {
+      "clean": false
+    },
+    "cn-northwest-1": {
+      "clean": false
+    },
+    "eu-central-1": {
+      "clean": true
+    },
+    "eu-north-1": {
+      "clean": true
+    },
+    "eu-west-1": {
+      "clean": true
+    },
+    "eu-west-2": {
+      "clean": true
+    },
+    "eu-west-3": {
+      "clean": true
+    },
+    "sa-east-1": {
+      "clean": true
+    },
+    "us-east-1": {
+      "clean": true
+    },
+    "us-east-2": {
+      "clean": true
+    },
+    "us-west-1": {
+      "clean": true
+    },
+    "us-west-2": {
+      "clean": true
+    }
+  }
+}
+```
+
+*Note: Some regions have `clean` set to `false` by default as they required special access from AWS*
 
 #### Dry Run
 
@@ -144,12 +258,12 @@ The Whitelist table allows users to add their resources to prevent removal.
 
 The Whitelist table as the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself:
 
-| Column      | Format                                      | Description                                                  |
-| ----------- | ------------------------------------------- | ------------------------------------------------------------ |
+| Column      | Format                                      | Description                                                                                                                                                   |
+| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource type>:<resource name>` | Unique identifier of the resource. This is a custom format base on the service (e.g., EC2, S3), the resource type (e.g., Instance, Bucket) and resource name. |
-| expire_at   | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date        |
-| comment     | Text field                                  | Comment field describing the resource and why it has been whitelisted |
-| owner_email | Email address                               | Email address of the resource owner in case they need to be contacted regarding the whitelisting |
+| expire_at   | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date                                                                                                         |
+| comment     | Text field                                  | Comment field describing the resource and why it has been whitelisted                                                                                         |
+| owner_email | Email address                               | Email address of the resource owner in case they need to be contacted regarding the whitelisting                                                              |
 
 Adding resources to the Whitelist table will ensure those resources are not removed by Auto Cleanup.
 

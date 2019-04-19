@@ -74,13 +74,13 @@ provider:
 
 functions:
   AutoCleanup:
-    handler: auto-cleanup.handler.handler
+    handler: auto-cleanup.handler.main
     name: auto-cleanup-${self:provider.stage}
     description: Auto Cleanup removes unused AWS resources
     memorySize: 128
     timeout: 300
     package:
-      include: 
+      include:
         - auto-cleanup/**
         - data/**
     environment:
@@ -102,13 +102,9 @@ resources:
         AttributeDefinitions:
           - AttributeName: key
             AttributeType: S
-          - AttributeName: category
-            AttributeType: S
         KeySchema:
           - AttributeName: key
             KeyType: HASH
-          - AttributeName: category
-            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1

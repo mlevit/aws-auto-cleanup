@@ -1,14 +1,14 @@
 import boto3
 import datetime
-import dateutil.parser
 import json
 import logging
 import os
 import sys
+import tempfile
 import threading
-import uuid
 
-from treelib import Node, Tree
+from dynamodb_json import json_util as dynamodb_json
+from treelib import Tree
 
 from helper import *
 from cloudformation_handler import *
@@ -32,7 +32,7 @@ logging.getLogger('urllib3').setLevel(logging.ERROR)
 logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
 
-def handler(event, context):
+def main(event, context):
     setup_dynamodb()
     
     tree = {'AWS': {}}
@@ -41,7 +41,8 @@ def handler(event, context):
     
     # build dictionary of whitelisted resources
     for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
-        parsed_resource_id = Helper.parse_resource_id(record['resource_id']['S'])
+        record_json = dynamodb_json.loads(record, True)
+        parsed_resource_id = Helper.parse_resource_id(record_json.get('resource_id'))
         
         whitelist.setdefault(
             parsed_resource_id.get('service'), {}).setdefault(
@@ -50,26 +51,28 @@ def handler(event, context):
     
     # build dictionary of settings
     for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
-        settings.setdefault(record['category']['S'], {})[record['key']['S']] = record['value']['S']
+        record_json = dynamodb_json.loads(record, True)
+        settings[record_json.get('key')] = record_json.get('value')
     
-    helper_class = Helper(settings)
+    helper_class = Helper()
 
-    if settings.get('general', {}).get('dry_run', 'true') == 'true':
+    if settings.get('general', {}).get('dry_run', True):
         logging.info("Auto Cleanup started in DRY RUN mode.")
     else:
         logging.info("Auto Cleanup started in DESTROY mode.")
 
-    for region in settings.get('region'):
-        if settings.get('region').get(region) == 'true':
+    for region in settings.get('regions'):
+        if settings.get('regions').get(region).get('clean'):
             logging.info("Switching region to '%s'." % region)
 
-            # create a list to keep all threads
+            # threads list
             threads = []
 
             # CloudFormation
+            # CloudFormation will run before all others as there is a potential
+            # through the removal of CloudFormation Stacks, many of the other resource will be removed
             cloudformation_class = CloudFormation(helper_class, whitelist, settings, tree, region)
-            thread = threading.Thread(target=cloudformation_class.run, args=())
-            threads.append(thread)
+            cloudformation_class.run()
 
             # DynamoDB
             dynamodb_class = DynamoDB(helper_class, whitelist, settings, tree, region)
@@ -123,7 +126,7 @@ def build_tree(tree_dict):
     """
 
     try:
-        os.chdir('/tmp')
+        os.chdir(tempfile.gettempdir())
         tree = Tree()
         
         for aws in tree_dict:
@@ -146,50 +149,82 @@ def build_tree(tree_dict):
                             resource_key = resource_type_key + resource
                             tree.create_node(resource, resource_key, parent=resource_type_key)
         
-        tree.save2file('/tmp/tree.txt')
+        try:
+            _, temp_file = tempfile.mkstemp()
+        
+            tree.save2file(temp_file)
 
-        client = boto3.client('s3')
-        bucket = os.environ['RESOURCETREEBUCKET']
-        key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        client.upload_file('/tmp/tree.txt', bucket, key)
+            client = boto3.client('s3')
+            bucket = os.environ['RESOURCETREEBUCKET']
+            key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+            
+            client.upload_file(temp_file, bucket, key)
 
-        logging.debug("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+            logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+        finally:
+            os.remove(temp_file)
     except:
         logging.critical(str(sys.exc_info()))
 
 
-
 def setup_dynamodb():
     """
-    Inserts all the default settings and whitelist data 
+    Inserts all the default settings and whitelist data
     into their respective DynamoDB tables. Records will be
     skipped if they already exist in the table.
     """
 
     try:
         client = boto3.client('dynamodb')
+        settings_data = open('data/auto-cleanup-settings.json')
+        whitelist_data = open('data/auto-cleanup-whitelist.json')
 
-        data = open('data/auto-cleanup-settings.json')
+        settings_json = json.loads(settings_data.read())
+        whitelist_json = json.loads(whitelist_data.read())
 
-        for setting in json.loads(data.read()):
-            try:
-                client.put_item(
-                    TableName=os.environ['SETTINGSTABLE'], 
-                    Item=setting,
-                    ConditionExpression='attribute_not_exists(#k) AND attribute_not_exists(category)',
-                    ExpressionAttributeNames={'#k': 'key'})
-            except:
-                continue
-    
-        data = open('data/auto-cleanup-whitelist.json')
+        update_settings = False
         
-        for whitelist in json.loads(data.read()):
+        # get current settings version
+        current_version = client.get_item(
+            TableName=os.environ['SETTINGSTABLE'],
+            Key={'key': {'S': 'version'}},
+            ConsistentRead=True)
+        
+        # get new settings version
+        new_version = float(settings_json[0].get('value', {}).get('N', 0.0))
+        
+        # check if settings exist and if they're older than current settings
+        if 'Item' in current_version:
+            current_version = float(current_version.get('Item').get('value').get('N'))
+            if current_version < new_version:
+                update_settings = True
+                logging.info("Existing settings with version %f are being updated to version %f in DynamoDB Table '%s'." % (current_version, new_version, os.environ['SETTINGSTABLE']))
+            else:
+                logging.debug("Existing settings are at the lastest version %f in DynamoDB Table '%s'." % (current_version, os.environ['SETTINGSTABLE']))
+        else:
+            update_settings = True
+            logging.info("Settings are being inserted into DynamoDB Table '%s' for the first time." % os.environ['SETTINGSTABLE'])
+
+        if update_settings:
+            for setting in settings_json:
+                try:
+                    client.put_item(
+                        TableName=os.environ['SETTINGSTABLE'],
+                        Item=setting)
+                except:
+                    logging.critical(str(sys.exc_info()))
+                    continue
+        
+        for whitelist in whitelist_json:
             try:
                 client.put_item(
-                    TableName=os.environ['WHITELISTTABLE'], 
+                    TableName=os.environ['WHITELISTTABLE'],
                     Item=whitelist,
                     ConditionExpression='attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)')
             except:
                 continue
+       
+        settings_data.close()
+        whitelist_data.close()
     except:
         logging.critical(str(sys.exc_info()))
