@@ -74,7 +74,7 @@ provider:
 
 functions:
   AutoCleanup:
-    handler: auto-cleanup.handler.handler
+    handler: auto-cleanup.handler.main
     name: auto-cleanup-${self:provider.stage}
     description: Auto Cleanup removes unused AWS resources
     memorySize: 128
