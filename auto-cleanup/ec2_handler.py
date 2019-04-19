@@ -184,7 +184,7 @@ class EC2:
                         if resource_id not in snapshots_in_use and 'for ami-' not in resource.get('Description'):
                             delta = self.helper.get_day_delta(resource_date)
                         
-                            if delta.days > ttl_days: 
+                            if delta.days > ttl_days:
                                 if not self.dry_run:
                                     self.client.delete_snapshot(SnapshotId=resource_id)
                                 
@@ -194,7 +194,7 @@ class EC2:
                         else:
                             logging.debug("EC2 Snapshot '%s' is currently used by an AMI and cannot been deleted without deleting the AMI first." % (resource_id))
                     else:
-                        logging.debug("EC2 Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))    
+                        logging.debug("EC2 Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))
                 except:
                     logging.critical(str(sys.exc_info()))
                 

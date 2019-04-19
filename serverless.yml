@@ -80,7 +80,7 @@ functions:
     memorySize: 128
     timeout: 300
     package:
-      include: 
+      include:
         - auto-cleanup/**
         - data/**
     environment:

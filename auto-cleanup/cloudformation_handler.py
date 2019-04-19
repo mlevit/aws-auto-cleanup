@@ -61,7 +61,7 @@ class CloudFormation:
                     if resource_id not in self.whitelist.get('cloudformation', {}).get('stack', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if not self.dry_run:
                                 self.client.delete_stack(StackName=resource_id)
                             

@@ -58,7 +58,7 @@ class DynamoDB:
                     if resource not in self.whitelist.get('dynamodb', {}).get('table', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if not self.dry_run:
                                 self.client.delete_table(TableName=resource)
                             
@@ -75,4 +75,4 @@ class DynamoDB:
                         'DynamoDB', {}).setdefault(
                             'Tables', []).append(resource)
         else:
-            logging.debug("Skipping cleanup of DynamoDB Tables.")    
+            logging.debug("Skipping cleanup of DynamoDB Tables.")

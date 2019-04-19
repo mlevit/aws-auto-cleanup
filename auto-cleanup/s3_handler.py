@@ -116,5 +116,3 @@ class S3:
                             'Buckets', []).append(resource_id)
         else:
             logging.debug("Skipping cleanup of S3 Buckets.")
-            
-        

@@ -1,15 +1,14 @@
 import boto3
 import datetime
-import dateutil.parser
 import json
 import logging
 import os
 import sys
+import tempfile
 import threading
-import uuid
 
 from dynamodb_json import json_util as dynamodb_json
-from treelib import Node, Tree
+from treelib import Tree
 
 from helper import *
 from cloudformation_handler import *
@@ -33,7 +32,7 @@ logging.getLogger('urllib3').setLevel(logging.ERROR)
 logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
 
-def handler(event, context):
+def main(event, context):
     setup_dynamodb()
     
     tree = {'AWS': {}}
@@ -127,7 +126,7 @@ def build_tree(tree_dict):
     """
 
     try:
-        os.chdir('/tmp')
+        os.chdir(tempfile.gettempdir())
         tree = Tree()
         
         for aws in tree_dict:
@@ -150,21 +149,27 @@ def build_tree(tree_dict):
                             resource_key = resource_type_key + resource
                             tree.create_node(resource, resource_key, parent=resource_type_key)
         
-        tree.save2file('/tmp/tree.txt')
+        try:
+            _, temp_file = tempfile.mkstemp()
+        
+            tree.save2file(temp_file)
 
-        client = boto3.client('s3')
-        bucket = os.environ['RESOURCETREEBUCKET']
-        key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-        client.upload_file('/tmp/tree.txt', bucket, key)
+            client = boto3.client('s3')
+            bucket = os.environ['RESOURCETREEBUCKET']
+            key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+            
+            client.upload_file(temp_file, bucket, key)
 
-        logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+            logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+        finally:
+            os.remove(temp_file)
     except:
         logging.critical(str(sys.exc_info()))
 
 
 def setup_dynamodb():
     """
-    Inserts all the default settings and whitelist data 
+    Inserts all the default settings and whitelist data
     into their respective DynamoDB tables. Records will be
     skipped if they already exist in the table.
     """
@@ -181,7 +186,7 @@ def setup_dynamodb():
         
         # get current settings version
         current_version = client.get_item(
-            TableName=os.environ['SETTINGSTABLE'], 
+            TableName=os.environ['SETTINGSTABLE'],
             Key={'key': {'S': 'version'}},
             ConsistentRead=True)
         
@@ -204,7 +209,7 @@ def setup_dynamodb():
             for setting in settings_json:
                 try:
                     client.put_item(
-                        TableName=os.environ['SETTINGSTABLE'], 
+                        TableName=os.environ['SETTINGSTABLE'],
                         Item=setting)
                 except:
                     logging.critical(str(sys.exc_info()))
@@ -213,12 +218,12 @@ def setup_dynamodb():
         for whitelist in whitelist_json:
             try:
                 client.put_item(
-                    TableName=os.environ['WHITELISTTABLE'], 
+                    TableName=os.environ['WHITELISTTABLE'],
                     Item=whitelist,
                     ConditionExpression='attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)')
             except:
                 continue
-        
+       
         settings_data.close()
         whitelist_data.close()
     except:

@@ -4,28 +4,28 @@ Open source application to programatically clean your AWS resources based on a w
 
 ## Table of Contents
 
-- [Setup](#setup)
-  - [Deployment](#deployment)
-  - [Removal](#removal)
-  - [Configuration](#configuration)
-- [Tables](#tables)
-- [Resource Tree](#resource-tree)
+  - [Setup](#setup)
+    - [Deployment](#deployment)
+    - [Removal](#removal)
+    - [Configuration](#configuration)
+  - [Tables](#tables)
+  - [Resource Tree](#resource-tree)
 
 ## Setup
 ### Deployment
 
 To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
-1. Install Serverless `npm install serverless -g`
-2. Install AWS CLI `pip3 install awscli --upgrade --user`
-3. Clone this repository `git clone https://github.com/servian/aws-auto-cleanup`
-4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
-5. If you've configure the AWS CLI using a profile, open the `serverless.yml` file and modify the `provider > profile` attribute to match your profile name.
-6. Change the custom `company` attribute within the `serverless.yml` file to your company name in order to prevent S3 Bucket name collision
-7. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
-8. Deploy Auto Cleanup `serverless deploy`
-9. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
-10. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
+ 1. Install Serverless `npm install serverless -g`
+ 2. Install AWS CLI `pip3 install awscli --upgrade --user`
+ 3. Clone this repository `git clone https://github.com/servian/aws-auto-cleanup`
+ 4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
+ 5. If you've configure the AWS CLI using a profile, open the `serverless.yml` file and modify the `provider > profile` attribute to match your profile name.
+ 6. Change the custom `company` attribute within the `serverless.yml` file to your company name in order to prevent S3 Bucket name collision
+ 7. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
+ 8. Deploy Auto Cleanup `serverless deploy`
+ 9. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
+ 10. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
 
 ### Removal
 
@@ -45,7 +45,6 @@ When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanu
 #### Region
 
 Within the `serverless.yml` file, under `provider` there is a `region` attribute. Set this attribute to your desired region.
-
 
 #### Logging
 
@@ -257,12 +256,12 @@ The Whitelist table allows users to add their resources to prevent removal.
 
 The Whitelist table as the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself:
 
-| Column      | Format                                      | Description                                                  |
-| ----------- | ------------------------------------------- | ------------------------------------------------------------ |
+| Column      | Format                                      | Description                                                                                                                                                   |
+| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource type>:<resource name>` | Unique identifier of the resource. This is a custom format base on the service (e.g., EC2, S3), the resource type (e.g., Instance, Bucket) and resource name. |
-| expire_at   | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date        |
-| comment     | Text field                                  | Comment field describing the resource and why it has been whitelisted |
-| owner_email | Email address                               | Email address of the resource owner in case they need to be contacted regarding the whitelisting |
+| expire_at   | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date                                                                                                         |
+| comment     | Text field                                  | Comment field describing the resource and why it has been whitelisted                                                                                         |
+| owner_email | Email address                               | Email address of the resource owner in case they need to be contacted regarding the whitelisting                                                              |
 
 Adding resources to the Whitelist table will ensure those resources are not removed by Auto Cleanup.
 

@@ -60,11 +60,11 @@ class Redshift:
                     if resource_id not in self.whitelist.get('redshift', {}).get('clusters', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if resource_status == 'available':
                                 if not self.dry_run:
                                     self.client.delete_cluster(
-                                        ClusterIdentifier=resource_id, 
+                                        ClusterIdentifier=resource_id,
                                         SkipFinalClusterSnapshot=True)
 
                                 logging.info("Redshift Cluster '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
@@ -109,7 +109,7 @@ class Redshift:
                     if resource_id not in self.whitelist.get('redshift', {}).get('snapshots', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if resource_status in ('available', 'final snapshot'):
                                 if not self.dry_run:
                                     self.client.delete_cluster_snapshot(SnapshotIdentifier=resource_id)

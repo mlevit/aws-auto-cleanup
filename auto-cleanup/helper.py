@@ -1,7 +1,6 @@
 import boto3
 import datetime
 import dateutil.parser
-import os
 
 class Helper:
     def __init__(self):

@@ -58,7 +58,7 @@ class Lambda:
                     if resource_id not in self.whitelist.get('lambda', {}).get('function', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if not self.dry_run:
                                 self.client.delete_function(FunctionName=resource_id)
                             

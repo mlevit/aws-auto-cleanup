@@ -39,8 +39,8 @@ class RDS:
     
     def instances(self):
         """
-        Deletes RDS Instances. If Instance has termination 
-        protection enabled, the protection will be first disabled 
+        Deletes RDS Instances. If Instance has termination
+        protection enabled, the protection will be first disabled
         and then the Instance will be terminated.
         """
         
@@ -62,7 +62,7 @@ class RDS:
                     if resource_id not in self.whitelist.get('rds', {}).get('instance', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if not self.dry_run:
                                 if resource.get('DeletionProtection'):
                                     self.client.modify_db_instance(
@@ -114,9 +114,9 @@ class RDS:
                     if resource_id not in self.whitelist.get('rds', {}).get('snapshot', []):
                         delta = self.helper.get_day_delta(resource_date)
                     
-                        if delta.days > ttl_days: 
+                        if delta.days > ttl_days:
                             if not self.dry_run:
-                                self.client.delete_db_snapshot(DBSnapshotIdentifier=resource_id)    
+                                self.client.delete_db_snapshot(DBSnapshotIdentifier=resource_id)
                             
                             logging.info("RDS Snapshot '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
                         else:

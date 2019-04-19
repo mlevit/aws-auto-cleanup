@@ -26,8 +26,6 @@ Deprecated! We prefer a unified processing of Tree object.
 """
 from __future__ import unicode_literals
 
-import codecs
-
 
 def export_to_dot(tree, filename=None, shape='circle', graph='digraph'):
     """Exports the tree in the dot format of the graphviz software"""
