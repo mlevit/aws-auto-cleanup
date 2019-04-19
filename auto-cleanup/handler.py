@@ -162,7 +162,6 @@ def build_tree(tree_dict):
         logging.critical(str(sys.exc_info()))
 
 
-
 def setup_dynamodb():
     """
     Inserts all the default settings and whitelist data 
