@@ -128,7 +128,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    ResourceTreeBuckett:
+    ResourceTreeBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
