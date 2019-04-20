@@ -1,5 +1,4 @@
 import boto3
-import os
 import sys
 
 from lambda_helper import *
@@ -116,7 +115,7 @@ class S3Cleanup:
                         self.logging.debug("S3 Bucket '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
                 else:
                     self.logging.debug("S3 Bucket '%s' has been whitelisted and has not been deleted." % (resource_id))
-                
+
                 self.resource_tree.get('AWS').setdefault(
                     self.region, {}).setdefault(
                         'S3', {}).setdefault(

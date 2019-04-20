@@ -100,25 +100,33 @@ class Cleanup:
         
         logging.info("Auto Cleanup completed.")
     
-
+    
     def get_settings(self):
         settings = {}
-        for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
-            record_json = dynamodb_json.loads(record, True)
-            settings[record_json.get('key')] = record_json.get('value')
+        try:
+            for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
+                record_json = dynamodb_json.loads(record, True)
+                settings[record_json.get('key')] = record_json.get('value')
+        except:
+            self.logging.error("Could not read DynamoDB table '%s'." % os.environ['SETTINGSTABLE'])
+        
         return settings
     
 
     def get_whitelist(self):
         whitelist = {}
-        for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
-            record_json = dynamodb_json.loads(record, True)
-            parsed_resource_id = LambdaHelper.parse_resource_id(record_json.get('resource_id'))
-            
-            whitelist.setdefault(
-                parsed_resource_id.get('service'), {}).setdefault(
-                    parsed_resource_id.get('resource_type'), []).append(
-                        parsed_resource_id.get('resource'))
+        try:
+            for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
+                record_json = dynamodb_json.loads(record, True)
+                parsed_resource_id = LambdaHelper.parse_resource_id(record_json.get('resource_id'))
+                
+                whitelist.setdefault(
+                    parsed_resource_id.get('service'), {}).setdefault(
+                        parsed_resource_id.get('resource_type'), []).append(
+                            parsed_resource_id.get('resource'))
+        except:
+            self.logging.error("Could not read DynamoDB table '%s'." % os.environ['WHITELISTTABLE'])
+        
         return whitelist
     
 
@@ -217,13 +225,21 @@ class Cleanup:
             try:
                 _, temp_file = tempfile.mkstemp()
             
-                tree.save2file(temp_file)
+                try:
+                    tree.save2file(temp_file)
+                except:
+                    self.logging.error("Could not generate resource tree.")
+                    return None
 
                 client = boto3.client('s3')
                 bucket = os.environ['RESOURCETREEBUCKET']
                 key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
                 
-                client.upload_file(temp_file, bucket, key)
+                try:
+                    client.upload_file(temp_file, bucket, key)
+                except:
+                    self.logging.error("Could not upload resource tree to S3 's3://%s/%s'." % (bucket, key))
+                    return None
 
                 logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
             finally:
@@ -245,4 +261,4 @@ def lambda_handler(event, context):
     logging.getLogger('urllib3').setLevel(logging.ERROR)
     logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
-    cleanup = Cleanup(logging)
+    Cleanup(logging)

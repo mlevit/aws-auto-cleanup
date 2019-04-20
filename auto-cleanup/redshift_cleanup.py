@@ -1,5 +1,4 @@
 import boto3
-import os
 import sys
 
 from lambda_helper import *
