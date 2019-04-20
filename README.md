@@ -171,7 +171,7 @@ Table includes the `clean` attribute which informs Auto Cleanup if the service s
 }
 ```
 
-#### Region
+#### Regions
 
 Table includes the `clean` attribute which informs Auto Cleanup if the region should be cleaned up or not.
 
@@ -289,7 +289,7 @@ An ASCI resource tree (example below) is generated with each invocation of the a
 
 This tree allows users to visualise their AWS resources in a simple fixed width text editor.
 
-```
+```bash
 AWS
 ├── ap-southeast-2
 │   ├── CloudFormation

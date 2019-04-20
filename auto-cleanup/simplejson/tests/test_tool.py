@@ -39,7 +39,7 @@ class TestTool(unittest.TestCase):
             :"yes"}  ]
            """
 
-    expect = textwrap.dedent("""\
+    expect = textwrap.dedent("\
     [
         [
             "blorpie"

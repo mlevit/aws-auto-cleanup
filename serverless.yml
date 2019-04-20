@@ -6,7 +6,7 @@ custom:
 provider:
   name: aws
   runtime: python3.7
-  stage: production
+  stage: dev
   region: ap-southeast-2    # change to your region
   profile: saml             # change to your profile
   environment:
@@ -74,7 +74,7 @@ provider:
 
 functions:
   AutoCleanup:
-    handler: auto-cleanup.handler.main
+    handler: auto-cleanup.lambda_handler.lambda_handler
     name: auto-cleanup-${self:provider.stage}
     description: Auto Cleanup removes unused AWS resources
     memorySize: 128
@@ -84,14 +84,14 @@ functions:
         - auto-cleanup/**
         - data/**
     environment:
-      LOGLEVEL: INFO        # change to DEBUG for testing
+      LOGLEVEL: DEBUG       # change to DEBUG for testing
       RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
     events:
       - schedule:
           rate: rate(3 days)
-          enabled: true
+          enabled: false
 
 resources:
   Resources:

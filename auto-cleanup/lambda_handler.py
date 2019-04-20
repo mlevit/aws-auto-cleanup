@@ -1,82 +1,248 @@
 import boto3
+import datetime
+import json
 import logging
 import os
 import sys
+import tempfile
+import threading
 
-# enable logging
-root = logging.getLogger()
+from dynamodb_json import json_util as dynamodb_json
+from treelib import Tree
 
-if root.handlers:
-    for handler in root.handlers:
-        root.removeHandler(handler)
+from lambda_helper import *
+from cloudformation_cleanup import *
+from dynamodb_cleanup import *
+from ec2_cleanup import *
+from lambda_cleanup import *
+from rds_cleanup import *
+from redshift_cleanup import *
+from s3_cleanup import *
 
-logging.getLogger('boto3').setLevel(logging.ERROR)
-logging.getLogger('botocore').setLevel(logging.ERROR)
-logging.getLogger('urllib3').setLevel(logging.ERROR)
-logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
 
-class Lambda:
-    def __init__(self, helper, whitelist, settings, tree, region):
-        self.helper = helper
-        self.whitelist = whitelist
-        self.settings = settings
-        self.tree = tree
-        self.region = region
+class Cleanup:
+    def __init__(self, logging):
+        self.logging = logging
+
+        # insert default values into settings and whitelist tables
+        self.setup_dynamodb()
         
-        self.dry_run = settings.get('general', {}).get('dry_run', True)
+        # create dictionaries and variables
+        self.resource_tree = {'AWS': {}}
+        self.settings = self.get_settings()
+        self.whitelist = self.get_whitelist()
+        self.dry_run = self.settings.get('general', {}).get('dry_run', True)
+
+        self.run_cleanup()
+
+        self.build_tree(self.resource_tree)
+    
+    
+    def run_cleanup(self):
+        if self.dry_run:
+            logging.info("Auto Cleanup started in DRY RUN mode.")
+        else:
+            logging.info("Auto Cleanup started in DESTROY mode.")
         
+        for region in self.settings.get('regions'):
+            if self.settings.get('regions').get(region).get('clean'):
+                self.logging.info("Switching region to '%s'." % region)
+
+                # threads list
+                threads = []
+
+                # CloudFormation
+                # CloudFormation will run before all others as there is a potential
+                # through the removal of CloudFormation Stacks, many of the other resource will be removed
+                cloudformation_class = CloudFormationCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                cloudformation_class.run()
+
+                # DynamoDB
+                dynamodb_class = DynamoDBCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=dynamodb_class.run, args=())
+                threads.append(thread)
+                
+                # EC2
+                ec2_class = EC2Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=ec2_class.run, args=())
+                threads.append(thread)
+                
+                # Lambda
+                lambda_class = LambdaCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=lambda_class.run, args=())
+                threads.append(thread)
+                
+                # RDS
+                rds_class = RDSCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=rds_class.run, args=())
+                threads.append(thread)
+
+                # Redshift
+                redshift_class = RedshiftCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=redshift_class.run, args=())
+                threads.append(thread)
+
+                # start all threads
+                for thread in threads:
+                    thread.start()
+
+                # make sure that all threads have finished
+                for thread in threads:
+                    thread.join()
+            else:
+                self.logging.debug("Skipping region '%s'." % region)
+            
+        self.logging.info("Switching region to 'global'.")
+
+        # S3
+        s3_class = S3Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree)
+        s3_class.run()
+        
+        logging.info("Auto Cleanup completed.")
+    
+
+    def get_settings(self):
+        settings = {}
+        for record in boto3.client('dynamodb').scan(TableName=os.environ['SETTINGSTABLE'])['Items']:
+            record_json = dynamodb_json.loads(record, True)
+            settings[record_json.get('key')] = record_json.get('value')
+        return settings
+    
+
+    def get_whitelist(self):
+        whitelist = {}
+        for record in boto3.client('dynamodb').scan(TableName=os.environ['WHITELISTTABLE'])['Items']:
+            record_json = dynamodb_json.loads(record, True)
+            parsed_resource_id = LambdaHelper.parse_resource_id(record_json.get('resource_id'))
+            
+            whitelist.setdefault(
+                parsed_resource_id.get('service'), {}).setdefault(
+                    parsed_resource_id.get('resource_type'), []).append(
+                        parsed_resource_id.get('resource'))
+        return whitelist
+    
+
+    def setup_dynamodb(self):
+        """
+        Inserts all the default settings and whitelist data
+        into their respective DynamoDB tables. Records will be
+        skipped if they already exist in the table.
+        """
+
         try:
-            self.client = boto3.client('lambda', region_name=region)
+            client = boto3.client('dynamodb')
+            settings_data = open('data/auto-cleanup-settings.json')
+            whitelist_data = open('data/auto-cleanup-whitelist.json')
+
+            settings_json = json.loads(settings_data.read())
+            whitelist_json = json.loads(whitelist_data.read())
+
+            update_settings = False
+            
+            # get current settings version
+            current_version = client.get_item(
+                TableName=os.environ['SETTINGSTABLE'],
+                Key={'key': {'S': 'version'}},
+                ConsistentRead=True)
+            
+            # get new settings version
+            new_version = float(settings_json[0].get('value', {}).get('N', 0.0))
+            
+            # check if settings exist and if they're older than current settings
+            if 'Item' in current_version:
+                current_version = float(current_version.get('Item').get('value').get('N'))
+                if current_version < new_version:
+                    update_settings = True
+                    logging.info("Existing settings with version %s are being updated to version %s in DynamoDB Table '%s'." % (str(current_version), str(new_version), os.environ['SETTINGSTABLE']))
+                else:
+                    logging.debug("Existing settings are at the lastest version %s in DynamoDB Table '%s'." % (str(current_version), os.environ['SETTINGSTABLE']))
+            else:
+                update_settings = True
+                logging.info("Settings are being inserted into DynamoDB Table '%s' for the first time." % os.environ['SETTINGSTABLE'])
+
+            if update_settings:
+                for setting in settings_json:
+                    try:
+                        client.put_item(
+                            TableName=os.environ['SETTINGSTABLE'],
+                            Item=setting)
+                    except:
+                        logging.critical(str(sys.exc_info()))
+                        continue
+            
+            for whitelist in whitelist_json:
+                try:
+                    client.put_item(
+                        TableName=os.environ['WHITELISTTABLE'],
+                        Item=whitelist,
+                        ConditionExpression="attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)")
+                except:
+                    continue
+        
+            settings_data.close()
+            whitelist_data.close()
         except:
             logging.critical(str(sys.exc_info()))
     
     
-    def run(self):
-        self.functions()
-        self.layers()
-        
-    def functions(self):
+    def build_tree(self, resource_tree):
         """
-        Deletes Lambda Functions.
+        Build ASCI tree and upload to S3.
         """
-        
-        clean = self.settings.get('services').get('lambda', {}).get('functions', {}).get('clean', False)
-        if clean:
-            try:
-                resources = self.client.list_functions().get('Functions')
-            except:
-                logging.critical(str(sys.exc_info()))
-                return None
-            
-            ttl_days = self.settings.get('services').get('lambda', {}).get('functions', {}).get('ttl', 7)
-            
-            for resource in resources:
-                try:
-                    resource_id = resource.get('FunctionName')
-                    resource_date = resource.get('LastModified')
 
-                    if resource_id not in self.whitelist.get('lambda', {}).get('function', []):
-                        delta = self.helper.get_day_delta(resource_date)
-                    
-                        if delta.days > ttl_days:
-                            if not self.dry_run:
-                                self.client.delete_function(FunctionName=resource_id)
-                            
-                            logging.info("Lambda Function '%s' was last modified %d days ago and has been deleted." % (resource_id, delta.days))
-                        else:
-                            logging.debug("Lambda Function '%s' was last modified %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
-                    else:
-                        logging.debug("Lambda Function '%s' has been whitelisted and has not been deleted." % (resource_id))
-                except:
-                    logging.critical(str(sys.exc_info()))
+        try:
+            os.chdir(tempfile.gettempdir())
+            tree = Tree()
+            
+            for aws in resource_tree:
+                aws_key = aws
+                tree.create_node(aws, aws_key)
+
+                for region in resource_tree.get(aws):
+                    region_key = aws_key + region
+                    tree.create_node(region, region_key, parent=aws_key)
+
+                    for service in resource_tree.get(aws).get(region):
+                        service_key = region_key + service
+                        tree.create_node(service, service_key, parent=region_key)
+
+                        for resource_type in resource_tree.get(aws).get(region).get(service):
+                            resource_type_key = service_key + resource_type
+                            tree.create_node(resource_type, resource_type_key, parent=service_key)
+
+                            for resource in resource_tree.get(aws).get(region).get(service).get(resource_type):
+                                resource_key = resource_type_key + resource
+                                tree.create_node(resource, resource_key, parent=resource_type_key)
+            
+            try:
+                _, temp_file = tempfile.mkstemp()
+            
+                tree.save2file(temp_file)
+
+                client = boto3.client('s3')
+                bucket = os.environ['RESOURCETREEBUCKET']
+                key = 'resource_tree_%s.txt' % datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
                 
-                self.tree.get('AWS').setdefault(
-                    self.region, {}).setdefault(
-                        'Lambda', {}).setdefault(
-                            'Functions', []).append(resource_id)
-        else:
-            logging.debug("Skipping cleanup of Lambda Functions.")
-    
-    
-    def layers(self):
-        pass
+                client.upload_file(temp_file, bucket, key)
+
+                logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+            finally:
+                os.remove(temp_file)
+        except:
+            logging.critical(str(sys.exc_info()))
+
+
+def lambda_handler(event, context):
+    # enable logging
+    root = logging.getLogger()
+
+    if root.handlers:
+        for handler in root.handlers:
+            root.removeHandler(handler)
+
+    logging.getLogger('boto3').setLevel(logging.ERROR)
+    logging.getLogger('botocore').setLevel(logging.ERROR)
+    logging.getLogger('urllib3').setLevel(logging.ERROR)
+    logging.basicConfig(format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)", level=os.environ.get('LOGLEVEL', 'WARNING').upper())
+
+    cleanup = Cleanup(logging)
