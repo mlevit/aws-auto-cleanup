@@ -40,9 +40,9 @@ class Cleanup:
     
     def run_cleanup(self):
         if self.dry_run:
-            logging.info("Auto Cleanup started in DRY RUN mode.")
+            self.logging.info("Auto Cleanup started in DRY RUN mode.")
         else:
-            logging.info("Auto Cleanup started in DESTROY mode.")
+            self.logging.info("Auto Cleanup started in DESTROY mode.")
         
         for region in self.settings.get('regions'):
             if self.settings.get('regions').get(region).get('clean'):
@@ -98,7 +98,7 @@ class Cleanup:
         s3_class = S3Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree)
         s3_class.run()
         
-        logging.info("Auto Cleanup completed.")
+        self.logging.info("Auto Cleanup completed.")
     
     
     def get_settings(self):
@@ -129,8 +129,8 @@ class Cleanup:
         
         return whitelist
     
-    @classmethod
-    def setup_dynamodb():
+    
+    def setup_dynamodb(self):
         """
         Inserts all the default settings and whitelist data
         into their respective DynamoDB tables. Records will be
@@ -161,12 +161,12 @@ class Cleanup:
                 current_version = float(current_version.get('Item').get('value').get('N'))
                 if current_version < new_version:
                     update_settings = True
-                    logging.info("Existing settings with version %s are being updated to version %s in DynamoDB Table '%s'." % (str(current_version), str(new_version), os.environ['SETTINGSTABLE']))
+                    self.logging.info("Existing settings with version %s are being updated to version %s in DynamoDB Table '%s'." % (str(current_version), str(new_version), os.environ['SETTINGSTABLE']))
                 else:
-                    logging.debug("Existing settings are at the lastest version %s in DynamoDB Table '%s'." % (str(current_version), os.environ['SETTINGSTABLE']))
+                    self.logging.debug("Existing settings are at the lastest version %s in DynamoDB Table '%s'." % (str(current_version), os.environ['SETTINGSTABLE']))
             else:
                 update_settings = True
-                logging.info("Settings are being inserted into DynamoDB Table '%s' for the first time." % os.environ['SETTINGSTABLE'])
+                self.logging.info("Settings are being inserted into DynamoDB Table '%s' for the first time." % os.environ['SETTINGSTABLE'])
 
             if update_settings:
                 for setting in settings_json:
@@ -175,7 +175,7 @@ class Cleanup:
                             TableName=os.environ['SETTINGSTABLE'],
                             Item=setting)
                     except:
-                        logging.critical(str(sys.exc_info()))
+                        self.logging.critical(str(sys.exc_info()))
                         continue
             
             for whitelist in whitelist_json:
@@ -190,7 +190,7 @@ class Cleanup:
             settings_data.close()
             whitelist_data.close()
         except:
-            logging.critical(str(sys.exc_info()))
+            self.logging.critical(str(sys.exc_info()))
     
     
     def build_tree(self, resource_tree):
@@ -241,11 +241,11 @@ class Cleanup:
                     self.logging.error("Could not upload resource tree to S3 's3://%s/%s'." % (bucket, key))
                     return None
 
-                logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
+                self.logging.info("Resource tree has been built and uploaded to S3 's3://%s/%s'." % (bucket, key))
             finally:
                 os.remove(temp_file)
         except:
-            logging.critical(str(sys.exc_info()))
+            self.logging.critical(str(sys.exc_info()))
 
 
 def lambda_handler(event, context):
