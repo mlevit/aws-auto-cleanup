@@ -58,7 +58,7 @@ class CloudFormationCleanup:
                         self.logging.debug("CloudFormation Stack '%s' was last modified %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
                 else:
                     self.logging.debug("CloudFormation Stack '%s' has been whitelisted and has not been deleted." % (resource_id))
-                    
+                
                 self.resource_tree.get('AWS').setdefault(
                     self.region, {}).setdefault(
                         'CloudFormation', {}).setdefault(

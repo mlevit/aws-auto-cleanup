@@ -129,8 +129,8 @@ class Cleanup:
         
         return whitelist
     
-
-    def setup_dynamodb(self):
+    @classmethod
+    def setup_dynamodb():
         """
         Inserts all the default settings and whitelist data
         into their respective DynamoDB tables. Records will be

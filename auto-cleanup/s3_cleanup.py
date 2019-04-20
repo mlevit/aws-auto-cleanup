@@ -33,7 +33,7 @@ class S3Cleanup:
             try:
                 resources = self.client.list_buckets()
             except:
-                logging.critical(str(sys.exc_info()))
+                self.logging.critical(str(sys.exc_info()))
                 return None
             
             ttl_days = self.settings.get('services').get('s3', {}).get('buckets', {}).get('ttl', 7)
@@ -115,7 +115,7 @@ class S3Cleanup:
                         self.logging.debug("S3 Bucket '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
                 else:
                     self.logging.debug("S3 Bucket '%s' has been whitelisted and has not been deleted." % (resource_id))
-
+                
                 self.resource_tree.get('AWS').setdefault(
                     self.region, {}).setdefault(
                         'S3', {}).setdefault(
