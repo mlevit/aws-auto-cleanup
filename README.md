@@ -25,9 +25,10 @@ To deploy this Auto Cleanup to your AWS account, follow the below steps:
 5. If you've configure the AWS CLI using a profile, open the `serverless.yml` file and modify the `provider > profile` attribute to match your profile name.
 6. Change the custom `company` attribute within the `serverless.yml` file to your company name in order to prevent S3 Bucket name collision
 7. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
-8. Deploy Auto Cleanup `serverless deploy`
-9. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
-10. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
+8. Install Serverless plugin `serverless plugin install -n serverless-python-requirements`
+9. Deploy Auto Cleanup `serverless deploy`
+10. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
+11. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
 
 ### Removal
 

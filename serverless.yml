@@ -8,9 +8,9 @@ provider:
   runtime: python3.7
   stage: production
   region: ap-southeast-2    # change to your region
-  profile: saml             # change to your profile
+  profile: saml             # change to your profile  
   environment:
-    PYTHONPATH: "/var/task/auto-cleanup:/var/runtime"
+    PYTHONPATH: "/var/task/auto-cleanup:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -71,6 +71,8 @@ provider:
         - s3:List*
         - s3:PutObject
       Resource: "*"
+  tracing:
+    lambda: true
 
 functions:
   AutoCleanup:
@@ -83,6 +85,9 @@ functions:
       include:
         - auto-cleanup/**
         - data/**
+        - dynamodb_json/**
+        - simplejson/**
+        - treelib/**
     environment:
       LOGLEVEL: INFO       # change to DEBUG for testing
       RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
@@ -93,42 +98,5 @@ functions:
           rate: rate(3 days)
           enabled: true
 
-resources:
-  Resources:
-    SettingsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: auto-cleanup-settings-${self:provider.stage}
-        AttributeDefinitions:
-          - AttributeName: key
-            AttributeType: S
-        KeySchema:
-          - AttributeName: key
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    WhitelistTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: auto-cleanup-whitelist-${self:provider.stage}
-        AttributeDefinitions:
-          - AttributeName: resource_id
-            AttributeType: S
-          - AttributeName: expire_at
-            AttributeType: N
-        KeySchema:
-          - AttributeName: resource_id
-            KeyType: HASH
-          - AttributeName: expire_at
-            KeyType: RANGE
-        TimeToLiveSpecification:
-          AttributeName: expire_at
-          Enabled: true
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    ResourceTreeBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
+plugins:
+  - serverless-python-requirements
