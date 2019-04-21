@@ -1,0 +1,16 @@
+{
+  "name": "auto-cleanup",
+  "description": "Open source application to programatically clean your AWS resources based on a whitelist and time to live (TTL) settings",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "serverless": "^1.41.0"
+  },
+  "devDependencies": {
+    "serverless-python-requirements": "^4.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:servian/aws-auto-cleanup.git"
+  }
+}
