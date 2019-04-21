@@ -48,7 +48,7 @@ class DynamoDBCleanup:
                             try:
                                 self.client.delete_table(TableName=resource)
                             except:
-                                self.logging.error("Could not delete Table '%s'." % resource)
+                                self.logging.error("Could not delete DynamoDB Table '%s'." % resource)
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         

@@ -50,7 +50,7 @@ class EC2Cleanup:
                             try:
                                 self.client.release_address(AllocationId=resource_id)
                             except:
-                                self.logging.error("Could not release Address '%s'." % resource_id)
+                                self.logging.error("Could not release EC2 Address '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
@@ -100,7 +100,7 @@ class EC2Cleanup:
                                     try:
                                         self.client.stop_instances(InstanceIds=[resource_id])
                                     except:
-                                        self.logging.error("Could not stop Instance '%s'." % resource_id)
+                                        self.logging.error("Could not stop EC2 Instance '%s'." % resource_id)
                                         self.logging.error(str(sys.exc_info()))
                                         break
                                 
@@ -113,7 +113,7 @@ class EC2Cleanup:
                                             Attribute='disableApiTermination',
                                             InstanceId=resource_id).get('DisableApiTermination').get('Value')
                                     except:
-                                        self.logging.error("Could not get if protection for Instance '%s' is on." % resource_id)
+                                        self.logging.error("Could not get if protection for EC2 Instance '%s' is on." % resource_id)
                                         self.logging.error(str(sys.exc_info()))
                                         break
                                     
@@ -123,7 +123,7 @@ class EC2Cleanup:
                                                 DisableApiTermination={'Value': False},
                                                 InstanceId=resource_id)
                                         except:
-                                            self.logging.error("Could not remove termination protection from Instance '%s'." % resource_id)
+                                            self.logging.error("Could not remove termination protection from EC2 Instance '%s'." % resource_id)
                                             self.logging.error(str(sys.exc_info()))
                                             break
                                     
@@ -132,7 +132,7 @@ class EC2Cleanup:
                                     try:
                                         self.client.terminate_instances(InstanceIds=[resource_id])
                                     except:
-                                        self.logging.error("Could not delete Instance '%s'." % resource_id)
+                                        self.logging.error("Could not delete Instance EC2 '%s'." % resource_id)
                                         self.logging.error(str(sys.exc_info()))
                                         break
                                 
@@ -174,7 +174,7 @@ class EC2Cleanup:
                     try:
                         images = self.client.describe_images(ExecutableUsers=[self.account_id]).get('Images')
                     except:
-                        self.logging.error("Could not retrieve AMIs.")
+                        self.logging.error("Could not retrieve EC2 AMIs.")
                         self.logging.error(str(sys.exc_info()))
                         break
                     
@@ -197,7 +197,7 @@ class EC2Cleanup:
                                 try:
                                     self.client.delete_snapshot(SnapshotId=resource_id)
                                 except:
-                                    self.logging.error("Could not delete Snapshot '%s'." % resource_id)
+                                    self.logging.error("Could not delete EC2 Snapshot '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
                             
@@ -245,7 +245,7 @@ class EC2Cleanup:
                                 try:
                                     self.client.delete_volume(VolumeId=resource_id)
                                 except:
-                                    self.logging.error("Could not delete Volume '%s'." % resource_id)
+                                    self.logging.error("Could not delete EC2 Volume '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
                             

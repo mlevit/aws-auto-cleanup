@@ -54,7 +54,7 @@ class RedshiftCleanup:
                                         ClusterIdentifier=resource_id,
                                         SkipFinalClusterSnapshot=True)
                                 except:
-                                    self.logging.error("Could not delete Cluster '%s'." % resource_id)
+                                    self.logging.error("Could not delete Redshift Cluster '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
 
@@ -103,7 +103,7 @@ class RedshiftCleanup:
                                 try:
                                     self.client.delete_cluster_snapshot(SnapshotIdentifier=resource_id)
                                 except:
-                                    self.logging.error("Could not delete Snapshot '%s'." % resource_id)
+                                    self.logging.error("Could not delete Redshift Snapshot '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
 

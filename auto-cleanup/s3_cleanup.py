@@ -51,7 +51,7 @@ class S3Cleanup:
                             try:
                                 response = self.client.list_objects_v2(Bucket=resource_id)
                             except:
-                                self.logging.error("Could not retrieve all Objects from Bucket '%s'." % resource_id)
+                                self.logging.error("Could not retrieve all Objects from S3 Bucket '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
 
@@ -65,7 +65,7 @@ class S3Cleanup:
                                             'Objects': [{'Key':obj.get('Key')} for obj in response.get('Contents')],
                                             'Quiet': True})
                                 except:
-                                    self.logging.error("Could not delete Objects from Bucket '%s'." % resource_id)
+                                    self.logging.error("Could not delete Objects from S3 Bucket '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                 
                                 response = self.client.list_objects_v2(Bucket=resource_id)
@@ -74,7 +74,7 @@ class S3Cleanup:
                             try:
                                 response = self.client.get_paginator('list_object_versions')
                             except:
-                                self.logging.error("Could not get all Versions and Delete Markers from Bucket '%s'." % resource_id)
+                                self.logging.error("Could not get all Versions and Delete Markers from S3 Bucket '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
 
@@ -99,7 +99,7 @@ class S3Cleanup:
                                             'Objects': delete_list[i:i+1000],
                                             'Quiet': True})
                                 except:
-                                    self.logging.error("Could not delete Versions and Delete Markers from Bucket '%s'." % resource_id)
+                                    self.logging.error("Could not delete Versions and Delete Markers from S3 Bucket '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
                             

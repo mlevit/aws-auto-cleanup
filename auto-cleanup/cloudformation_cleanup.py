@@ -49,7 +49,7 @@ class CloudFormationCleanup:
                             try:
                                 self.client.delete_stack(StackName=resource_id)
                             except:
-                                self.logging.error("Could not delete Stack '%s'." % resource_id)
+                                self.logging.error("Could not delete CloudFormation Stack '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         

@@ -50,7 +50,7 @@ class LambdaCleanup:
                             try:
                                 self.client.delete_function(FunctionName=resource_id)
                             except:
-                                self.logging.error("Could not delete Function '%s'." % resource_id)
+                                self.logging.error("Could not delete Lambda Function '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         

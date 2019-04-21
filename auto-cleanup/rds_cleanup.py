@@ -58,7 +58,7 @@ class RDSCleanup:
                                     
                                     self.logging.info("RDS Instance '%s' had delete protection turned on and now has been turned off." % (resource_id))
                                 except:
-                                    self.logging.error("Could not remove termination protection from Instance '%s'." % resource_id)
+                                    self.logging.error("Could not remove termination protection from RDS Instance '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
                             
@@ -68,7 +68,7 @@ class RDSCleanup:
                                     DBInstanceIdentifier=resource_id,
                                     SkipFinalSnapshot=True)
                             except:
-                                self.logging.error("Could not delete Instance '%s'." % resource_id)
+                                self.logging.error("Could not delete RDS Instance '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
@@ -113,7 +113,7 @@ class RDSCleanup:
                             try:
                                 self.client.delete_db_snapshot(DBSnapshotIdentifier=resource_id)
                             except:
-                                self.logging.error("Could not delete Snapshot '%s'." % resource_id)
+                                self.logging.error("Could not delete RDS Snapshot '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
