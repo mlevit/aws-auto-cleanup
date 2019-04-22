@@ -2,7 +2,7 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4f20fbbb03464b9aa6c558a4415d2288)](https://app.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Grade_Settings)
 
-Open source application to programatically clean your AWS resources based on a whitelist and time to live (TTL) settings.
+Open source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings.
 
 ## Table of Contents
 
