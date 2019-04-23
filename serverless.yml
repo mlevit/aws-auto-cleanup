@@ -6,7 +6,7 @@ custom:
 provider:
   name: aws
   runtime: python3.7
-  stage: production
+  stage: dev
   region: ap-southeast-2    # change to your region
   profile: saml             # change to your profile  
   environment:
@@ -42,6 +42,11 @@ provider:
         - ec2:ReleaseAddress
         - ec2:StopInstances
         - ec2:TerminateInstances
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - elasticmapreduce:ListClusters
+        - elasticmapreduce:TerminateJobFlows
       Resource: "*"
     - Effect: Allow
       Action:
@@ -89,7 +94,7 @@ functions:
         - simplejson/**
         - treelib/**
     environment:
-      LOGLEVEL: INFO       # change to DEBUG for testing
+      LOGLEVEL: DEBUG       # change to DEBUG for testing
       RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}

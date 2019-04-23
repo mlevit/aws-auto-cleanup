@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "0.6"
+      "N": "0.7"
     }
   },
   {
@@ -83,6 +83,20 @@
               }
             },
             "volumes": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "emr": {
+          "M": {
+            "clusters": {
               "M": {
                 "clean": {
                   "BOOL": true
