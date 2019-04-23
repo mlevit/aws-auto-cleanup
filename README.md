@@ -93,7 +93,7 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 | Key     | Value |
 | ------- | ----- |
-| version | x.x   |
+| Version | x.x   |
 
 #### General
 
@@ -105,21 +105,22 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
 
-| Service        | Resource Type | Clean | TTL  |
-| -------------- | ------------- | ----- | ---- |
-| CloudFormation | Stacks        | True  | 7    |
-| DynamoDB       | Tables        | True  | 7    |
-| EC2            | Addresses     | True  | 7    |
-|                | Instances     | True  | 7    |
-|                | Snapshots     | True  | 7    |
-|                | Volumes       | True  | 7    |
-| EMR            | Clusters      | True  | 7    |
-| Lambda         | Functions     | True  | 7    |
-| RDS            | Instances     | True  | 7    |
-|                | Snapshots     | True  | 7    |
-| Redshift       | Clusters      | True  | 7    |
-|                | Snapshots     | True  | 7    |
-| S3             | Buckets       | True  | 7    |
+| Service        | Resource Type   | Clean | TTL  |
+| -------------- | --------------- | ----- | ---- |
+| CloudFormation | Stacks          | True  | 7    |
+| DynamoDB       | Tables          | True  | 7    |
+| EC2            | Addresses       | True  | N/A  |
+|                | Instances       | True  | 7    |
+|                | Security Groups | True  | N/A  |
+|                | Snapshots       | True  | 7    |
+|                | Volumes         | True  | 7    |
+| EMR            | Clusters        | True  | 7    |
+| Lambda         | Functions       | True  | 7    |
+| RDS            | Instances       | True  | 7    |
+|                | Snapshots       | True  | 7    |
+| Redshift       | Clusters        | True  | 7    |
+|                | Snapshots       | True  | 7    |
+| S3             | Buckets         | True  | 7    |
 
 #### Regions
 
