@@ -54,11 +54,14 @@ class EC2Cleanup:
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
-                        self.logging.info("EC2 Address '%s' is not associated with an EC2 instance and has been released." % (resource.get('PublicIp')))
+                        self.logging.info(("EC2 Address '%s' is not associated with an EC2 instance and has "
+                                           "been released.") % (resource.get('PublicIp')))
                     else:
-                        self.logging.debug("EC2 Address '%s' is associated with an EC2 instance and has not been deleted." % (resource_id))
+                        self.logging.debug(("EC2 Address '%s' is associated with an EC2 instance and has not "
+                                            "been deleted.") % (resource_id))
                 else:
-                    self.logging.debug("EC2 Address '%s' has been whitelisted and has not been deleted." % (resource_id))
+                    self.logging.debug(("EC2 Address '%s' has been whitelisted and has not "
+                                        "been deleted.") % (resource_id))
                 
                 self.resource_tree.get('AWS').setdefault(
                     self.region, {}).setdefault(
@@ -104,7 +107,8 @@ class EC2Cleanup:
                                         self.logging.error(str(sys.exc_info()))
                                         break
                                 
-                                self.logging.info("EC2 Instance '%s' in a 'running' state was last launched %d days ago and has been stopped." % (resource_id, delta.days))
+                                self.logging.info(("EC2 Instance '%s' in a 'running' state was last "
+                                                   "launched %d days ago and has been stopped.") % (resource_id, delta.days))
                             elif resource_state == 'stopped':
                                 if not self.settings.get('general', {}).get('dry_run', True):
                                     # disable termination protection before terminating the instance
@@ -127,7 +131,8 @@ class EC2Cleanup:
                                             self.logging.error(str(sys.exc_info()))
                                             break
                                     
-                                        self.logging.info("EC2 Instance '%s' had termination protection turned on and now has been turned off." % (resource_id))
+                                        self.logging.info(("EC2 Instance '%s' had termination protection "
+                                                           "turned on and now has been turned off.") % (resource_id))
                                 
                                     try:
                                         self.client.terminate_instances(InstanceIds=[resource_id])
@@ -136,9 +141,11 @@ class EC2Cleanup:
                                         self.logging.error(str(sys.exc_info()))
                                         break
                                 
-                                self.logging.info("EC2 Instance '%s' in a 'stopped' state was last launched %d days ago and has been terminated." % (resource_id, delta.days))
+                                self.logging.info(("EC2 Instance '%s' in a 'stopped' state was last "
+                                                   "launched %d days ago and has been terminated.") % (resource_id, delta.days))
                         else:
-                            self.logging.debug("EC2 Instance '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                            self.logging.debug(("EC2 Instance '%s' was created %d days ago "
+                                                "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                     else:
                         self.logging.debug("EC2 Instance '%s' has been whitelisted and has not been deleted." % (resource_id))
                     
@@ -201,11 +208,14 @@ class EC2Cleanup:
                                     self.logging.error(str(sys.exc_info()))
                                     break
                             
-                            self.logging.info("EC2 Snapshot '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            self.logging.info(("EC2 Snapshot '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
-                            self.logging.debug("EC2 Snapshot '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                            self.logging.debug(("EC2 Snapshot '%s' was created %d days ago "
+                                                "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                     else:
-                        self.logging.debug("EC2 Snapshot '%s' is currently used by an AMI and cannot been deleted without deleting the AMI first." % (resource_id))
+                        self.logging.debug(("EC2 Snapshot '%s' is currently used by an AMI "
+                                            "and cannot been deleted without deleting the AMI first.") % (resource_id))
                 else:
                     self.logging.debug("EC2 Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))
                 
@@ -249,11 +259,14 @@ class EC2Cleanup:
                                     self.logging.error(str(sys.exc_info()))
                                     break
                             
-                            self.logging.info("EC2 Volume '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            self.logging.info(("EC2 Volume '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
-                            self.logging.debug("EC2 Volume '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                            self.logging.debug(("EC2 Volume '%s' was created %d days ago "
+                                                "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                     else:
-                        self.logging.debug("EC2 Volume '%s' is attached to an EC2 instance and has not been deleted." % (resource_id))
+                        self.logging.debug(("EC2 Volume '%s' is attached to an EC2 instance "
+                                            "and has not been deleted.") % (resource_id))
                 else:
                     self.logging.debug("EC2 Volume '%s' has been whitelisted and has not been deleted." % (resource_id))
                 

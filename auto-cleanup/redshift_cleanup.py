@@ -58,11 +58,13 @@ class RedshiftCleanup:
                                     self.logging.error(str(sys.exc_info()))
                                     break
 
-                            self.logging.info("Redshift Cluster '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            self.logging.info(("Redshift Cluster '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
                             self.logging.debug("Redshift Cluster '%s' in state '%s' cannot be deleted." % (resource_id, resource_status))
                     else:
-                        self.logging.debug("Redshift Cluster '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("Redshift Cluster '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("Redshift Cluster '%s' has been whitelisted and has not been deleted." % (resource_id))
                 
@@ -107,11 +109,13 @@ class RedshiftCleanup:
                                     self.logging.error(str(sys.exc_info()))
                                     break
 
-                            self.logging.info("Redshift Snapshot '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            self.logging.info(("Redshift Snapshot '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
                             self.logging.debug("Redshift Snapshot '%s' in state '%s' cannot be deleted." % (resource_id, resource_status))
                     else:
-                        self.logging.debug("Redshift Snapshot '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("Redshift Snapshot '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("Redshift Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))
                 

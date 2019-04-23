@@ -110,9 +110,11 @@ class S3Cleanup:
                                 self.logging.error("Could not delete Bucket '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
                         
-                        self.logging.info("S3 Bucket '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                        self.logging.info(("S3 Bucket '%s' was created %d days ago "
+                                           "and has been deleted.") % (resource_id, delta.days))
                     else:
-                        self.logging.debug("S3 Bucket '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("S3 Bucket '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("S3 Bucket '%s' has been whitelisted and has not been deleted." % (resource_id))
                 

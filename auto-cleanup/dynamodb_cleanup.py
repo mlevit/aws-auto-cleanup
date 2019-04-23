@@ -52,11 +52,14 @@ class DynamoDBCleanup:
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
-                        self.logging.info("DynamoDB Table '%s' was created %d days ago and has been deleted." % (resource, delta.days))
+                        self.logging.info(("DynamoDB Table '%s' was created %d days ago "
+                                           "and has been deleted.") % (resource, delta.days))
                     else:
-                        self.logging.debug("DynamoDB Table '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource, delta.days))
+                        self.logging.debug(("DynamoDB Table '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource, delta.days))
                 else:
-                    self.logging.debug("DynamoDB Table '%s' has been whitelisted and has not been deleted." % (resource))
+                    self.logging.debug(("DynamoDB Table '%s' has been whitelisted and has not "
+                                        "been deleted.") % (resource))
                 
                 self.resource_tree.get('AWS').setdefault(
                     self.region, {}).setdefault(

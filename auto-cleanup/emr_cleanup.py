@@ -46,7 +46,7 @@ class EMRCleanup:
                     delta = LambdaHelper.get_day_delta(resource_date)
                 
                     if delta.days > ttl_days:
-                        if resource_status == 'RUNNING':
+                        if resource_status in ('RUNNING', 'WAITING'):
                             if not self.settings.get('general', {}).get('dry_run', True):
                                 try:
                                     self.client.terminate_job_flows(
@@ -55,12 +55,14 @@ class EMRCleanup:
                                     self.logging.error("Could not delete EMR Cluster '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
                                     break
-
-                            self.logging.info("EMR Cluster '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            
+                            self.logging.info(("EMR Cluster '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
                             self.logging.debug("EMR Cluster '%s' in state '%s' cannot be deleted." % (resource_id, resource_status))
                     else:
-                        self.logging.debug("EMR Cluster '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("EMR Cluster '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("EMR Cluster '%s' has been whitelisted and has not been deleted." % (resource_id))
                 
