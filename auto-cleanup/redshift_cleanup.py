@@ -43,7 +43,7 @@ class RedshiftCleanup:
                 resource_date = resource.get('ClusterCreateTime')
                 resource_status = resource.get('ClusterStatus')
 
-                if resource_id not in self.whitelist.get('redshift', {}).get('clusters', []):
+                if resource_id not in self.whitelist.get('redshift', {}).get('cluster', []):
                     delta = LambdaHelper.get_day_delta(resource_date)
                 
                     if delta.days > ttl_days:
@@ -58,11 +58,13 @@ class RedshiftCleanup:
                                     self.logging.error(str(sys.exc_info()))
                                     break
 
-                            self.logging.info("Redshift Cluster '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            self.logging.info(("Redshift Cluster '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
                             self.logging.debug("Redshift Cluster '%s' in state '%s' cannot be deleted." % (resource_id, resource_status))
                     else:
-                        self.logging.debug("Redshift Cluster '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("Redshift Cluster '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("Redshift Cluster '%s' has been whitelisted and has not been deleted." % (resource_id))
                 
@@ -87,7 +89,7 @@ class RedshiftCleanup:
                 self.logging.error(str(sys.exc_info()))
                 return None
             
-            ttl_days = self.settings.get('services').get('redshift', {}).get('snapshots', {}).get('ttl', 7)
+            ttl_days = self.settings.get('services').get('redshift', {}).get('snapshot', {}).get('ttl', 7)
             
             for resource in resources:
                 resource_id = resource.get('SnapshotIdentifier')
@@ -107,11 +109,13 @@ class RedshiftCleanup:
                                     self.logging.error(str(sys.exc_info()))
                                     break
 
-                            self.logging.info("Redshift Snapshot '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                            self.logging.info(("Redshift Snapshot '%s' was created %d days ago "
+                                               "and has been deleted.") % (resource_id, delta.days))
                         else:
                             self.logging.debug("Redshift Snapshot '%s' in state '%s' cannot be deleted." % (resource_id, resource_status))
                     else:
-                        self.logging.debug("Redshift Snapshot '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("Redshift Snapshot '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("Redshift Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))
                 

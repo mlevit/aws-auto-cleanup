@@ -56,7 +56,8 @@ class RDSCleanup:
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False)
                                     
-                                    self.logging.info("RDS Instance '%s' had delete protection turned on and now has been turned off." % (resource_id))
+                                    self.logging.info(("RDS Instance '%s' had delete protection turned on "
+                                                       "and now has been turned off.") % (resource_id))
                                 except:
                                     self.logging.error("Could not remove termination protection from RDS Instance '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
@@ -72,9 +73,11 @@ class RDSCleanup:
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
-                        self.logging.info("RDS Instance '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                        self.logging.info(("RDS Instance '%s' was created %d days ago "
+                                           "and has been deleted.") % (resource_id, delta.days))
                     else:
-                        self.logging.debug("RDS Instance '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("RDS Instance '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("RDS Instance '%s' has been whitelisted and has not been deleted." % (resource_id))
                 
@@ -117,9 +120,11 @@ class RDSCleanup:
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
-                        self.logging.info("RDS Snapshot '%s' was created %d days ago and has been deleted." % (resource_id, delta.days))
+                        self.logging.info(("RDS Snapshot '%s' was created %d days ago "
+                                           "and has been deleted.") % (resource_id, delta.days))
                     else:
-                        self.logging.debug("RDS Snapshot '%s' was created %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("RDS Snapshot '%s' was created %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("RDS Snapshot '%s' has been whitelisted and has not been deleted." % (resource_id))
                 

@@ -54,9 +54,11 @@ class LambdaCleanup:
                                 self.logging.error(str(sys.exc_info()))
                                 break
                         
-                        self.logging.info("Lambda Function '%s' was last modified %d days ago and has been deleted." % (resource_id, delta.days))
+                        self.logging.info(("Lambda Function '%s' was last modified %d days ago "
+                                           "and has been deleted.") % (resource_id, delta.days))
                     else:
-                        self.logging.debug("Lambda Function '%s' was last modified %d days ago (less than TTL setting) and has not been deleted." % (resource_id, delta.days))
+                        self.logging.debug(("Lambda Function '%s' was last modified %d days ago "
+                                            "(less than TTL setting) and has not been deleted.") % (resource_id, delta.days))
                 else:
                     self.logging.debug("Lambda Function '%s' has been whitelisted and has not been deleted." % (resource_id))
                 

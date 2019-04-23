@@ -45,6 +45,11 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - elasticmapreduce:ListClusters
+        - elasticmapreduce:TerminateJobFlows
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - lambda:DeleteFunction
         - lambda:ListFunctions
       Resource: "*"

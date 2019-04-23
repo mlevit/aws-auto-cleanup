@@ -14,6 +14,7 @@ from lambda_helper import *
 from cloudformation_cleanup import *
 from dynamodb_cleanup import *
 from ec2_cleanup import *
+from emr_cleanup import *
 from lambda_cleanup import *
 from rds_cleanup import *
 from redshift_cleanup import *
@@ -52,7 +53,7 @@ class Cleanup:
                 threads = []
 
                 # CloudFormation
-                # CloudFormation will run before all others as there is a potential
+                # CloudFormation will run before all other cleanup operations as there is a potential
                 # through the removal of CloudFormation Stacks, many of the other resource will be removed
                 cloudformation_class = CloudFormationCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
                 cloudformation_class.run()
@@ -61,10 +62,10 @@ class Cleanup:
                 dynamodb_class = DynamoDBCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
                 thread = threading.Thread(target=dynamodb_class.run, args=())
                 threads.append(thread)
-                
-                # EC2
-                ec2_class = EC2Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
-                thread = threading.Thread(target=ec2_class.run, args=())
+
+                # EMR
+                emr_class = EMRCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=emr_class.run, args=())
                 threads.append(thread)
                 
                 # Lambda
@@ -89,6 +90,12 @@ class Cleanup:
                 # make sure that all threads have finished
                 for thread in threads:
                     thread.join()
+                
+                # EC2
+                # EC2 will run after all other cleanup operations as there is a potential
+                # through the removal of other services, EC2 instances will be cleaned up
+                ec2_class = EC2Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                ec2_class.run()
             else:
                 self.logging.debug("Skipping region '%s'." % region)
             

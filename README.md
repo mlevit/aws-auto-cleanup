@@ -18,17 +18,25 @@ Open source application to programmatically clean your AWS resources based on a 
 
 To deploy this Auto Cleanup to your AWS account, follow the below steps:
 
-1. Install Serverless `npm install serverless -g`
-2. Install AWS CLI `pip3 install awscli --upgrade --user`
-3. Clone this repository `git clone https://github.com/servian/aws-auto-cleanup`
+1. Install Serverless
+   `npm install serverless -g`
+2. Install AWS CLI 
+   `pip3 install awscli --upgrade --user`
+3. Clone this repository 
+   `git clone https://github.com/servian/aws-auto-cleanup`
 4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
 5. If you've configure the AWS CLI using a profile, open the `serverless.yml` file and modify the `provider > profile` attribute to match your profile name.
 6. Change the custom `company` attribute within the `serverless.yml` file to your company name in order to prevent S3 Bucket name collision
-7. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
-8. Install Serverless plugin `serverless plugin install -n serverless-python-requirements`
-9. Deploy Auto Cleanup `serverless deploy`
-10. Invoke Auto Cleanup for the first time `serverless invoke -f AutoCleanup`
-11. Check Auto Cleanup logs `serverless logs -f AutoCleanup`
+7. Change into the Auto Cleanup directory 
+   `cd aws-auto-cleanup`
+8. Install Serverless plugin 
+   `serverless plugin install -n serverless-python-requirements`
+9. Deploy Auto Cleanup 
+   `serverless deploy`
+10. Invoke Auto Cleanup for the first time 
+      `serverless invoke -f AutoCleanup`
+11. Check Auto Cleanup logs 
+      `serverless logs -f AutoCleanup`
 
 ### Removal
 
@@ -36,8 +44,10 @@ Auto Cleanup is deployed using the Serverless Framework which under the hood cre
 
 To remove Auto Cleanup from your AWS account, follow the below steps:
 
-1. Change into the Auto Cleanup directory `cd aws-auto-cleanup`
-2. Remove Auto Cleanup `serverless remove`
+1. Change into the Auto Cleanup directory 
+   `cd aws-auto-cleanup`
+2. Remove Auto Cleanup 
+   `serverless remove`
 
 ### Configuration
 
@@ -81,165 +91,61 @@ By default, the below settings are automatically inserted when Auto Cleanup is r
 
 The version is used to inform Auto Cleanup if new settings exist in the default data file that should be loaded into DynamoDB. If the version present in the default data file is greater than the version in DynamoDB table, the load will commence.
 
-```json
-{
-  "key": "version",
-  "value": x.x
-}
-```
+| Key     | Value |
+| ------- | ----- |
+| version | x.x   |
 
 #### General
 
-```json
-{
-  "key": "general",
-  "value": {
-    "dry_run": true
-  }
-}
-```
+| Key     | Value |
+| ------- | ----- |
+| Dry Run | True  |
 
 #### Services
 
 Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
 
-```json
-{
-  "key": "services",
-  "value": {
-    "cloudformation": {
-      "stacks": {
-        "clean": true,
-        "ttl": 7
-      }
-    },
-    "dynamodb": {
-      "tables": {
-        "clean": true,
-        "ttl": 7
-      }
-    },
-    "ec2": {
-      "addresses": {
-        "clean": true
-      },
-      "instances": {
-        "clean": true,
-        "ttl": 7
-      },
-      "snapshots": {
-        "clean": true,
-        "ttl": 7
-      },
-      "volumes": {
-        "clean": true,
-        "ttl": 7
-      }
-    },
-    "lambda": {
-      "functions": {
-        "clean": true,
-        "ttl": 7
-      }
-    },
-    "rds": {
-      "instances": {
-        "clean": true,
-        "ttl": 7
-      },
-      "snapshots": {
-        "clean": true,
-        "ttl": 7
-      }
-    },
-    "redshift": {
-      "clusters": {
-        "clean": true,
-        "ttl": 7
-      },
-      "snapshots": {
-        "clean": true,
-        "ttl": 7
-      }
-    },
-    "s3": {
-      "buckets": {
-        "clean": true,
-        "ttl": 7
-      }
-    }
-  }
-}
-```
+| Service        | Resource Type | Clean | TTL  |
+| -------------- | ------------- | ----- | ---- |
+| CloudFormation | Stacks        | True  | 7    |
+| DynamoDB       | Tables        | True  | 7    |
+| EC2            | Addresses     | True  | 7    |
+|                | Instances     | True  | 7    |
+|                | Snapshots     | True  | 7    |
+|                | Volumes       | True  | 7    |
+| EMR            | Clusters      | True  | 7    |
+| Lambda         | Functions     | True  | 7    |
+| RDS            | Instances     | True  | 7    |
+|                | Snapshots     | True  | 7    |
+| Redshift       | Clusters      | True  | 7    |
+|                | Snapshots     | True  | 7    |
+| S3             | Buckets       | True  | 7    |
 
 #### Regions
 
 Table includes the `clean` attribute which informs Auto Cleanup if the region should be cleaned up or not.
 
-```json
-{
-  "key": "regions",
-  "value": {
-    "ap-northeast-1": {
-      "clean": true
-    },
-    "ap-northeast-2": {
-      "clean": true
-    },
-    "ap-northeast-3": {
-      "clean": false
-    },
-    "ap-south-1": {
-      "clean": true
-    },
-    "ap-southeast-1": {
-      "clean": true
-    },
-    "ap-southeast-2": {
-      "clean": true
-    },
-    "ca-central-1": {
-      "clean": true
-    },
-    "cn-north-1": {
-      "clean": false
-    },
-    "cn-northwest-1": {
-      "clean": false
-    },
-    "eu-central-1": {
-      "clean": true
-    },
-    "eu-north-1": {
-      "clean": true
-    },
-    "eu-west-1": {
-      "clean": true
-    },
-    "eu-west-2": {
-      "clean": true
-    },
-    "eu-west-3": {
-      "clean": true
-    },
-    "sa-east-1": {
-      "clean": true
-    },
-    "us-east-1": {
-      "clean": true
-    },
-    "us-east-2": {
-      "clean": true
-    },
-    "us-west-1": {
-      "clean": true
-    },
-    "us-west-2": {
-      "clean": true
-    }
-  }
-}
-```
+| Region            | Clean |
+| ----------------- | ----- |
+| ap-northeast-1    | True  |
+| ap-northeast-2    | True  |
+| ap-northeast-3 \* | False |
+| ap-south-1        | True  |
+| ap-southeast-1    | True  |
+| ap-southeast-2    | True  |
+| ca-central-1      | True  |
+| cn-north-1 \*     | False |
+| cn-northwest-1 \* | False |
+| eu-central-1      | True  |
+| eu-north-1        | True  |
+| eu-west-1         | True  |
+| eu-west-2         | True  |
+| eu-west-3         | True  |
+| sa-east-1         | True  |
+| us-east-1         | True  |
+| us-east-2         | True  |
+| us-west-1         | True  |
+| us-west-2         | True  |
 
 *Note: Some regions have `clean` set to `false` by default as they required special access from AWS*
 
@@ -278,11 +184,13 @@ The below table lists the resource attribute that should be used for unique iden
 | EC2 Volumes           | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
 | EC2 Snapshots         | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
 | EC2 Elastic IPs       | Allocation ID          | `ec2:address:eipalloc-03e6c42893296972f`       |
+| EMR Clusters          | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
 | Lambda Functions      | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances    | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
 | Redshift Snapshots    | DB Snapshot Name       | `redshift:snapshot:my_cluster_snapshot`        |
 | RDS Instances         | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
 | RDS Snapshots         | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
+| S3 Buckets            | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
 
 ## Resource Tree
 
