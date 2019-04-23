@@ -2,12 +2,24 @@
 
 ## [Unreleased](https://github.com/servian/aws-auto-cleanup/tree/HEAD)
 
-[Full Changelog](https://github.com/servian/aws-auto-cleanup/compare/v0.6...HEAD)
+[Full Changelog](https://github.com/servian/aws-auto-cleanup/compare/v0.7...HEAD)
+
+**Implemented enhancements:**
+
+- Amazon EMR support [\#8](https://github.com/servian/aws-auto-cleanup/issues/8)
+
+## [v0.7](https://github.com/servian/aws-auto-cleanup/tree/v0.7) (2019-04-23)
+[Full Changelog](https://github.com/servian/aws-auto-cleanup/compare/v0.6...v0.7)
+
+**Closed issues:**
+
+- Error with serverless deploy [\#22](https://github.com/servian/aws-auto-cleanup/issues/22)
 
 **Merged pull requests:**
 
+- EMR support [\#23](https://github.com/servian/aws-auto-cleanup/pull/23) ([maratlevit](https://github.com/maratlevit))
 - Fix readme typo [\#17](https://github.com/servian/aws-auto-cleanup/pull/17) ([erjanmx](https://github.com/erjanmx))
-- \[WIP\] Code refactor [\#16](https://github.com/servian/aws-auto-cleanup/pull/16) ([maratlevit](https://github.com/maratlevit))
+- Code refactor [\#16](https://github.com/servian/aws-auto-cleanup/pull/16) ([maratlevit](https://github.com/maratlevit))
 
 ## [v0.6](https://github.com/servian/aws-auto-cleanup/tree/v0.6) (2019-04-19)
 [Full Changelog](https://github.com/servian/aws-auto-cleanup/compare/v0.5...v0.6)
