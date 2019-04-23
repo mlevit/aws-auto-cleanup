@@ -72,6 +72,13 @@
                 }
               }
             },
+            "security_groups": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                }
+              }
+            },
             "snapshots": {
               "M": {
                 "clean": {

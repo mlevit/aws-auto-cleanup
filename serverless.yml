@@ -6,7 +6,7 @@ custom:
 provider:
   name: aws
   runtime: python3.7
-  stage: production
+  stage: dev
   region: ap-southeast-2    # change to your region
   profile: saml             # change to your profile  
   environment:
@@ -29,12 +29,14 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - ec2:DeleteSecurityGroup
         - ec2:DeleteSnapshot
         - ec2:DeleteVolume
         - ec2:DescribeAddresses
         - ec2:DescribeImages
         - ec2:DescribeInstanceAttribute
         - ec2:DescribeInstances
+        - ec2:DescribeSecurityGroups
         - ec2:DescribeSnapshots
         - ec2:DescribeVolumes
         - ec2:DescribeVolumes
@@ -55,18 +57,18 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - redshift:DeleteCluster
+        - redshift:DeleteClusterSnapshot
+        - redshift:DescribeClusterSnapshots
+        - redshift:DescribeClusters
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - rds:DeleteDBInstance
         - rds:DeleteDBSnapshot
         - rds:DescribeDBInstances
         - rds:DescribeDBSnapshots
         - rds:ModifyDBInstance
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - redshift:DeleteCluster
-        - redshift:DeleteClusterSnapshot
-        - redshift:DescribeClusterSnapshots
-        - redshift:DescribeClusters
       Resource: "*"
     - Effect: Allow
       Action:

@@ -22,10 +22,11 @@ class EC2Cleanup:
     
     
     def run(self):
-        self.instances()
-        self.volumes()
-        self.snapshots()
         self.addresses()
+        self.instances()
+        self.security_groups()
+        self.snapshots()
+        self.volumes()
     
     
     def addresses(self):
@@ -166,22 +167,21 @@ class EC2Cleanup:
         if clean:
             try:
                 # help from https://stackoverflow.com/a/41150217
-                all_instances = self.client.describe_instances()
-                all_security_groups = self.client.describe_security_groups()
+                instances = self.client.describe_instances()
+                security_groups = self.client.describe_security_groups()
 
                 instance_security_group_set = set()
                 security_group_set = set()
 
-                for reservation in all_instances['Reservations'] :
-                    for instance in reservation['Instances']: 
-                        for security_group in instance['SecurityGroups']:
-                            instance_security_group_set.add(security_group['GroupId']) 
-
-
-                    for security_group in all_security_groups['SecurityGroups'] :
-                        security_group_set.add(security_group ['GroupId'])
-
-                    resources = security_group_set - instance_security_group_set
+                for reservation in instances.get('Reservations'):
+                    for instance in reservation.get('Instances'):
+                        for security_group in instance.get('SecurityGroups'):
+                            instance_security_group_set.add(security_group.get('GroupId'))
+                
+                for security_group in security_groups.get('SecurityGroups'):
+                    security_group_set.add(security_group.get('GroupId'))
+                
+                resources = security_group_set - instance_security_group_set
             except:
                 self.logging.error("Could not retrieve all unused Security Groups.")
                 self.logging.error(str(sys.exc_info()))
