@@ -91,23 +91,15 @@ By default, the below settings are automatically inserted when Auto Cleanup is r
 
 The version is used to inform Auto Cleanup if new settings exist in the default data file that should be loaded into DynamoDB. If the version present in the default data file is greater than the version in DynamoDB table, the load will commence.
 
-```json
-{
-  "key": "version",
-  "value": x.x
-}
-```
+| Key     | Value |
+| ------- | ----- |
+| version | x.x   |
 
 #### General
 
-```json
-{
-  "key": "general",
-  "value": {
-    "dry_run": true
-  }
-}
-```
+| Key     | Value |
+| ------- | ----- |
+| Dry Run | True  |
 
 #### Services
 
