@@ -157,12 +157,66 @@ class EC2Cleanup:
             self.logging.debug("Skipping cleanup of EC2 Instances.")
     
     
+    def security_groups(self):
+        """
+        Deletes Security Groups not attached to an EC2 Instance.
+        """
+
+        clean = self.settings.get('services').get('ec2', {}).get('security_groups', {}).get('clean', False)
+        if clean:
+            try:
+                # help from https://stackoverflow.com/a/41150217
+                all_instances = self.client.describe_instances()
+                all_security_groups = self.client.describe_security_groups()
+
+                instance_security_group_set = set()
+                security_group_set = set()
+
+                for reservation in all_instances['Reservations'] :
+                    for instance in reservation['Instances']: 
+                        for security_group in instance['SecurityGroups']:
+                            instance_security_group_set.add(security_group['GroupId']) 
+
+
+                    for security_group in all_security_groups['SecurityGroups'] :
+                        security_group_set.add(security_group ['GroupId'])
+
+                    resources = security_group_set - instance_security_group_set
+            except:
+                self.logging.error("Could not retrieve all unused Security Groups.")
+                self.logging.error(str(sys.exc_info()))
+                return None
+            
+            for resource in resources:
+                if resource not in self.whitelist.get('ec2', {}).get('security_group', []):
+                    if not self.settings.get('general', {}).get('dry_run', True):
+                        try:
+                            self.client.delete_security_group(GroupId=resource)
+                        except:
+                            self.logging.error("Could not delete EC2 Security Group '%s'." % resource)
+                            self.logging.error(str(sys.exc_info()))
+                            break
+                    
+                    self.logging.info(("EC2 Security Group '%s' is not associated with an EC2 instance and has "
+                                       "been deleted.") % (resource))
+                else:
+                    self.logging.debug(("EC2 Security Group '%s' has been whitelisted and has not "
+                                        "been deleted.") % (resource))
+                
+                self.resource_tree.get('AWS').setdefault(
+                    self.region, {}).setdefault(
+                        'EC2', {}).setdefault(
+                            'Security Groups', []).append(resource)
+        else:
+            self.logging.debug("Skipping cleanup of EC2 Security Groups.")
+    
+    
     def snapshots(self):
         """
         Deletes Snapshots not attached to EBS volumes.
         """
 
-        clean = self.settings.get('services').get('ec2', {}).get('instances', {}).get('clean', False)
+        clean = self.settings.get('services').get('ec2', {}).get('snapshots', {}).get('clean', False)
         if clean:
             try:
                 resources = self.client.describe_snapshots(OwnerIds=[self.account_id]).get('Snapshots')
@@ -232,7 +286,7 @@ class EC2Cleanup:
         Deletes Volumes not attached to an EC2 Instance.
         """
 
-        clean = self.settings.get('services').get('ec2', {}).get('addresses', {}).get('clean', False)
+        clean = self.settings.get('services').get('ec2', {}).get('volumes', {}).get('clean', False)
         if clean:
             try:
                 resources = self.client.describe_volumes().get('Volumes')
