@@ -179,7 +179,8 @@ class EC2Cleanup:
                             instance_security_group_set.add(security_group.get('GroupId'))
                 
                 for security_group in security_groups.get('SecurityGroups'):
-                    security_group_set.add(security_group.get('GroupId'))
+                    if security_group.get('GroupName') != 'default':
+                        security_group_set.add(security_group.get('GroupId'))
                 
                 resources = security_group_set - instance_security_group_set
             except:
