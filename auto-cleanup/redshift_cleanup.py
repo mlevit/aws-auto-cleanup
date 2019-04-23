@@ -43,7 +43,7 @@ class RedshiftCleanup:
                 resource_date = resource.get('ClusterCreateTime')
                 resource_status = resource.get('ClusterStatus')
 
-                if resource_id not in self.whitelist.get('redshift', {}).get('clusters', []):
+                if resource_id not in self.whitelist.get('redshift', {}).get('cluster', []):
                     delta = LambdaHelper.get_day_delta(resource_date)
                 
                     if delta.days > ttl_days:
@@ -89,7 +89,7 @@ class RedshiftCleanup:
                 self.logging.error(str(sys.exc_info()))
                 return None
             
-            ttl_days = self.settings.get('services').get('redshift', {}).get('snapshots', {}).get('ttl', 7)
+            ttl_days = self.settings.get('services').get('redshift', {}).get('snapshot', {}).get('ttl', 7)
             
             for resource in resources:
                 resource_id = resource.get('SnapshotIdentifier')

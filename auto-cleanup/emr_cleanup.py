@@ -42,7 +42,7 @@ class EMRCleanup:
                 resource_date = resource.get('Status').get('Timeline').get('CreationDateTime')
                 resource_status = resource.get('Status').get('State')
 
-                if resource_id not in self.whitelist.get('emr', {}).get('clusters', []):
+                if resource_id not in self.whitelist.get('emr', {}).get('cluster', []):
                     delta = LambdaHelper.get_day_delta(resource_date)
                 
                     if delta.days > ttl_days:
