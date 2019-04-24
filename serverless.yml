@@ -6,7 +6,7 @@ custom:
 provider:
   name: aws
   runtime: python3.7
-  stage: dev
+  stage: production
   region: ap-southeast-2    # change to your region
   profile: saml             # change to your profile  
   environment:
