@@ -93,7 +93,7 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 | Key     | Value |
 | ------- | ----- |
-| version | x.x   |
+| Version | x.x   |
 
 #### General
 
@@ -105,21 +105,22 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
 
-| Service        | Resource Type | Clean | TTL  |
-| -------------- | ------------- | ----- | ---- |
-| CloudFormation | Stacks        | True  | 7    |
-| DynamoDB       | Tables        | True  | 7    |
-| EC2            | Addresses     | True  | 7    |
-|                | Instances     | True  | 7    |
-|                | Snapshots     | True  | 7    |
-|                | Volumes       | True  | 7    |
-| EMR            | Clusters      | True  | 7    |
-| Lambda         | Functions     | True  | 7    |
-| RDS            | Instances     | True  | 7    |
-|                | Snapshots     | True  | 7    |
-| Redshift       | Clusters      | True  | 7    |
-|                | Snapshots     | True  | 7    |
-| S3             | Buckets       | True  | 7    |
+| Service        | Resource Type   | Clean | TTL  |
+| -------------- | --------------- | ----- | ---- |
+| CloudFormation | Stacks          | True  | 7    |
+| DynamoDB       | Tables          | True  | 7    |
+| EC2            | Addresses       | True  | N/A  |
+|                | Instances       | True  | 7    |
+|                | Security Groups | True  | N/A  |
+|                | Snapshots       | True  | 7    |
+|                | Volumes         | True  | 7    |
+| EMR            | Clusters        | True  | 7    |
+| Lambda         | Functions       | True  | 7    |
+| RDS            | Instances       | True  | 7    |
+|                | Snapshots       | True  | 7    |
+| Redshift       | Clusters        | True  | 7    |
+|                | Snapshots       | True  | 7    |
+| S3             | Buckets         | True  | 7    |
 
 #### Regions
 
@@ -180,10 +181,11 @@ The below table lists the resource attribute that should be used for unique iden
 | --------------------- | ---------------------- | ---------------------------------------------- |
 | CloudFormation Stacks | Stack Name             | `cloudformation:stack:my_cloudformation_stack` |
 | DynamoDB Tables       | Table Name             | `dynamodb:table:my_dynamodb_table`             |
-| EC2 Instances         | Instance ID            | `ec2:instance:i-0326701a029dbf9d0`             |
-| EC2 Volumes           | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
-| EC2 Snapshots         | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
 | EC2 Elastic IPs       | Allocation ID          | `ec2:address:eipalloc-03e6c42893296972f`       |
+| EC2 Instances         | Instance ID            | `ec2:instance:i-0326701a029dbf9d0`             |
+| EC2 Security Groups   | Group ID               | `ec2:security_group:sg-09ef7b767c3ff4071`      |
+| EC2 Snapshots         | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
+| EC2 Volumes           | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
 | EMR Clusters          | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
 | Lambda Functions      | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances    | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
