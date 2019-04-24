@@ -115,6 +115,7 @@ Table includes the `clean` attribute which informs Auto Cleanup if the service s
 |                | Snapshots       | True  | 7    |
 |                | Volumes         | True  | 7    |
 | EMR            | Clusters        | True  | 7    |
+| IAM            | Roles           | True  | 7    |
 | Lambda         | Functions       | True  | 7    |
 | RDS            | Instances       | True  | 7    |
 |                | Snapshots       | True  | 7    |
@@ -187,6 +188,7 @@ The below table lists the resource attribute that should be used for unique iden
 | EC2 Snapshots         | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
 | EC2 Volumes           | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
 | EMR Clusters          | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
+| IAM Roles             | Role Name              | `iam:role:auto-cleanup-role`                   |
 | Lambda Functions      | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances    | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
 | Redshift Snapshots    | DB Snapshot Name       | `redshift:snapshot:my_cluster_snapshot`        |

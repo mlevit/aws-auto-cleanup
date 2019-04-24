@@ -15,6 +15,7 @@ from cloudformation_cleanup import *
 from dynamodb_cleanup import *
 from ec2_cleanup import *
 from emr_cleanup import *
+from iam_cleanup import *
 from lambda_cleanup import *
 from rds_cleanup import *
 from redshift_cleanup import *
@@ -92,18 +93,25 @@ class Cleanup:
                     thread.join()
                 
                 # EC2
-                # EC2 will run after all other cleanup operations as there is a potential
+                # EC2 will run after most cleanup operations as there is a potential
                 # through the removal of other services, EC2 instances will be cleaned up
                 ec2_class = EC2Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
                 ec2_class.run()
             else:
                 self.logging.debug("Skipping region '%s'." % region)
-            
+        
+        # global services
         self.logging.info("Switching region to 'global'.")
 
         # S3
         s3_class = S3Cleanup(self.logging, self.whitelist, self.settings, self.resource_tree)
         s3_class.run()
+
+        # IAM
+        # IAM will run after all other cleanup operations as there is a potential
+        # through the removal of other services, IAM resources will be freed up
+        iam_class = IAMCleanup(self.logging, self.whitelist, self.settings, self.resource_tree)
+        iam_class.run()
         
         self.logging.info("Auto Cleanup completed.")
     

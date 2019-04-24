@@ -50,7 +50,7 @@ class DynamoDBCleanup:
                             except:
                                 self.logging.error("Could not delete DynamoDB Table '%s'." % resource)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
                         
                         self.logging.info(("DynamoDB Table '%s' was created %d days ago "
                                            "and has been deleted.") % (resource, delta.days))

@@ -51,7 +51,7 @@ class CloudFormationCleanup:
                             except:
                                 self.logging.error("Could not delete CloudFormation Stack '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
                         
                         self.logging.info(("CloudFormation Stack '%s' was last modified %d days ago "
                                            "and has been deleted.") % (resource_id, delta.days))

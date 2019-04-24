@@ -54,7 +54,7 @@ class EMRCleanup:
                                 except:
                                     self.logging.error("Could not delete EMR Cluster '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
                             
                             self.logging.info(("EMR Cluster '%s' was created %d days ago "
                                                "and has been deleted.") % (resource_id, delta.days))

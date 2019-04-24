@@ -56,7 +56,7 @@ class RedshiftCleanup:
                                 except:
                                     self.logging.error("Could not delete Redshift Cluster '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
 
                             self.logging.info(("Redshift Cluster '%s' was created %d days ago "
                                                "and has been deleted.") % (resource_id, delta.days))
@@ -107,7 +107,7 @@ class RedshiftCleanup:
                                 except:
                                     self.logging.error("Could not delete Redshift Snapshot '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
 
                             self.logging.info(("Redshift Snapshot '%s' was created %d days ago "
                                                "and has been deleted.") % (resource_id, delta.days))
