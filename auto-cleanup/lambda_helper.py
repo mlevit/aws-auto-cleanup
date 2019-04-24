@@ -9,14 +9,14 @@ class LambdaHelper:
     
     @staticmethod
     def convert_to_datetime(date):
-        return dateutil.parser.isoparse(date).replace(tzinfo=None)
+        return dateutil.parser.isoparse(str(date)).replace(tzinfo=None)
     
     
     @staticmethod
     def get_day_delta(resource_date):
         if resource_date is not None:
-            from_datetime = LambdaHelper.convert_to_datetime(str(datetime.datetime.now().isoformat()))
-            to_datetime = LambdaHelper.convert_to_datetime(str(resource_date))
+            from_datetime = LambdaHelper.convert_to_datetime(datetime.datetime.now().isoformat())
+            to_datetime = LambdaHelper.convert_to_datetime(resource_date)
             return from_datetime - to_datetime
         else:
             return 0
