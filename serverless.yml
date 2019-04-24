@@ -56,7 +56,6 @@ provider:
         - iam:GenerateServiceLastAccessedDetails
         - iam:GetServiceLastAccessedDetails
         - iam:ListRoles
-        - iam:*
       Resource: "*"
     - Effect: Allow
       Action:

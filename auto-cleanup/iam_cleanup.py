@@ -15,6 +15,7 @@ class IAMCleanup:
         
         try:
             self.client = boto3.client('iam')
+            print(dir(self.client))
         except:
             self.logging.error(str(sys.exc_info()))
 
@@ -32,7 +33,6 @@ class IAMCleanup:
         if clean:
             try:
                 resources = self.client.list_roles().get('Roles')
-                print(resources)
             except:
                 self.logging.error(str(sys.exc_info()))
                 return None
