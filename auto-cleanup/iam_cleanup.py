@@ -81,7 +81,7 @@ class IAMCleanup:
                                 return None
                         
                         if get_last_accessed.get('JobStatus') == 'COMPLETED':
-                            last_accessed = '1900-01-01 00:00:00'
+                            last_accessed = datetime.datetime.now() - datetime.timedelta(days=365)
                             
                             for service in get_last_accessed.get('ServicesLastAccessed'):
                                 service_date = service.get('LastAuthenticated', '1900-01-01 00:00:00')
@@ -164,6 +164,7 @@ class IAMCleanup:
                                             self.logging.error(str(sys.exc_info()))
                                             continue
                                     
+                                    # delete role
                                     try:
                                         self.client.delete_role(RoleName=resource_id)
                                     except:
