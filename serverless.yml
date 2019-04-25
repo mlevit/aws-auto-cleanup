@@ -2,6 +2,15 @@ service: auto-cleanup
 
 custom:
   company: servian          # change to your company name
+  pythonRequirements:       # allows us to deploy a newer version of boto3
+    noDeploy: [
+      'docutils',
+      'jmespath',
+      'python-dateutil',
+      's3transfer',
+      'six',
+      'pip',
+      'setuptools']
 
 provider:
   name: aws
@@ -10,7 +19,7 @@ provider:
   region: ap-southeast-2    # change to your region
   profile: saml             # change to your profile  
   environment:
-    PYTHONPATH: "/var/task/auto-cleanup:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
+    PYTHONPATH: "/var/task/auto-cleanup:/var/task/boto3:/var/task/botocore:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -49,6 +58,20 @@ provider:
       Action:
         - elasticmapreduce:ListClusters
         - elasticmapreduce:TerminateJobFlows
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - iam:DeleteInstanceProfile
+        - iam:DeleteRole
+        - iam:DeleteRolePolicy
+        - iam:DetachRolePolicy
+        - iam:GenerateServiceLastAccessedDetails
+        - iam:GetServiceLastAccessedDetails
+        - iam:ListAttachedRolePolicies
+        - iam:ListInstanceProfilesForRole
+        - iam:ListRolePolicies
+        - iam:ListRoles
+        - iam:RemoveRoleFromInstanceProfile
       Resource: "*"
     - Effect: Allow
       Action:
@@ -96,7 +119,7 @@ functions:
         - simplejson/**
         - treelib/**
     environment:
-      LOGLEVEL: INFO       # change to DEBUG for testing
+      LOGLEVEL: DEBUG       # change to DEBUG for testing
       RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}

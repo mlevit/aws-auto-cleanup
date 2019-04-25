@@ -52,7 +52,7 @@ class LambdaCleanup:
                             except:
                                 self.logging.error("Could not delete Lambda Function '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
                         
                         self.logging.info(("Lambda Function '%s' was last modified %d days ago "
                                            "and has been deleted.") % (resource_id, delta.days))

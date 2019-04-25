@@ -6,14 +6,15 @@
 
 **Implemented enhancements:**
 
+- AWS Security Groups support [\#25](https://github.com/servian/aws-auto-cleanup/issues/25)
 - Amazon EMR support [\#8](https://github.com/servian/aws-auto-cleanup/issues/8)
+
+**Merged pull requests:**
+
+- Security Groups support [\#26](https://github.com/servian/aws-auto-cleanup/pull/26) ([maratlevit](https://github.com/maratlevit))
 
 ## [v0.7](https://github.com/servian/aws-auto-cleanup/tree/v0.7) (2019-04-23)
 [Full Changelog](https://github.com/servian/aws-auto-cleanup/compare/v0.6...v0.7)
-
-**Closed issues:**
-
-- Error with serverless deploy [\#22](https://github.com/servian/aws-auto-cleanup/issues/22)
 
 **Merged pull requests:**
 

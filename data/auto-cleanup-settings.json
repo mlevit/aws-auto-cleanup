@@ -115,6 +115,20 @@
             }
           }
         },
+        "iam": {
+          "M": {
+            "roles": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "lambda": {
           "M": {
             "functions": {

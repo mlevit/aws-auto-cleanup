@@ -53,7 +53,7 @@ class S3Cleanup:
                             except:
                                 self.logging.error("Could not retrieve all Objects from S3 Bucket '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
 
                             while response.get('KeyCount') > 0:
                                 self.logging.debug("S3 Bucket '%s' has %d Objects that have been deleted." % (resource_id, len(response.get('Contents'))))
@@ -76,7 +76,7 @@ class S3Cleanup:
                             except:
                                 self.logging.error("Could not get all Versions and Delete Markers from S3 Bucket '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
 
                             delete_list = []
                             
@@ -101,7 +101,7 @@ class S3Cleanup:
                                 except:
                                     self.logging.error("Could not delete Versions and Delete Markers from S3 Bucket '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
                             
                             # delete bucket
                             try:

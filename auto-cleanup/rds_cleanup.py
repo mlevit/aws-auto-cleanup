@@ -61,7 +61,7 @@ class RDSCleanup:
                                 except:
                                     self.logging.error("Could not remove termination protection from RDS Instance '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
                             
                             # delete instance
                             try:
@@ -71,7 +71,7 @@ class RDSCleanup:
                             except:
                                 self.logging.error("Could not delete RDS Instance '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
                         
                         self.logging.info(("RDS Instance '%s' was created %d days ago "
                                            "and has been deleted.") % (resource_id, delta.days))
@@ -118,7 +118,7 @@ class RDSCleanup:
                             except:
                                 self.logging.error("Could not delete RDS Snapshot '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
                         
                         self.logging.info(("RDS Snapshot '%s' was created %d days ago "
                                            "and has been deleted.") % (resource_id, delta.days))

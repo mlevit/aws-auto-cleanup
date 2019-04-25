@@ -53,7 +53,7 @@ class EC2Cleanup:
                             except:
                                 self.logging.error("Could not release EC2 Address '%s'." % resource_id)
                                 self.logging.error(str(sys.exc_info()))
-                                break
+                                continue
                         
                         self.logging.info(("EC2 Address '%s' is not associated with an EC2 instance and has "
                                            "been released.") % (resource.get('PublicIp')))
@@ -106,7 +106,7 @@ class EC2Cleanup:
                                     except:
                                         self.logging.error("Could not stop EC2 Instance '%s'." % resource_id)
                                         self.logging.error(str(sys.exc_info()))
-                                        break
+                                        continue
                                 
                                 self.logging.info(("EC2 Instance '%s' in a 'running' state was last "
                                                    "launched %d days ago and has been stopped.") % (resource_id, delta.days))
@@ -120,7 +120,7 @@ class EC2Cleanup:
                                     except:
                                         self.logging.error("Could not get if protection for EC2 Instance '%s' is on." % resource_id)
                                         self.logging.error(str(sys.exc_info()))
-                                        break
+                                        continue
                                     
                                     if resource_protection:
                                         try:
@@ -130,7 +130,7 @@ class EC2Cleanup:
                                         except:
                                             self.logging.error("Could not remove termination protection from EC2 Instance '%s'." % resource_id)
                                             self.logging.error(str(sys.exc_info()))
-                                            break
+                                            continue
                                     
                                         self.logging.info(("EC2 Instance '%s' had termination protection "
                                                            "turned on and now has been turned off.") % (resource_id))
@@ -140,7 +140,7 @@ class EC2Cleanup:
                                     except:
                                         self.logging.error("Could not delete Instance EC2 '%s'." % resource_id)
                                         self.logging.error(str(sys.exc_info()))
-                                        break
+                                        continue
                                 
                                 self.logging.info(("EC2 Instance '%s' in a 'stopped' state was last "
                                                    "launched %d days ago and has been terminated.") % (resource_id, delta.days))
@@ -196,7 +196,7 @@ class EC2Cleanup:
                         except:
                             self.logging.error("Could not delete EC2 Security Group '%s'." % resource)
                             self.logging.error(str(sys.exc_info()))
-                            break
+                            continue
                     
                     self.logging.info(("EC2 Security Group '%s' is not associated with an EC2 instance and has "
                                        "been deleted.") % (resource))
@@ -238,7 +238,7 @@ class EC2Cleanup:
                     except:
                         self.logging.error("Could not retrieve EC2 AMIs.")
                         self.logging.error(str(sys.exc_info()))
-                        break
+                        continue
                     
                     for image in images:
                         block_device_mappings = image.get('BlockDeviceMappings')
@@ -261,7 +261,7 @@ class EC2Cleanup:
                                 except:
                                     self.logging.error("Could not delete EC2 Snapshot '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
                             
                             self.logging.info(("EC2 Snapshot '%s' was created %d days ago "
                                                "and has been deleted.") % (resource_id, delta.days))
@@ -312,7 +312,7 @@ class EC2Cleanup:
                                 except:
                                     self.logging.error("Could not delete EC2 Volume '%s'." % resource_id)
                                     self.logging.error(str(sys.exc_info()))
-                                    break
+                                    continue
                             
                             self.logging.info(("EC2 Volume '%s' was created %d days ago "
                                                "and has been deleted.") % (resource_id, delta.days))
