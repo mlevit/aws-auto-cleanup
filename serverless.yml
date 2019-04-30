@@ -60,6 +60,11 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - elasticbeanstalk:DeleteApplication
+        - elasticbeanstalk:DescribeApplications
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - elasticmapreduce:ListClusters
         - elasticmapreduce:TerminateJobFlows
       Resource: "*"
