@@ -11,6 +11,10 @@ custom:
       'six',
       'pip',
       'setuptools']
+  remover:
+    prompt: true
+    buckets:
+      - auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
 
 provider:
   name: aws
@@ -119,7 +123,7 @@ functions:
         - simplejson/**
         - treelib/**
     environment:
-      LOGLEVEL: DEBUG       # change to DEBUG for testing
+      LOGLEVEL: INFO       # change to DEBUG for testing
       RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
@@ -170,3 +174,4 @@ resources:
 
 plugins:
   - serverless-python-requirements
+  - serverless-s3-remover
