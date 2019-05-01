@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "0.8"
+      "N": "0.9"
     }
   },
   {
@@ -90,6 +90,20 @@
               }
             },
             "volumes": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "elasticbeanstalk": {
+          "M": {
+            "applications": {
               "M": {
                 "clean": {
                   "BOOL": true

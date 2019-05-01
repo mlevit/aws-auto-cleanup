@@ -14,6 +14,7 @@ from lambda_helper import *
 from cloudformation_cleanup import *
 from dynamodb_cleanup import *
 from ec2_cleanup import *
+from elasticbeanstalk_cleanup import *
 from emr_cleanup import *
 from iam_cleanup import *
 from lambda_cleanup import *
@@ -64,6 +65,11 @@ class Cleanup:
                 thread = threading.Thread(target=dynamodb_class.run, args=())
                 threads.append(thread)
 
+                # Elastic Beanstalk
+                elasticbeanstalk_class = ElasticBeanstalkCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
+                thread = threading.Thread(target=elasticbeanstalk_class.run, args=())
+                threads.append(thread)
+                
                 # EMR
                 emr_class = EMRCleanup(self.logging, self.whitelist, self.settings, self.resource_tree, region)
                 thread = threading.Thread(target=emr_class.run, args=())
