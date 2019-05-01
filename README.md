@@ -105,23 +105,24 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
 
-| Service        | Resource Type   | Clean | TTL  |
-| -------------- | --------------- | ----- | ---- |
-| CloudFormation | Stacks          | True  | 7    |
-| DynamoDB       | Tables          | True  | 7    |
-| EC2            | Addresses       | True  | N/A  |
-|                | Instances       | True  | 7    |
-|                | Security Groups | True  | N/A  |
-|                | Snapshots       | True  | 7    |
-|                | Volumes         | True  | 7    |
-| EMR            | Clusters        | True  | 7    |
-| IAM            | Roles           | True  | 7    |
-| Lambda         | Functions       | True  | 7    |
-| RDS            | Instances       | True  | 7    |
-|                | Snapshots       | True  | 7    |
-| Redshift       | Clusters        | True  | 7    |
-|                | Snapshots       | True  | 7    |
-| S3             | Buckets         | True  | 7    |
+| Service           | Resource Type   | Clean | TTL  |
+| ----------------- | --------------- | ----- | ---- |
+| CloudFormation    | Stacks          | True  | 7    |
+| DynamoDB          | Tables          | True  | 7    |
+| EC2               | Addresses       | True  | N/A  |
+|                   | Instances       | True  | 7    |
+|                   | Security Groups | True  | N/A  |
+|                   | Snapshots       | True  | 7    |
+|                   | Volumes         | True  | 7    |
+| Elastic Beanstalk | Applications    | True  | 7    |
+| EMR               | Clusters        | True  | 7    |
+| IAM               | Roles           | True  | 7    |
+| Lambda            | Functions       | True  | 7    |
+| RDS               | Instances       | True  | 7    |
+|                   | Snapshots       | True  | 7    |
+| Redshift          | Clusters        | True  | 7    |
+|                   | Snapshots       | True  | 7    |
+| S3                | Buckets         | True  | 7    |
 
 #### Regions
 
@@ -178,23 +179,24 @@ Adding resources to the Whitelist table will ensure those resources are not remo
 
 The below table lists the resource attribute that should be used for unique identification of resources for whitelisting.
 
-| Resource              | ID Attribute           | Example Value                                  |
-| --------------------- | ---------------------- | ---------------------------------------------- |
-| CloudFormation Stacks | Stack Name             | `cloudformation:stack:my_cloudformation_stack` |
-| DynamoDB Tables       | Table Name             | `dynamodb:table:my_dynamodb_table`             |
-| EC2 Elastic IPs       | Allocation ID          | `ec2:address:eipalloc-03e6c42893296972f`       |
-| EC2 Instances         | Instance ID            | `ec2:instance:i-0326701a029dbf9d0`             |
-| EC2 Security Groups   | Group ID               | `ec2:security_group:sg-09ef7b767c3ff4071`      |
-| EC2 Snapshots         | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
-| EC2 Volumes           | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
-| EMR Clusters          | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
-| IAM Roles             | Role Name              | `iam:role:auto-cleanup-role`                   |
-| Lambda Functions      | Function Name          | `lambda:function:my_lambda_function`           |
-| Redshift Instances    | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
-| Redshift Snapshots    | DB Snapshot Name       | `redshift:snapshot:my_cluster_snapshot`        |
-| RDS Instances         | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
-| RDS Snapshots         | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
-| S3 Buckets            | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
+| Resource                       | ID Attribute           | Example Value                                  |
+| ------------------------------ | ---------------------- | ---------------------------------------------- |
+| CloudFormation Stacks          | Stack Name             | `cloudformation:stack:my_cloudformation_stack` |
+| DynamoDB Tables                | Table Name             | `dynamodb:table:my_dynamodb_table`             |
+| EC2 Elastic IPs                | Allocation ID          | `ec2:address:eipalloc-03e6c42893296972f`       |
+| EC2 Instances                  | Instance ID            | `ec2:instance:i-0326701a029dbf9d0`             |
+| EC2 Security Groups            | Group ID               | `ec2:security_group:sg-09ef7b767c3ff4071`      |
+| EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
+| EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
+| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:my-app`          |
+| EMR Clusters                   | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
+| IAM Roles                      | Role Name              | `iam:role:auto-cleanup-role`                   |
+| Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
+| Redshift Instances             | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
+| Redshift Snapshots             | DB Snapshot Name       | `redshift:snapshot:my_cluster_snapshot`        |
+| RDS Instances                  | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
+| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
+| S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
 
 ## Resource Tree
 
@@ -217,30 +219,49 @@ AWS
 │   │       └── auto-cleanup-whitelist-production
 │   ├── EC2
 │   │   ├── Addresses
-│   │   │   ├── eipalloc-03e6c42893296972f
-│   │   │   └── eipalloc-05065c5fa7c5b481d
+│   │   │   ├── eipalloc-05065c5fa7c5b481d
+│   │   │   └── eipalloc-0b4c35908a9347747
 │   │   ├── Instances
-│   │   │   ├── i-060698bee8d6f3422
-│   │   │   ├── i-07440be98bfa9a15a
+│   │   │   ├── i-01e008e103b99d5b2
+│   │   │   └── i-07440be98bfa9a15a
+│   │   ├── Security Groups
+│   │   │   ├── sg-61f46719
+│   │   │   └── sg-fbfa6983
 │   │   ├── Snapshots
 │   │   │   ├── snap-00c8c90db9fdceb3c
-│   │   │   ├── snap-036ea48b4b3105598
+│   │   │   └── snap-0c416b329cacc4175
 │   │   └── Volumes
-│   │       ├── vol-0652568b9c72f0bb9
-│   │       ├── vol-07e62ab726cb2c520
+│   │       ├── vol-0db31d5473b5669b0
+│   │       └── vol-0e0b7da76435d07ff
+│   ├── EMR
+│   │   └── Clusters
+│   │       ├── j-2EZVIAN6FFOT0
+│   │       └── j-YR3UZD1ULRGI
+│   ├── Elastic Beanstalk
+│   │   └── Applications
+│   │       └── my-application
 │   ├── Lambda
 │   │   └── Functions
 │   │       ├── auto-cleanup-dev
 │   │       └── auto-cleanup-production
 │   └── Redshift
+│       ├── Clusters
+│       │   └── redshift-cluster-1
 │       └── Snapshots
-│           ├── redshift-cluster-1-data-loaded-1
-│           └── redshift-cluster-1-snapshot-1
+│           ├── rs:redshift-cluster-1-2019-04-29-19-16-08
+│           └── rs:redshift-cluster-1-2019-04-30-03-16-21
 ├── global
+│   ├── IAM
+│   │   └── Roles
+│   │       ├── auto-cleanup-dev-ap-southeast-2-lambdaRole
+│   │       └── auto-cleanup-production-ap-southeast-2-lambdaRole
 │   └── S3
 │       └── Buckets
-│           ├── auto-cleanup-dev-resourcetreebucket
-│           ├── auto-cleanup-dev-serverlessdeploymentbucket-1g2bp8sh8iqqa
+│           ├── auto-cleanup-dev-resourcetreebucket-servian
+│           ├── auto-cleanup-dev-serverlessdeploymentbucket-1xa94mmahew4r
+│           ├── auto-cleanup-dev-serverlessdeploymentbucket-2ftdllozuhia
+│           ├── auto-cleanup-production-resourcetreebucket-servian
+│           └── auto-cleanup-production-serverlessdeploymentbucke-1l0x00s8wpz9g
 └── us-east-1
     ├── CloudFormation
     │   └── Stacks
