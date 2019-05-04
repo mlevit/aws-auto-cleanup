@@ -113,6 +113,11 @@ provider:
   tracing:
     lambda: true
 
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
 functions:
   AutoCleanup:
     handler: auto-cleanup.lambda_handler.lambda_handler
