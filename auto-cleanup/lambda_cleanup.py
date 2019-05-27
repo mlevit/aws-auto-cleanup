@@ -13,10 +13,13 @@ class LambdaCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("lambda", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_lambda = None
+
+    @property
+    def client_lambda(self):
+        if not self._client_lambda:
+            self._client_lambda = boto3.client("lambda", region_name=region)
+        return self._client_lambda
 
     def run(self):
         self.functions()
@@ -35,7 +38,7 @@ class LambdaCleanup:
         )
         if clean:
             try:
-                resources = self.client.list_functions().get("Functions")
+                resources = self.client_lambda.list_functions().get("Functions")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -59,7 +62,9 @@ class LambdaCleanup:
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client.delete_function(FunctionName=resource_id)
+                                self.client_lambda.delete_function(
+                                    FunctionName=resource_id
+                                )
                             except:
                                 self.logging.error(
                                     f"Could not delete Lambda Function '{resource_id}'."

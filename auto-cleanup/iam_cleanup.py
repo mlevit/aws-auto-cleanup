@@ -14,10 +14,13 @@ class IAMCleanup:
         self.resource_tree = resource_tree
         self.region = "global"
 
-        try:
-            self.client = boto3.client("iam")
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_iam = None
+
+    @property
+    def client_iam(self):
+        if not self._client_iam:
+            self._client_iam = boto3.client("iam")
+        return self._client_iam
 
     def run(self):
         self.roles()
@@ -35,7 +38,7 @@ class IAMCleanup:
         )
         if clean:
             try:
-                resources = self.client.list_roles().get("Roles")
+                resources = self.client_iam.list_roles().get("Roles")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -61,7 +64,7 @@ class IAMCleanup:
                     if delta.days > ttl_days:
                         # check when the role was last accessed
                         try:
-                            gen_last_accessed = self.client.generate_service_last_accessed_details(
+                            gen_last_accessed = self.client_iam.generate_service_last_accessed_details(
                                 Arn=resource_arn
                             )
                         except:
@@ -72,7 +75,7 @@ class IAMCleanup:
                             continue
 
                         try:
-                            get_last_accessed = self.client.get_service_last_accessed_details(
+                            get_last_accessed = self.client_iam.get_service_last_accessed_details(
                                 JobId=gen_last_accessed.get("JobId")
                             )
                         except:
@@ -88,7 +91,7 @@ class IAMCleanup:
                                 time.sleep(backoff)
 
                                 try:
-                                    get_last_accessed = self.client.get_service_last_accessed_details(
+                                    get_last_accessed = self.client_iam.get_service_last_accessed_details(
                                         JobId=gen_last_accessed.get("JobId")
                                     )
                                 except:
@@ -131,7 +134,7 @@ class IAMCleanup:
                                 ):
                                     # delete all inline policies
                                     try:
-                                        policies = self.client.list_role_policies(
+                                        policies = self.client_iam.list_role_policies(
                                             RoleName=resource_id
                                         )
                                     except:
@@ -143,7 +146,7 @@ class IAMCleanup:
 
                                     for policy in policies.get("PolicyNames"):
                                         try:
-                                            self.client.delete_role_policy(
+                                            self.client_iam.delete_role_policy(
                                                 RoleName=resource_id, PolicyName=policy
                                             )
 
@@ -159,7 +162,7 @@ class IAMCleanup:
 
                                     # detach all managed policies
                                     try:
-                                        policies = self.client.list_attached_role_policies(
+                                        policies = self.client_iam.list_attached_role_policies(
                                             RoleName=resource_id
                                         )
                                     except:
@@ -171,7 +174,7 @@ class IAMCleanup:
 
                                     for policy in policies.get("AttachedPolicies"):
                                         try:
-                                            self.client.detach_role_policy(
+                                            self.client_iam.detach_role_policy(
                                                 RoleName=resource_id,
                                                 PolicyArn=policy.get("PolicyArn"),
                                             )
@@ -188,7 +191,7 @@ class IAMCleanup:
 
                                     # delete all instance profiles
                                     try:
-                                        profiles = self.client.list_instance_profiles_for_role(
+                                        profiles = self.client_iam.list_instance_profiles_for_role(
                                             RoleName=resource_id
                                         )
                                     except:
@@ -201,7 +204,7 @@ class IAMCleanup:
                                     for profile in profiles.get("InstanceProfiles"):
                                         # remove role from instance profile
                                         try:
-                                            self.client.remove_role_from_instance_profile(
+                                            self.client_iam.remove_role_from_instance_profile(
                                                 InstanceProfileName=profile.get(
                                                     "InstanceProfileName"
                                                 ),
@@ -220,7 +223,7 @@ class IAMCleanup:
 
                                         # delete instance profile
                                         try:
-                                            self.client.delete_instance_profile(
+                                            self.client_iam.delete_instance_profile(
                                                 InstanceProfileName=profile.get(
                                                     "InstanceProfileName"
                                                 )
@@ -238,7 +241,9 @@ class IAMCleanup:
 
                                     # delete role
                                     try:
-                                        self.client.delete_role(RoleName=resource_id)
+                                        self.client_iam.delete_role(
+                                            RoleName=resource_id
+                                        )
                                     except:
                                         self.logging.error(
                                             f"Could not delete IAM Role '{resource_id}'."

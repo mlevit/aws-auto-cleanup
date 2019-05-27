@@ -13,10 +13,15 @@ class ElasticBeanstalkCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("elasticbeanstalk", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_elasticbeanstalk = None
+
+    @property
+    def client_elasticbeanstalk(self):
+        if not self._client_elasticbeanstalk:
+            self._client_elasticbeanstalk = boto3.client(
+                "elasticbeanstalk", region_name=region
+            )
+        return self._client_elasticbeanstalk
 
     def run(self):
         self.applications()
@@ -34,7 +39,9 @@ class ElasticBeanstalkCleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_applications().get("Applications")
+                resources = self.client_elasticbeanstalk.describe_applications().get(
+                    "Applications"
+                )
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -58,7 +65,7 @@ class ElasticBeanstalkCleanup:
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client.delete_application(
+                                self.client_elasticbeanstalk.delete_application(
                                     ApplicationName=resource_id,
                                     TerminateEnvByForce=True,
                                 )

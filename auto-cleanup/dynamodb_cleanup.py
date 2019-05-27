@@ -13,10 +13,13 @@ class DynamoDBCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("dynamodb", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_dynamodb = None
+
+    @property
+    def client_dynamodb(self):
+        if not self._client_dynamodb:
+            self._client_dynamodb = boto3.client("dynamodb", region_name=region)
+        return self._client_dynamodb
 
     def run(self):
         self.tables()
@@ -34,7 +37,7 @@ class DynamoDBCleanup:
         )
         if clean:
             try:
-                resources = self.client.list_tables().get("TableNames")
+                resources = self.client_dynamodb.list_tables().get("TableNames")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -48,7 +51,7 @@ class DynamoDBCleanup:
 
             for resource in resources:
                 resource_date = (
-                    self.client.describe_table(TableName=resource)
+                    self.client_dynamodb.describe_table(TableName=resource)
                     .get("Table")
                     .get("CreationDateTime")
                 )
@@ -59,7 +62,7 @@ class DynamoDBCleanup:
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client.delete_table(TableName=resource)
+                                self.client_dynamodb.delete_table(TableName=resource)
                             except:
                                 self.logging.error(
                                     f"Could not delete DynamoDB Table '{resource}'."

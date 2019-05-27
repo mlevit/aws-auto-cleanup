@@ -13,10 +13,13 @@ class RedshiftCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("redshift", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_redshift = None
+
+    @property
+    def client_redshift(self):
+        if not self._client_redshift:
+            self._client_redshift = boto3.client("redshift", region_name=region)
+        return self._client_redshift
 
     def run(self):
         self.clusters()
@@ -35,7 +38,7 @@ class RedshiftCleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_clusters().get("Clusters")
+                resources = self.client_redshift.describe_clusters().get("Clusters")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -63,7 +66,7 @@ class RedshiftCleanup:
                                 "dry_run", True
                             ):
                                 try:
-                                    self.client.delete_cluster(
+                                    self.client_redshift.delete_cluster(
                                         ClusterIdentifier=resource_id,
                                         SkipFinalClusterSnapshot=True,
                                     )
@@ -111,7 +114,9 @@ class RedshiftCleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_cluster_snapshots().get("Snapshots")
+                resources = self.client_redshift.describe_cluster_snapshots().get(
+                    "Snapshots"
+                )
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -139,7 +144,7 @@ class RedshiftCleanup:
                                 "dry_run", True
                             ):
                                 try:
-                                    self.client.delete_cluster_snapshot(
+                                    self.client_redshift.delete_cluster_snapshot(
                                         SnapshotIdentifier=resource_id
                                     )
                                 except:

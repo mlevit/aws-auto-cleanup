@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from rds_helper import *
 
 
 class RDSCleanup:
@@ -13,10 +13,13 @@ class RDSCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("rds", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_rds = None
+
+    @property
+    def client_rds(self):
+        if not self._client_rds:
+            self._client_rds = boto3.client("rds", region_name=region)
+        return self._client_rds
 
     def run(self):
         self.instances()
@@ -37,7 +40,7 @@ class RDSCleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_db_instances().get("DBInstances")
+                resources = self.client_rds.describe_db_instances().get("DBInstances")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -54,14 +57,14 @@ class RDSCleanup:
                 resource_date = resource.get("InstanceCreateTime")
 
                 if resource_id not in self.whitelist.get("rds", {}).get("instance", []):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = rdsHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             # remove termination prodtection
                             if resource.get("DeletionProtection"):
                                 try:
-                                    self.client.modify_db_instance(
+                                    self.client_rds.modify_db_instance(
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False,
                                     )
@@ -79,7 +82,7 @@ class RDSCleanup:
 
                             # delete instance
                             try:
-                                self.client.delete_db_instance(
+                                self.client_rds.delete_db_instance(
                                     DBInstanceIdentifier=resource_id,
                                     SkipFinalSnapshot=True,
                                 )
@@ -123,7 +126,7 @@ class RDSCleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_db_snapshots().get("DBSnapshots")
+                resources = self.client_rds.describe_db_snapshots().get("DBSnapshots")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -140,12 +143,12 @@ class RDSCleanup:
                 resource_date = resource.get("SnapshotCreateTime")
 
                 if resource_id not in self.whitelist.get("rds", {}).get("snapshot", []):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = rdsHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client.delete_db_snapshot(
+                                self.client_rds.delete_db_snapshot(
                                     DBSnapshotIdentifier=resource_id
                                 )
                             except:

@@ -13,10 +13,13 @@ class EMRCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("emr", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_emr = None
+
+    @property
+    def client_emr(self):
+        if not self._client_emr:
+            self._client_emr = boto3.client("emr", region_name=region)
+        return self._client_emr
 
     def run(self):
         self.clusters()
@@ -34,7 +37,7 @@ class EMRCleanup:
         )
         if clean:
             try:
-                resources = self.client.list_clusters().get("Clusters")
+                resources = self.client_emr.list_clusters().get("Clusters")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -62,7 +65,7 @@ class EMRCleanup:
                                 "dry_run", True
                             ):
                                 try:
-                                    self.client.terminate_job_flows(
+                                    self.client_emr.terminate_job_flows(
                                         JobFlowIds=[resource_id]
                                     )
                                 except:

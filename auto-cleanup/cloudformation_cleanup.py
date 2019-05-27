@@ -13,10 +13,15 @@ class CloudFormationCleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        try:
-            self.client = boto3.client("cloudformation", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+        self._client_cloudformation = None
+
+    @property
+    def client_cloudformation(self):
+        if not self._client_cloudformation:
+            self._client_cloudformation = boto3.client(
+                "cloudformation", region_name=region
+            )
+        return self._client_cloudformation
 
     def run(self):
         self.stacks()
@@ -34,7 +39,7 @@ class CloudFormationCleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_stacks().get("Stacks")
+                resources = self.client_cloudformation.describe_stacks().get("Stacks")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -62,7 +67,9 @@ class CloudFormationCleanup:
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client.delete_stack(StackName=resource_id)
+                                self.client_cloudformation.delete_stack(
+                                    StackName=resource_id
+                                )
                             except:
                                 self.logging.error(
                                     f"Could not delete CloudFormation Stack '{resource_id}'."

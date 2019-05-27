@@ -13,10 +13,13 @@ class S3Cleanup:
         self.resource_tree = resource_tree
         self.region = "global"
 
-        try:
-            self.client = boto3.client("s3")
-        except:
-            logging.error(sys.exc_info()[1])
+        self._client_s3 = None
+
+    @property
+    def client_s3(self):
+        if not self._client_s3:
+            self._client_s3 = boto3.client("s3")
+        return self._client_s3
 
     def run(self):
         self.buckets()
@@ -35,7 +38,7 @@ class S3Cleanup:
         )
         if clean:
             try:
-                resources = self.client.list_buckets()
+                resources = self.client_s3.list_buckets()
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -58,7 +61,7 @@ class S3Cleanup:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             # delete all objects
                             try:
-                                response = self.client.list_objects_v2(
+                                response = self.client_s3.list_objects_v2(
                                     Bucket=resource_id
                                 )
                             except:
@@ -74,7 +77,7 @@ class S3Cleanup:
                                 )
 
                                 try:
-                                    self.client.delete_objects(
+                                    self.client_s3.delete_objects(
                                         Bucket=resource_id,
                                         Delete={
                                             "Objects": [
@@ -90,13 +93,13 @@ class S3Cleanup:
                                     )
                                     self.logging.error(sys.exc_info()[1])
 
-                                response = self.client.list_objects_v2(
+                                response = self.client_s3.list_objects_v2(
                                     Bucket=resource_id
                                 )
 
                             # delete all Versions and DeleteMarkers
                             try:
-                                response = self.client.get_paginator(
+                                response = self.client_s3.get_paginator(
                                     "list_object_versions"
                                 )
                             except:
@@ -137,7 +140,7 @@ class S3Cleanup:
 
                             for i in range(0, len(delete_list), 1000):
                                 try:
-                                    self.client.delete_objects(
+                                    self.client_s3.delete_objects(
                                         Bucket=resource_id,
                                         Delete={
                                             "Objects": delete_list[i : i + 1000],
@@ -153,7 +156,7 @@ class S3Cleanup:
 
                             # delete bucket
                             try:
-                                self.client.delete_bucket(Bucket=resource_id)
+                                self.client_s3.delete_bucket(Bucket=resource_id)
                             except:
                                 self.logging.error(
                                     f"Could not delete Bucket '{resource_id}'."

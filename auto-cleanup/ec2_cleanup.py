@@ -13,13 +13,17 @@ class EC2Cleanup:
         self.resource_tree = resource_tree
         self.region = region
 
-        self.account_id = boto3.client("sts").get_caller_identity().get("Account")
+        self._client_ec2 = None
 
-        try:
-            self.client = boto3.client("ec2", region_name=region)
-            self.resource = boto3.resource("ec2", region_name=region)
-        except:
-            self.logging.error(sys.exc_info()[1])
+    @property
+    def account_number(self):
+        return self.client_sts.get_caller_identity()["Account"]
+
+    @property
+    def client_ec2(self):
+        if not self._client_ec2:
+            self._client_ec2 = boto3.client("ec2", region_name=region)
+        return self._client_ec2
 
     def run(self):
         self.addresses()
@@ -41,7 +45,7 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_addresses().get("Addresses")
+                resources = self.client_ec2.describe_addresses().get("Addresses")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -53,7 +57,9 @@ class EC2Cleanup:
                     if resource.get("AssociationId") is None:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client.release_address(AllocationId=resource_id)
+                                self.client_ec2.release_address(
+                                    AllocationId=resource_id
+                                )
                             except:
                                 self.logging.error(
                                     f"Could not release EC2 Address '{resource_id}'."
@@ -97,7 +103,7 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                reservations = self.client.describe_instances().get("Reservations")
+                reservations = self.client_ec2.describe_instances().get("Reservations")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -126,7 +132,7 @@ class EC2Cleanup:
                                     "dry_run", True
                                 ):
                                     try:
-                                        self.client.stop_instances(
+                                        self.client_ec2.stop_instances(
                                             InstanceIds=[resource_id]
                                         )
                                     except:
@@ -147,7 +153,7 @@ class EC2Cleanup:
                                     # disable termination protection before terminating the instance
                                     try:
                                         resource_protection = (
-                                            self.client.describe_instance_attribute(
+                                            self.client_ec2.describe_instance_attribute(
                                                 Attribute="disableApiTermination",
                                                 InstanceId=resource_id,
                                             )
@@ -163,7 +169,7 @@ class EC2Cleanup:
 
                                     if resource_protection:
                                         try:
-                                            self.client.modify_instance_attribute(
+                                            self.client_ec2.modify_instance_attribute(
                                                 DisableApiTermination={"Value": False},
                                                 InstanceId=resource_id,
                                             )
@@ -180,7 +186,7 @@ class EC2Cleanup:
                                         )
 
                                     try:
-                                        self.client.terminate_instances(
+                                        self.client_ec2.terminate_instances(
                                             InstanceIds=[resource_id]
                                         )
                                     except:
@@ -226,8 +232,8 @@ class EC2Cleanup:
         if clean:
             try:
                 # help from https://stackoverflow.com/a/41150217
-                instances = self.client.describe_instances()
-                security_groups = self.client.describe_security_groups()
+                instances = self.client_ec2.describe_instances()
+                security_groups = self.client_ec2.describe_security_groups()
 
                 instance_security_group_set = set()
                 security_group_set = set()
@@ -255,7 +261,7 @@ class EC2Cleanup:
                 ):
                     if not self.settings.get("general", {}).get("dry_run", True):
                         try:
-                            self.client.delete_security_group(GroupId=resource)
+                            self.client_ec2.delete_security_group(GroupId=resource)
                         except:
                             self.logging.error(
                                 f"Could not delete EC2 Security Group '{resource}'."
@@ -292,8 +298,8 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_snapshots(
-                    OwnerIds=[self.account_id]
+                resources = self.client_ec2.describe_snapshots(
+                    OwnerIds=[self.account_number]
                 ).get("Snapshots")
             except:
                 self.logging.error(sys.exc_info()[1])
@@ -313,8 +319,8 @@ class EC2Cleanup:
                 if resource_id not in self.whitelist.get("ec2", {}).get("snapshot", []):
                     snapshots_in_use = []
                     try:
-                        images = self.client.describe_images(
-                            ExecutableUsers=[self.account_id]
+                        images = self.client_ec2.describe_images(
+                            ExecutableUsers=[self.account_number]
                         ).get("Images")
                     except:
                         self.logging.error(f"Could not retrieve EC2 AMIs.")
@@ -345,7 +351,9 @@ class EC2Cleanup:
                                 "dry_run", True
                             ):
                                 try:
-                                    self.client.delete_snapshot(SnapshotId=resource_id)
+                                    self.client_ec2.delete_snapshot(
+                                        SnapshotId=resource_id
+                                    )
                                 except:
                                     self.logging.error(
                                         f"Could not delete EC2 Snapshot '{resource_id}'."
@@ -391,7 +399,7 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                resources = self.client.describe_volumes().get("Volumes")
+                resources = self.client_ec2.describe_volumes().get("Volumes")
             except:
                 self.logging.error(sys.exc_info()[1])
                 return None
@@ -416,7 +424,7 @@ class EC2Cleanup:
                                 "dry_run", True
                             ):
                                 try:
-                                    self.client.delete_volume(VolumeId=resource_id)
+                                    self.client_ec2.delete_volume(VolumeId=resource_id)
                                 except:
                                     self.logging.error(
                                         f"Could not delete EC2 Volume '{resource_id}'."
