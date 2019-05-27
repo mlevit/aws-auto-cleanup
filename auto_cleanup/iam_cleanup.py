@@ -108,7 +108,7 @@ class IAMCleanup:
                                     f"Could not retrieve IAM Role '{resource_id}' last accessed "
                                     "details in a reasonable amount of time."
                                 )
-                                return None
+                                return False
 
                         if get_last_accessed.get("JobStatus") == "COMPLETED":
                             last_accessed = datetime.datetime.now() - datetime.timedelta(
@@ -265,7 +265,7 @@ class IAMCleanup:
                             self.logging.error(
                                 f"Could not get IAM Role last accessed details for '{resource_id}'."
                             )
-                            return None
+                            return False
                     else:
                         self.logging.debug(
                             f"IAM Role '{resource_id}' was last modified {delta.days} days ago "

@@ -19,6 +19,5 @@ script:
   # - coverage xml
   # - python-codacy-coverage -r coverage.xml
   - serverless deploy --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2
-  - serverless invoke --function AutoCleanup --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2
-  - serverless logs --function AutoCleanup --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2
+  - serverless invoke --function AutoCleanup --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2 --type DryRun --log
   - serverless remove --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2

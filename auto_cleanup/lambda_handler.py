@@ -36,10 +36,6 @@ class Cleanup:
         self.whitelist = self.get_whitelist()
         self.dry_run = self.settings.get("general", {}).get("dry_run", True)
 
-        self.run_cleanup()
-
-        self.build_tree(self.resource_tree)
-
     def run_cleanup(self):
         if self.dry_run:
             self.logging.info(f"Auto Cleanup started in DRY RUN mode.")
@@ -185,6 +181,7 @@ class Cleanup:
             self.logging.error(
                 f"Could not read DynamoDB table '{os.environ['SETTINGSTABLE']}'."
             )
+            self.logging.error(sys.exc_info()[1])
         return settings
 
     def get_whitelist(self):
@@ -205,6 +202,7 @@ class Cleanup:
             self.logging.error(
                 f"Could not read DynamoDB table '{os.environ['WHITELISTTABLE']}'."
             )
+            self.logging.error(sys.exc_info()[1])
         return whitelist
 
     def setup_dynamodb(self):
@@ -274,6 +272,7 @@ class Cleanup:
                         ConditionExpression="attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)",
                     )
                 except:
+                    self.logging.error(sys.exc_info()[1])
                     continue
 
             settings_data.close()
@@ -327,8 +326,8 @@ class Cleanup:
                 try:
                     tree.save2file(temp_file)
                 except:
-                    self.logging.error(f"Could not generate resource tree.")
-                    return None
+                    self.logging.error("Could not generate resource tree.")
+                    return False
 
                 client = boto3.client("s3")
                 bucket = os.environ["RESOURCETREEBUCKET"]
@@ -342,15 +341,18 @@ class Cleanup:
                     self.logging.error(
                         f"Could not upload resource tree to S3 's3://{bucket}/{key}."
                     )
-                    return None
+                    return False
 
                 self.logging.info(
                     f"Resource tree has been built and uploaded to S3 's3://{bucket}/{key}."
                 )
             finally:
                 os.remove(temp_file)
+            return True
         except:
+            self.logging.error("Could not generate resource tree.")
             self.logging.error(sys.exc_info()[1])
+            return False
 
 
 def lambda_handler(event, context):
@@ -370,4 +372,11 @@ def lambda_handler(event, context):
         level=os.environ.get("LOGLEVEL", "WARNING").upper(),
     )
 
-    Cleanup(logging)
+    # create instance of class
+    cleanup = Cleanup(logging)
+
+    # run cleanup
+    cleanup.run_cleanup()
+
+    # build resource tree
+    cleanup.build_tree(cleanup.resource_tree)
