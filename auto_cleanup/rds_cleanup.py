@@ -18,7 +18,7 @@ class RDSCleanup:
     @property
     def client_rds(self):
         if not self._client_rds:
-            self._client_rds = boto3.client("rds", region_name=region)
+            self._client_rds = boto3.client("rds", region_name=self.region)
         return self._client_rds
 
     def run(self):

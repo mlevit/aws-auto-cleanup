@@ -18,7 +18,7 @@ class LambdaCleanup:
     @property
     def client_lambda(self):
         if not self._client_lambda:
-            self._client_lambda = boto3.client("lambda", region_name=region)
+            self._client_lambda = boto3.client("lambda", region_name=self.region)
         return self._client_lambda
 
     def run(self):

@@ -18,7 +18,7 @@ class RedshiftCleanup:
     @property
     def client_redshift(self):
         if not self._client_redshift:
-            self._client_redshift = boto3.client("redshift", region_name=region)
+            self._client_redshift = boto3.client("redshift", region_name=self.region)
         return self._client_redshift
 
     def run(self):

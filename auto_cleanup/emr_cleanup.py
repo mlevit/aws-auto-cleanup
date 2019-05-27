@@ -18,7 +18,7 @@ class EMRCleanup:
     @property
     def client_emr(self):
         if not self._client_emr:
-            self._client_emr = boto3.client("emr", region_name=region)
+            self._client_emr = boto3.client("emr", region_name=self.region)
         return self._client_emr
 
     def run(self):

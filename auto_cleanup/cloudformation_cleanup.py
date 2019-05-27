@@ -19,7 +19,7 @@ class CloudFormationCleanup:
     def client_cloudformation(self):
         if not self._client_cloudformation:
             self._client_cloudformation = boto3.client(
-                "cloudformation", region_name=region
+                "cloudformation", region_name=self.region
             )
         return self._client_cloudformation
 

@@ -22,7 +22,7 @@ class EC2Cleanup:
     @property
     def client_ec2(self):
         if not self._client_ec2:
-            self._client_ec2 = boto3.client("ec2", region_name=region)
+            self._client_ec2 = boto3.client("ec2", region_name=self.region)
         return self._client_ec2
 
     def run(self):

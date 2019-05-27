@@ -19,7 +19,7 @@ class ElasticBeanstalkCleanup:
     def client_elasticbeanstalk(self):
         if not self._client_elasticbeanstalk:
             self._client_elasticbeanstalk = boto3.client(
-                "elasticbeanstalk", region_name=region
+                "elasticbeanstalk", region_name=self.region
             )
         return self._client_elasticbeanstalk
 

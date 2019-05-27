@@ -18,7 +18,7 @@ class DynamoDBCleanup:
     @property
     def client_dynamodb(self):
         if not self._client_dynamodb:
-            self._client_dynamodb = boto3.client("dynamodb", region_name=region)
+            self._client_dynamodb = boto3.client("dynamodb", region_name=self.region)
         return self._client_dynamodb
 
     def run(self):
