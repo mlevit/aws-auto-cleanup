@@ -302,7 +302,7 @@ class EC2Cleanup:
                 resource_date = resource.get('CreateTime')
 
                 if resource_id not in self.whitelist.get('ec2', {}).get('volume', []):
-                    if resource.get('Attachments') is None:
+                    if not resource.get('Attachments'):
                         delta = LambdaHelper.get_day_delta(resource_date)
                     
                         if delta.days > ttl_days:
