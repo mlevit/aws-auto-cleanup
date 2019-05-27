@@ -17,8 +17,6 @@ Open source application to programmatically clean your AWS resources based on a 
 
 ### Deployment
 
-### Deployment
-
 1.  Install the [Serverless Framework](https://serverless.com/)
 
 ```bash
