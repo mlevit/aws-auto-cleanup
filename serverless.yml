@@ -18,7 +18,7 @@ custom:
   remover:
     prompt: true
     buckets:
-      - auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
+      - ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
 
 provider:
   name: aws
@@ -124,8 +124,8 @@ package:
 
 functions:
   AutoCleanup:
-    handler: auto-cleanup.lambda_handler.lambda_handler
-    name: auto-cleanup-${self:provider.stage}
+    handler: auto_cleanup.lambda_handler.lambda_handler
+    name: ${self:service}-${self:provider.stage}
     description: Auto Cleanup removes unused AWS resources
     memorySize: 128
     timeout: 300
@@ -138,9 +138,9 @@ functions:
         - treelib/**
     environment:
       LOGLEVEL: INFO # change to DEBUG for testing
-      RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
-      SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
-      WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
+      RESOURCETREEBUCKET: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
+      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
       - schedule:
           rate: rate(3 days)
@@ -151,7 +151,7 @@ resources:
     SettingsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: auto-cleanup-settings-${self:provider.stage}
+        TableName: ${self:service}-settings-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: key
             AttributeType: S
@@ -164,7 +164,7 @@ resources:
     WhitelistTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: auto-cleanup-whitelist-${self:provider.stage}
+        TableName: ${self:service}-whitelist-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: resource_id
             AttributeType: S
@@ -184,7 +184,7 @@ resources:
     ResourceTreeBuckett:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
+        BucketName: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
 
 plugins:
   - serverless-python-requirements
