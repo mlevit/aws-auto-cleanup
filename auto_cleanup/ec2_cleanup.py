@@ -14,6 +14,13 @@ class EC2Cleanup:
         self.region = region
 
         self._client_ec2 = None
+        self._client_sts = None
+    
+    @property
+    def client_sts(self):
+        if not self._client_sts:
+            self._client_sts = boto3.client("sts")
+        return self._client_sts
 
     @property
     def account_number(self):
