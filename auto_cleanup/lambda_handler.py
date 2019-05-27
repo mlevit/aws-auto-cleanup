@@ -217,8 +217,8 @@ class Cleanup:
 
         try:
             client = boto3.client("dynamodb")
-            settings_data = open("data/auto-cleanup-settings.json")
-            whitelist_data = open("data/auto-cleanup-whitelist.json")
+            settings_data = open("auto_cleanup/data/auto-cleanup-settings.json")
+            whitelist_data = open("auto_cleanup/data/auto-cleanup-whitelist.json")
 
             settings_json = json.loads(settings_data.read())
             whitelist_json = json.loads(whitelist_data.read())

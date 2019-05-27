@@ -99,7 +99,7 @@ serverless remove [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 
 #### Default Values
 
-When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
+When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `auto_cleanup/data/auto-cleanup-settings.json` and `auto_cleanup/data/auto-cleanup-whitelist.json`.
 
 #### Logging
 
