@@ -1,16 +1,20 @@
 service: auto-cleanup
 
 custom:
-  company: servian          # change to your company name
-  pythonRequirements:       # allows us to deploy a newer version of boto3
-    noDeploy: [
-      'docutils',
-      'jmespath',
-      'python-dateutil',
-      's3transfer',
-      'six',
-      'pip',
-      'setuptools']
+  company: servian # change to your company name
+  log_level: INFO # DEBUG for dev | INFO for prod
+  region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+  pythonRequirements: # allows us to deploy a newer version of boto3
+    noDeploy:
+      [
+        "docutils",
+        "jmespath",
+        "python-dateutil",
+        "s3transfer",
+        "six",
+        "pip",
+        "setuptools",
+      ]
   remover:
     prompt: true
     buckets:
@@ -19,9 +23,9 @@ custom:
 provider:
   name: aws
   runtime: python3.7
-  stage: production
-  region: ap-southeast-2    # change to your region
-  profile: saml             # change to your profile  
+  stage: ${opt:stage, "prod"} # Override via CLI "--stage dev"
+  region: ${self:custom.region}
+  profile: ${opt:profile, ""} # Override via CLI "--aws-profile saml"
   environment:
     PYTHONPATH: "/var/task/auto-cleanup:/var/task/boto3:/var/task/botocore:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
   iamRoleStatements:
@@ -133,7 +137,7 @@ functions:
         - simplejson/**
         - treelib/**
     environment:
-      LOGLEVEL: INFO       # change to DEBUG for testing
+      LOGLEVEL: INFO # change to DEBUG for testing
       RESOURCETREEBUCKET: auto-cleanup-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: auto-cleanup-settings-${self:provider.stage}
       WHITELISTTABLE: auto-cleanup-whitelist-${self:provider.stage}
