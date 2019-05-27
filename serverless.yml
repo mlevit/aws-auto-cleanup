@@ -27,7 +27,7 @@ provider:
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # Override via CLI "--aws-profile saml"
   environment:
-    PYTHONPATH: "/var/task/auto-cleanup:/var/task/boto3:/var/task/botocore:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
+    PYTHONPATH: "/var/task/auto_cleanup:/var/task/boto3:/var/task/botocore:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
   iamRoleStatements:
     - Effect: Allow
       Action:
