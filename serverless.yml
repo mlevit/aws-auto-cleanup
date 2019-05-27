@@ -16,7 +16,7 @@ custom:
         "setuptools",
       ]
   remover:
-    prompt: true
+    prompt: false
     buckets:
       - ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
 

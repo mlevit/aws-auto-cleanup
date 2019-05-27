@@ -68,13 +68,13 @@ serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 10. Invoke Auto Cleanup Setup for the first time to create the necessary AWS Config rules and settings
 
 ```bash
-serverless invoke -f AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 ```
 
 11. Check Auto Cleanup Setup logs
 
 ```bash
-serverless logs -f AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 ```
 
 ### Removal
