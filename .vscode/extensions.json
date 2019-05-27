@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "dracula-theme.theme-dracula",
+    "drewbourne.vscode-remark-lint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "kevinrose.vsc-python-indent",
+    "ms-python.python",
+    "ms-vsliveshare.vsliveshare",
+    "njpwerner.autodocstring",
+    "pkief.material-icon-theme",
+    "visualstudioexptteam.vscodeintellicode"
+  ],
+  "unwantedRecommendations": []
+}

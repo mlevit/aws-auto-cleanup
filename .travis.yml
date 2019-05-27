@@ -1,0 +1,22 @@
+dist: xenial
+language: python
+python:
+  - "3.7"
+install:
+  - pip install awscli --upgrade
+  - pip install codacy-coverage --upgrade
+  - pip install coverage --upgrade
+  - pip install moto --upgrade
+  - pip install --requirement requirements.txt --upgrade
+  - npm install serverless --global
+  - npm install serverless-iam-roles-per-function
+  - npm install serverless-s3-remover
+  - serverless plugin install --name serverless-python-requirements
+before_script:
+  - export BOTO_CONFIG=/dev/null
+script:
+  - coverage run -m pytest --disable-warnings
+  - coverage xml
+  - python-codacy-coverage -r coverage.xml
+  - serverless deploy --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2
+  - serverless remove --stage $TRAVIS_BUILD_NUMBER --region ap-southeast-2
