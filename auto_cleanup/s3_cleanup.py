@@ -40,8 +40,9 @@ class S3Cleanup:
             try:
                 resources = self.client_s3.list_buckets()
             except:
+                self.logging.error("Could not list all S3 Buckets.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -180,5 +181,7 @@ class S3Cleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "S3", {}
                 ).setdefault("Buckets", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of S3 Buckets.")
+            return True

@@ -42,8 +42,9 @@ class RDSCleanup:
             try:
                 resources = self.client_rds.describe_db_instances().get("DBInstances")
             except:
+                self.logging.error("Could not list all RDS Instances.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -110,8 +111,10 @@ class RDSCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
                 ).setdefault("Instances", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of RDS Instances.")
+            return True
 
     def snapshots(self):
         """
@@ -128,8 +131,9 @@ class RDSCleanup:
             try:
                 resources = self.client_rds.describe_db_snapshots().get("DBSnapshots")
             except:
+                self.logging.error("Could not list all RDS Snapshots.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -175,5 +179,7 @@ class RDSCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
                 ).setdefault("Snapshots", []).append(resource_id)
+            return True
         else:
             self.logging.debug("Skipping cleanup of RDS Snapshots.")
+            return True

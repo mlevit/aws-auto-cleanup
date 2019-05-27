@@ -151,7 +151,7 @@ class Cleanup:
                 )
                 ec2_class.run()
             else:
-                self.logging.info("Skipping region '{region}'.")
+                self.logging.info(f"Skipping region '{region}'.")
 
         # global services
         self.logging.info("Switching region to 'global'.")
@@ -171,6 +171,7 @@ class Cleanup:
         iam_class.run()
 
         self.logging.info("Auto Cleanup completed.")
+        return True
 
     def get_settings(self):
         settings = {}
@@ -184,7 +185,6 @@ class Cleanup:
             self.logging.error(
                 f"Could not read DynamoDB table '{os.environ['SETTINGSTABLE']}'."
             )
-
         return settings
 
     def get_whitelist(self):
@@ -205,7 +205,6 @@ class Cleanup:
             self.logging.error(
                 f"Could not read DynamoDB table '{os.environ['WHITELISTTABLE']}'."
             )
-
         return whitelist
 
     def setup_dynamodb(self):

@@ -39,8 +39,9 @@ class EMRCleanup:
             try:
                 resources = self.client_emr.list_clusters().get("Clusters")
             except:
+                self.logging.error("Could not list all EMR Clusters.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -97,5 +98,7 @@ class EMRCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EMR", {}
                 ).setdefault("Clusters", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of EMR Clusters.")
+            return True

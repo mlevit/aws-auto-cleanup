@@ -40,8 +40,9 @@ class RedshiftCleanup:
             try:
                 resources = self.client_redshift.describe_clusters().get("Clusters")
             except:
+                self.logging.error("Could not list all Redshift Clusters.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -98,8 +99,10 @@ class RedshiftCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
                 ).setdefault("Clusters", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of Redshift Clusters.")
+            return True
 
     def snapshots(self):
         """
@@ -118,8 +121,9 @@ class RedshiftCleanup:
                     "Snapshots"
                 )
             except:
+                self.logging.error("Could not list all Redshift Snapshots.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -175,5 +179,7 @@ class RedshiftCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
                 ).setdefault("Snapshots", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of Redshift Snapshots.")
+            return True

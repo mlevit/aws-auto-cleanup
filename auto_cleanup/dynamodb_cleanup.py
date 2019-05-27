@@ -39,8 +39,9 @@ class DynamoDBCleanup:
             try:
                 resources = self.client_dynamodb.list_tables().get("TableNames")
             except:
+                self.logging.error("Could not list all DynamoDB Tables.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -88,5 +89,7 @@ class DynamoDBCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "DynamoDB", {}
                 ).setdefault("Tables", []).append(resource)
+            return True
         else:
             self.logging.info("Skipping cleanup of DynamoDB Tables.")
+            return True

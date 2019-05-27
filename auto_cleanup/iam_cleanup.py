@@ -40,8 +40,9 @@ class IAMCleanup:
             try:
                 resources = self.client_iam.list_roles().get("Roles")
             except:
+                self.logging.error("Could not list all IAM Roles.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -279,5 +280,7 @@ class IAMCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "IAM", {}
                 ).setdefault("Roles", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of IAM Roles.")
+            return True

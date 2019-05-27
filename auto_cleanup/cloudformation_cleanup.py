@@ -41,8 +41,9 @@ class CloudFormationCleanup:
             try:
                 resources = self.client_cloudformation.describe_stacks().get("Stacks")
             except:
+                self.logging.error("Could not list all CloudFormation Stacks.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -95,5 +96,7 @@ class CloudFormationCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "CloudFormation", {}
                 ).setdefault("Stacks", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of CloudFormation Stacks.")
+            return True

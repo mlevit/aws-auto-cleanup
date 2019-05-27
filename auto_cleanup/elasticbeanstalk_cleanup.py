@@ -43,8 +43,9 @@ class ElasticBeanstalkCleanup:
                     "Applications"
                 )
             except:
+                self.logging.error("Could not list all ElasticBeanstalk Applications.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -93,5 +94,7 @@ class ElasticBeanstalkCleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Elastic Beanstalk", {}
                 ).setdefault("Applications", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of Elastic Beanstalk Applications.")
+            return True

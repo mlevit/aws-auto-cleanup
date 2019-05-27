@@ -15,7 +15,7 @@ class EC2Cleanup:
 
         self._client_ec2 = None
         self._client_sts = None
-    
+
     @property
     def client_sts(self):
         if not self._client_sts:
@@ -54,8 +54,9 @@ class EC2Cleanup:
             try:
                 resources = self.client_ec2.describe_addresses().get("Addresses")
             except:
+                self.logging.error("Could not list all EC2 Addresses.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             for resource in resources:
                 resource_id = resource.get("AllocationId")
@@ -92,8 +93,10 @@ class EC2Cleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Addresses", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of EC2 Addresses.")
+            return True
 
     def instances(self):
         """
@@ -112,8 +115,9 @@ class EC2Cleanup:
             try:
                 reservations = self.client_ec2.describe_instances().get("Reservations")
             except:
+                self.logging.error("Could not list all EC2 Instances.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -222,8 +226,10 @@ class EC2Cleanup:
                     ).setdefault("EC2", {}).setdefault("Instances", []).append(
                         resource_id
                     )
+            return True
         else:
             self.logging.info("Skipping cleanup of EC2 Instances.")
+            return True
 
     def security_groups(self):
         """
@@ -260,7 +266,7 @@ class EC2Cleanup:
             except:
                 self.logging.error(f"Could not retrieve all unused Security Groups.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             for resource in resources:
                 if resource not in self.whitelist.get("ec2", {}).get(
@@ -289,8 +295,10 @@ class EC2Cleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Security Groups", []).append(resource)
+            return True
         else:
             self.logging.info("Skipping cleanup of EC2 Security Groups.")
+            return True
 
     def snapshots(self):
         """
@@ -309,8 +317,9 @@ class EC2Cleanup:
                     OwnerIds=[self.account_number]
                 ).get("Snapshots")
             except:
+                self.logging.errpr("Could not list all EC2 Snapshots.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -390,8 +399,10 @@ class EC2Cleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Snapshots", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of EC2 Snapshots.")
+            return True
 
     def volumes(self):
         """
@@ -408,8 +419,9 @@ class EC2Cleanup:
             try:
                 resources = self.client_ec2.describe_volumes().get("Volumes")
             except:
+                self.logging.error("Could not list all EC2 Volumes.")
                 self.logging.error(sys.exc_info()[1])
-                return None
+                return False
 
             ttl_days = (
                 self.settings.get("services")
@@ -423,7 +435,7 @@ class EC2Cleanup:
                 resource_date = resource.get("CreateTime")
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
-                    if resource.get("Attachments") is None:
+                    if resource.get("Attachments") == []:
                         delta = LambdaHelper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
@@ -461,5 +473,7 @@ class EC2Cleanup:
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Volumes", []).append(resource_id)
+            return True
         else:
             self.logging.info("Skipping cleanup of EC2 Volumes.")
+            return True
