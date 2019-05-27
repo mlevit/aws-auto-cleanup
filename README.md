@@ -14,50 +14,92 @@ Open source application to programmatically clean your AWS resources based on a 
 - [Resource Tree](#resource-tree)
 
 ## Setup
+
 ### Deployment
 
-To deploy this Auto Cleanup to your AWS account, follow the below steps:
+### Deployment
 
-1. Install Serverless
-   `npm install serverless -g`
-2. Install AWS CLI 
-   `pip3 install awscli --upgrade --user`
-3. Clone this repository 
-   `git clone https://github.com/servian/aws-auto-cleanup`
-4. Configure AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
-5. If you've configure the AWS CLI using a profile, open the `serverless.yml` file and modify the `provider > profile` attribute to match your profile name.
-6. Change the custom `company` attribute within the `serverless.yml` file to your company name in order to prevent S3 Bucket name collision
-7. Change into the Auto Cleanup directory 
-   `cd aws-auto-cleanup`
-8. Install Serverless plugin 
-   `serverless plugin install -n serverless-python-requirements`
-9. Deploy Auto Cleanup 
-   `serverless deploy`
-10. Invoke Auto Cleanup for the first time 
-      `serverless invoke -f AutoCleanup`
-11. Check Auto Cleanup logs 
-      `serverless logs -f AutoCleanup`
+1.  Install the [Serverless Framework](https://serverless.com/)
+
+```bash
+npm install serverless --global
+```
+
+2.  Install [AWS CLI](https://aws.amazon.com/cli/)
+
+```bash
+pip3 install awscli --upgrade --user
+```
+
+3.  Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
+
+4.  Install Auto Cleanup
+
+```bash
+serverless create --template-url aws-auto-cleanup --path aws-auto-cleanup
+```
+
+5.  Change into the Auto Cleanup directory
+
+```bash
+cd aws-auto-cleanup
+```
+
+8.  Install Serverless plugins needed for deployment
+
+```bash
+serverless plugin install --name serverless-python-requirements
+```
+
+```bash
+npm install serverless-iam-roles-per-function
+```
+
+```bash
+npm install serverless-s3-remover
+```
+
+9.  Deploy Auto Cleanup to your AWS account
+
+```bash
+serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+```
+
+10. Invoke Auto Cleanup Setup for the first time to create the necessary AWS Config rules and settings
+
+```bash
+serverless invoke -f AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+```
+
+11. Check Auto Cleanup Setup logs
+
+```bash
+serverless logs -f AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+```
 
 ### Removal
 
-Auto Cleanup is deployed using the Serverless Framework which under the hood creates an AWS CloudFormation Stack. This means removal is clean and simple.
+Auto Cleanup is deployed using the Serverless Framework which under the hood creates an AWS CloudFormation Stack allowing for a clean and simple removal process.
 
 To remove Auto Cleanup from your AWS account, follow the below steps:
 
-1. Change into the Auto Cleanup directory 
-   `cd aws-auto-cleanup`
-2. Remove Auto Cleanup 
-   `serverless remove`
+1.  Change into the Auto Cleanup directory
+
+```bash
+cd aws-auto-cleanup
+```
+
+2.  Remove Auto Cleanup from your AWS account
+
+```bash
+serverless remove [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+```
 
 ### Configuration
 
 #### Default Values
 
 When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `/data/auto-cleanup-settings.json` and `/data/auto-cleanup-whitelist.json`.
-
-#### Region
-
-Within the `serverless.yml` file, under `provider` there is a `region` attribute. Set this attribute to your desired region.
 
 #### Logging
 
@@ -67,7 +109,7 @@ Auto Cleanup will output all resource remove logs at the `INFO` level and logs o
 
 #### Scheduling
 
-Within the `serverless.yml` file, under `functions > AutoCleanup > events > schedule` there is a `RATE`  and `enabled` attributes.
+Within the `serverless.yml` file, under `functions > AutoCleanup > events > schedule` there is a `RATE` and `enabled` attributes.
 
 You can enable custom scheduling of the Lambda by following the instruction at [Schedule Expressions Using Rate or Cron](https://docs.aws.amazon.com/lambda/latest/dg/tutorial-scheduled-events-schedule-expressions.html).
 
@@ -105,24 +147,24 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
 
-| Service           | Resource Type   | Clean | TTL  |
-| ----------------- | --------------- | ----- | ---- |
-| CloudFormation    | Stacks          | True  | 7    |
-| DynamoDB          | Tables          | True  | 7    |
-| EC2               | Addresses       | True  | N/A  |
-|                   | Instances       | True  | 7    |
-|                   | Security Groups | True  | N/A  |
-|                   | Snapshots       | True  | 7    |
-|                   | Volumes         | True  | 7    |
-| Elastic Beanstalk | Applications    | True  | 7    |
-| EMR               | Clusters        | True  | 7    |
-| IAM               | Roles           | True  | 7    |
-| Lambda            | Functions       | True  | 7    |
-| RDS               | Instances       | True  | 7    |
-|                   | Snapshots       | True  | 7    |
-| Redshift          | Clusters        | True  | 7    |
-|                   | Snapshots       | True  | 7    |
-| S3                | Buckets         | True  | 7    |
+| Service           | Resource Type   | Clean | TTL |
+| ----------------- | --------------- | ----- | --- |
+| CloudFormation    | Stacks          | True  | 7   |
+| DynamoDB          | Tables          | True  | 7   |
+| EC2               | Addresses       | True  | N/A |
+|                   | Instances       | True  | 7   |
+|                   | Security Groups | True  | N/A |
+|                   | Snapshots       | True  | 7   |
+|                   | Volumes         | True  | 7   |
+| Elastic Beanstalk | Applications    | True  | 7   |
+| EMR               | Clusters        | True  | 7   |
+| IAM               | Roles           | True  | 7   |
+| Lambda            | Functions       | True  | 7   |
+| RDS               | Instances       | True  | 7   |
+|                   | Snapshots       | True  | 7   |
+| Redshift          | Clusters        | True  | 7   |
+|                   | Snapshots       | True  | 7   |
+| S3                | Buckets         | True  | 7   |
 
 #### Regions
 
@@ -150,7 +192,7 @@ Table includes the `clean` attribute which informs Auto Cleanup if the region sh
 | us-west-1         | True  |
 | us-west-2         | True  |
 
-*Note: Some regions have `clean` set to `false` by default as they required special access from AWS*
+_Note: Some regions have `clean` set to `false` by default as they required special access from AWS_
 
 #### Dry Run
 
