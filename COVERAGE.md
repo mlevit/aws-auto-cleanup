@@ -11,13 +11,13 @@ Test coverage: **10 of 24**
 | CloudFormation    | Stacks          | Done               | Done                                                                  |
 | DynamoDB          | Tables          | Done               | Done                                                                  |
 | EC2               | Addresses       | Done               | No Moto support ([issue](https://github.com/spulec/moto/issues/2221)) |
-|                   | Instances       | Done               |                                                                       |
-|                   | Security Groups | Done               |                                                                       |
-|                   | Snapshots       | Done               |                                                                       |
-|                   | Volumes         | Done               |                                                                       |
+|                   | Instances       | Done               | Done                                                                  |
+|                   | Security Groups | Done               | Done                                                                  |
+|                   | Snapshots       | Done               | Done                                                                  |
+|                   | Volumes         | Done               | Done                                                                  |
 | Elastic Beanstalk | Applications    | Done               | No Moto support                                                       |
 | EMR               | Clusters        | Done               | Done                                                                  |
-| IAM               | Roles           | Done               |                                                                       |
+| IAM               | Roles           | Done               | No Moto support                                                       |
 | Lambda            | Functions       | Done               |                                                                       |
 | RDS               | Instances       | Done               | No Moto support ([issue](https://github.com/spulec/moto/issues/2220)) |
 |                   | Snapshots       | Done               | Done                                                                  |

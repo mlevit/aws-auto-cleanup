@@ -15,6 +15,7 @@ class EC2Cleanup:
 
         self._client_ec2 = None
         self._client_sts = None
+        self._resource_ec2 = None
 
     @property
     def client_sts(self):
@@ -31,6 +32,12 @@ class EC2Cleanup:
         if not self._client_ec2:
             self._client_ec2 = boto3.client("ec2", region_name=self.region)
         return self._client_ec2
+
+    @property
+    def resource_ec2(self):
+        if not self._resource_ec2:
+            self._resource_ec2 = boto3.resource("ec2", region_name=self.region)
+        return self._resource_ec2
 
     def run(self):
         self.addresses()
@@ -264,7 +271,7 @@ class EC2Cleanup:
 
                 resources = security_group_set - instance_security_group_set
             except:
-                self.logging.error(f"Could not retrieve all unused Security Groups.")
+                self.logging.error("Could not retrieve all unused Security Groups.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
