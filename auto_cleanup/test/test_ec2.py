@@ -25,26 +25,26 @@ class TestInstancesMoreThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.clien_ec2.create_instances(
+        test_class.client_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
         # validate instance creation
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["ImageId"] == "ami-43a15f3e"
 
         # test instances functions for running instace
         test_class.instances()
 
         # # validate instance stopped
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["State"]["Name"] == "stopped"
 
         # test instances functions for stopped instance
         test_class.instances()
 
         # # validate instance stopped
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert (
             response["Reservations"][0]["Instances"][0]["State"]["Name"] == "terminated"
         )
@@ -68,19 +68,19 @@ class TestInstancesLessThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.clien_ec2.create_instances(
+        test_class.client_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
         # validate instance creation
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["ImageId"] == "ami-43a15f3e"
 
         # test instances functions for running instace
         test_class.instances()
 
         # # validate instance not stopped
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["State"]["Name"] == "running"
 
 
@@ -102,12 +102,12 @@ class TestInstancesWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.clien_ec2.create_instances(
+        test_class.client_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
         # validate instance creation
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["ImageId"] == "ami-43a15f3e"
 
         # get instance id and add to whitelist
@@ -121,7 +121,7 @@ class TestInstancesWhitelist:
         test_class.instances()
 
         # # validate instance not stopped
-        response = test_class.client_test_class.describe_instances()
+        response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["State"]["Name"] == "running"
 
 
@@ -145,19 +145,19 @@ class TestSecurityGroupsNotWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.clien_ec2.create_security_group(
+        test_class.client_ec2.create_security_group(
             Description="test-security-group", GroupName="test-security-group"
         )
 
         # validate instance creation
-        response = test_class.client_test_class.describe_security_groups()
+        response = test_class.client_ec2.describe_security_groups()
         assert response["SecurityGroups"][1]["GroupName"] == "test-security-group"
 
         # test instances functions for running instace
         test_class.security_groups()
 
         # validate instance stopped
-        response = test_class.client_test_class.describe_security_groups()
+        response = test_class.client_ec2.describe_security_groups()
         for group in response["SecurityGroups"]:
             assert group["GroupName"] != "test-security-group"
 
@@ -182,12 +182,12 @@ class TestSecurityGroupsWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.clien_ec2.create_security_group(
+        test_class.client_ec2.create_security_group(
             Description="test-security-group", GroupName="test-security-group"
         )
 
         # validate instance creation
-        response = test_class.client_test_class.describe_security_groups()
+        response = test_class.client_ec2.describe_security_groups()
         assert response["SecurityGroups"][1]["GroupName"] == "test-security-group"
 
         # get security group id and add to whitelist
@@ -199,7 +199,7 @@ class TestSecurityGroupsWhitelist:
         test_class.security_groups()
 
         # validate instance stopped
-        response = test_class.client_test_class.describe_security_groups()
+        response = test_class.client_ec2.describe_security_groups()
         assert response["SecurityGroups"][1]["GroupName"] == "test-security-group"
 
 
@@ -221,19 +221,17 @@ class TestVolumesMoreThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.client_test_class.create_volume(
-            AvailabilityZone="ap-southeast-2a", Size=10
-        )
+        test_class.client_ec2.create_volume(AvailabilityZone="ap-southeast-2a", Size=10)
 
         # validate instance creation
-        response = test_class.client_test_class.describe_volumes()
+        response = test_class.client_ec2.describe_volumes()
         assert len(response["Volumes"]) == 1
 
         # test instances functions for running instace
         test_class.volumes()
 
         # validate instance stopped
-        response = test_class.client_test_class.describe_volumes()
+        response = test_class.client_ec2.describe_volumes()
         assert response["Volumes"] == []
 
 
@@ -255,19 +253,17 @@ class TestVolumesLessThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.client_test_class.create_volume(
-            AvailabilityZone="ap-southeast-2a", Size=10
-        )
+        test_class.client_ec2.create_volume(AvailabilityZone="ap-southeast-2a", Size=10)
 
         # validate instance creation
-        response = test_class.client_test_class.describe_volumes()
+        response = test_class.client_ec2.describe_volumes()
         assert len(response["Volumes"]) == 1
 
         # test instances functions for running instace
         test_class.volumes()
 
         # validate instance stopped
-        response = test_class.client_test_class.describe_volumes()
+        response = test_class.client_ec2.describe_volumes()
         assert len(response["Volumes"]) == 1
 
 
@@ -289,12 +285,10 @@ class TestVolumesWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.client_test_class.create_volume(
-            AvailabilityZone="ap-southeast-2a", Size=10
-        )
+        test_class.client_ec2.create_volume(AvailabilityZone="ap-southeast-2a", Size=10)
 
         # validate instance creation
-        response = test_class.client_test_class.describe_volumes()
+        response = test_class.client_ec2.describe_volumes()
         assert len(response["Volumes"]) == 1
 
         # get volume id and add to whitelist
@@ -306,5 +300,5 @@ class TestVolumesWhitelist:
         test_class.volumes()
 
         # validate instance stopped
-        response = test_class.client_test_class.describe_volumes()
+        response = test_class.client_ec2.describe_volumes()
         assert len(response["Volumes"]) == 1
