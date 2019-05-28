@@ -18,7 +18,7 @@ class TestClustersMoreThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = emr_cleanup.test_classCleanup(
+            test_class = emr_cleanup.EMRCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -57,7 +57,7 @@ class TestClustersLessThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = emr_cleanup.test_classCleanup(
+            test_class = emr_cleanup.EMRCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -96,7 +96,7 @@ class TestClustersWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = emr_cleanup.test_classCleanup(
+            test_class = emr_cleanup.EMRCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class

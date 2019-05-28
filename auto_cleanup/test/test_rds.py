@@ -18,7 +18,7 @@ class TestSnapshotsMoreThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = rds_cleanup.test_classCleanup(
+            test_class = rds_cleanup.RDSCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -63,7 +63,7 @@ class TestSnapshotsLessThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = rds_cleanup.test_classCleanup(
+            test_class = rds_cleanup.RDSCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -108,7 +108,7 @@ class TestSnapshotsWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = rds_cleanup.test_classCleanup(
+            test_class = rds_cleanup.RDSCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class

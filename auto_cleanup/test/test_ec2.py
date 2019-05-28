@@ -18,7 +18,7 @@ class TestInstancesMoreThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -61,7 +61,7 @@ class TestInstancesLessThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -95,7 +95,7 @@ class TestInstancesWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -138,7 +138,7 @@ class TestSecurityGroupsNotWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -175,7 +175,7 @@ class TestSecurityGroupsWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -214,7 +214,7 @@ class TestVolumesMoreThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -248,7 +248,7 @@ class TestVolumesLessThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
@@ -282,7 +282,7 @@ class TestVolumesWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            test_class = ec2_cleanup.test_classCleanup(
+            test_class = ec2_cleanup.EC2Cleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
             yield test_class
