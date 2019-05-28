@@ -20,7 +20,7 @@ Test coverage: **10 of 24**
 | IAM               | Roles           | Done               |                                                                       |
 | Lambda            | Functions       | Done               |                                                                       |
 | RDS               | Instances       | Done               | No Moto support ([issue](https://github.com/spulec/moto/issues/2220)) |
-|                   | Snapshots       | Done               | No Moto support                                                       |
+|                   | Snapshots       | Done               | Done                                                                  |
 | Redshift          | Clusters        | Done               | Done                                                                  |
 |                   | Snapshots       | Done               | Done                                                                  |
 | S3                | Buckets         | Done               | Done                                                                  |
