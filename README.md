@@ -38,7 +38,7 @@ pip3 install awscli --upgrade --user
 4.  Install Auto Cleanup
 
 ```bash
-serverless create --template-url aws-auto-cleanup --path aws-auto-cleanup
+serverless create --template-url https://github.com/servian/aws-auto-cleanup --path aws-auto-cleanup
 ```
 
 5.  Change into the Auto Cleanup directory
@@ -67,13 +67,13 @@ npm install serverless-s3-remover
 serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 ```
 
-10. Invoke Auto Cleanup Setup for the first time to create the necessary AWS Config rules and settings
+10. Invoke Auto Cleanup for the first time to create the necessary AWS Config rules and settings
 
 ```bash
-serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>] --type Event
 ```
 
-11. Check Auto Cleanup Setup logs
+11. Check Auto Cleanup logs
 
 ```bash
 serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
