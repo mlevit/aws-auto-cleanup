@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class RedshiftCleanup:
@@ -59,7 +59,7 @@ class RedshiftCleanup:
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "cluster", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if resource_status == "available":
@@ -140,7 +140,7 @@ class RedshiftCleanup:
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "snapshots", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if resource_status in ("available", "final snapshot"):
