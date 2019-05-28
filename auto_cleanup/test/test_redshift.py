@@ -141,7 +141,7 @@ class TestSnapshotsMoreThanTTL:
             yield redshift
 
     def test(self, redshift):
-        # create test table
+        # create test cluster
         redshift.client_redshift.create_cluster(
             DBName="test-redshift",
             ClusterIdentifier="redshift123",
@@ -151,9 +151,11 @@ class TestSnapshotsMoreThanTTL:
             MasterUserPassword="Admin123",
         )
 
+        # create test snapshot
         redshift.client_redshift.create_cluster_snapshot(
             SnapshotIdentifier="snapshot123", ClusterIdentifier="redshift123"
         )
+
         # validate snapshot creation
         response = redshift.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
@@ -183,7 +185,7 @@ class TestSnapshotsLessThanTTL:
             yield redshift
 
     def test(self, redshift):
-        # create test table
+        # create test cluster
         redshift.client_redshift.create_cluster(
             DBName="test-redshift",
             ClusterIdentifier="redshift123",
@@ -193,9 +195,11 @@ class TestSnapshotsLessThanTTL:
             MasterUserPassword="Admin123",
         )
 
+        # create test snapshot
         redshift.client_redshift.create_cluster_snapshot(
             SnapshotIdentifier="snapshot123", ClusterIdentifier="redshift123"
         )
+
         # validate snapshot creation
         response = redshift.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
@@ -203,7 +207,7 @@ class TestSnapshotsLessThanTTL:
         # test snapshot functions
         redshift.snapshots()
 
-        # validate snapshot deletion
+        # validate snapshot not deleted
         response = redshift.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
 
@@ -225,7 +229,7 @@ class TestSnapshotsWhitelist:
             yield redshift
 
     def test(self, redshift):
-        # create test table
+        # create test cluster
         redshift.client_redshift.create_cluster(
             DBName="test-redshift",
             ClusterIdentifier="redshift123",
@@ -235,9 +239,11 @@ class TestSnapshotsWhitelist:
             MasterUserPassword="Admin123",
         )
 
+        # create test snapshot
         redshift.client_redshift.create_cluster_snapshot(
             SnapshotIdentifier="snapshot123", ClusterIdentifier="redshift123"
         )
+
         # validate snapshot creation
         response = redshift.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
@@ -245,6 +251,6 @@ class TestSnapshotsWhitelist:
         # test snapshot functions
         redshift.snapshots()
 
-        # validate snapshot deletion
+        # validate snapshot not deleted
         response = redshift.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"] == []
