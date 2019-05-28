@@ -25,7 +25,7 @@ class TestSnapshotsMoreThanTTL:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.create_db_instance(
+        test_class.client_rds.create_db_instance(
             DBName="test",
             DBInstanceIdentifier="test123",
             AllocatedStorage=10,
@@ -36,19 +36,19 @@ class TestSnapshotsMoreThanTTL:
         )
 
         # create test snapshot
-        test_class.client_test_class.create_db_snapshot(
+        test_class.client_rds.create_db_snapshot(
             DBSnapshotIdentifier="snapshot123", DBInstanceIdentifier="test123"
         )
 
         # validate snapshot creation
-        response = test_class.client_test_class.describe_db_snapshots()
+        response = test_class.client_rds.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
         test_class.snapshots()
 
         # validate snapshot deletion
-        response = test_class.client_test_class.describe_db_snapshots()
+        response = test_class.client_rds.describe_db_snapshots()
         assert response["DBSnapshots"] == []
 
 
@@ -70,7 +70,7 @@ class TestSnapshotsLessThanTTL:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.create_db_instance(
+        test_class.client_rds.create_db_instance(
             DBName="test",
             DBInstanceIdentifier="test123",
             AllocatedStorage=10,
@@ -81,19 +81,19 @@ class TestSnapshotsLessThanTTL:
         )
 
         # create test snapshot
-        test_class.client_test_class.create_db_snapshot(
+        test_class.client_rds.create_db_snapshot(
             DBSnapshotIdentifier="snapshot123", DBInstanceIdentifier="test123"
         )
 
         # validate snapshot creation
-        response = test_class.client_test_class.describe_db_snapshots()
+        response = test_class.client_rds.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
         test_class.snapshots()
 
         # validate snapshot deletion
-        response = test_class.client_test_class.describe_db_snapshots()
+        response = test_class.client_rds.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
 
@@ -115,7 +115,7 @@ class TestSnapshotsWhitelist:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.create_db_instance(
+        test_class.client_rds.create_db_instance(
             DBName="test",
             DBInstanceIdentifier="test123",
             AllocatedStorage=10,
@@ -126,17 +126,17 @@ class TestSnapshotsWhitelist:
         )
 
         # create test snapshot
-        test_class.client_test_class.create_db_snapshot(
+        test_class.client_rds.create_db_snapshot(
             DBSnapshotIdentifier="snapshot123", DBInstanceIdentifier="test123"
         )
 
         # validate snapshot creation
-        response = test_class.client_test_class.describe_db_snapshots()
+        response = test_class.client_rds.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
         test_class.snapshots()
 
         # validate snapshot deletion
-        response = test_class.client_test_class.describe_db_snapshots()
+        response = test_class.client_rds.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"

@@ -25,7 +25,7 @@ class TestInstancesMoreThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.resource_test_class.create_instances(
+        test_class.clien_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
@@ -68,7 +68,7 @@ class TestInstancesLessThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.resource_test_class.create_instances(
+        test_class.clien_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
@@ -102,7 +102,7 @@ class TestInstancesWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.resource_test_class.create_instances(
+        test_class.clien_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
@@ -145,7 +145,7 @@ class TestSecurityGroupsNotWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.resource_test_class.create_security_group(
+        test_class.clien_ec2.create_security_group(
             Description="test-security-group", GroupName="test-security-group"
         )
 
@@ -182,7 +182,7 @@ class TestSecurityGroupsWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.resource_test_class.create_security_group(
+        test_class.clien_ec2.create_security_group(
             Description="test-security-group", GroupName="test-security-group"
         )
 

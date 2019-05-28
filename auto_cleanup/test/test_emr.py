@@ -25,7 +25,7 @@ class TestClustersMoreThanTTL:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.run_job_flow(
+        test_class.client_emr.run_job_flow(
             Name="test",
             Instances={
                 "MasterInstanceType": "m5.xlarge",
@@ -35,14 +35,14 @@ class TestClustersMoreThanTTL:
         )
 
         # validate cluster creation
-        response = test_class.client_test_class.list_clusters()
+        response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
         # test clusters functions
         test_class.clusters()
 
         # validate cluster deletion
-        response = test_class.client_test_class.list_clusters()
+        response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Status"]["State"] == "TERMINATED"
 
 
@@ -64,7 +64,7 @@ class TestClustersLessThanTTL:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.run_job_flow(
+        test_class.client_emr.run_job_flow(
             Name="test",
             Instances={
                 "MasterInstanceType": "m5.xlarge",
@@ -74,14 +74,14 @@ class TestClustersLessThanTTL:
         )
 
         # validate cluster creation
-        response = test_class.client_test_class.list_clusters()
+        response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
         # test clusters functions
         test_class.clusters()
 
         # validate cluster not deleted
-        response = test_class.client_test_class.list_clusters()
+        response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Status"]["State"] == "WAITING"
 
 
@@ -103,7 +103,7 @@ class TestClustersWhitelist:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.run_job_flow(
+        test_class.client_emr.run_job_flow(
             Name="test",
             Instances={
                 "MasterInstanceType": "m5.xlarge",
@@ -113,7 +113,7 @@ class TestClustersWhitelist:
         )
 
         # validate cluster creation
-        response = test_class.client_test_class.list_clusters()
+        response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
         # get test_class Cluster ID and add to whitelist
@@ -125,5 +125,5 @@ class TestClustersWhitelist:
         test_class.clusters()
 
         # validate cluster not deleted
-        response = test_class.client_test_class.list_clusters()
+        response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Status"]["State"] == "WAITING"

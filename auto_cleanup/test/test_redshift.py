@@ -25,7 +25,7 @@ class TestClustersMoreThanTTL:
 
     def test(self, test_class):
         # create test table
-        test_class.client_test_class.create_cluster(
+        test_class.client_redshift.create_cluster(
             DBName="test-test_class",
             ClusterIdentifier="test_class123",
             ClusterType="single-node",
@@ -35,14 +35,14 @@ class TestClustersMoreThanTTL:
         )
 
         # validate cluster creation
-        response = test_class.client_test_class.describe_clusters()
+        response = test_class.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "test_class123"
 
         # test clusters functions
         test_class.clusters()
 
         # validate cluster deletion
-        response = test_class.client_test_class.describe_clusters()
+        response = test_class.client_redshift.describe_clusters()
         assert response["Clusters"] == []
 
 
@@ -64,7 +64,7 @@ class TestClustersLessThanTTL:
 
     def test(self, test_class):
         # create test table
-        test_class.client_test_class.create_cluster(
+        test_class.client_redshift.create_cluster(
             DBName="test-test_class",
             ClusterIdentifier="test_class123",
             ClusterType="single-node",
@@ -74,14 +74,14 @@ class TestClustersLessThanTTL:
         )
 
         # validate cluster creation
-        response = test_class.client_test_class.describe_clusters()
+        response = test_class.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "test_class123"
 
         # test clusters functions
         test_class.clusters()
 
         # validate cluster not deleted
-        response = test_class.client_test_class.describe_clusters()
+        response = test_class.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "test_class123"
 
 
@@ -103,7 +103,7 @@ class TestClustersWhitelist:
 
     def test(self, test_class):
         # create test table
-        test_class.client_test_class.create_cluster(
+        test_class.client_redshift.create_cluster(
             DBName="test-test_class",
             ClusterIdentifier="test_class123",
             ClusterType="single-node",
@@ -113,14 +113,14 @@ class TestClustersWhitelist:
         )
 
         # validate cluster creation
-        response = test_class.client_test_class.describe_clusters()
+        response = test_class.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "test_class123"
 
         # test clusters functions
         test_class.clusters()
 
         # validate cluster not deleted
-        response = test_class.client_test_class.describe_clusters()
+        response = test_class.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "test_class123"
 
 
@@ -142,7 +142,7 @@ class TestSnapshotsMoreThanTTL:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.create_cluster(
+        test_class.client_redshift.create_cluster(
             DBName="test-test_class",
             ClusterIdentifier="test_class123",
             ClusterType="single-node",
@@ -152,19 +152,19 @@ class TestSnapshotsMoreThanTTL:
         )
 
         # create test snapshot
-        test_class.client_test_class.create_cluster_snapshot(
+        test_class.client_redshift.create_cluster_snapshot(
             SnapshotIdentifier="snapshot123", ClusterIdentifier="test_class123"
         )
 
         # validate snapshot creation
-        response = test_class.client_test_class.describe_cluster_snapshots()
+        response = test_class.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
         test_class.snapshots()
 
         # validate snapshot deletion
-        response = test_class.client_test_class.describe_cluster_snapshots()
+        response = test_class.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"] == []
 
 
@@ -186,7 +186,7 @@ class TestSnapshotsLessThanTTL:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.create_cluster(
+        test_class.client_redshift.create_cluster(
             DBName="test-test_class",
             ClusterIdentifier="test_class123",
             ClusterType="single-node",
@@ -196,19 +196,19 @@ class TestSnapshotsLessThanTTL:
         )
 
         # create test snapshot
-        test_class.client_test_class.create_cluster_snapshot(
+        test_class.client_redshift.create_cluster_snapshot(
             SnapshotIdentifier="snapshot123", ClusterIdentifier="test_class123"
         )
 
         # validate snapshot creation
-        response = test_class.client_test_class.describe_cluster_snapshots()
+        response = test_class.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
         test_class.snapshots()
 
         # validate snapshot not deleted
-        response = test_class.client_test_class.describe_cluster_snapshots()
+        response = test_class.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
 
 
@@ -230,7 +230,7 @@ class TestSnapshotsWhitelist:
 
     def test(self, test_class):
         # create test cluster
-        test_class.client_test_class.create_cluster(
+        test_class.client_redshift.create_cluster(
             DBName="test-test_class",
             ClusterIdentifier="test_class123",
             ClusterType="single-node",
@@ -240,17 +240,17 @@ class TestSnapshotsWhitelist:
         )
 
         # create test snapshot
-        test_class.client_test_class.create_cluster_snapshot(
+        test_class.client_redshift.create_cluster_snapshot(
             SnapshotIdentifier="snapshot123", ClusterIdentifier="test_class123"
         )
 
         # validate snapshot creation
-        response = test_class.client_test_class.describe_cluster_snapshots()
+        response = test_class.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
         test_class.snapshots()
 
         # validate snapshot not deleted
-        response = test_class.client_test_class.describe_cluster_snapshots()
+        response = test_class.client_redshift.describe_cluster_snapshots()
         assert response["Snapshots"] == []
