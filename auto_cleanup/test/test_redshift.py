@@ -34,16 +34,14 @@ class TestClustersMoreThanTTL:
             MasterUserPassword="Admin123",
         )
 
-        # print(redshift.client_redshift.describe_clusters())
-
-        # validate table creation
+        # validate cluster creation
         response = redshift.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "redshift123"
 
         # test clusters functions
         redshift.clusters()
 
-        # validate table deletion
+        # validate cluster deletion
         response = redshift.client_redshift.describe_clusters()
         assert response["Clusters"] == []
 
@@ -75,16 +73,14 @@ class TestClustersLessThanTTL:
             MasterUserPassword="Admin123",
         )
 
-        # print(redshift.client_redshift.describe_clusters())
-
-        # validate table creation
+        # validate cluster creation
         response = redshift.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "redshift123"
 
         # test clusters functions
         redshift.clusters()
 
-        # validate table deletion
+        # validate cluster not deleted
         response = redshift.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "redshift123"
 
@@ -116,15 +112,139 @@ class TestClustersWhitelist:
             MasterUserPassword="Admin123",
         )
 
-        # print(redshift.client_redshift.describe_clusters())
-
-        # validate table creation
+        # validate cluster creation
         response = redshift.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "redshift123"
 
         # test clusters functions
         redshift.clusters()
 
-        # validate table deletion
+        # validate cluster not deleted
         response = redshift.client_redshift.describe_clusters()
         assert response["Clusters"][0]["ClusterIdentifier"] == "redshift123"
+
+
+class TestSnapshotsMoreThanTTL:
+    @pytest.fixture
+    def redshift(self):
+        with moto.mock_redshift():
+            whitelist = {}
+            settings = {
+                "general": {"dry_run": False},
+                "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
+            }
+            resource_tree = {"AWS": {}}
+
+            redshift = redshift_cleanup.RedshiftCleanup(
+                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+            )
+            yield redshift
+
+    def test(self, redshift):
+        # create test table
+        redshift.client_redshift.create_cluster(
+            DBName="test-redshift",
+            ClusterIdentifier="redshift123",
+            ClusterType="single-node",
+            NodeType="ds2.xlarge",
+            MasterUsername="admin",
+            MasterUserPassword="Admin123",
+        )
+
+        redshift.client_redshift.create_cluster_snapshot(
+            SnapshotIdentifier="snapshot123", ClusterIdentifier="redshift123"
+        )
+        # validate snapshot creation
+        response = redshift.client_redshift.describe_cluster_snapshots()
+        assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
+
+        # test snapshot functions
+        redshift.snapshots()
+
+        # validate snapshot deletion
+        response = redshift.client_redshift.describe_cluster_snapshots()
+        assert response["Snapshots"] == []
+
+
+class TestSnapshotsLessThanTTL:
+    @pytest.fixture
+    def redshift(self):
+        with moto.mock_redshift():
+            whitelist = {}
+            settings = {
+                "general": {"dry_run": False},
+                "services": {"redshift": {"snapshots": {"clean": True, "ttl": 7}}},
+            }
+            resource_tree = {"AWS": {}}
+
+            redshift = redshift_cleanup.RedshiftCleanup(
+                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+            )
+            yield redshift
+
+    def test(self, redshift):
+        # create test table
+        redshift.client_redshift.create_cluster(
+            DBName="test-redshift",
+            ClusterIdentifier="redshift123",
+            ClusterType="single-node",
+            NodeType="ds2.xlarge",
+            MasterUsername="admin",
+            MasterUserPassword="Admin123",
+        )
+
+        redshift.client_redshift.create_cluster_snapshot(
+            SnapshotIdentifier="snapshot123", ClusterIdentifier="redshift123"
+        )
+        # validate snapshot creation
+        response = redshift.client_redshift.describe_cluster_snapshots()
+        assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
+
+        # test snapshot functions
+        redshift.snapshots()
+
+        # validate snapshot deletion
+        response = redshift.client_redshift.describe_cluster_snapshots()
+        assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
+
+
+class TestSnapshotsWhitelist:
+    @pytest.fixture
+    def redshift(self):
+        with moto.mock_redshift():
+            whitelist = {"redshift": {"snapshot": ["snapshot123"]}}
+            settings = {
+                "general": {"dry_run": False},
+                "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
+            }
+            resource_tree = {"AWS": {}}
+
+            redshift = redshift_cleanup.RedshiftCleanup(
+                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+            )
+            yield redshift
+
+    def test(self, redshift):
+        # create test table
+        redshift.client_redshift.create_cluster(
+            DBName="test-redshift",
+            ClusterIdentifier="redshift123",
+            ClusterType="single-node",
+            NodeType="ds2.xlarge",
+            MasterUsername="admin",
+            MasterUserPassword="Admin123",
+        )
+
+        redshift.client_redshift.create_cluster_snapshot(
+            SnapshotIdentifier="snapshot123", ClusterIdentifier="redshift123"
+        )
+        # validate snapshot creation
+        response = redshift.client_redshift.describe_cluster_snapshots()
+        assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
+
+        # test snapshot functions
+        redshift.snapshots()
+
+        # validate snapshot deletion
+        response = redshift.client_redshift.describe_cluster_snapshots()
+        assert response["Snapshots"] == []
