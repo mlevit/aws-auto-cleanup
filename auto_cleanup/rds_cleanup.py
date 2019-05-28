@@ -147,7 +147,7 @@ class RDSCleanup:
                 resource_date = resource.get("SnapshotCreateTime")
 
                 if resource_id not in self.whitelist.get("rds", {}).get("snapshot", []):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
