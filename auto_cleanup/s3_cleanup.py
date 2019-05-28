@@ -31,7 +31,7 @@ class S3Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("s3", {})
             .get("buckets", {})
             .get("clean", False)
@@ -45,7 +45,7 @@ class S3Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("s3", {})
                 .get("buckets", {})
                 .get("ttl", 7)

@@ -32,7 +32,7 @@ class ElasticBeanstalkCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("elasticbeanstalk", {})
             .get("applications", {})
             .get("clean", False)
@@ -48,7 +48,7 @@ class ElasticBeanstalkCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("elasticbeanstalk", {})
                 .get("applications", {})
                 .get("ttl", 7)

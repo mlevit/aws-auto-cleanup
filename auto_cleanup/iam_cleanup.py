@@ -31,7 +31,7 @@ class IAMCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("iam", {})
             .get("roles", {})
             .get("clean", False)
@@ -45,7 +45,7 @@ class IAMCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("iam", {})
                 .get("roles", {})
                 .get("ttl", 7)

@@ -31,7 +31,7 @@ class RedshiftCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("redshift", {})
             .get("clusters", {})
             .get("clean", False)
@@ -45,7 +45,7 @@ class RedshiftCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("redshift", {})
                 .get("clusters", {})
                 .get("ttl", 7)
@@ -110,7 +110,7 @@ class RedshiftCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("redshift", {})
             .get("snapshots", {})
             .get("clean", False)
@@ -126,7 +126,7 @@ class RedshiftCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("redshift", {})
                 .get("snapshot", {})
                 .get("ttl", 7)

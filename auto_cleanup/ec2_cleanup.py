@@ -45,7 +45,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("addresses", {})
             .get("clean", False)
@@ -106,7 +106,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("instances", {})
             .get("clean", False)
@@ -120,7 +120,7 @@ class EC2Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("ec2", {})
                 .get("instances", {})
                 .get("ttl", 7)
@@ -237,7 +237,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("security_groups", {})
             .get("clean", False)
@@ -306,7 +306,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("snapshots", {})
             .get("clean", False)
@@ -322,7 +322,7 @@ class EC2Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("ec2", {})
                 .get("snapshots", {})
                 .get("ttl", 7)
@@ -410,7 +410,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("volumes", {})
             .get("clean", False)
@@ -424,7 +424,7 @@ class EC2Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("ec2", {})
                 .get("volumes", {})
                 .get("ttl", 7)

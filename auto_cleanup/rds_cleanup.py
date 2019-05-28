@@ -33,7 +33,7 @@ class RDSCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("rds", {})
             .get("instances", {})
             .get("clean", False)
@@ -47,7 +47,7 @@ class RDSCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("rds", {})
                 .get("instances", {})
                 .get("ttl", 7)
@@ -122,7 +122,7 @@ class RDSCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("rds", {})
             .get("snapshots", {})
             .get("clean", False)
@@ -136,7 +136,7 @@ class RDSCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("rds", {})
                 .get("snapshots", {})
                 .get("ttl", 7)
