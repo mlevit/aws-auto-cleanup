@@ -9,23 +9,23 @@ from .. import rds_cleanup
 
 class TestSnapshotsMoreThanTTL:
     @pytest.fixture
-    def rds(self):
-        with moto.mock_rds2():
+    def test_class(self):
+        with moto.mock_test_class2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"rds": {"snapshots": {"clean": True, "ttl": -1}}},
+                "services": {"test_class": {"snapshots": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
-            rds = rds_cleanup.RDSCleanup(
+            test_class = rds_cleanup.test_classCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield rds
+            yield test_class
 
-    def test(self, rds):
+    def test(self, test_class):
         # create test cluster
-        rds.client_rds.create_db_instance(
+        test_class.client_test_class.create_db_instance(
             DBName="test",
             DBInstanceIdentifier="test123",
             AllocatedStorage=10,
@@ -36,41 +36,41 @@ class TestSnapshotsMoreThanTTL:
         )
 
         # create test snapshot
-        rds.client_rds.create_db_snapshot(
+        test_class.client_test_class.create_db_snapshot(
             DBSnapshotIdentifier="snapshot123", DBInstanceIdentifier="test123"
         )
 
         # validate snapshot creation
-        response = rds.client_rds.describe_db_snapshots()
+        response = test_class.client_test_class.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
-        rds.snapshots()
+        test_class.snapshots()
 
         # validate snapshot deletion
-        response = rds.client_rds.describe_db_snapshots()
+        response = test_class.client_test_class.describe_db_snapshots()
         assert response["DBSnapshots"] == []
 
 
 class TestSnapshotsLessThanTTL:
     @pytest.fixture
-    def rds(self):
-        with moto.mock_rds2():
+    def test_class(self):
+        with moto.mock_test_class2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
+                "services": {"test_class": {"snapshots": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
-            rds = rds_cleanup.RDSCleanup(
+            test_class = rds_cleanup.test_classCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield rds
+            yield test_class
 
-    def test(self, rds):
+    def test(self, test_class):
         # create test cluster
-        rds.client_rds.create_db_instance(
+        test_class.client_test_class.create_db_instance(
             DBName="test",
             DBInstanceIdentifier="test123",
             AllocatedStorage=10,
@@ -81,41 +81,41 @@ class TestSnapshotsLessThanTTL:
         )
 
         # create test snapshot
-        rds.client_rds.create_db_snapshot(
+        test_class.client_test_class.create_db_snapshot(
             DBSnapshotIdentifier="snapshot123", DBInstanceIdentifier="test123"
         )
 
         # validate snapshot creation
-        response = rds.client_rds.describe_db_snapshots()
+        response = test_class.client_test_class.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
-        rds.snapshots()
+        test_class.snapshots()
 
         # validate snapshot deletion
-        response = rds.client_rds.describe_db_snapshots()
+        response = test_class.client_test_class.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
 
 class TestSnapshotsWhitelist:
     @pytest.fixture
-    def rds(self):
-        with moto.mock_rds2():
-            whitelist = {"rds": {"snapshot": ["snapshot123"]}}
+    def test_class(self):
+        with moto.mock_test_class2():
+            whitelist = {"test_class": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
+                "services": {"test_class": {"snapshots": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
-            rds = rds_cleanup.RDSCleanup(
+            test_class = rds_cleanup.test_classCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield rds
+            yield test_class
 
-    def test(self, rds):
+    def test(self, test_class):
         # create test cluster
-        rds.client_rds.create_db_instance(
+        test_class.client_test_class.create_db_instance(
             DBName="test",
             DBInstanceIdentifier="test123",
             AllocatedStorage=10,
@@ -126,17 +126,17 @@ class TestSnapshotsWhitelist:
         )
 
         # create test snapshot
-        rds.client_rds.create_db_snapshot(
+        test_class.client_test_class.create_db_snapshot(
             DBSnapshotIdentifier="snapshot123", DBInstanceIdentifier="test123"
         )
 
         # validate snapshot creation
-        response = rds.client_rds.describe_db_snapshots()
+        response = test_class.client_test_class.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
         # test snapshot functions
-        rds.snapshots()
+        test_class.snapshots()
 
         # validate snapshot deletion
-        response = rds.client_rds.describe_db_snapshots()
+        response = test_class.client_test_class.describe_db_snapshots()
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"

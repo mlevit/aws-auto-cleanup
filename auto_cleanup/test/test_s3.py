@@ -9,89 +9,95 @@ from .. import s3_cleanup
 
 class TestBucketsMoreThanTTL:
     @pytest.fixture
-    def s3(self):
+    def test_class(self):
         with moto.mock_s3():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
+                "services": {"test_class": {"buckets": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
-            s3 = s3_cleanup.S3Cleanup(logging, whitelist, settings, resource_tree)
-            yield s3
+            test_class = s3_cleanup.S3Cleanup(
+                logging, whitelist, settings, resource_tree
+            )
+            yield test_class
 
-    def test(self, s3):
+    def test(self, test_class):
         # create test table
-        s3.client_s3.create_bucket(Bucket="test")
+        test_class.client_s3.create_bucket(Bucket="test")
 
         # validate bucket creation
-        response = s3.client_s3.list_buckets()
+        response = test_class.client_s3.list_buckets()
         assert response["Buckets"][0]["Name"] == "test"
 
         # test buckets functions
-        s3.buckets()
+        test_class.buckets()
 
         # validate bucket deletion
-        response = s3.client_s3.list_buckets()
+        response = test_class.client_s3.list_buckets()
         assert response["Buckets"] == []
 
 
 class TestBucketsLessThanTTL:
     @pytest.fixture
-    def s3(self):
+    def test_class(self):
         with moto.mock_s3():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"s3": {"buckets": {"clean": True, "ttl": 5000}}},
+                "services": {"test_class": {"buckets": {"clean": True, "ttl": 5000}}},
             }
             resource_tree = {"AWS": {}}
 
-            s3 = s3_cleanup.S3Cleanup(logging, whitelist, settings, resource_tree)
-            yield s3
+            test_class = s3_cleanup.S3Cleanup(
+                logging, whitelist, settings, resource_tree
+            )
+            yield test_class
 
-    def test(self, s3):
+    def test(self, test_class):
         # create test table
-        s3.client_s3.create_bucket(Bucket="test")
+        test_class.client_s3.create_bucket(Bucket="test")
 
         # validate bucket creation
-        response = s3.client_s3.list_buckets()
+        response = test_class.client_s3.list_buckets()
         assert response["Buckets"][0]["Name"] == "test"
 
         # test buckets functions
-        s3.buckets()
+        test_class.buckets()
 
         # validate bucket deletion
-        response = s3.client_s3.list_buckets()
+        response = test_class.client_s3.list_buckets()
         assert response["Buckets"][0]["Name"] == "test"
 
 
 class TestBucketsWhitelist:
     @pytest.fixture
-    def s3(self):
+    def test_class(self):
         with moto.mock_s3():
-            whitelist = {"s3": {"bucket": ["test"]}}
+            whitelist = {"test_class": {"bucket": ["test"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
+                "services": {"test_class": {"buckets": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
-            s3 = s3_cleanup.S3Cleanup(logging, whitelist, settings, resource_tree)
-            yield s3
+            test_class = s3_cleanup.S3Cleanup(
+                logging, whitelist, settings, resource_tree
+            )
+            yield test_class
 
-    def test(self, s3):
+    def test(self, test_class):
         # create test table
-        s3.client_s3.create_bucket(Bucket="test")
+        test_class.client_s3.create_bucket(Bucket="test")
 
         # validate bucket creation
-        response = s3.client_s3.list_buckets()
+        response = test_class.client_s3.list_buckets()
         assert response["Buckets"][0]["Name"] == "test"
 
         # test buckets functions
-        s3.buckets()
+        test_class.buckets()
 
         # validate bucket deletion
-        response = s3.client_s3.list_buckets()
+        response = test_class.client_s3.list_buckets()
         assert response["Buckets"][0]["Name"] == "test"

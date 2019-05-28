@@ -9,7 +9,7 @@ from .. import dynamodb_cleanup
 
 class TestTablesMoreThanTTL:
     @pytest.fixture
-    def dd(self):
+    def test_class(self):
         with moto.mock_dynamodb2():
             whitelist = {}
             settings = {
@@ -18,14 +18,14 @@ class TestTablesMoreThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            dd = dynamodb_cleanup.DynamoDBCleanup(
+            test_class = dynamodb_cleanup.DynamoDBCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield dd
+            yield test_class
 
-    def test(self, dd):
+    def test(self, test_class):
         # create test table
-        dd.client_dynamodb.create_table(
+        test_class.client_dynamodb.create_table(
             TableName="settings-table",
             KeySchema=[{"AttributeName": "key", "KeyType": "HASH"}],
             AttributeDefinitions=[{"AttributeName": "key", "AttributeType": "S"}],
@@ -33,20 +33,20 @@ class TestTablesMoreThanTTL:
         )
 
         # validate table creation
-        response = dd.client_dynamodb.list_tables()
+        response = test_class.client_dynamodb.list_tables()
         assert "settings-table" in response["TableNames"]
 
         # test tables functions
-        dd.tables()
+        test_class.tables()
 
         # # validate table deletion
-        response = dd.client_dynamodb.list_tables()
+        response = test_class.client_dynamodb.list_tables()
         assert response["TableNames"] == []
 
 
 class TestTablesLessThanTTL:
     @pytest.fixture
-    def dd(self):
+    def test_class(self):
         with moto.mock_dynamodb2():
             whitelist = {}
             settings = {
@@ -55,14 +55,14 @@ class TestTablesLessThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            dd = dynamodb_cleanup.DynamoDBCleanup(
+            test_class = dynamodb_cleanup.DynamoDBCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield dd
+            yield test_class
 
-    def test(self, dd):
+    def test(self, test_class):
         # create test table
-        dd.client_dynamodb.create_table(
+        test_class.client_dynamodb.create_table(
             TableName="settings-table",
             KeySchema=[{"AttributeName": "key", "KeyType": "HASH"}],
             AttributeDefinitions=[{"AttributeName": "key", "AttributeType": "S"}],
@@ -70,20 +70,20 @@ class TestTablesLessThanTTL:
         )
 
         # validate table creation
-        response = dd.client_dynamodb.list_tables()
+        response = test_class.client_dynamodb.list_tables()
         assert "settings-table" in response["TableNames"]
 
         # test tables functions
-        dd.tables()
+        test_class.tables()
 
         # # validate table not deleted
-        response = dd.client_dynamodb.list_tables()
+        response = test_class.client_dynamodb.list_tables()
         assert "settings-table" in response["TableNames"]
 
 
 class TestTablesWhitelist:
     @pytest.fixture
-    def dd(self):
+    def test_class(self):
         with moto.mock_dynamodb2():
             whitelist = {"dynamodb": {"table": ["settings-table"]}}
             settings = {
@@ -92,14 +92,14 @@ class TestTablesWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            dd = dynamodb_cleanup.DynamoDBCleanup(
+            test_class = dynamodb_cleanup.DynamoDBCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield dd
+            yield test_class
 
-    def test(self, dd):
+    def test(self, test_class):
         # create test table
-        dd.client_dynamodb.create_table(
+        test_class.client_dynamodb.create_table(
             TableName="settings-table",
             KeySchema=[{"AttributeName": "key", "KeyType": "HASH"}],
             AttributeDefinitions=[{"AttributeName": "key", "AttributeType": "S"}],
@@ -107,12 +107,12 @@ class TestTablesWhitelist:
         )
 
         # validate table creation
-        response = dd.client_dynamodb.list_tables()
+        response = test_class.client_dynamodb.list_tables()
         assert "settings-table" in response["TableNames"]
 
         # test tables functions
-        dd.tables()
+        test_class.tables()
 
         # # validate table not deleted
-        response = dd.client_dynamodb.list_tables()
+        response = test_class.client_dynamodb.list_tables()
         assert "settings-table" in response["TableNames"]

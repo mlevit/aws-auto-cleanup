@@ -9,7 +9,7 @@ from .. import cloudformation_cleanup
 
 class TestStacksMoreThanTTL:
     @pytest.fixture
-    def cf(self):
+    def test_class(self):
         with moto.mock_cloudformation():
             whitelist = {}
             settings = {
@@ -18,34 +18,34 @@ class TestStacksMoreThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            cf = cloudformation_cleanup.CloudFormationCleanup(
+            test_class = cloudformation_cleanup.CloudFormationCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield cf
+            yield test_class
 
-    def test(self, cf):
+    def test(self, test_class):
         # create test stack
-        cf.client_cloudformation.create_stack(
+        test_class.client_cloudformation.create_stack(
             StackName="sample-sqs",
             TemplateBody='{"Resources":{"SQSQueue":{"Type":"AWS::SQS::Queue","Properties":{"QueueName":"test_queue"}}}}',
         )
 
         # validate stack creation
-        response = cf.client_cloudformation.list_stacks()
+        response = test_class.client_cloudformation.list_stacks()
         assert response["StackSummaries"][0]["StackName"] == "sample-sqs"
 
         # test stacks functions
-        cf.stacks()
+        test_class.stacks()
 
         # validate stack deletion
-        response = cf.client_cloudformation.list_stacks()
+        response = test_class.client_cloudformation.list_stacks()
 
         assert response["StackSummaries"][0]["StackStatus"] == "DELETE_COMPLETE"
 
 
 class TestStacksLessThanTTL:
     @pytest.fixture
-    def cf(self):
+    def test_class(self):
         with moto.mock_cloudformation():
             whitelist = {}
             settings = {
@@ -56,34 +56,34 @@ class TestStacksLessThanTTL:
             }
             resource_tree = {"AWS": {}}
 
-            cf = cloudformation_cleanup.CloudFormationCleanup(
+            test_class = cloudformation_cleanup.CloudFormationCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield cf
+            yield test_class
 
-    def test(self, cf):
+    def test(self, test_class):
         # create test stack
-        cf.client_cloudformation.create_stack(
+        test_class.client_cloudformation.create_stack(
             StackName="sample-sqs",
             TemplateBody='{"Resources":{"SQSQueue":{"Type":"AWS::SQS::Queue","Properties":{"QueueName":"test_queue"}}}}',
         )
 
         # validate stack creation
-        response = cf.client_cloudformation.list_stacks()
+        response = test_class.client_cloudformation.list_stacks()
         assert response["StackSummaries"][0]["StackName"] == "sample-sqs"
 
         # test stacks functions
-        cf.stacks()
+        test_class.stacks()
 
         # validate stack not deleted
-        response = cf.client_cloudformation.list_stacks()
+        response = test_class.client_cloudformation.list_stacks()
 
         assert response["StackSummaries"][0]["StackStatus"] == "CREATE_COMPLETE"
 
 
 class TestStacksWhitelist:
     @pytest.fixture
-    def cf(self):
+    def test_class(self):
         with moto.mock_cloudformation():
             whitelist = {"cloudformation": {"stack": ["sample-sqs"]}}
             settings = {
@@ -94,26 +94,26 @@ class TestStacksWhitelist:
             }
             resource_tree = {"AWS": {}}
 
-            cf = cloudformation_cleanup.CloudFormationCleanup(
+            test_class = cloudformation_cleanup.CloudFormationCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield cf
+            yield test_class
 
-    def test(self, cf):
+    def test(self, test_class):
         # create test stack
-        cf.client_cloudformation.create_stack(
+        test_class.client_cloudformation.create_stack(
             StackName="sample-sqs",
             TemplateBody='{"Resources":{"SQSQueue":{"Type":"AWS::SQS::Queue","Properties":{"QueueName":"test_queue"}}}}',
         )
 
         # validate stack creation
-        response = cf.client_cloudformation.list_stacks()
+        response = test_class.client_cloudformation.list_stacks()
         assert response["StackSummaries"][0]["StackName"] == "sample-sqs"
 
         # test stacks functions
-        cf.stacks()
+        test_class.stacks()
 
         # validate stack not deleted
-        response = cf.client_cloudformation.list_stacks()
+        response = test_class.client_cloudformation.list_stacks()
 
         assert response["StackSummaries"][0]["StackStatus"] == "CREATE_COMPLETE"

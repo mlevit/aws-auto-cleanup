@@ -9,23 +9,23 @@ from .. import emr_cleanup
 
 class TestClustersMoreThanTTL:
     @pytest.fixture
-    def emr(self):
-        with moto.mock_emr():
+    def test_class(self):
+        with moto.mock_test_class():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
+                "services": {"test_class": {"clusters": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
-            emr = emr_cleanup.EMRCleanup(
+            test_class = emr_cleanup.test_classCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield emr
+            yield test_class
 
-    def test(self, emr):
+    def test(self, test_class):
         # create test cluster
-        emr.client_emr.run_job_flow(
+        test_class.client_test_class.run_job_flow(
             Name="test",
             Instances={
                 "MasterInstanceType": "m5.xlarge",
@@ -35,36 +35,36 @@ class TestClustersMoreThanTTL:
         )
 
         # validate cluster creation
-        response = emr.client_emr.list_clusters()
+        response = test_class.client_test_class.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
         # test clusters functions
-        emr.clusters()
+        test_class.clusters()
 
         # validate cluster deletion
-        response = emr.client_emr.list_clusters()
+        response = test_class.client_test_class.list_clusters()
         assert response["Clusters"][0]["Status"]["State"] == "TERMINATED"
 
 
 class TestClustersLessThanTTL:
     @pytest.fixture
-    def emr(self):
-        with moto.mock_emr():
+    def test_class(self):
+        with moto.mock_test_class():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"emr": {"clusters": {"clean": True, "ttl": 7}}},
+                "services": {"test_class": {"clusters": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
-            emr = emr_cleanup.EMRCleanup(
+            test_class = emr_cleanup.test_classCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield emr
+            yield test_class
 
-    def test(self, emr):
+    def test(self, test_class):
         # create test cluster
-        emr.client_emr.run_job_flow(
+        test_class.client_test_class.run_job_flow(
             Name="test",
             Instances={
                 "MasterInstanceType": "m5.xlarge",
@@ -74,36 +74,36 @@ class TestClustersLessThanTTL:
         )
 
         # validate cluster creation
-        response = emr.client_emr.list_clusters()
+        response = test_class.client_test_class.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
         # test clusters functions
-        emr.clusters()
+        test_class.clusters()
 
         # validate cluster not deleted
-        response = emr.client_emr.list_clusters()
+        response = test_class.client_test_class.list_clusters()
         assert response["Clusters"][0]["Status"]["State"] == "WAITING"
 
 
 class TestClustersWhitelist:
     @pytest.fixture
-    def emr(self):
-        with moto.mock_emr():
+    def test_class(self):
+        with moto.mock_test_class():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
+                "services": {"test_class": {"clusters": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
-            emr = emr_cleanup.EMRCleanup(
+            test_class = emr_cleanup.test_classCleanup(
                 logging, whitelist, settings, resource_tree, "ap-southeast-2"
             )
-            yield emr
+            yield test_class
 
-    def test(self, emr):
+    def test(self, test_class):
         # create test cluster
-        emr.client_emr.run_job_flow(
+        test_class.client_test_class.run_job_flow(
             Name="test",
             Instances={
                 "MasterInstanceType": "m5.xlarge",
@@ -113,15 +113,17 @@ class TestClustersWhitelist:
         )
 
         # validate cluster creation
-        response = emr.client_emr.list_clusters()
+        response = test_class.client_test_class.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
-        # get EMR Cluster ID and add to whitelist
-        emr.whitelist = {"emr": {"cluster": [response["Clusters"][0]["Id"]]}}
+        # get test_class Cluster ID and add to whitelist
+        test_class.whitelist = {
+            "test_class": {"cluster": [response["Clusters"][0]["Id"]]}
+        }
 
         # test clusters functions
-        emr.clusters()
+        test_class.clusters()
 
         # validate cluster not deleted
-        response = emr.client_emr.list_clusters()
+        response = test_class.client_test_class.list_clusters()
         assert response["Clusters"][0]["Status"]["State"] == "WAITING"
