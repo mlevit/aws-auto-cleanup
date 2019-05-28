@@ -117,4 +117,3 @@ class TestStacksWhitelist:
         response = cf.client_cloudformation.list_stacks()
 
         assert response["StackSummaries"][0]["StackStatus"] == "CREATE_COMPLETE"
-
