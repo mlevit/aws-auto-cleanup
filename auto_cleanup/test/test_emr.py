@@ -10,7 +10,7 @@ from .. import emr_cleanup
 class TestClustersMoreThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_emr():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -49,7 +49,7 @@ class TestClustersMoreThanTTL:
 class TestClustersLessThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_emr():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -88,7 +88,7 @@ class TestClustersLessThanTTL:
 class TestClustersWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_emr():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},

@@ -10,7 +10,7 @@ from .. import rds_cleanup
 class TestSnapshotsMoreThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class2():
+        with moto.mock_rds2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -55,7 +55,7 @@ class TestSnapshotsMoreThanTTL:
 class TestSnapshotsLessThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class2():
+        with moto.mock_rds2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -100,7 +100,7 @@ class TestSnapshotsLessThanTTL:
 class TestSnapshotsWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class2():
+        with moto.mock_rds2():
             whitelist = {"test_class": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},

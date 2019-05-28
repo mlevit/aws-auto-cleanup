@@ -10,7 +10,7 @@ from .. import redshift_cleanup
 class TestClustersMoreThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_redshift():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -49,7 +49,7 @@ class TestClustersMoreThanTTL:
 class TestClustersLessThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_redshift():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -88,7 +88,7 @@ class TestClustersLessThanTTL:
 class TestClustersWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_redshift():
             whitelist = {"test_class": {"cluster": ["test_class123"]}}
             settings = {
                 "general": {"dry_run": False},
@@ -127,7 +127,7 @@ class TestClustersWhitelist:
 class TestSnapshotsMoreThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_redshift():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -171,7 +171,7 @@ class TestSnapshotsMoreThanTTL:
 class TestSnapshotsLessThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_redshift():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -215,7 +215,7 @@ class TestSnapshotsLessThanTTL:
 class TestSnapshotsWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_redshift():
             whitelist = {"test_class": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},

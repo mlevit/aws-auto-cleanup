@@ -10,7 +10,7 @@ from .. import ec2_cleanup
 class TestInstancesMoreThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -53,7 +53,7 @@ class TestInstancesMoreThanTTL:
 class TestInstancesLessThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -87,7 +87,7 @@ class TestInstancesLessThanTTL:
 class TestInstancesWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -128,7 +128,7 @@ class TestInstancesWhitelist:
 class TestSecurityGroupsNotWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -165,7 +165,7 @@ class TestSecurityGroupsNotWhitelist:
 class TestSecurityGroupsWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {"test_class": {"security_group": ["test-security-group"]}}
             settings = {
                 "general": {"dry_run": False},
@@ -206,7 +206,7 @@ class TestSecurityGroupsWhitelist:
 class TestVolumesMoreThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -240,7 +240,7 @@ class TestVolumesMoreThanTTL:
 class TestVolumesLessThanTTL:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
@@ -274,7 +274,7 @@ class TestVolumesLessThanTTL:
 class TestVolumesWhitelist:
     @pytest.fixture
     def test_class(self):
-        with moto.mock_test_class():
+        with moto.mock_ec2():
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
