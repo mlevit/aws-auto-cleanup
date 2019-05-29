@@ -14,7 +14,7 @@ class TestClustersMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"clusters": {"clean": True, "ttl": -1}}},
+                "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -53,7 +53,7 @@ class TestClustersLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"clusters": {"clean": True, "ttl": 7}}},
+                "services": {"emr": {"clusters": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -92,7 +92,7 @@ class TestClustersWhitelist:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"clusters": {"clean": True, "ttl": -1}}},
+                "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -117,9 +117,7 @@ class TestClustersWhitelist:
         assert response["Clusters"][0]["Name"] == "test"
 
         # get test_class Cluster ID and add to whitelist
-        test_class.whitelist = {
-            "test_class": {"cluster": [response["Clusters"][0]["Id"]]}
-        }
+        test_class.whitelist = {"emr": {"cluster": [response["Clusters"][0]["Id"]]}}
 
         # test clusters functions
         test_class.clusters()

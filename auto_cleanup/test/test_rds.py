@@ -14,7 +14,7 @@ class TestSnapshotsMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"snapshots": {"clean": True, "ttl": -1}}},
+                "services": {"rds": {"snapshots": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -59,7 +59,7 @@ class TestSnapshotsLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"snapshots": {"clean": True, "ttl": 7}}},
+                "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -101,10 +101,10 @@ class TestSnapshotsWhitelist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_rds2():
-            whitelist = {"test_class": {"snapshot": ["snapshot123"]}}
+            whitelist = {"rds": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"snapshots": {"clean": True, "ttl": 7}}},
+                "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 

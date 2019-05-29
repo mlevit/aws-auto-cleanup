@@ -14,7 +14,7 @@ class TestInstancesMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"instances": {"clean": True, "ttl": -1}}},
+                "services": {"ec2": {"instances": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -25,7 +25,7 @@ class TestInstancesMoreThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.client_ec2.create_instances(
+        test_class.resource_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
@@ -57,7 +57,7 @@ class TestInstancesLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"instances": {"clean": True, "ttl": 7}}},
+                "services": {"ec2": {"instances": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -68,7 +68,7 @@ class TestInstancesLessThanTTL:
 
     def test(self, test_class):
         # create test instance
-        test_class.client_ec2.create_instances(
+        test_class.resource_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
@@ -91,7 +91,7 @@ class TestInstancesWhitelist:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"instances": {"clean": True, "ttl": -1}}},
+                "services": {"ec2": {"instances": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -102,7 +102,7 @@ class TestInstancesWhitelist:
 
     def test(self, test_class):
         # create test instance
-        test_class.client_ec2.create_instances(
+        test_class.resource_ec2.create_instances(
             ImageId="ami-43a15f3e", MinCount=1, MaxCount=1, InstanceType="t2.micro"
         )
 
@@ -112,7 +112,7 @@ class TestInstancesWhitelist:
 
         # get instance id and add to whitelist
         test_class.whitelist = {
-            "test_class": {
+            "ec2": {
                 "instance": [response["Reservations"][0]["Instances"][0]["InstanceId"]]
             }
         }
@@ -132,9 +132,7 @@ class TestSecurityGroupsNotWhitelist:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {
-                    "test_class": {"security_groups": {"clean": True, "ttl": -1}}
-                },
+                "services": {"ec2": {"security_groups": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -166,12 +164,10 @@ class TestSecurityGroupsWhitelist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {"test_class": {"security_group": ["test-security-group"]}}
+            whitelist = {"ec2": {"security_group": ["test-security-group"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {
-                    "test_class": {"security_groups": {"clean": True, "ttl": -1}}
-                },
+                "services": {"ec2": {"security_groups": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -192,7 +188,7 @@ class TestSecurityGroupsWhitelist:
 
         # get security group id and add to whitelist
         test_class.whitelist = {
-            "test_class": {"security_group": [response["SecurityGroups"][1]["GroupId"]]}
+            "ec2": {"security_group": [response["SecurityGroups"][1]["GroupId"]]}
         }
 
         # test instances functions for running instace
@@ -210,7 +206,7 @@ class TestVolumesMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"volumes": {"clean": True, "ttl": -1}}},
+                "services": {"ec2": {"volumes": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -242,7 +238,7 @@ class TestVolumesLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"volumes": {"clean": True, "ttl": 7}}},
+                "services": {"ec2": {"volumes": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -274,7 +270,7 @@ class TestVolumesWhitelist:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"volumes": {"clean": True, "ttl": -1}}},
+                "services": {"ec2": {"volumes": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -292,9 +288,7 @@ class TestVolumesWhitelist:
         assert len(response["Volumes"]) == 1
 
         # get volume id and add to whitelist
-        test_class.whitelist = {
-            "test_class": {"volume": [response["Volumes"][0]["VolumeId"]]}
-        }
+        test_class.whitelist = {"ec2": {"volume": [response["Volumes"][0]["VolumeId"]]}}
 
         # test instances functions for running instace
         test_class.volumes()

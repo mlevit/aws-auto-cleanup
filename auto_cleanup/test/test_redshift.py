@@ -14,7 +14,7 @@ class TestClustersMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"clusters": {"clean": True, "ttl": -1}}},
+                "services": {"redshift": {"clusters": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -53,7 +53,7 @@ class TestClustersLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"clusters": {"clean": True, "ttl": 7}}},
+                "services": {"redshift": {"clusters": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -89,10 +89,10 @@ class TestClustersWhitelist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {"test_class": {"cluster": ["test_class123"]}}
+            whitelist = {"redshift": {"cluster": ["test_class123"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"clusters": {"clean": True, "ttl": -1}}},
+                "services": {"redshift": {"clusters": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -131,7 +131,7 @@ class TestSnapshotsMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"snapshots": {"clean": True, "ttl": -1}}},
+                "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -175,7 +175,7 @@ class TestSnapshotsLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"snapshots": {"clean": True, "ttl": 7}}},
+                "services": {"redshift": {"snapshots": {"clean": True, "ttl": 7}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -216,10 +216,10 @@ class TestSnapshotsWhitelist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {"test_class": {"snapshot": ["snapshot123"]}}
+            whitelist = {"redshift": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"snapshots": {"clean": True, "ttl": -1}}},
+                "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -253,4 +253,4 @@ class TestSnapshotsWhitelist:
 
         # validate snapshot not deleted
         response = test_class.client_redshift.describe_cluster_snapshots()
-        assert response["Snapshots"] == []
+        assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"

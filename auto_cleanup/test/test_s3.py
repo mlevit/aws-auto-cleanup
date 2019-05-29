@@ -14,7 +14,7 @@ class TestBucketsMoreThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"buckets": {"clean": True, "ttl": -1}}},
+                "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -46,7 +46,7 @@ class TestBucketsLessThanTTL:
             whitelist = {}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"buckets": {"clean": True, "ttl": 5000}}},
+                "services": {"s3": {"buckets": {"clean": True, "ttl": 5000}}},
             }
             resource_tree = {"AWS": {}}
 
@@ -75,10 +75,10 @@ class TestBucketsWhitelist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_s3():
-            whitelist = {"test_class": {"bucket": ["test"]}}
+            whitelist = {"s3": {"bucket": ["test"]}}
             settings = {
                 "general": {"dry_run": False},
-                "services": {"test_class": {"buckets": {"clean": True, "ttl": -1}}},
+                "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
             }
             resource_tree = {"AWS": {}}
 

@@ -138,7 +138,7 @@ class RedshiftCleanup:
                 resource_status = resource.get("Status")
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
-                    "snapshots", []
+                    "snapshot", []
                 ):
                     delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
                     if delta.days > ttl_days:
