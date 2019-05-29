@@ -17,7 +17,6 @@ from . import elasticbeanstalk_cleanup
 from . import emr_cleanup
 from . import iam_cleanup
 from . import lambda_cleanup
-from . import lambda_helper
 from . import redshift_cleanup
 from . import rds_cleanup
 from . import s3_cleanup
