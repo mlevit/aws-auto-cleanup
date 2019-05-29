@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class ElasticBeanstalkCleanup:
@@ -32,7 +32,7 @@ class ElasticBeanstalkCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("elasticbeanstalk", {})
             .get("applications", {})
             .get("clean", False)
@@ -48,7 +48,7 @@ class ElasticBeanstalkCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("elasticbeanstalk", {})
                 .get("applications", {})
                 .get("ttl", 7)
@@ -61,7 +61,7 @@ class ElasticBeanstalkCleanup:
                 if resource_id not in self.whitelist.get("elasticbeanstalk", {}).get(
                     "application", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):

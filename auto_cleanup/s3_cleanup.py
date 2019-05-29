@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class S3Cleanup:
@@ -31,7 +31,7 @@ class S3Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("s3", {})
             .get("buckets", {})
             .get("clean", False)
@@ -45,7 +45,7 @@ class S3Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("s3", {})
                 .get("buckets", {})
                 .get("ttl", 7)
@@ -56,7 +56,7 @@ class S3Cleanup:
                 resource_date = resource.get("CreationDate")
 
                 if resource_id not in self.whitelist.get("s3", {}).get("bucket", []):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):

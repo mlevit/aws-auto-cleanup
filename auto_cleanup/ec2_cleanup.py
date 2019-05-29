@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class EC2Cleanup:
@@ -15,6 +15,7 @@ class EC2Cleanup:
 
         self._client_ec2 = None
         self._client_sts = None
+        self._resource_ec2 = None
 
     @property
     def client_sts(self):
@@ -32,6 +33,12 @@ class EC2Cleanup:
             self._client_ec2 = boto3.client("ec2", region_name=self.region)
         return self._client_ec2
 
+    @property
+    def resource_ec2(self):
+        if not self._resource_ec2:
+            self._resource_ec2 = boto3.resource("ec2", region_name=self.region)
+        return self._resource_ec2
+
     def run(self):
         self.addresses()
         self.instances()
@@ -45,7 +52,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("addresses", {})
             .get("clean", False)
@@ -106,7 +113,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("instances", {})
             .get("clean", False)
@@ -120,7 +127,7 @@ class EC2Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("ec2", {})
                 .get("instances", {})
                 .get("ttl", 7)
@@ -135,7 +142,7 @@ class EC2Cleanup:
                     if resource_id not in self.whitelist.get("ec2", {}).get(
                         "instance", []
                     ):
-                        delta = LambdaHelper.get_day_delta(resource_date)
+                        delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
                             if resource_state == "running":
@@ -237,7 +244,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("security_groups", {})
             .get("clean", False)
@@ -264,7 +271,7 @@ class EC2Cleanup:
 
                 resources = security_group_set - instance_security_group_set
             except:
-                self.logging.error(f"Could not retrieve all unused Security Groups.")
+                self.logging.error("Could not retrieve all unused Security Groups.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
@@ -306,7 +313,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("snapshots", {})
             .get("clean", False)
@@ -322,7 +329,7 @@ class EC2Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("ec2", {})
                 .get("snapshots", {})
                 .get("ttl", 7)
@@ -360,7 +367,7 @@ class EC2Cleanup:
                         resource_id not in snapshots_in_use
                         and "for ami-" not in resource.get("Description")
                     ):
-                        delta = LambdaHelper.get_day_delta(resource_date)
+                        delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
                             if not self.settings.get("general", {}).get(
@@ -410,7 +417,7 @@ class EC2Cleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("ec2", {})
             .get("volumes", {})
             .get("clean", False)
@@ -424,7 +431,7 @@ class EC2Cleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("ec2", {})
                 .get("volumes", {})
                 .get("ttl", 7)
@@ -436,7 +443,7 @@ class EC2Cleanup:
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
                     if resource.get("Attachments") == []:
-                        delta = LambdaHelper.get_day_delta(resource_date)
+                        delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
                             if not self.settings.get("general", {}).get(

@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class EMRCleanup:
@@ -30,7 +30,7 @@ class EMRCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("emr", {})
             .get("clusters", {})
             .get("clean", False)
@@ -44,7 +44,7 @@ class EMRCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("emr", {})
                 .get("clusters", {})
                 .get("ttl", 7)
@@ -58,7 +58,7 @@ class EMRCleanup:
                 resource_status = resource.get("Status").get("State")
 
                 if resource_id not in self.whitelist.get("emr", {}).get("cluster", []):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if resource_status in ("RUNNING", "WAITING"):

@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class RedshiftCleanup:
@@ -31,7 +31,7 @@ class RedshiftCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("redshift", {})
             .get("clusters", {})
             .get("clean", False)
@@ -45,7 +45,7 @@ class RedshiftCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("redshift", {})
                 .get("clusters", {})
                 .get("ttl", 7)
@@ -59,7 +59,7 @@ class RedshiftCleanup:
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "cluster", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if resource_status == "available":
@@ -110,7 +110,7 @@ class RedshiftCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("redshift", {})
             .get("snapshots", {})
             .get("clean", False)
@@ -126,9 +126,9 @@ class RedshiftCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("redshift", {})
-                .get("snapshot", {})
+                .get("snapshots", {})
                 .get("ttl", 7)
             )
 
@@ -138,10 +138,9 @@ class RedshiftCleanup:
                 resource_status = resource.get("Status")
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
-                    "snapshots", []
+                    "snapshot", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
-
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
                     if delta.days > ttl_days:
                         if resource_status in ("available", "final snapshot"):
                             if not self.settings.get("general", {}).get(
@@ -163,6 +162,7 @@ class RedshiftCleanup:
                                 "and has been deleted."
                             )
                         else:
+                            print("dry run")
                             self.logging.debug(
                                 f"Redshift Snapshot '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )

@@ -16,6 +16,7 @@ Open source application to programmatically clean your AWS resources based on a 
   - [Configuration](#configuration)
 - [Tables](#tables)
 - [Resource Tree](#resource-tree)
+- [Contributing](CONTRIBUTING.md)
 
 ## Setup
 
@@ -236,8 +237,8 @@ The below table lists the resource attribute that should be used for unique iden
 | EMR Clusters                   | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
 | IAM Roles                      | Role Name              | `iam:role:auto-cleanup-role`                   |
 | Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
-| Redshift Instances             | Snapshot Identifier    | `redshift:instance:my_cluster`                 |
-| Redshift Snapshots             | DB Snapshot Name       | `redshift:snapshot:my_cluster_snapshot`        |
+| Redshift Instances             | Cluster Identifier     | `redshift:instance:my_cluster`                 |
+| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:my_cluster_snapshot`        |
 | RDS Instances                  | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |

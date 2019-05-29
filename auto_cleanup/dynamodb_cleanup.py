@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class DynamoDBCleanup:
@@ -30,7 +30,7 @@ class DynamoDBCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("dynamodb", {})
             .get("tables", {})
             .get("clean", False)
@@ -44,7 +44,7 @@ class DynamoDBCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("dynamodb", {})
                 .get("tables", {})
                 .get("ttl", 7)
@@ -58,8 +58,7 @@ class DynamoDBCleanup:
                 )
 
                 if resource not in self.whitelist.get("dynamodb", {}).get("table", []):
-                    delta = LambdaHelper.get_day_delta(resource_date)
-
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:

@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class CloudFormationCleanup:
@@ -32,7 +32,7 @@ class CloudFormationCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("cloudformation", {})
             .get("stacks", {})
             .get("clean", False)
@@ -46,7 +46,7 @@ class CloudFormationCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("cloudformation", {})
                 .get("stacks", {})
                 .get("ttl", 7)
@@ -63,8 +63,7 @@ class CloudFormationCleanup:
                 if resource_id not in self.whitelist.get("cloudformation", {}).get(
                     "stack", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
-
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:

@@ -2,7 +2,7 @@ import sys
 
 import boto3
 
-from lambda_helper import *
+from . import lambda_helper
 
 
 class LambdaCleanup:
@@ -31,7 +31,7 @@ class LambdaCleanup:
         """
 
         clean = (
-            self.settings.get("services")
+            self.settings.get("services", {})
             .get("lambda", {})
             .get("functions", {})
             .get("clean", False)
@@ -45,7 +45,7 @@ class LambdaCleanup:
                 return False
 
             ttl_days = (
-                self.settings.get("services")
+                self.settings.get("services", {})
                 .get("lambda", {})
                 .get("functions", {})
                 .get("ttl", 7)
@@ -58,7 +58,7 @@ class LambdaCleanup:
                 if resource_id not in self.whitelist.get("lambda", {}).get(
                     "function", []
                 ):
-                    delta = LambdaHelper.get_day_delta(resource_date)
+                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
