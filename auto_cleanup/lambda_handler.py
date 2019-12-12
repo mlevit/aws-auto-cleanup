@@ -20,6 +20,7 @@ from . import lambda_cleanup
 from . import redshift_cleanup
 from . import rds_cleanup
 from . import s3_cleanup
+from . import lambda_helper
 
 
 class Cleanup:
@@ -190,7 +191,7 @@ class Cleanup:
                 TableName=os.environ["WHITELISTTABLE"]
             )["Items"]:
                 record_json = dynamodb_json.loads(record, True)
-                parsed_resource_id = lambda_handler.LambdaHelper.parse_resource_id(
+                parsed_resource_id = lambda_helper.LambdaHelper.parse_resource_id(
                     record_json.get("resource_id")
                 )
 
