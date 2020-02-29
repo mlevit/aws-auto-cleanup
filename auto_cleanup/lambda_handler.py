@@ -10,16 +10,19 @@ import boto3
 from dynamodb_json import json_util as dynamodb_json
 from treelib import Tree
 
-from . import cloudformation_cleanup
-from . import dynamodb_cleanup
-from . import ec2_cleanup
-from . import elasticbeanstalk_cleanup
-from . import emr_cleanup
-from . import iam_cleanup
-from . import lambda_cleanup
-from . import redshift_cleanup
-from . import rds_cleanup
-from . import s3_cleanup
+from . import (
+    cloudformation_cleanup,
+    dynamodb_cleanup,
+    ec2_cleanup,
+    elasticbeanstalk_cleanup,
+    emr_cleanup,
+    iam_cleanup,
+    lambda_cleanup,
+    lambda_helper,
+    rds_cleanup,
+    redshift_cleanup,
+    s3_cleanup,
+)
 
 
 class Cleanup:
@@ -190,7 +193,7 @@ class Cleanup:
                 TableName=os.environ["WHITELISTTABLE"]
             )["Items"]:
                 record_json = dynamodb_json.loads(record, True)
-                parsed_resource_id = lambda_handler.LambdaHelper.parse_resource_id(
+                parsed_resource_id = lambda_helper.LambdaHelper.parse_resource_id(
                     record_json.get("resource_id")
                 )
 
