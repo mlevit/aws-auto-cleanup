@@ -239,7 +239,7 @@ The below table lists the resource attribute that should be used for unique iden
 | Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:my_cluster`                 |
 | Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:my_cluster_snapshot`        |
-| RDS Instances                  | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
+| RDS Instances                  | DB Instance Identifier | `rds:instance:my_rds_instance`                 |
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
 
