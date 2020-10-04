@@ -1,4 +1,5 @@
 import sys
+import time
 
 import boto3
 
@@ -57,6 +58,7 @@ class ElasticBeanstalkCleanup:
             for resource in resources:
                 resource_id = resource.get("ApplicationName")
                 resource_date = resource.get("DateUpdated")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("elasticbeanstalk", {}).get(
                     "application", []
@@ -75,25 +77,35 @@ class ElasticBeanstalkCleanup:
                                     f"Could not delete Elastic Beanstalk Application '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"Elastic Beanstalk Application '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Elastic Beanstalk", {}
-                ).setdefault("Applications", []).append(resource_id)
+                ).setdefault("Applications", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of Elastic Beanstalk Applications.")

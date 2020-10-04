@@ -1,4 +1,5 @@
 import sys
+import time
 
 import boto3
 
@@ -56,6 +57,7 @@ class RDSCleanup:
             for resource in resources:
                 resource_id = resource.get("DBInstanceIdentifier")
                 resource_date = resource.get("InstanceCreateTime")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("rds", {}).get("instance", []):
                     delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
@@ -79,6 +81,7 @@ class RDSCleanup:
                                         f"Could not remove termination protection from RDS Instance '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             # delete instance
@@ -92,25 +95,35 @@ class RDSCleanup:
                                     f"Could not delete RDS Instance '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"RDS Instance '{resource_id}' was created {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"RDS Instance '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"RDS Instance '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
-                ).setdefault("Instances", []).append(resource_id)
+                ).setdefault("Instances", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of RDS Instances.")
@@ -145,6 +158,7 @@ class RDSCleanup:
             for resource in resources:
                 resource_id = resource.get("DBSnapshotIdentifier")
                 resource_date = resource.get("SnapshotCreateTime")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("rds", {}).get("snapshot", []):
                     delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
@@ -160,25 +174,35 @@ class RDSCleanup:
                                     f"Could not delete RDS Snapshot '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"RDS Snapshot '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
-                ).setdefault("Snapshots", []).append(resource_id)
+                ).setdefault("Snapshots", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.debug("Skipping cleanup of RDS Snapshots.")

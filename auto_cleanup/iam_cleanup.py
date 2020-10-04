@@ -56,6 +56,7 @@ class IAMCleanup:
                 resource_id = resource.get("RoleName")
                 resource_arn = resource.get("Arn")
                 resource_date = resource.get("CreateDate")
+                resource_action = "skip"
 
                 if (
                     resource_id not in self.whitelist.get("iam", {}).get("role", [])
@@ -74,6 +75,7 @@ class IAMCleanup:
                                 f"Could not generate IAM Role last accessed details for '{resource_arn}'."
                             )
                             self.logging.error(sys.exc_info()[1])
+                            resource_action = "error"
                             continue
 
                         try:
@@ -85,6 +87,7 @@ class IAMCleanup:
                                 f"Could not get IAM Role last accessed details for '{resource_arn}'."
                             )
                             self.logging.error(sys.exc_info()[1])
+                            resource_action = "error"
                             continue
 
                         backoff = 1
@@ -101,6 +104,7 @@ class IAMCleanup:
                                         f"Could not get IAM Role last accessed details for '{resource_arn}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                                 backoff = 2 * backoff
@@ -109,6 +113,7 @@ class IAMCleanup:
                                     f"Could not retrieve IAM Role '{resource_id}' last accessed "
                                     "details in a reasonable amount of time."
                                 )
+                                resource_action = "error"
                                 return False
 
                         if get_last_accessed.get("JobStatus") == "COMPLETED":
@@ -125,10 +130,14 @@ class IAMCleanup:
 
                                 if lambda_helper.LambdaHelper.convert_to_datetime(
                                     service_date
-                                ) > lambda_helper.LambdaHelper.convert_to_datetime(last_accessed):
+                                ) > lambda_helper.LambdaHelper.convert_to_datetime(
+                                    last_accessed
+                                ):
                                     last_accessed = service_date
 
-                            delta = lambda_helper.LambdaHelper.get_day_delta(last_accessed)
+                            delta = lambda_helper.LambdaHelper.get_day_delta(
+                                last_accessed
+                            )
 
                             if delta.days > ttl_days:
                                 if not self.settings.get("general", {}).get(
@@ -144,6 +153,7 @@ class IAMCleanup:
                                             f"Could not retrieve inline IAM Policies for IAM Role '{resource_id}'."
                                         )
                                         self.logging.error(sys.exc_info()[1])
+                                        resource_action = "error"
                                         continue
 
                                     for policy in policies.get("PolicyNames"):
@@ -155,11 +165,13 @@ class IAMCleanup:
                                             self.logging.info(
                                                 f"IAM Policy '{policy}' has been deleted from IAM Role '{resource_id}'."
                                             )
+                                            resource_action = "delete"
                                         except:
                                             self.logging.error(
                                                 f"Could not delete an inline IAM Policy '{policy}' from IAM Role '{resource_id}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "error"
                                             continue
 
                                     # detach all managed policies
@@ -172,6 +184,7 @@ class IAMCleanup:
                                             f"Could not retrieve managed IAM Policies attached to IAM Role '{resource_id}'."
                                         )
                                         self.logging.error(sys.exc_info()[1])
+                                        resource_action = "error"
                                         continue
 
                                     for policy in policies.get("AttachedPolicies"):
@@ -189,6 +202,7 @@ class IAMCleanup:
                                                 f"Could not detach a managed IAM Policy '{policy.get('PolicyName')}' from IAM Role '{resource_id}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "error"
                                             continue
 
                                     # delete all instance profiles
@@ -201,6 +215,7 @@ class IAMCleanup:
                                             f"Could not retrieve IAM Instance Profiles associated with IAM Role '{resource_id}'."
                                         )
                                         self.logging.error(sys.exc_info()[1])
+                                        resource_action = "error"
                                         continue
 
                                     for profile in profiles.get("InstanceProfiles"):
@@ -221,6 +236,7 @@ class IAMCleanup:
                                                 f"Could not remove IAM Role '{resource_id}' from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "error"
                                             continue
 
                                         # delete instance profile
@@ -239,6 +255,7 @@ class IAMCleanup:
                                                 f"Could not delete IAM Instance Profile '{profile.get('InstanceProfileName')}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "error"
                                             continue
 
                                     # delete role
@@ -251,6 +268,7 @@ class IAMCleanup:
                                             f"Could not delete IAM Role '{resource_id}'."
                                         )
                                         self.logging.error(sys.exc_info()[1])
+                                        resource_action = "error"
                                         continue
 
                                 self.logging.info(
@@ -262,6 +280,7 @@ class IAMCleanup:
                                     f"IAM Role '{resource_id}' was last accessed {delta.days} days ago "
                                     "(less than TTL setting) and has not been deleted."
                                 )
+                                resource_action = "skip - TTL"
                         else:
                             self.logging.error(
                                 f"Could not get IAM Role last accessed details for '{resource_id}'."
@@ -272,15 +291,23 @@ class IAMCleanup:
                             f"IAM Role '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"IAM Role '%s' has been whitelisted and has not been deleted."
                         % (resource_id)
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "IAM", {}
-                ).setdefault("Roles", []).append(resource_id)
+                ).setdefault("Roles", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of IAM Roles.")

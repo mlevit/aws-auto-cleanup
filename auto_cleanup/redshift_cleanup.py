@@ -1,4 +1,5 @@
 import sys
+import time
 
 import boto3
 
@@ -55,6 +56,7 @@ class RedshiftCleanup:
                 resource_id = resource.get("ClusterIdentifier")
                 resource_date = resource.get("ClusterCreateTime")
                 resource_status = resource.get("ClusterStatus")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "cluster", []
@@ -76,29 +78,40 @@ class RedshiftCleanup:
                                         f"Could not delete Redshift Cluster '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             self.logging.info(
                                 f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
                                 "and has been deleted."
                             )
+                            resource_action = "delete"
                         else:
                             self.logging.debug(
                                 f"Redshift Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
+                            resource_action = "error"
                     else:
                         self.logging.debug(
                             f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"Redshift Cluster '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
-                ).setdefault("Clusters", []).append(resource_id)
+                ).setdefault("Clusters", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of Redshift Clusters.")
@@ -136,6 +149,7 @@ class RedshiftCleanup:
                 resource_id = resource.get("SnapshotIdentifier")
                 resource_date = resource.get("SnapshotCreateTime")
                 resource_status = resource.get("Status")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "snapshot", []
@@ -155,30 +169,41 @@ class RedshiftCleanup:
                                         f"Could not delete Redshift Snapshot '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             self.logging.info(
                                 f"Redshift Snapshot '{resource_id}' was created {delta.days} days ago "
                                 "and has been deleted."
                             )
+                            resource_action = "delete"
                         else:
                             print("dry run")
                             self.logging.debug(
                                 f"Redshift Snapshot '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
+                            resource_action = "error"
                     else:
                         self.logging.debug(
                             f"Redshift Snapshot '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"Redshift Snapshot '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
-                ).setdefault("Snapshots", []).append(resource_id)
+                ).setdefault("Snapshots", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of Redshift Snapshots.")

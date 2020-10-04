@@ -18,6 +18,7 @@ custom:
   remover:
     prompt: false
     buckets:
+      - ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
       - ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
 
 provider:
@@ -138,6 +139,7 @@ functions:
         - treelib/**
     environment:
       LOGLEVEL: INFO # change to DEBUG for testing
+      ACTIONSTAKENBUCKET: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
       RESOURCETREEBUCKET: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
@@ -181,6 +183,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    ActionsTakenBuckett:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
     ResourceTreeBuckett:
       Type: AWS::S3::Bucket
       Properties:

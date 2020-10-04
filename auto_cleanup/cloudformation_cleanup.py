@@ -1,4 +1,5 @@
 import sys
+import time
 
 import boto3
 
@@ -59,6 +60,7 @@ class CloudFormationCleanup:
                     if resource.get("LastUpdatedTime") is not None
                     else resource.get("CreationTime")
                 )
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("cloudformation", {}).get(
                     "stack", []
@@ -75,26 +77,36 @@ class CloudFormationCleanup:
                                     f"Could not delete CloudFormation Stack '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
                         "been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "CloudFormation", {}
-                ).setdefault("Stacks", []).append(resource_id)
+                ).setdefault("Stacks", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of CloudFormation Stacks.")

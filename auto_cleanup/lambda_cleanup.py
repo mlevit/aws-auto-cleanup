@@ -1,4 +1,5 @@
 import sys
+import time
 
 import boto3
 
@@ -54,6 +55,7 @@ class LambdaCleanup:
             for resource in resources:
                 resource_id = resource.get("FunctionName")
                 resource_date = resource.get("LastModified")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("lambda", {}).get(
                     "function", []
@@ -71,26 +73,36 @@ class LambdaCleanup:
                                     f"Could not delete Lambda Function '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"Lambda Function '%s' has been whitelisted and has not been deleted."
                         % (resource_id)
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Lambda", {}
-                ).setdefault("Functions", []).append(resource_id)
+                ).setdefault("Functions", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of Lambda Functions.")

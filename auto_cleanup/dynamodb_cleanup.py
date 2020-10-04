@@ -1,4 +1,5 @@
 import sys
+import time
 
 import boto3
 
@@ -56,6 +57,7 @@ class DynamoDBCleanup:
                     .get("Table")
                     .get("CreationDateTime")
                 )
+                resource_action = "skip"
 
                 if resource not in self.whitelist.get("dynamodb", {}).get("table", []):
                     delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
@@ -68,26 +70,36 @@ class DynamoDBCleanup:
                                     f"Could not delete DynamoDB Table '{resource}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"DynamoDB Table '{resource}' was created {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"DynamoDB Table '{resource}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"DynamoDB Table '{resource}' has been whitelisted and has not "
                         "been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "DynamoDB", {}
-                ).setdefault("Tables", []).append(resource)
+                ).setdefault("Tables", []).append(
+                    {
+                        "id": resource,
+                        "action": resource_action,
+                        "timestamp": time.localtime(),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of DynamoDB Tables.")

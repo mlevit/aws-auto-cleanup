@@ -1,3 +1,4 @@
+import csv
 import datetime
 import json
 import logging
@@ -282,6 +283,81 @@ class Cleanup:
         except:
             self.logging.error(sys.exc_info()[1])
 
+    def export_actions_taken(self, resource_tree):
+        """Export a CSV file with all actions taken during run.
+
+        Args:
+            resource_tree (dict): Dictionary of all actions taken
+        """
+        try:
+            os.chdir(tempfile.gettempdir())
+
+            try:
+                _, temp_file = tempfile.mkstemp()
+
+                try:
+                    with open(temp_file, "w") as f:  # Just use 'w' mode in 3.x
+                        wr = csv.writer(temp_file, quoting=csv.QUOTE_ALL)
+
+                        # write header
+                        wr.writerow(
+                            [
+                                "Platform",
+                                "Region",
+                                "Service",
+                                "Resource ID",
+                                "Action",
+                                "Timestamp",
+                                "Dry Run",
+                            ]
+                        )
+
+                        for platform in resource_tree:
+                            for region in platform:
+                                for service in region:
+                                    for action in service:
+                                        wr.writerow(
+                                            [
+                                                platform,
+                                                region,
+                                                service,
+                                                action["id"],
+                                                action["action"],
+                                                action["timestamp"],
+                                                self.dry_run,
+                                            ]
+                                        )
+
+                except:
+                    self.logging.error("Could not generate actions taken.")
+                    self.logging.error(sys.exc_info()[1])
+                    return False
+
+                client = boto3.client("s3")
+                bucket = os.environ["ACTIONSTAKENBUCKET"]
+                key = "actions_taken_%s.txt" % datetime.datetime.now().strftime(
+                    "%Y_%m_%d_%H_%M_%S"
+                )
+
+                try:
+                    client.upload_file(temp_file, bucket, key)
+                except:
+                    self.logging.error(
+                        f"Could not upload resource tree to S3 's3://{bucket}/{key}."
+                    )
+                    return False
+
+                self.logging.info(
+                    f"Actions taken has been built and uploaded to S3 's3://{bucket}/{key}."
+                )
+            finally:
+                os.remove(temp_file)
+            return True
+        except:
+            self.logging.error("Could not generate resource tree.")
+            self.logging.error(sys.exc_info()[1])
+            return False
+
     def build_tree(self, resource_tree):
         """
         Build ASCI tree and upload to S3.
@@ -381,4 +457,7 @@ def lambda_handler(event, context):
     cleanup.run_cleanup()
 
     # build resource tree
-    cleanup.build_tree(cleanup.resource_tree)
+    # cleanup.build_tree(cleanup.resource_tree)
+
+    # export actions taken
+    cleanup.export_actions_taken(cleanup.resource_tree)
