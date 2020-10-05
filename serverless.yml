@@ -138,7 +138,7 @@ functions:
         - simplejson/**
         - treelib/**
     environment:
-      LOGLEVEL: INFO # change to DEBUG for testing
+      LOGLEVEL: ${self:custom.log_level}
       ACTIONSTAKENBUCKET: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
       RESOURCETREEBUCKET: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
@@ -191,6 +191,49 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
+    AutoCleanupDatabase:
+      Type: "AWS::Glue::Database"
+      Properties:
+        DatabaseInput:
+          Name: auto_cleanup_${self:provider.stage}
+        CatalogId: !Ref AWS::AccountId
+    ActionsTakenTable:
+      Type: AWS::Glue::Table
+      Properties:
+        CatalogId: !Ref AWS::AccountId
+        DatabaseName: !Ref AutoCleanupDatabase
+        TableInput:
+          Name: actions_taken
+          StorageDescriptor:
+            Columns:
+              - Name: platform
+                Type: string
+              - Name: region
+                Type: string
+              - Name: service
+                Type: string
+              - Name: resource
+                Type: string
+              - Name: resource_id
+                Type: string
+              - Name: action
+                Type: string
+              - Name: timestamp
+                Type: timestamp
+              - Name: is_dry_run
+                Type: boolean
+            Compressed: False
+            Location: s3://${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}/
+            InputFormat: org.apache.hadoop.mapred.TextInputFormat
+            OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+            SerdeInfo:
+              SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+              Parameters:
+                field.delim: ","
+          Parameters:
+            delimiter: ","
+            classification: csv
+            "skip.header.line.count": 1
 
 plugins:
   - serverless-python-requirements
