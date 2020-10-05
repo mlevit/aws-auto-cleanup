@@ -15,7 +15,7 @@ class LambdaHelper:
     def get_day_delta(resource_date):
         if resource_date is not None:
             from_datetime = LambdaHelper.convert_to_datetime(
-                datetime.datetime.now().isoformat()
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
             to_datetime = LambdaHelper.convert_to_datetime(resource_date)
             return from_datetime - to_datetime

@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import threading
+import traceback
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
@@ -272,10 +273,11 @@ class Cleanup:
                     client.put_item(
                         TableName=os.environ["WHITELISTTABLE"],
                         Item=whitelist,
-                        ConditionExpression="attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)",
+                        # ConditionExpression="attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)",
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
+                    # self.logging.debug(traceback.print_stack())
                     continue
 
             settings_data.close()
@@ -296,41 +298,47 @@ class Cleanup:
                 _, temp_file = tempfile.mkstemp()
 
                 try:
-                    with open(temp_file, "w") as f:  # Just use 'w' mode in 3.x
-                        wr = csv.writer(temp_file, quoting=csv.QUOTE_ALL)
+                    with open(
+                        temp_file, "w"
+                    ) as output_file:  # Just use 'w' mode in 3.x
+                        wr = csv.writer(output_file)
 
                         # write header
                         wr.writerow(
                             [
-                                "Platform",
-                                "Region",
-                                "Service",
-                                "Resource ID",
-                                "Action",
-                                "Timestamp",
-                                "Dry Run",
+                                "platform",
+                                "region",
+                                "service",
+                                "resource",
+                                "resource_id",
+                                "action",
+                                "timestamp",
+                                "is_dry_run",
                             ]
                         )
 
-                        for platform in resource_tree:
-                            for region in platform:
-                                for service in region:
-                                    for action in service:
-                                        wr.writerow(
-                                            [
-                                                platform,
-                                                region,
-                                                service,
-                                                action["id"],
-                                                action["action"],
-                                                action["timestamp"],
-                                                self.dry_run,
-                                            ]
-                                        )
+                        for platform, platform_dict in resource_tree.items():
+                            for region, region_dict in platform_dict.items():
+                                for service, service_dict in region_dict.items():
+                                    for resource in service_dict:
+                                        for action in service_dict.get(resource):
+                                            wr.writerow(
+                                                [
+                                                    platform,
+                                                    region,
+                                                    service,
+                                                    resource,
+                                                    action["id"],
+                                                    action["action"],
+                                                    action["timestamp"],
+                                                    self.dry_run,
+                                                ]
+                                            )
 
                 except:
                     self.logging.error("Could not generate actions taken.")
                     self.logging.error(sys.exc_info()[1])
+                    # self.logging.debug(traceback.print_stack())
                     return False
 
                 client = boto3.client("s3")

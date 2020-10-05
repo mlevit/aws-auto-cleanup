@@ -1,5 +1,5 @@
 import sys
-import time
+import datetime
 
 import boto3
 
@@ -109,7 +109,9 @@ class RedshiftCleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True
@@ -201,7 +203,9 @@ class RedshiftCleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True

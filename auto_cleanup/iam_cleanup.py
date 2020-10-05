@@ -275,6 +275,7 @@ class IAMCleanup:
                                     f"IAM Role '{resource_id}' was last modified {delta.days} days ago "
                                     "and has been deleted."
                                 )
+                                resource_action = "delete"
                             else:
                                 self.logging.debug(
                                     f"IAM Role '{resource_id}' was last accessed {delta.days} days ago "
@@ -305,7 +306,9 @@ class IAMCleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True

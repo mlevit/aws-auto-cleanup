@@ -1,5 +1,5 @@
 import sys
-import time
+import datetime
 
 import boto3
 
@@ -109,7 +109,9 @@ class EC2Cleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True
@@ -254,7 +256,9 @@ class EC2Cleanup:
                         {
                             "id": resource_id,
                             "action": resource_action,
-                            "timestamp": time.localtime(),
+                            "timestamp": datetime.datetime.now()
+                            .astimezone()
+                            .isoformat(),
                         }
                     )
             return True
@@ -333,7 +337,9 @@ class EC2Cleanup:
                     {
                         "id": resource,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True
@@ -448,7 +454,9 @@ class EC2Cleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True
@@ -533,7 +541,9 @@ class EC2Cleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True

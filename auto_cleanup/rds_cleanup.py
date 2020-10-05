@@ -1,5 +1,5 @@
 import sys
-import time
+import datetime
 
 import boto3
 
@@ -121,7 +121,9 @@ class RDSCleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True
@@ -200,7 +202,9 @@ class RDSCleanup:
                     {
                         "id": resource_id,
                         "action": resource_action,
-                        "timestamp": time.localtime(),
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                     }
                 )
             return True
