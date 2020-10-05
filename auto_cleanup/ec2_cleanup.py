@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 import boto3
 
@@ -67,6 +68,7 @@ class EC2Cleanup:
 
             for resource in resources:
                 resource_id = resource.get("AllocationId")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("address", []):
                     if resource.get("AssociationId") is None:
@@ -80,26 +82,38 @@ class EC2Cleanup:
                                     f"Could not release EC2 Address '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                         self.logging.info(
                             f"EC2 Address '{resource.get('PublicIp')}' is not associated with an EC2 instance and has "
                             "been released."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"EC2 Address '{resource_id}' is associated with an EC2 instance and has not "
                             "been deleted."
                         )
+                        resource_action = "skip"
                 else:
                     self.logging.debug(
                         f"EC2 Address '{resource_id}' has been whitelisted and has not "
                         "been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Addresses", []).append(resource_id)
+                ).setdefault("Addresses", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Addresses.")
@@ -138,6 +152,7 @@ class EC2Cleanup:
                     resource_id = resource.get("InstanceId")
                     resource_date = resource.get("LaunchTime")
                     resource_state = resource.get("State").get("Name")
+                    resource_action = "skip"
 
                     if resource_id not in self.whitelist.get("ec2", {}).get(
                         "instance", []
@@ -158,12 +173,14 @@ class EC2Cleanup:
                                             f"Could not stop EC2 Instance '{resource_id}'."
                                         )
                                         self.logging.error(sys.exc_info()[1])
+                                        resource_action = "error"
                                         continue
 
                                 self.logging.info(
                                     f"EC2 Instance '{resource_id}' in a 'running' state was last "
                                     f"launched {delta.days} days ago and has been stopped."
                                 )
+                                resource_action = "stop"
                             elif resource_state == "stopped":
                                 if not self.settings.get("general", {}).get(
                                     "dry_run", True
@@ -183,6 +200,7 @@ class EC2Cleanup:
                                             f"Could not get if protection for EC2 Instance '{resource_id}' is on."
                                         )
                                         self.logging.error(sys.exc_info()[1])
+                                        resource_action = "error"
                                         continue
 
                                     if resource_protection:
@@ -196,6 +214,7 @@ class EC2Cleanup:
                                                 f"Could not remove termination protection from EC2 Instance '{resource_id}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "error"
                                             continue
 
                                         self.logging.info(
@@ -218,20 +237,29 @@ class EC2Cleanup:
                                     f"EC2 Instance '{resource_id}' in a 'stopped' state was last "
                                     f"launched {delta.days} days ago and has been terminated."
                                 )
+                                resource_action = "delete"
                         else:
                             self.logging.debug(
                                 f"EC2 Instance '{resource_id}' was created {delta.days} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
+                            resource_action = "skip - TTL"
                     else:
                         self.logging.debug(
                             f"EC2 Instance '{resource_id}' has been whitelisted and has not been deleted."
                         )
+                        resource_action = "skip - whitelist"
 
                     self.resource_tree.get("AWS").setdefault(
                         self.region, {}
                     ).setdefault("EC2", {}).setdefault("Instances", []).append(
-                        resource_id
+                        {
+                            "id": resource_id,
+                            "action": resource_action,
+                            "timestamp": datetime.datetime.now()
+                            .astimezone()
+                            .isoformat(),
+                        }
                     )
             return True
         else:
@@ -279,6 +307,7 @@ class EC2Cleanup:
                 if resource not in self.whitelist.get("ec2", {}).get(
                     "security_group", []
                 ):
+                    resource_action = "skip"
                     if not self.settings.get("general", {}).get("dry_run", True):
                         try:
                             self.client_ec2.delete_security_group(GroupId=resource)
@@ -287,21 +316,32 @@ class EC2Cleanup:
                                 f"Could not delete EC2 Security Group '{resource}'."
                             )
                             self.logging.error(sys.exc_info()[1])
+                            resource_action = "error"
                             continue
 
                     self.logging.info(
                         f"EC2 Security Group '{resource}' is not associated with an EC2 instance and has "
                         "been deleted."
                     )
+                    resource_action = "delete"
                 else:
                     self.logging.debug(
                         f"EC2 Security Group '{resource}' has been whitelisted and has not "
                         "been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Security Groups", []).append(resource)
+                ).setdefault("Security Groups", []).append(
+                    {
+                        "id": resource,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Security Groups.")
@@ -338,6 +378,7 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("SnapshotId")
                 resource_date = resource.get("StartTime")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("snapshot", []):
                     snapshots_in_use = []
@@ -382,22 +423,26 @@ class EC2Cleanup:
                                         f"Could not delete EC2 Snapshot '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             self.logging.info(
                                 f"EC2 Snapshot '{resource_id}' was created {delta.days} days ago "
                                 "and has been deleted."
                             )
+                            resource_action = "delete"
                         else:
                             self.logging.debug(
                                 f"EC2 Snapshot '{resource_id} was created {delta.days} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
+                            resource_action = "skip - TTL"
                     else:
                         self.logging.debug(
                             f"EC2 Snapshot '{resource_id}' is currently used by an AMI "
                             "and cannot been deleted without deleting the AMI first."
                         )
+                        resource_action = "skip - whitelist"
                 else:
                     self.logging.debug(
                         f"EC2 Snapshot '{resource_id}' has been whitelisted and has not been deleted."
@@ -405,7 +450,15 @@ class EC2Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Snapshots", []).append(resource_id)
+                ).setdefault("Snapshots", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Snapshots.")
@@ -440,6 +493,7 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("VolumeId")
                 resource_date = resource.get("CreateTime")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
                     if resource.get("Attachments") == []:
@@ -456,17 +510,20 @@ class EC2Cleanup:
                                         f"Could not delete EC2 Volume '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             self.logging.info(
                                 f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
                                 "and has been deleted."
                             )
+                            resource_action = "delete"
                         else:
                             self.logging.debug(
                                 f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
+                            resource_action = "skip - TTL"
                     else:
                         self.logging.debug(
                             f"EC2 Volume '{resource_id}' is attached to an EC2 instance "
@@ -476,10 +533,19 @@ class EC2Cleanup:
                     self.logging.debug(
                         f"EC2 Volume '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Volumes", []).append(resource_id)
+                ).setdefault("Volumes", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Volumes.")

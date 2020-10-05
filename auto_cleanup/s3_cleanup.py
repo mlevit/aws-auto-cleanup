@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 import boto3
 
@@ -54,6 +55,7 @@ class S3Cleanup:
             for resource in resources.get("Buckets"):
                 resource_id = resource.get("Name")
                 resource_date = resource.get("CreationDate")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("s3", {}).get("bucket", []):
                     delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
@@ -70,6 +72,7 @@ class S3Cleanup:
                                     f"Could not retrieve all Objects from S3 Bucket '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                             while response.get("KeyCount") > 0:
@@ -93,6 +96,7 @@ class S3Cleanup:
                                         f"Could not delete Objects from S3 Bucket '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
 
                                 response = self.client_s3.list_objects_v2(
                                     Bucket=resource_id
@@ -108,6 +112,7 @@ class S3Cleanup:
                                     f"Could not get all Versions and Delete Markers from S3 Bucket '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
                                 continue
 
                             delete_list = []
@@ -153,6 +158,7 @@ class S3Cleanup:
                                         f"Could not delete Versions and Delete Markers from S3 Bucket '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             # delete bucket
@@ -163,24 +169,36 @@ class S3Cleanup:
                                     f"Could not delete Bucket '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
 
                         self.logging.info(
                             f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
                             "and has been deleted."
                         )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"S3 Bucket '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "S3", {}
-                ).setdefault("Buckets", []).append(resource_id)
+                ).setdefault("Buckets", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of S3 Buckets.")

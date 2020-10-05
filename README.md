@@ -15,7 +15,7 @@ Open source application to programmatically clean your AWS resources based on a 
   - [Removal](#removal)
   - [Configuration](#configuration)
 - [Tables](#tables)
-- [Resource Tree](#resource-tree)
+- [Actions Taken](#actions-taken)
 - [Contributing](CONTRIBUTING.md)
 
 ## Setup
@@ -71,13 +71,13 @@ serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 10. Invoke Auto Cleanup for the first time to create the necessary AWS Config rules and settings
 
 ```bash
-serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>] --type Event
+serverless invoke --function AutoCleanup [--region <AWS region>] [--stage <dev/prod>] [--aws-profile <AWS CLI profile>] --type Event
 ```
 
 11. Check Auto Cleanup logs
 
 ```bash
-serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
+serverless logs --function AutoCleanup [--region <AWS region>] [--stage <dev/prod>] [--aws-profile <AWS CLI profile>]
 ```
 
 ### Removal
@@ -239,83 +239,23 @@ The below table lists the resource attribute that should be used for unique iden
 | Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:my_cluster`                 |
 | Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:my_cluster_snapshot`        |
-| RDS Instances                  | DB Instance Identifier | `rds:snapshot:my_rds_instance`                 |
+| RDS Instances                  | DB Instance Identifier | `rds:instance:my_rds_instance`                 |
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
 
-## Resource Tree
+## Actions Taken
 
-An ASCI resource tree (example below) is generated with each invocation of the application. The tree is exported into the `ResourceTreeBuckett` objects within the `serverless.yml` file.
+Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `actionstaken` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `actions_taken` Glue Table have been created for the purpose of querying the data via Amazon Athena.
 
-This tree allows users to visualise their AWS resources in a simple fixed width text editor.
+The `actions_taken` table has the following schema:
 
-```bash
-AWS
-├── ap-southeast-2
-│   ├── CloudFormation
-│   │   └── Stacks
-│   │       ├── auto-cleanup-dev
-│   │       └── auto-cleanup-production
-│   ├── DynamoDB
-│   │   └── Tables
-│   │       ├── auto-cleanup-settings-dev
-│   │       ├── auto-cleanup-settings-production
-│   │       ├── auto-cleanup-whitelist-dev
-│   │       └── auto-cleanup-whitelist-production
-│   ├── EC2
-│   │   ├── Addresses
-│   │   │   ├── eipalloc-05065c5fa7c5b481d
-│   │   │   └── eipalloc-0b4c35908a9347747
-│   │   ├── Instances
-│   │   │   ├── i-01e008e103b99d5b2
-│   │   │   └── i-07440be98bfa9a15a
-│   │   ├── Security Groups
-│   │   │   ├── sg-61f46719
-│   │   │   └── sg-fbfa6983
-│   │   ├── Snapshots
-│   │   │   ├── snap-00c8c90db9fdceb3c
-│   │   │   └── snap-0c416b329cacc4175
-│   │   └── Volumes
-│   │       ├── vol-0db31d5473b5669b0
-│   │       └── vol-0e0b7da76435d07ff
-│   ├── EMR
-│   │   └── Clusters
-│   │       ├── j-2EZVIAN6FFOT0
-│   │       └── j-YR3UZD1ULRGI
-│   ├── Elastic Beanstalk
-│   │   └── Applications
-│   │       └── my-application
-│   ├── Lambda
-│   │   └── Functions
-│   │       ├── auto-cleanup-dev
-│   │       └── auto-cleanup-production
-│   └── Redshift
-│       ├── Clusters
-│       │   └── redshift-cluster-1
-│       └── Snapshots
-│           ├── rs:redshift-cluster-1-2019-04-29-19-16-08
-│           └── rs:redshift-cluster-1-2019-04-30-03-16-21
-├── global
-│   ├── IAM
-│   │   └── Roles
-│   │       ├── auto-cleanup-dev-ap-southeast-2-lambdaRole
-│   │       └── auto-cleanup-production-ap-southeast-2-lambdaRole
-│   └── S3
-│       └── Buckets
-│           ├── auto-cleanup-dev-resourcetreebucket-servian
-│           ├── auto-cleanup-dev-serverlessdeploymentbucket-1xa94mmahew4r
-│           ├── auto-cleanup-dev-serverlessdeploymentbucket-2ftdllozuhia
-│           ├── auto-cleanup-production-resourcetreebucket-servian
-│           └── auto-cleanup-production-serverlessdeploymentbucke-1l0x00s8wpz9g
-└── us-east-1
-    ├── CloudFormation
-    │   └── Stacks
-    │       └── cc-iam-stack
-    └── EC2
-        ├── Addresses
-        │   └── eipalloc-0b7a547aba879ec06
-        ├── Instances
-        │   └── i-0cbfb68a0d6e42c99
-        └── Volumes
-            └── vol-0921cdc9b3e6fc85a
-```
+| Column      | Format    | Description                                                                                         |
+| ----------- | --------- | --------------------------------------------------------------------------------------------------- |
+| platform    | string    | Always `AWS`                                                                                        |
+| region      | string    | Region (e.g. `ap-southeast-2`)                                                                      |
+| service     | string    | Service (e.g., `S3`)                                                                                |
+| resource    | string    | Resource (e.g., `Buckets`)                                                                          |
+| resource_id | string    | Resource ID (e.g., ARN)                                                                             |
+| action      | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
+| timestamp   | timestamp | Timestamp when action was performed                                                                 |
+| is_dry_run  | boolean   | Dry run activated                                                                                   |

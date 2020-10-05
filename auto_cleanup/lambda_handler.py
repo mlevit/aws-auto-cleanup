@@ -1,3 +1,4 @@
+import csv
 import datetime
 import json
 import logging
@@ -5,6 +6,7 @@ import os
 import sys
 import tempfile
 import threading
+import traceback
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
@@ -269,9 +271,7 @@ class Cleanup:
             for whitelist in whitelist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ["WHITELISTTABLE"],
-                        Item=whitelist,
-                        ConditionExpression="attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)",
+                        TableName=os.environ["WHITELISTTABLE"], Item=whitelist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
@@ -282,58 +282,63 @@ class Cleanup:
         except:
             self.logging.error(sys.exc_info()[1])
 
-    def build_tree(self, resource_tree):
-        """
-        Build ASCI tree and upload to S3.
-        """
+    def export_actions_taken(self, resource_tree):
+        """Export a CSV file with all actions taken during run.
 
+        Args:
+            resource_tree (dict): Dictionary of all actions taken
+        """
         try:
             os.chdir(tempfile.gettempdir())
-            tree = Tree()
-
-            for aws in resource_tree:
-                aws_key = aws
-                tree.create_node(aws, aws_key)
-
-                for region in resource_tree.get(aws):
-                    region_key = aws_key + region
-                    tree.create_node(region, region_key, parent=aws_key)
-
-                    for service in resource_tree.get(aws).get(region):
-                        service_key = region_key + service
-                        tree.create_node(service, service_key, parent=region_key)
-
-                        for resource_type in (
-                            resource_tree.get(aws).get(region).get(service)
-                        ):
-                            resource_type_key = service_key + resource_type
-                            tree.create_node(
-                                resource_type, resource_type_key, parent=service_key
-                            )
-
-                            for resource in (
-                                resource_tree.get(aws)
-                                .get(region)
-                                .get(service)
-                                .get(resource_type)
-                            ):
-                                resource_key = resource_type_key + resource
-                                tree.create_node(
-                                    resource, resource_key, parent=resource_type_key
-                                )
 
             try:
                 _, temp_file = tempfile.mkstemp()
 
                 try:
-                    tree.save2file(temp_file)
+                    with open(temp_file, "w") as output_file:
+                        wr = csv.writer(output_file)
+
+                        # write header
+                        wr.writerow(
+                            [
+                                "platform",
+                                "region",
+                                "service",
+                                "resource",
+                                "resource_id",
+                                "action",
+                                "timestamp",
+                                "is_dry_run",
+                            ]
+                        )
+
+                        # write each action
+                        for platform, platform_dict in resource_tree.items():
+                            for region, region_dict in platform_dict.items():
+                                for service, service_dict in region_dict.items():
+                                    for resource in service_dict:
+                                        for action in service_dict.get(resource):
+                                            wr.writerow(
+                                                [
+                                                    platform,
+                                                    region,
+                                                    service,
+                                                    resource,
+                                                    action["id"],
+                                                    action["action"],
+                                                    action["timestamp"],
+                                                    self.dry_run,
+                                                ]
+                                            )
+
                 except:
-                    self.logging.error("Could not generate resource tree.")
+                    self.logging.error("Could not generate actions taken.")
+                    self.logging.error(sys.exc_info()[1])
                     return False
 
                 client = boto3.client("s3")
-                bucket = os.environ["RESOURCETREEBUCKET"]
-                key = "resource_tree_%s.txt" % datetime.datetime.now().strftime(
+                bucket = os.environ["ACTIONSTAKENBUCKET"]
+                key = "actions_taken_%s.txt" % datetime.datetime.now().strftime(
                     "%Y_%m_%d_%H_%M_%S"
                 )
 
@@ -346,7 +351,7 @@ class Cleanup:
                     return False
 
                 self.logging.info(
-                    f"Resource tree has been built and uploaded to S3 's3://{bucket}/{key}."
+                    f"Actions taken has been built and uploaded to S3 's3://{bucket}/{key}."
                 )
             finally:
                 os.remove(temp_file)
@@ -380,5 +385,5 @@ def lambda_handler(event, context):
     # run cleanup
     cleanup.run_cleanup()
 
-    # build resource tree
-    cleanup.build_tree(cleanup.resource_tree)
+    # export actions taken
+    cleanup.export_actions_taken(cleanup.resource_tree)

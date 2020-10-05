@@ -15,7 +15,7 @@
   },
   {
     "resource_id": {
-      "S": "cloudformation:stack:auto-cleanup-production"
+      "S": "cloudformation:stack:auto-cleanup-prod"
     },
     "comment": {
       "S": "Auto Cleanup production CloudFormation stack"
@@ -71,7 +71,7 @@
   },
   {
     "resource_id": {
-      "S": "dynamodb:table:auto-cleanup-logs-production"
+      "S": "dynamodb:table:auto-cleanup-logs-prod"
     },
     "comment": {
       "S": "DynamoDB production logs table"
@@ -85,7 +85,7 @@
   },
   {
     "resource_id": {
-      "S": "dynamodb:table:auto-cleanup-settings-production"
+      "S": "dynamodb:table:auto-cleanup-settings-prod"
     },
     "comment": {
       "S": "DynamoDB production settings table"
@@ -99,7 +99,7 @@
   },
   {
     "resource_id": {
-      "S": "dynamodb:table:auto-cleanup-whitelist-production"
+      "S": "dynamodb:table:auto-cleanup-whitelist-prod"
     },
     "comment": {
       "S": "DynamoDB production whitelist table"
@@ -127,7 +127,7 @@
   },
   {
     "resource_id": {
-      "S": "lambda:function:auto-cleanup-production"
+      "S": "lambda:function:auto-cleanup-prod"
     },
     "comment": {
       "S": "Auto Cleanup production Lambda function"

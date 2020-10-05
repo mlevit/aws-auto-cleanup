@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 import boto3
 
@@ -56,6 +57,7 @@ class EMRCleanup:
                     resource.get("Status").get("Timeline").get("CreationDateTime")
                 )
                 resource_status = resource.get("Status").get("State")
+                resource_action = "skip"
 
                 if resource_id not in self.whitelist.get("emr", {}).get("cluster", []):
                     delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
@@ -74,30 +76,43 @@ class EMRCleanup:
                                         f"Could not delete EMR Cluster '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
                                     continue
 
                             self.logging.info(
                                 f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
                                 "and has been deleted."
                             )
+                            resource_action = "delete"
                         else:
                             self.logging.debug(
                                 f"EMR Cluster '%s' in state '%s' cannot be deleted."
                                 % (resource_id, resource_status)
                             )
+                            resource_action = "error"
                     else:
                         self.logging.debug(
                             f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
+                        resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
                         f"EMR Cluster '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EMR", {}
-                ).setdefault("Clusters", []).append(resource_id)
+                ).setdefault("Clusters", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
             return True
         else:
             self.logging.info("Skipping cleanup of EMR Clusters.")
