@@ -19,7 +19,6 @@ custom:
     prompt: false
     buckets:
       - ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
-      - ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
 
 provider:
   name: aws
