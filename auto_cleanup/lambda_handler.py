@@ -271,13 +271,10 @@ class Cleanup:
             for whitelist in whitelist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ["WHITELISTTABLE"],
-                        Item=whitelist,
-                        # ConditionExpression="attribute_not_exists(resource_id) AND attribute_not_exists(expire_at)",
+                        TableName=os.environ["WHITELISTTABLE"], Item=whitelist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
-                    # self.logging.debug(traceback.print_stack())
                     continue
 
             settings_data.close()
@@ -298,9 +295,7 @@ class Cleanup:
                 _, temp_file = tempfile.mkstemp()
 
                 try:
-                    with open(
-                        temp_file, "w"
-                    ) as output_file:  # Just use 'w' mode in 3.x
+                    with open(temp_file, "w") as output_file:
                         wr = csv.writer(output_file)
 
                         # write header
@@ -317,6 +312,7 @@ class Cleanup:
                             ]
                         )
 
+                        # write each action
                         for platform, platform_dict in resource_tree.items():
                             for region, region_dict in platform_dict.items():
                                 for service, service_dict in region_dict.items():
@@ -338,7 +334,6 @@ class Cleanup:
                 except:
                     self.logging.error("Could not generate actions taken.")
                     self.logging.error(sys.exc_info()[1])
-                    # self.logging.debug(traceback.print_stack())
                     return False
 
                 client = boto3.client("s3")
