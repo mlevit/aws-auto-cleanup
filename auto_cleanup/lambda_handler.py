@@ -366,80 +366,6 @@ class Cleanup:
             self.logging.error(sys.exc_info()[1])
             return False
 
-    def build_tree(self, resource_tree):
-        """
-        Build ASCI tree and upload to S3.
-        """
-
-        try:
-            os.chdir(tempfile.gettempdir())
-            tree = Tree()
-
-            for aws in resource_tree:
-                aws_key = aws
-                tree.create_node(aws, aws_key)
-
-                for region in resource_tree.get(aws):
-                    region_key = aws_key + region
-                    tree.create_node(region, region_key, parent=aws_key)
-
-                    for service in resource_tree.get(aws).get(region):
-                        service_key = region_key + service
-                        tree.create_node(service, service_key, parent=region_key)
-
-                        for resource_type in (
-                            resource_tree.get(aws).get(region).get(service)
-                        ):
-                            resource_type_key = service_key + resource_type
-                            tree.create_node(
-                                resource_type, resource_type_key, parent=service_key
-                            )
-
-                            for resource in (
-                                resource_tree.get(aws)
-                                .get(region)
-                                .get(service)
-                                .get(resource_type)
-                            ):
-                                resource_key = resource_type_key + resource
-                                tree.create_node(
-                                    resource, resource_key, parent=resource_type_key
-                                )
-
-            try:
-                _, temp_file = tempfile.mkstemp()
-
-                try:
-                    tree.save2file(temp_file)
-                except:
-                    self.logging.error("Could not generate resource tree.")
-                    return False
-
-                client = boto3.client("s3")
-                bucket = os.environ["RESOURCETREEBUCKET"]
-                key = "resource_tree_%s.txt" % datetime.datetime.now().strftime(
-                    "%Y_%m_%d_%H_%M_%S"
-                )
-
-                try:
-                    client.upload_file(temp_file, bucket, key)
-                except:
-                    self.logging.error(
-                        f"Could not upload resource tree to S3 's3://{bucket}/{key}."
-                    )
-                    return False
-
-                self.logging.info(
-                    f"Resource tree has been built and uploaded to S3 's3://{bucket}/{key}."
-                )
-            finally:
-                os.remove(temp_file)
-            return True
-        except:
-            self.logging.error("Could not generate resource tree.")
-            self.logging.error(sys.exc_info()[1])
-            return False
-
 
 def lambda_handler(event, context):
     # enable logging
@@ -463,9 +389,6 @@ def lambda_handler(event, context):
 
     # run cleanup
     cleanup.run_cleanup()
-
-    # build resource tree
-    # cleanup.build_tree(cleanup.resource_tree)
 
     # export actions taken
     cleanup.export_actions_taken(cleanup.resource_tree)

@@ -140,7 +140,6 @@ functions:
     environment:
       LOGLEVEL: ${self:custom.log_level}
       ACTIONSTAKENBUCKET: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
-      RESOURCETREEBUCKET: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
@@ -187,10 +186,6 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
-    ResourceTreeBuckett:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:service}-${self:provider.stage}-resourcetreebucket-${self:custom.company}
     AutoCleanupDatabase:
       Type: "AWS::Glue::Database"
       Properties:
