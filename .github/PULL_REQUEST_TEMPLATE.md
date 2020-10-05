@@ -15,10 +15,10 @@ A clear and concise description of what the pull request is.
 
 ### Development
 
-- [ ] Have you deployed your changes to AWS and triggeed an AWS Config compliance rule change?
+- [ ] Have you deployed your changes to AWS and triggered an AWS Config compliance rule change?
 - [ ] Have you added comments to all relevant changes within the code?
 - [ ] Have you lint your code locally prior to submission?
-- [ ] Have you formatted (Pythn Black and Prettier) your code locally prior to submission?
+- [ ] Have you formatted (Python Black and Prettier) your code locally prior to submission?
 
 ### Testing
 
