@@ -134,7 +134,7 @@ class CloudFormationCleanup:
                         ).add(id)
 
                         self.logging.debug(
-                            f"{service} {resource} has been added to the Whitelist."
+                            f"{service} {resource} '{resource_id}' has been added to the whitelist."
                         )
             return True
         else:
