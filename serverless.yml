@@ -9,11 +9,11 @@ custom:
       [
         "docutils",
         "jmespath",
+        "pip",
         "python-dateutil",
         "s3transfer",
-        "six",
-        "pip",
         "setuptools",
+        "six",
       ]
   remover:
     prompt: false
@@ -75,8 +75,8 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
-        - glue:GetDevEndpoints
         - glue:DeleteDevEndPoint
+        - glue:GetDevEndpoints
       Resource: "*"
     - Effect: Allow
       Action:
