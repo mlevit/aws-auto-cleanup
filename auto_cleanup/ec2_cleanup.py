@@ -442,7 +442,7 @@ class EC2Cleanup:
                             f"EC2 Snapshot '{resource_id}' is currently used by an AMI "
                             "and cannot been deleted without deleting the AMI first."
                         )
-                        resource_action = "skip - whitelist"
+                        resource_action = "skip"
                 else:
                     self.logging.debug(
                         f"EC2 Snapshot '{resource_id}' has been whitelisted and has not been deleted."
