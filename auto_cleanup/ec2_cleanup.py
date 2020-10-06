@@ -105,7 +105,7 @@ class EC2Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Addresse", []).append(
+                ).setdefault("Address", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
