@@ -200,8 +200,8 @@ class Cleanup:
                 )
 
                 whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
-                    parsed_resource_id.get("resource_type"), []
-                ).append(parsed_resource_id.get("resource"))
+                    parsed_resource_id.get("resource_type"), set()
+                ).add(parsed_resource_id.get("resource"))
         except:
             self.logging.error(
                 f"Could not read DynamoDB table '{os.environ['WHITELISTTABLE']}'."
