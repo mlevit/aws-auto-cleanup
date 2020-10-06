@@ -87,7 +87,7 @@ class RedshiftCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            self.logging.debug(
+                            self.logging.error(
                                 f"Redshift Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
                             resource_action = "error"
@@ -180,8 +180,7 @@ class RedshiftCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            print("dry run")
-                            self.logging.debug(
+                            self.logging.error(
                                 f"Redshift Snapshot '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
                             resource_action = "error"

@@ -85,7 +85,7 @@ class EMRCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            self.logging.debug(
+                            self.logging.error(
                                 f"EMR Cluster '%s' in state '%s' cannot be deleted."
                                 % (resource_id, resource_status)
                             )
