@@ -161,13 +161,13 @@ Table includes the `clean` attribute which informs Auto Cleanup if the service s
 |                   | Volumes         | True  | 7   |
 | Elastic Beanstalk | Applications    | True  | 7   |
 | EMR               | Clusters        | True  | 7   |
-| IAM               | Roles           | True  | 7   |
-| Lambda            | Functions       | True  | 7   |
+| IAM               | Roles           | True  | 30  |
+| Lambda            | Functions       | True  | 30  |
 | RDS               | Instances       | True  | 7   |
 |                   | Snapshots       | True  | 7   |
 | Redshift          | Clusters        | True  | 7   |
 |                   | Snapshots       | True  | 7   |
-| S3                | Buckets         | True  | 7   |
+| S3                | Buckets         | True  | 30  |
 
 #### Regions
 
@@ -242,6 +242,8 @@ The below table lists the resource attribute that should be used for unique iden
 | RDS Instances                  | DB Instance Identifier | `rds:instance:my_rds_instance`                 |
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
+
+_Note:_ Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions.
 
 ## Actions Taken
 

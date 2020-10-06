@@ -33,6 +33,7 @@ provider:
       Action:
         - cloudformation:DeleteStack
         - cloudformation:DescribeStacks
+        - cloudformation:DescribeStackResources
       Resource: "*"
     - Effect: Allow
       Action:
