@@ -304,10 +304,11 @@ class EC2Cleanup:
                 return False
 
             for resource in resources:
+                resource_action = "skip"
+
                 if resource not in self.whitelist.get("ec2", {}).get(
                     "security_group", []
                 ):
-                    resource_action = "skip"
                     if not self.settings.get("general", {}).get("dry_run", True):
                         try:
                             self.client_ec2.delete_security_group(GroupId=resource)
