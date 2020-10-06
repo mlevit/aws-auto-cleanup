@@ -133,7 +133,7 @@ functions:
     handler: auto_cleanup.lambda_handler.lambda_handler
     name: ${self:service}-${self:provider.stage}
     description: Auto Cleanup removes unused AWS resources
-    memorySize: 128
+    memorySize: 256
     timeout: 300
     package:
       include:
@@ -164,9 +164,7 @@ resources:
         KeySchema:
           - AttributeName: key
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
     WhitelistTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -184,9 +182,7 @@ resources:
         TimeToLiveSpecification:
           AttributeName: expire_at
           Enabled: true
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
     ActionsTakenBuckett:
       Type: AWS::S3::Bucket
       Properties:
