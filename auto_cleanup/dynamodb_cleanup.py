@@ -93,7 +93,7 @@ class DynamoDBCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "DynamoDB", {}
-                ).setdefault("Tables", []).append(
+                ).setdefault("Table", []).append(
                     {
                         "id": resource,
                         "action": resource_action,

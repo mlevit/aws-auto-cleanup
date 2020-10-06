@@ -96,7 +96,7 @@ class LambdaCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Lambda", {}
-                ).setdefault("Functions", []).append(
+                ).setdefault("Function", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

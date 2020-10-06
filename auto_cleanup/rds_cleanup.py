@@ -117,7 +117,7 @@ class RDSCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
-                ).setdefault("Instances", []).append(
+                ).setdefault("Instance", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -198,7 +198,7 @@ class RDSCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
-                ).setdefault("Snapshots", []).append(
+                ).setdefault("Snapshot", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

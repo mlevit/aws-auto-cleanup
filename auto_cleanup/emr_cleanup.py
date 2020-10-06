@@ -104,7 +104,7 @@ class EMRCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EMR", {}
-                ).setdefault("Clusters", []).append(
+                ).setdefault("Cluster", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
