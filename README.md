@@ -52,13 +52,7 @@ cd aws-auto-cleanup
 
 ```bash
 serverless plugin install --name serverless-python-requirements
-```
-
-```bash
 npm install serverless-iam-roles-per-function
-```
-
-```bash
 npm install serverless-s3-remover
 ```
 
@@ -71,13 +65,13 @@ serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 10. Invoke Auto Cleanup for the first time to create the necessary AWS Config rules and settings
 
 ```bash
-serverless invoke --function AutoCleanup [--region <AWS region>] [--stage <dev/prod>] [--aws-profile <AWS CLI profile>] --type Event
+serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>] --type Event
 ```
 
 11. Check Auto Cleanup logs
 
 ```bash
-serverless logs --function AutoCleanup [--region <AWS region>] [--stage <dev/prod>] [--aws-profile <AWS CLI profile>]
+serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 ```
 
 ### Removal
