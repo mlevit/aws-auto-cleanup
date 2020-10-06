@@ -69,7 +69,7 @@ class GlueCleanup:
                                 )
                             except:
                                 self.logging.error(
-                                    f"Could not delete glue Dev Endpoint '{resource_id}'."
+                                    f"Could not delete Glue Dev Endpoint '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "error"
