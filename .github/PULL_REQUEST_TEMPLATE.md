@@ -10,12 +10,11 @@ A clear and concise description of what the pull request is.
 
 ### Generic
 
-- [ ] Have you followed the guidelines in our [Contributing](https://github.com/servian/aws-auto-remediate/blob/master/CONTRIBUTING.md) document?
-- [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/servian/aws-auto-remediate/pulls) for the same update/change?
+- [ ] Have you followed the guidelines in our [Contributing](https://github.com/servian/aws-auto-cleanup/blob/master/CONTRIBUTING.md) document?
+- [ ] Have you checked to ensure there aren't other open [Pull Requests](https://github.com/servian/aws-auto-cleanup/pulls) for the same update/change?
 
 ### Development
 
-- [ ] Have you deployed your changes to AWS and triggered an AWS Config compliance rule change?
 - [ ] Have you added comments to all relevant changes within the code?
 - [ ] Have you lint your code locally prior to submission?
 - [ ] Have you formatted (Python Black and Prettier) your code locally prior to submission?
@@ -24,7 +23,7 @@ A clear and concise description of what the pull request is.
 
 - [ ] Have you created new tests for your submission?
 - [ ] Does your submission pass all tests?
-- [ ] Does your submission improve or at the very least keep code coverage at the same percentage?
+- [ ] Does your submission improve or at the very least kept code coverage at the same percentage?
 
 ### Documentation
 
