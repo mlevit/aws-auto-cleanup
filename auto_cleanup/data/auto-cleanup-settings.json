@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "0.10"
+      "N": "1"
     }
   },
   {
@@ -118,6 +118,20 @@
         "emr": {
           "M": {
             "clusters": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "glue": {
+          "M": {
+            "dev_endpoints": {
               "M": {
                 "clean": {
                   "BOOL": true

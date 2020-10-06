@@ -126,15 +126,15 @@ class CloudFormationCleanup:
                         return False
 
                     for _ in resource_details:
-                        id = _.get("PhysicalResourceId")
+                        resource_child_id = _.get("PhysicalResourceId")
                         platform, service, resource = _.get("ResourceType").split("::")
 
                         self.whitelist.setdefault(service.lower(), {}).setdefault(
                             resource.lower(), set()
-                        ).add(id)
+                        ).add(resource_child_id)
 
                         self.logging.debug(
-                            f"{service} {resource} has been added to the Whitelist."
+                            f"{service} {resource} '{resource_child_id}' has been added to the whitelist."
                         )
             return True
         else:

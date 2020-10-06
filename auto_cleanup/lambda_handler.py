@@ -18,6 +18,7 @@ from . import (
     ec2_cleanup,
     elasticbeanstalk_cleanup,
     emr_cleanup,
+    glue_cleanup,
     iam_cleanup,
     lambda_cleanup,
     lambda_helper,
@@ -96,6 +97,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=emr_class.run, args=())
+                threads.append(thread)
+
+                # Glue
+                glue_class = glue_cleanup.GlueCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.resource_tree,
+                    region,
+                )
+                thread = threading.Thread(target=glue_class.run, args=())
                 threads.append(thread)
 
                 # Lambda
