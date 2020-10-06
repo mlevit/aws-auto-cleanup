@@ -75,6 +75,11 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - glue:GetDevEndpoints
+        - glue:DeleteDevEndPoint
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - iam:DeleteInstanceProfile
         - iam:DeleteRole
         - iam:DeleteRolePolicy
