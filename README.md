@@ -243,6 +243,8 @@ The below table lists the resource attribute that should be used for unique iden
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
 
+_Note:_ Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions.
+
 ## Actions Taken
 
 Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `actionstaken` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `actions_taken` Glue Table have been created for the purpose of querying the data via Amazon Athena.
