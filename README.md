@@ -161,13 +161,13 @@ Table includes the `clean` attribute which informs Auto Cleanup if the service s
 |                   | Volumes         | True  | 7   |
 | Elastic Beanstalk | Applications    | True  | 7   |
 | EMR               | Clusters        | True  | 7   |
-| IAM               | Roles           | True  | 7   |
-| Lambda            | Functions       | True  | 7   |
+| IAM               | Roles           | True  | 30  |
+| Lambda            | Functions       | True  | 30  |
 | RDS               | Instances       | True  | 7   |
 |                   | Snapshots       | True  | 7   |
 | Redshift          | Clusters        | True  | 7   |
 |                   | Snapshots       | True  | 7   |
-| S3                | Buckets         | True  | 7   |
+| S3                | Buckets         | True  | 30  |
 
 #### Regions
 
