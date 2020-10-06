@@ -109,6 +109,33 @@ class CloudFormationCleanup:
                         ),
                     }
                 )
+
+                # For CloudFormation Stacks that are not deleted, add all physical
+                # resources into the Whitelist dictionary to prevent the need to whitelist
+                # each and every resource
+                if resource_action != "delete":
+                    try:
+                        resource_details = self.client_cloudformation.describe_stack_resources(
+                            StackName=resource_id
+                        ).get(
+                            "StackResources"
+                        )
+                    except:
+                        self.logging.error("Could not Describe Stack Resources.")
+                        self.logging.error(sys.exc_info()[1])
+                        return False
+
+                    for _ in resource_details:
+                        id = _.get("PhysicalResourceId")
+                        platform, service, resource = _.get("ResourceType").split("::")
+
+                        self.whitelist.setdefault(service.lower(), {}).setdefault(
+                            resource.lower(), set()
+                        ).add(id)
+
+                        self.logging.debug(
+                            f"{service} {resource} has been added to the Whitelist."
+                        )
             return True
         else:
             self.logging.info("Skipping cleanup of CloudFormation Stacks.")
