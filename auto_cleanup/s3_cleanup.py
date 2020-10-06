@@ -190,7 +190,7 @@ class S3Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "S3", {}
-                ).setdefault("Buckets", []).append(
+                ).setdefault("Bucket", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

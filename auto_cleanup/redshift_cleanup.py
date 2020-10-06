@@ -105,7 +105,7 @@ class RedshiftCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
-                ).setdefault("Clusters", []).append(
+                ).setdefault("Cluster", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -199,7 +199,7 @@ class RedshiftCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
-                ).setdefault("Snapshots", []).append(
+                ).setdefault("Snapshot", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

@@ -105,7 +105,7 @@ class EC2Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Addresses", []).append(
+                ).setdefault("Address", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -252,7 +252,7 @@ class EC2Cleanup:
 
                     self.resource_tree.get("AWS").setdefault(
                         self.region, {}
-                    ).setdefault("EC2", {}).setdefault("Instances", []).append(
+                    ).setdefault("EC2", {}).setdefault("Instance", []).append(
                         {
                             "id": resource_id,
                             "action": resource_action,
@@ -333,7 +333,7 @@ class EC2Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Security Groups", []).append(
+                ).setdefault("Security Group", []).append(
                     {
                         "id": resource,
                         "action": resource_action,
@@ -450,7 +450,7 @@ class EC2Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Snapshots", []).append(
+                ).setdefault("Snapshot", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -537,7 +537,7 @@ class EC2Cleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
-                ).setdefault("Volumes", []).append(
+                ).setdefault("Volume", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

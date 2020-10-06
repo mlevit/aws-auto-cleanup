@@ -100,7 +100,7 @@ class CloudFormationCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "CloudFormation", {}
-                ).setdefault("Stacks", []).append(
+                ).setdefault("Stack", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

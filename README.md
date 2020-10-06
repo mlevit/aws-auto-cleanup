@@ -254,7 +254,7 @@ The `actions_taken` table has the following schema:
 | platform    | string    | Always `AWS`                                                                                        |
 | region      | string    | Region (e.g. `ap-southeast-2`)                                                                      |
 | service     | string    | Service (e.g., `S3`)                                                                                |
-| resource    | string    | Resource (e.g., `Buckets`)                                                                          |
+| resource    | string    | Resource (e.g., `Bucket`)                                                                           |
 | resource_id | string    | Resource ID (e.g., ARN)                                                                             |
 | action      | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
 | timestamp   | timestamp | Timestamp when action was performed                                                                 |

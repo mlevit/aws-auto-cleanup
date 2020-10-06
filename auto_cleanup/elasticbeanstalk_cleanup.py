@@ -99,7 +99,7 @@ class ElasticBeanstalkCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "Elastic Beanstalk", {}
-                ).setdefault("Applications", []).append(
+                ).setdefault("Application", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

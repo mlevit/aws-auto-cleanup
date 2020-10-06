@@ -302,7 +302,7 @@ class IAMCleanup:
 
                 self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
                     "IAM", {}
-                ).setdefault("Roles", []).append(
+                ).setdefault("Role", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
