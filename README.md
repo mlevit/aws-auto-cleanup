@@ -6,7 +6,7 @@
 
 ![Language](https://img.shields.io/github/languages/top/servian/aws-auto-cleanup.svg) [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com) [![Python Black](https://img.shields.io/badge/code%20style-black-000000.svg?label=Python%20code%20style)](https://github.com/python/black) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?label=Markdown%2FYAML%20code%20style)](https://github.com/prettier/prettier)
 
-Open source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings.
+Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings.
 
 ## Table of Contents
 
@@ -148,7 +148,7 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 #### Services
 
-Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned up or not and the `ttl` attribute which stores the time to live number of days for that service resource type pair.
+Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned and the `ttl` attribute which stores the time to live in days for that service resource pair.
 
 | Service           | Resource Type   | Clean | TTL |
 | ----------------- | --------------- | ----- | --- |
@@ -161,6 +161,7 @@ Table includes the `clean` attribute which informs Auto Cleanup if the service s
 |                   | Volumes         | True  | 7   |
 | Elastic Beanstalk | Applications    | True  | 7   |
 | EMR               | Clusters        | True  | 7   |
+| Glue              | Dev Endpoints   | True  | 7   |
 | IAM               | Roles           | True  | 30  |
 | Lambda            | Functions       | True  | 30  |
 | RDS               | Instances       | True  | 7   |
@@ -211,7 +212,7 @@ At any time, you may modify the time to live settings for any service resource t
 
 The Whitelist table allows users to add their resources to prevent removal.
 
-The Whitelist table as the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself:
+The Whitelist table as the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself.
 
 | Column      | Format                                      | Description                                                                                                                                                   |
 | ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -235,6 +236,7 @@ The below table lists the resource attribute that should be used for unique iden
 | EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:my-app`          |
 | EMR Clusters                   | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
+| Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:my_endpoint`                |
 | IAM Roles                      | Role Name              | `iam:role:auto-cleanup-role`                   |
 | Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:my_cluster`                 |
@@ -247,7 +249,7 @@ _Note:_ Resources that are a part of a CloudFormation Stack will be automaticall
 
 ## Actions Taken
 
-Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `actionstaken` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `actions_taken` Glue Table have been created for the purpose of querying the data via Amazon Athena.
+Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `actionstaken` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `actions_taken` Glue Table have been created to query the data via Amazon Athena.
 
 The `actions_taken` table has the following schema:
 
