@@ -33,7 +33,7 @@ class EMRCleanup:
         clean = (
             self.settings.get("services", {})
             .get("emr", {})
-            .get("clusters", {})
+            .get("cluster", {})
             .get("clean", False)
         )
         if clean:
@@ -47,7 +47,7 @@ class EMRCleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("emr", {})
-                .get("clusters", {})
+                .get("cluster", {})
                 .get("ttl", 7)
             )
 

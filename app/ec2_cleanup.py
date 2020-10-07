@@ -55,7 +55,7 @@ class EC2Cleanup:
         clean = (
             self.settings.get("services", {})
             .get("ec2", {})
-            .get("addresses", {})
+            .get("address", {})
             .get("clean", False)
         )
         if clean:
@@ -129,7 +129,7 @@ class EC2Cleanup:
         clean = (
             self.settings.get("services", {})
             .get("ec2", {})
-            .get("instances", {})
+            .get("instance", {})
             .get("clean", False)
         )
         if clean:
@@ -143,7 +143,7 @@ class EC2Cleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("ec2", {})
-                .get("instances", {})
+                .get("instance", {})
                 .get("ttl", 7)
             )
 
@@ -274,7 +274,7 @@ class EC2Cleanup:
         clean = (
             self.settings.get("services", {})
             .get("ec2", {})
-            .get("security_groups", {})
+            .get("security_group", {})
             .get("clean", False)
         )
         if clean:
@@ -356,7 +356,7 @@ class EC2Cleanup:
         clean = (
             self.settings.get("services", {})
             .get("ec2", {})
-            .get("snapshots", {})
+            .get("snapshot", {})
             .get("clean", False)
         )
         if clean:
@@ -372,7 +372,7 @@ class EC2Cleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("ec2", {})
-                .get("snapshots", {})
+                .get("snapshot", {})
                 .get("ttl", 7)
             )
 
@@ -473,7 +473,7 @@ class EC2Cleanup:
         clean = (
             self.settings.get("services", {})
             .get("ec2", {})
-            .get("volumes", {})
+            .get("volume", {})
             .get("clean", False)
         )
         if clean:
@@ -487,7 +487,7 @@ class EC2Cleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("ec2", {})
-                .get("volumes", {})
+                .get("volume", {})
                 .get("ttl", 7)
             )
 

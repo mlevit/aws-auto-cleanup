@@ -34,7 +34,7 @@ class LambdaCleanup:
         clean = (
             self.settings.get("services", {})
             .get("lambda", {})
-            .get("functions", {})
+            .get("function", {})
             .get("clean", False)
         )
         if clean:
@@ -48,7 +48,7 @@ class LambdaCleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("lambda", {})
-                .get("functions", {})
+                .get("function", {})
                 .get("ttl", 7)
             )
 

@@ -33,7 +33,7 @@ class GlueCleanup:
         clean = (
             self.settings.get("services", {})
             .get("glue", {})
-            .get("dev_endpoints", {})
+            .get("dev_endpoint", {})
             .get("clean", False)
         )
         if clean:
@@ -47,7 +47,7 @@ class GlueCleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("glue", {})
-                .get("dev_endpoints", {})
+                .get("dev_endpoint", {})
                 .get("ttl", 7)
             )
 

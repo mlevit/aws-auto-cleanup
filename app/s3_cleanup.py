@@ -34,7 +34,7 @@ class S3Cleanup:
         clean = (
             self.settings.get("services", {})
             .get("s3", {})
-            .get("buckets", {})
+            .get("bucket", {})
             .get("clean", False)
         )
         if clean:
@@ -48,7 +48,7 @@ class S3Cleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("s3", {})
-                .get("buckets", {})
+                .get("bucket", {})
                 .get("ttl", 7)
             )
 

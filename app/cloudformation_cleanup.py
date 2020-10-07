@@ -35,7 +35,7 @@ class CloudFormationCleanup:
         clean = (
             self.settings.get("services", {})
             .get("cloudformation", {})
-            .get("stacks", {})
+            .get("stack", {})
             .get("clean", False)
         )
         if clean:
@@ -49,7 +49,7 @@ class CloudFormationCleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("cloudformation", {})
-                .get("stacks", {})
+                .get("stack", {})
                 .get("ttl", 7)
             )
 

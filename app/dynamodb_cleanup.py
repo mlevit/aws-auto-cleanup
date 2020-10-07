@@ -33,7 +33,7 @@ class DynamoDBCleanup:
         clean = (
             self.settings.get("services", {})
             .get("dynamodb", {})
-            .get("tables", {})
+            .get("table", {})
             .get("clean", False)
         )
         if clean:
@@ -47,7 +47,7 @@ class DynamoDBCleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("dynamodb", {})
-                .get("tables", {})
+                .get("table", {})
                 .get("ttl", 7)
             )
 
