@@ -17,14 +17,14 @@ def lambda_handler(event, context):
         for resource in resources:
             item = {}
             for key, value in resource.items():
-                if key == "expire_at":
+                item[key] = str(deserializer.deserialize(value))
+
+                if key == "expiration":
                     # convert EPOCH timestamp to a human readable one
-                    item[key] = time.strftime(
+                    item["expiration_human"] = time.strftime(
                         "%Y-%m-%d %H:%M:%S",
                         time.localtime(deserializer.deserialize(value)),
                     )
-                else:
-                    item[key] = deserializer.deserialize(value)
 
             body.append(item)
 
