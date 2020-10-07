@@ -115,10 +115,10 @@ class CloudFormationCleanup:
                 # each and every resource
                 if resource_action != "delete":
                     try:
-                        resource_details = self.client_cloudformation.describe_stack_resources(
-                            StackName=resource_id
-                        ).get(
-                            "StackResources"
+                        resource_details = (
+                            self.client_cloudformation.describe_stack_resources(
+                                StackName=resource_id
+                            ).get("StackResources")
                         )
                     except:
                         self.logging.error("Could not Describe Stack Resources.")

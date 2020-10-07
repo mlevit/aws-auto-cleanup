@@ -67,8 +67,10 @@ class IAMCleanup:
                     if delta.days > ttl_days:
                         # check when the role was last accessed
                         try:
-                            gen_last_accessed = self.client_iam.generate_service_last_accessed_details(
-                                Arn=resource_arn
+                            gen_last_accessed = (
+                                self.client_iam.generate_service_last_accessed_details(
+                                    Arn=resource_arn
+                                )
                             )
                         except:
                             self.logging.error(
@@ -79,8 +81,10 @@ class IAMCleanup:
                             continue
 
                         try:
-                            get_last_accessed = self.client_iam.get_service_last_accessed_details(
-                                JobId=gen_last_accessed.get("JobId")
+                            get_last_accessed = (
+                                self.client_iam.get_service_last_accessed_details(
+                                    JobId=gen_last_accessed.get("JobId")
+                                )
                             )
                         except:
                             self.logging.error(
@@ -117,8 +121,8 @@ class IAMCleanup:
                                 return False
 
                         if get_last_accessed.get("JobStatus") == "COMPLETED":
-                            last_accessed = datetime.datetime.now() - datetime.timedelta(
-                                days=365
+                            last_accessed = (
+                                datetime.datetime.now() - datetime.timedelta(days=365)
                             )
 
                             for service in get_last_accessed.get(
@@ -176,8 +180,10 @@ class IAMCleanup:
 
                                     # detach all managed policies
                                     try:
-                                        policies = self.client_iam.list_attached_role_policies(
-                                            RoleName=resource_id
+                                        policies = (
+                                            self.client_iam.list_attached_role_policies(
+                                                RoleName=resource_id
+                                            )
                                         )
                                     except:
                                         self.logging.error(

@@ -78,12 +78,14 @@ class Cleanup:
                 threads.append(thread)
 
                 # Elastic Beanstalk
-                elasticbeanstalk_class = elasticbeanstalk_cleanup.ElasticBeanstalkCleanup(
-                    self.logging,
-                    self.whitelist,
-                    self.settings,
-                    self.resource_tree,
-                    region,
+                elasticbeanstalk_class = (
+                    elasticbeanstalk_cleanup.ElasticBeanstalkCleanup(
+                        self.logging,
+                        self.whitelist,
+                        self.settings,
+                        self.resource_tree,
+                        region,
+                    )
                 )
                 thread = threading.Thread(target=elasticbeanstalk_class.run, args=())
                 threads.append(thread)
