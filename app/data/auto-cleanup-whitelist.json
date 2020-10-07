@@ -6,10 +6,10 @@
     "comment": {
       "S": "Auto Cleanup development CloudFormation stack"
     },
-    "expire_at": {
+    "expiration": {
       "N": "99999999999"
     },
-    "owner_email": {
+    "owner": {
       "S": "example@email.com"
     }
   },
@@ -20,10 +20,10 @@
     "comment": {
       "S": "Auto Cleanup production CloudFormation stack"
     },
-    "expire_at": {
+    "expiration": {
       "N": "99999999999"
     },
-    "owner_email": {
+    "owner": {
       "S": "example@email.com"
     }
   }
