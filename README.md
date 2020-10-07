@@ -211,9 +211,9 @@ The Whitelist table as the following schema and comes pre-populated with Auto Cl
 | Column      | Format                                      | Description                                                                                                                                                   |
 | ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource type>:<resource name>` | Unique identifier of the resource. This is a custom format base on the service (e.g., EC2, S3), the resource type (e.g., Instance, Bucket) and resource name. |
-| expire_at   | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date                                                                                                         |
+| expiration  | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date                                                                                                         |
 | comment     | Text field                                  | Comment field describing the resource and why it has been whitelisted                                                                                         |
-| owner_email | Email address                               | Email address of the resource owner in case they need to be contacted regarding the whitelisting                                                              |
+| owner       | Text field                                  | Email address or name of the resource owner in case they need to be contacted regarding the whitelisting                                                      |
 
 Adding resources to the Whitelist table will ensure those resources are not removed by Auto Cleanup.
 
@@ -257,3 +257,14 @@ The `actions_taken` table has the following schema:
 | action      | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
 | timestamp   | timestamp | Timestamp when action was performed                                                                 |
 | is_dry_run  | boolean   | Dry run activated                                                                                   |
+
+## Web Application
+
+### API
+
+A simple CRUD API has been built to work alongside the web application.
+
+- [Create Whitelist Entry](./web/docs/create_whitelist.md)
+- [Read Whitelist Entries](./web/docs/read_whitelist.md)
+- [Update Whitelist Entry](./web/docs/update_whitelist.md)
+- [Delete Whitelist Entry](./web/docs/delete_whitelist.md)
