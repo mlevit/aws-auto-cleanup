@@ -15,6 +15,7 @@ custom:
         "setuptools",
         "six",
       ]
+    slim: true
   remover:
     prompt: false
     buckets:
@@ -26,8 +27,6 @@ provider:
   stage: ${opt:stage, "prod"} # Override via CLI "--stage dev"
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # Override via CLI "--aws-profile saml"
-  environment:
-    PYTHONPATH: "/var/task/auto_cleanup:/var/task/boto3:/var/task/botocore:/var/task/dynamodb_json:/var/task/simplejson:/var/task/treelib:/var/runtime"
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -38,6 +37,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:BatchWriteItem
+        - dynamodb:DeleteItem
         - dynamodb:DeleteTable
         - dynamodb:DescribeTable
         - dynamodb:GetItem
@@ -130,20 +130,16 @@ package:
 
 functions:
   AutoCleanup:
-    handler: lambda_handler.lambda_handler
+    handler: main.lambda_handler
     module: app
     name: ${self:service}-${self:provider.stage}
-    description: Auto Cleanup removes unused AWS resources
+    description: Removes unused AWS resources based on time of creation
     memorySize: 256
     timeout: 300
     package:
       include:
-        # - auto-cleanup/**
-        # - data/**
-        # - dynamodb_json/**
-        # - simplejson/**
-        # - treelib/**
-        - "./app/**"
+        - app/data/**
+        - app/**.py
       exclude:
         - "**"
     environment:
@@ -164,7 +160,7 @@ functions:
     timeout: 30
     package:
       include:
-        - "./web/create_whitelist.py"
+        - web/create_whitelist.py
       exclude:
         - "**"
     environment:
@@ -172,7 +168,7 @@ functions:
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
-      - http: GET create
+      - http: POST create
   ReadWhitelist:
     handler: read_whitelist.lambda_handler
     module: web
@@ -182,10 +178,9 @@ functions:
     timeout: 30
     package:
       include:
-        - "./web/read_whitelist.py"
+        - web/read_whitelist.py
       exclude:
         - "**"
-        - "./web/dynamodb_json/**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
@@ -200,7 +195,7 @@ functions:
     timeout: 30
     package:
       include:
-        - "./web/update_whitelist.py"
+        - web/update_whitelist.py
       exclude:
         - "**"
     environment:
@@ -208,7 +203,24 @@ functions:
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
-      - http: GET update
+      - http: PUT update
+  DeleteWhitelist:
+    handler: delete_whitelist.lambda_handler
+    module: web
+    name: ${self:service}-${self:provider.stage}-delete-whitelist
+    description: Updates an existing whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - web/delete_whitelist.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+    events:
+      - http: DELETE delete
 
 resources:
   Resources:
@@ -230,15 +242,11 @@ resources:
         AttributeDefinitions:
           - AttributeName: resource_id
             AttributeType: S
-          - AttributeName: expire_at
-            AttributeType: N
         KeySchema:
           - AttributeName: resource_id
             KeyType: HASH
-          - AttributeName: expire_at
-            KeyType: RANGE
         TimeToLiveSpecification:
-          AttributeName: expire_at
+          AttributeName: expiration
           Enabled: true
         BillingMode: PAY_PER_REQUEST
     ActionsTakenBuckett:
