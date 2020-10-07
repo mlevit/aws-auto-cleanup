@@ -10,9 +10,18 @@ import traceback
 
 import boto3
 
-# from dynamodb_json import json_util as dynamodb_json
-
-import cloudformation_cleanup, dynamodb_cleanup, ec2_cleanup, elasticbeanstalk_cleanup, emr_cleanup, glue_cleanup, helper, iam_cleanup, lambda_cleanup, rds_cleanup, redshift_cleanup, s3_cleanup
+import cloudformation_cleanup
+import dynamodb_cleanup
+import ec2_cleanup
+import elasticbeanstalk_cleanup
+import emr_cleanup
+import glue_cleanup
+import helper
+import iam_cleanup
+import lambda_cleanup
+import rds_cleanup
+import redshift_cleanup
+import s3_cleanup
 
 
 class Cleanup:
@@ -196,13 +205,15 @@ class Cleanup:
                 TableName=os.environ["WHITELISTTABLE"]
             )["Items"]:
                 record_json = helper.Helper.unmarshal_dynamodb_json(record)
-                
+
                 try:
                     parsed_resource_id = helper.Helper.parse_resource_id(
                         record_json.get("resource_id")
                     )
                 except:
-                    self.logging.error(f"Resource ID '{record_json.get("resource_id")}' is invalid.")
+                    self.logging.error(
+                        f"""Resource ID '{record_json.get("resource_id")}' is invalid."""
+                    )
 
                 whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
                     parsed_resource_id.get("resource_type"), set()
