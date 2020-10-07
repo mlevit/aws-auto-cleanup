@@ -152,7 +152,7 @@ functions:
           rate: rate(3 days)
           enabled: true
   CreateWhitelist:
-    handler: create_whitelist.lambda_handler
+    handler: create_whitelist_entry.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-create-whitelist
     description: Creates a new whitelist entry
@@ -160,7 +160,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/create_whitelist.py
+        - web/create_whitelist_entry.py
       exclude:
         - "**"
     environment:
@@ -187,7 +187,7 @@ functions:
     events:
       - http: GET read
   UpdateWhitelist:
-    handler: update_whitelist.lambda_handler
+    handler: update_whitelist_entry.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-update-whitelist
     description: Updates an existing whitelist entry
@@ -195,7 +195,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/update_whitelist.py
+        - web/update_whitelist_entry.py
       exclude:
         - "**"
     environment:
@@ -205,7 +205,7 @@ functions:
     events:
       - http: PUT update
   DeleteWhitelist:
-    handler: delete_whitelist.lambda_handler
+    handler: delete_whitelist_entry.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-delete-whitelist
     description: Updates an existing whitelist entry
@@ -213,7 +213,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/delete_whitelist.py
+        - web/delete_whitelist_entry.py
       exclude:
         - "**"
     environment:

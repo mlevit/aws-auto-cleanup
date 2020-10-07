@@ -264,7 +264,7 @@ The `actions_taken` table has the following schema:
 
 A simple CRUD API has been built to work alongside the web application.
 
-- [Create Whitelist Entry](./web/docs/create_whitelist.md)
+- [Create Whitelist Entry](./web/docs/create_whitelist_entry.md)
 - [Read Whitelist Entries](./web/docs/read_whitelist.md)
-- [Update Whitelist Entry](./web/docs/update_whitelist.md)
-- [Delete Whitelist Entry](./web/docs/delete_whitelist.md)
+- [Update Whitelist Entry](./web/docs/update_whitelist_entry.md)
+- [Delete Whitelist Entry](./web/docs/delete_whitelist_entry.md)
