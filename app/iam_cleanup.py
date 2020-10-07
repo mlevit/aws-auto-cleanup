@@ -4,7 +4,7 @@ import time
 
 import boto3
 
-from . import lambda_helper
+import helper
 
 
 class IAMCleanup:
@@ -62,7 +62,7 @@ class IAMCleanup:
                     resource_id not in self.whitelist.get("iam", {}).get("role", [])
                     and "AWSServiceRoleFor" not in resource_id
                 ):
-                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
+                    delta = helper.Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         # check when the role was last accessed
@@ -132,16 +132,12 @@ class IAMCleanup:
                                     "LastAuthenticated", "1900-01-01 00:00:00"
                                 )
 
-                                if lambda_helper.LambdaHelper.convert_to_datetime(
+                                if helper.Helper.convert_to_datetime(
                                     service_date
-                                ) > lambda_helper.LambdaHelper.convert_to_datetime(
-                                    last_accessed
-                                ):
+                                ) > helper.Helper.convert_to_datetime(last_accessed):
                                     last_accessed = service_date
 
-                            delta = lambda_helper.LambdaHelper.get_day_delta(
-                                last_accessed
-                            )
+                            delta = helper.Helper.get_day_delta(last_accessed)
 
                             if delta.days > ttl_days:
                                 if not self.settings.get("general", {}).get(

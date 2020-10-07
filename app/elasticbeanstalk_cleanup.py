@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-from . import lambda_helper
+import helper
 
 
 class ElasticBeanstalkCleanup:
@@ -63,7 +63,7 @@ class ElasticBeanstalkCleanup:
                 if resource_id not in self.whitelist.get("elasticbeanstalk", {}).get(
                     "application", []
                 ):
-                    delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
+                    delta = helper.Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):

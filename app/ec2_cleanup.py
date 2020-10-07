@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-from . import lambda_helper
+import helper
 
 
 class EC2Cleanup:
@@ -157,7 +157,7 @@ class EC2Cleanup:
                     if resource_id not in self.whitelist.get("ec2", {}).get(
                         "instance", []
                     ):
-                        delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
+                        delta = helper.Helper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
                             if resource_state == "running":
@@ -409,7 +409,7 @@ class EC2Cleanup:
                         resource_id not in snapshots_in_use
                         and "for ami-" not in resource.get("Description")
                     ):
-                        delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
+                        delta = helper.Helper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
                             if not self.settings.get("general", {}).get(
@@ -498,7 +498,7 @@ class EC2Cleanup:
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
                     if resource.get("Attachments") == []:
-                        delta = lambda_helper.LambdaHelper.get_day_delta(resource_date)
+                        delta = helper.Helper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
                             if not self.settings.get("general", {}).get(
