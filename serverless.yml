@@ -154,7 +154,7 @@ functions:
   CreateWhitelist:
     handler: create_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-${self:provider.stage}-create-whitelist
+    name: ${self:service}-create-whitelist-${self:provider.stage}
     description: Creates a new whitelist entry
     memorySize: 128
     timeout: 30
@@ -168,11 +168,13 @@ functions:
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
-      - http: POST create
+      - http:
+          method: POST
+          path: /whitelist/entry
   ReadWhitelist:
     handler: read_whitelist.lambda_handler
     module: web
-    name: ${self:service}-${self:provider.stage}-read-whitelist
+    name: ${self:service}-read-whitelist-${self:provider.stage}
     description: Returns the entire whitelist
     memorySize: 128
     timeout: 30
@@ -185,11 +187,13 @@ functions:
       LOGLEVEL: ${self:custom.log_level}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
-      - http: GET read
+      - http:
+          method: GET
+          path: /whitelist
   UpdateWhitelist:
     handler: update_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-${self:provider.stage}-update-whitelist
+    name: ${self:service}-update-whitelist-${self:provider.stage}
     description: Updates an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -203,12 +207,14 @@ functions:
       SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
-      - http: PUT update
+      - http:
+          method: PUT
+          path: /whitelist/entry
   DeleteWhitelist:
     handler: delete_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-${self:provider.stage}-delete-whitelist
-    description: Updates an existing whitelist entry
+    name: ${self:service}-delete-whitelist-${self:provider.stage}
+    description: Deletes an existing whitelist entry
     memorySize: 128
     timeout: 30
     package:
@@ -220,7 +226,9 @@ functions:
       LOGLEVEL: ${self:custom.log_level}
       WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
     events:
-      - http: DELETE delete
+      - http:
+          method: DELETE
+          path: /whitelist/entry
 
 resources:
   Resources:

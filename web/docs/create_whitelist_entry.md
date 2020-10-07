@@ -2,7 +2,7 @@
 
 Inserts a new whitelist entry into DynamoDB.
 
-**URL**: `/api/create/`
+**URL**: `/whitelist/entry`
 
 **Method**: `POST`
 

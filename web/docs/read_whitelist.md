@@ -2,7 +2,7 @@
 
 Returns the entire whitelist table.
 
-**URL**: `/api/read/`
+**URL**: `/whitelist`
 
 **Method**: `POST`
 

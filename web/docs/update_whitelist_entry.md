@@ -2,7 +2,7 @@
 
 Updates an existing whitelist entry into DynamoDB. This is not meant to be used to update the `owner` or `comment` fields, but rather to extend the `expiration` date to ensure the resources are kept alive for longer.
 
-**URL**: `/api/update/`
+**URL**: `/whitelist/entry`
 
 **Method**: `PUT`
 

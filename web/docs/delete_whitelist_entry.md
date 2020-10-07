@@ -2,7 +2,7 @@
 
 Deletes a new whitelist entry into DynamoDB.
 
-**URL**: `/api/delete/`
+**URL**: `/whitelist/entry`
 
 **Method**: `DELETE`
 
