@@ -130,18 +130,22 @@ package:
 
 functions:
   AutoCleanup:
-    handler: auto_cleanup.lambda_handler.lambda_handler
+    handler: lambda_handler.lambda_handler
+    module: app
     name: ${self:service}-${self:provider.stage}
     description: Auto Cleanup removes unused AWS resources
     memorySize: 256
     timeout: 300
     package:
       include:
-        - auto-cleanup/**
-        - data/**
-        - dynamodb_json/**
-        - simplejson/**
-        - treelib/**
+        # - auto-cleanup/**
+        # - data/**
+        # - dynamodb_json/**
+        # - simplejson/**
+        # - treelib/**
+        - "./app/**"
+      exclude:
+        - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
       ACTIONSTAKENBUCKET: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
@@ -151,6 +155,60 @@ functions:
       - schedule:
           rate: rate(3 days)
           enabled: true
+  CreateWhitelist:
+    handler: create_whitelist.lambda_handler
+    module: web
+    name: ${self:service}-${self:provider.stage}-create-whitelist
+    description: Creates a new whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - "./web/create_whitelist.py"
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+    events:
+      - http: GET create
+  ReadWhitelist:
+    handler: read_whitelist.lambda_handler
+    module: web
+    name: ${self:service}-${self:provider.stage}-read-whitelist
+    description: Returns the entire whitelist
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - "./web/read_whitelist.py"
+      exclude:
+        - "**"
+        - "./web/dynamodb_json/**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+    events:
+      - http: GET read
+  UpdateWhitelist:
+    handler: update_whitelist.lambda_handler
+    module: web
+    name: ${self:service}-${self:provider.stage}-update-whitelist
+    description: Updates an existing whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - "./web/update_whitelist.py"
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+    events:
+      - http: GET update
 
 resources:
   Resources:

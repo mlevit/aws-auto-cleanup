@@ -10,7 +10,6 @@ import traceback
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
-from treelib import Tree
 
 from . import (
     cloudformation_cleanup,

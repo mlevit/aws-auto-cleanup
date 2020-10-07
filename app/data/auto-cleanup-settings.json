@@ -27,7 +27,7 @@
       "M": {
         "cloudformation": {
           "M": {
-            "stacks": {
+            "stack": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -41,7 +41,7 @@
         },
         "dynamodb": {
           "M": {
-            "tables": {
+            "table": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -55,31 +55,14 @@
         },
         "ec2": {
           "M": {
-            "addresses": {
+            "address": {
               "M": {
                 "clean": {
                   "BOOL": true
                 }
               }
             },
-            "instances": {
-              "M": {
-                "clean": {
-                  "BOOL": true
-                },
-                "ttl": {
-                  "N": "7"
-                }
-              }
-            },
-            "security_groups": {
-              "M": {
-                "clean": {
-                  "BOOL": true
-                }
-              }
-            },
-            "snapshots": {
+            "instance": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -89,7 +72,24 @@
                 }
               }
             },
-            "volumes": {
+            "security_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                }
+              }
+            },
+            "snapshot": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "volume": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -103,7 +103,7 @@
         },
         "elasticbeanstalk": {
           "M": {
-            "applications": {
+            "application": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -117,7 +117,7 @@
         },
         "emr": {
           "M": {
-            "clusters": {
+            "cluster": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -131,7 +131,7 @@
         },
         "glue": {
           "M": {
-            "dev_endpoints": {
+            "dev_endpoint": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -145,7 +145,7 @@
         },
         "iam": {
           "M": {
-            "roles": {
+            "role": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -159,7 +159,7 @@
         },
         "lambda": {
           "M": {
-            "functions": {
+            "function": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -173,7 +173,7 @@
         },
         "rds": {
           "M": {
-            "instances": {
+            "instance": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -183,7 +183,7 @@
                 }
               }
             },
-            "snapshots": {
+            "snapshot": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -197,7 +197,7 @@
         },
         "redshift": {
           "M": {
-            "clusters": {
+            "cluster": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -207,7 +207,7 @@
                 }
               }
             },
-            "snapshots": {
+            "snapshot": {
               "M": {
                 "clean": {
                   "BOOL": true
@@ -221,7 +221,7 @@
         },
         "s3": {
           "M": {
-            "buckets": {
+            "bucket": {
               "M": {
                 "clean": {
                   "BOOL": true
