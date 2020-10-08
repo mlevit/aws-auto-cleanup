@@ -68,24 +68,40 @@ def lambda_handler(event, context):
     except:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
             "body": f"""Resource ID '{event.get("resource_id")}' is invalid.""",
         }
 
     if settings.get("services", {}).get(service) is None:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
             "body": f"Service '{service}' is invalid.",
         }
 
     if settings.get("services", {}).get(service, {}).get(resource) is None:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
             "body": f"Resource '{resource}' is invalid.",
         }
 
     if resource_id is None or len(resource_id) == 0:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
             "body": f"Resource ID cannot be empty.",
         }
 
@@ -108,6 +124,17 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
         }
     except:
-        return {"statusCode": 500, "body": sys.exc_info()[1]}
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
+            "body": sys.exc_info()[1],
+        }

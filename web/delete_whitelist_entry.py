@@ -18,6 +18,17 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
         }
     except:
-        return {"statusCode": 500, "body": sys.exc_info()[1]}
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
+            "body": sys.exc_info()[1],
+        }

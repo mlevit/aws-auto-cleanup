@@ -65,6 +65,10 @@ def lambda_handler(event, context):
     if parameter is None or parameter < 1:
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
             "body": f"Execution number '{parameter}' is invalid.",
         }
 
@@ -95,5 +99,9 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True,
+        },
         "body": json.dumps(execution_log),
     }

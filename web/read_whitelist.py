@@ -28,6 +28,20 @@ def lambda_handler(event, context):
 
             body.append(item)
 
-        return {"statusCode": 200, "body": json.dumps(body)}
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
+            "body": json.dumps(body),
+        }
     except:
-        return {"statusCode": 500, "body": sys.exc_info()[1]}
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True,
+            },
+            "body": sys.exc_info()[1],
+        }
