@@ -19,7 +19,8 @@ custom:
   remover:
     prompt: false
     buckets:
-      - ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
+      - ${self:service}-${self:provider.stage}-athena-results-${self:custom.company}
+      - ${self:service}-${self:provider.stage}-execution-log-${self:custom.company}
 
 provider:
   name: aws
@@ -28,6 +29,12 @@ provider:
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # Override via CLI "--aws-profile saml"
   iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - athena:GetQueryExecution
+        - athena:GetQueryResults
+        - athena:StartQueryExecution
+      Resource: "*"
     - Effect: Allow
       Action:
         - cloudformation:DeleteStack
@@ -77,6 +84,7 @@ provider:
       Action:
         - glue:DeleteDevEndPoint
         - glue:GetDevEndpoints
+        - glue:GetTable
       Resource: "*"
     - Effect: Allow
       Action:
@@ -117,6 +125,7 @@ provider:
         - s3:DeleteBucket
         - s3:DeleteObject
         - s3:DeleteObjectVersion
+        - s3:Get*
         - s3:List*
         - s3:PutObject
       Resource: "*"
@@ -144,9 +153,12 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      ACTIONSTAKENBUCKET: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
-      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
-      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+      EXECUTIONLOGBUCKET:
+        Ref: ExecutionLogBucket
+      SETTINGSTABLE:
+        Ref: SettingsTable
+      WHITELISTTABLE:
+        Ref: WhitelistTable
     events:
       - schedule:
           rate: rate(3 days)
@@ -165,8 +177,10 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
-      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+      SETTINGSTABLE:
+        Ref: SettingsTable
+      WHITELISTTABLE:
+        Ref: WhitelistTable
     events:
       - http:
           method: POST
@@ -185,7 +199,8 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+      WHITELISTTABLE:
+        Ref: WhitelistTable
     events:
       - http:
           method: GET
@@ -204,8 +219,10 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
-      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+      SETTINGSTABLE:
+        Ref: SettingsTable
+      WHITELISTTABLE:
+        Ref: WhitelistTable
     events:
       - http:
           method: PUT
@@ -224,7 +241,8 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      WHITELISTTABLE: ${self:service}-whitelist-${self:provider.stage}
+      WHITELISTTABLE:
+        Ref: WhitelistTable
     events:
       - http:
           method: DELETE
@@ -243,11 +261,14 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+      SETTINGSTABLE:
+        Ref: SettingsTable
     events:
       - http:
           method: GET
           path: /settings/service
+          caching:
+            enabled: true
   ReadSettingsResource:
     handler: read_settings_resource.lambda_handler
     module: web
@@ -262,11 +283,40 @@ functions:
         - "**"
     environment:
       LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+      SETTINGSTABLE:
+        Ref: SettingsTable
     events:
       - http:
           method: GET
           path: /settings/resource
+          caching:
+            enabled: true
+  ReadExecutionLog:
+    handler: read_execution_log.lambda_handler
+    module: web
+    name: ${self:service}-read-execution-log-${self:provider.stage}
+    description: Returns execution logs
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - web/read_execution_log.py
+      exclude:
+        - "**"
+    environment:
+      ATHENARESULTSBUCKET:
+        Ref: AthenaResultsBucket
+      AUTOCLEANUPDATABASE:
+        Ref: AutoCleanupDatabase
+      EXECUTIONLOGTABLE:
+        Ref: ExecutionLogTable
+      LOGLEVEL: ${self:custom.log_level}
+    events:
+      - http:
+          method: GET
+          path: /execution/{number}
+          caching:
+            enabled: true
 
 resources:
   Resources:
@@ -295,23 +345,27 @@ resources:
           AttributeName: expiration
           Enabled: true
         BillingMode: PAY_PER_REQUEST
-    ActionsTakenBuckett:
+    ExecutionLogBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}
+        BucketName: ${self:service}-${self:provider.stage}-execution-log-${self:custom.company}
+    AthenaResultsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-athena-results-${self:custom.company}
     AutoCleanupDatabase:
       Type: "AWS::Glue::Database"
       Properties:
         DatabaseInput:
           Name: auto_cleanup_${self:provider.stage}
         CatalogId: !Ref AWS::AccountId
-    ActionsTakenTable:
+    ExecutionLogTable:
       Type: AWS::Glue::Table
       Properties:
         CatalogId: !Ref AWS::AccountId
         DatabaseName: !Ref AutoCleanupDatabase
         TableInput:
-          Name: actions_taken
+          Name: execution_log
           StorageDescriptor:
             Columns:
               - Name: platform
@@ -333,7 +387,7 @@ resources:
               - Name: execution_id
                 Type: string
             Compressed: False
-            Location: s3://${self:service}-${self:provider.stage}-actionstaken-${self:custom.company}/
+            Location: s3://${self:service}-${self:provider.stage}-execution-log-${self:custom.company}/
             InputFormat: org.apache.hadoop.mapred.TextInputFormat
             OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
             SerdeInfo:
@@ -346,5 +400,6 @@ resources:
             "skip.header.line.count": 1
 
 plugins:
+  - serverless-api-gateway-caching
   - serverless-python-requirements
   - serverless-s3-remover
