@@ -16,6 +16,7 @@ Open-source application to programmatically clean your AWS resources based on a 
   - [Configuration](#configuration)
 - [Tables](#tables)
 - [Actions Taken](#actions-taken)
+- [Web Application](#web-application)
 - [Contributing](CONTRIBUTING.md)
 
 ## Setup
