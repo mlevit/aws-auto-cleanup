@@ -59,10 +59,14 @@ def get_query_results(query):
 
 
 def lambda_handler(event, context):
-    client = boto3.client("athena")
-
     # get route parameter
     parameter = int(event.get("pathParameters").get("number"))
+
+    if parameter is None or parameter < 1:
+        return {
+            "statusCode": 500,
+            "body": f"Execution number '{parameter}' is invalid.",
+        }
 
     # get execution ID based on parameter
     execution_id = get_query_results(
