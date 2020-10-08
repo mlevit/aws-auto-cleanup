@@ -141,7 +141,7 @@ functions:
   AutoCleanup:
     handler: main.lambda_handler
     module: app
-    name: ${self:service}-${self:provider.stage}
+    name: ${self:service}-app-${self:provider.stage}
     description: Removes unused AWS resources based on time of creation
     memorySize: 256
     timeout: 300
@@ -166,7 +166,7 @@ functions:
   CreateWhitelistEntry:
     handler: create_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-create-whitelist-entry-${self:provider.stage}
+    name: ${self:service}-api-create-whitelist-entry-${self:provider.stage}
     description: Creates a new whitelist entry
     memorySize: 128
     timeout: 30
@@ -188,7 +188,7 @@ functions:
   ReadWhitelist:
     handler: read_whitelist.lambda_handler
     module: web
-    name: ${self:service}-read-whitelist-${self:provider.stage}
+    name: ${self:service}-api-read-whitelist-${self:provider.stage}
     description: Returns the entire whitelist
     memorySize: 128
     timeout: 30
@@ -208,7 +208,7 @@ functions:
   UpdateWhitelistEntry:
     handler: update_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-update-whitelist-entry-${self:provider.stage}
+    name: ${self:service}-api-update-whitelist-entry-${self:provider.stage}
     description: Updates an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -230,7 +230,7 @@ functions:
   DeleteWhitelistEntry:
     handler: delete_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-delete-whitelist-entry-${self:provider.stage}
+    name: ${self:service}-api-delete-whitelist-entry-${self:provider.stage}
     description: Deletes an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -250,7 +250,7 @@ functions:
   ReadSettingsService:
     handler: read_settings_service.lambda_handler
     module: web
-    name: ${self:service}-read-settings-service-${self:provider.stage}
+    name: ${self:service}-api-read-settings-service-${self:provider.stage}
     description: Returns AWS services supported by Auto Cleanup
     memorySize: 128
     timeout: 30
@@ -272,7 +272,7 @@ functions:
   ReadSettingsResource:
     handler: read_settings_resource.lambda_handler
     module: web
-    name: ${self:service}-read-settings-resource-${self:provider.stage}
+    name: ${self:service}-api-read-settings-resource-${self:provider.stage}
     description: Returns AWS resources supported by Auto Cleanup
     memorySize: 128
     timeout: 30
@@ -294,7 +294,7 @@ functions:
   ReadExecutionLog:
     handler: read_execution_log.lambda_handler
     module: web
-    name: ${self:service}-read-execution-log-${self:provider.stage}
+    name: ${self:service}-api-read-execution-log-${self:provider.stage}
     description: Returns execution logs
     memorySize: 128
     timeout: 30
