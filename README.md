@@ -212,12 +212,12 @@ The Whitelist table allows users to add their resources to prevent removal.
 
 The Whitelist table has the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself.
 
-| Column      | Format                      | Description                                                                                                                                            |
-| ----------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| resource_id | `<service>:<resource>:<id>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., EC2, S3), the resource<br>(e.g., Instance, Bucket) and id. |
-| expiration  | EPOCH timestamp             | EPOCH timestamp no later than 7 days<br>from insert date                                                                                               |
-| comment     | Text field                  | Comment field describing the resource<br>and why it has been whitelisted                                                                               |
-| owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                         |
+| Column      | Format                      | Description                                                                                                                                                      |
+| ----------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| resource_id | `<service>:<resource>:<id>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., `ec2`, `s3`), the resource<br>(e.g., `instance`, `bucket`) and `id`. |
+| expiration  | EPOCH timestamp             | EPOCH timestamp when the the record will be removed from the Settings table                                                                                      |
+| comment     | Text field                  | Comment field describing the resource<br>and why it has been whitelisted                                                                                         |
+| owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                                   |
 
 Adding resources to the Whitelist table will ensure those resources are not removed by Auto Cleanup.
 
