@@ -151,10 +151,10 @@ functions:
       - schedule:
           rate: rate(3 days)
           enabled: true
-  CreateWhitelist:
+  CreateWhitelistEntry:
     handler: create_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-create-whitelist-${self:provider.stage}
+    name: ${self:service}-create-whitelist-entry-${self:provider.stage}
     description: Creates a new whitelist entry
     memorySize: 128
     timeout: 30
@@ -190,10 +190,10 @@ functions:
       - http:
           method: GET
           path: /whitelist
-  UpdateWhitelist:
+  UpdateWhitelistEntry:
     handler: update_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-update-whitelist-${self:provider.stage}
+    name: ${self:service}-update-whitelist-entry-${self:provider.stage}
     description: Updates an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -210,10 +210,10 @@ functions:
       - http:
           method: PUT
           path: /whitelist/entry
-  DeleteWhitelist:
+  DeleteWhitelistEntry:
     handler: delete_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-delete-whitelist-${self:provider.stage}
+    name: ${self:service}-delete-whitelist-entry-${self:provider.stage}
     description: Deletes an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -229,6 +229,44 @@ functions:
       - http:
           method: DELETE
           path: /whitelist/entry
+  ReadSettingsService:
+    handler: read_settings_service.lambda_handler
+    module: web
+    name: ${self:service}-read-settings-service-${self:provider.stage}
+    description: Returns AWS services supported by Auto Cleanup
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - web/read_settings_service.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+    events:
+      - http:
+          method: GET
+          path: /settings/service
+  ReadSettingsResource:
+    handler: read_settings_resource.lambda_handler
+    module: web
+    name: ${self:service}-read-settings-resource-${self:provider.stage}
+    description: Returns AWS resources supported by Auto Cleanup
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - web/read_settings_resource.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${self:service}-settings-${self:provider.stage}
+    events:
+      - http:
+          method: GET
+          path: /settings/resource
 
 resources:
   Resources:

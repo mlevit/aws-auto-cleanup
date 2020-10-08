@@ -264,7 +264,14 @@ The `actions_taken` table has the following schema:
 
 A simple CRUD API has been built to work alongside the web application.
 
+**Whitelist**
+
 - [Create Whitelist Entry](./web/docs/create_whitelist_entry.md)
 - [Read Whitelist Entries](./web/docs/read_whitelist.md)
 - [Update Whitelist Entry](./web/docs/update_whitelist_entry.md)
 - [Delete Whitelist Entry](./web/docs/delete_whitelist_entry.md)
+
+**Settings**
+
+- [Read Settings Service](./web/docs/read_settings_service.md)
+- [Read Settings Service](./web/docs/read_settings_resource.md)
