@@ -100,13 +100,13 @@ serverless remove [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 
 #### Default Values
 
-When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `app/data/auto-cleanup-settings.json` and `app/data/auto-cleanup-whitelist.json`.
+When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from files `app/data/auto-cleanup-settings.json` and `app/data/auto-cleanup-whitelist.json`.
 
 #### Logging
 
-Within the `serverless.yml` file, under `functions > AutoCleanup > environment` there is a `LOGLEVEL` attribute. By default, the log level is set to `INFO`. This can be changed to `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `CRITICAL` based on your logging requirements.
+Within the `serverless.yml` file, under `custom` there is a `LOGLEVEL` attribute. By default, the log level is set to `INFO`. This can be changed to `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `CRITICAL` based on your logging requirements.
 
-Auto Cleanup will output all resource remove logs at the `INFO` level and logs of why resources were **not** removed at the `DEBUG` level.
+Auto Cleanup will output all resource deletion logs under the `INFO` level and logs of why resources were **not** removed under the `DEBUG` level.
 
 #### Scheduling
 
@@ -243,7 +243,7 @@ The below table lists the resource attribute that should be used for the unique 
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
 
-_Note:_ Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions.
+_Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
 
 ## Execution Log
 
