@@ -271,16 +271,16 @@ A simple CRUD API has been built to work alongside the web application.
 
 **Execution Log**
 
-- [Read Execution Log](./web/docs/read_execution_log.md)
+- [Read Execution Log](./web/api/docs/read_execution_log.md)
 
 **Settings**
 
-- [Read Settings Service](./web/docs/read_settings_service.md)
-- [Read Settings Resource](./web/docs/read_settings_resource.md)
+- [Read Settings Service](./web/api/docs/read_settings_service.md)
+- [Read Settings Resource](./web/api/docs/read_settings_resource.md)
 
 **Whitelist**
 
-- [Create Whitelist Entry](./web/docs/create_whitelist_entry.md)
-- [Read Whitelist](./web/docs/read_whitelist.md)
-- [Update Whitelist Entry](./web/docs/update_whitelist_entry.md)
-- [Delete Whitelist Entry](./web/docs/delete_whitelist_entry.md)
+- [Create Whitelist Entry](./web/api/docs/create_whitelist_entry.md)
+- [Read Whitelist](./web/api/docs/read_whitelist.md)
+- [Update Whitelist Entry](./web/api/docs/update_whitelist_entry.md)
+- [Delete Whitelist Entry](./web/api/docs/delete_whitelist_entry.md)
