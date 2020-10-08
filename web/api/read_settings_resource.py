@@ -59,6 +59,17 @@ def get_settings():
     return settings
 
 
+def get_return(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True,
+        },
+        "body": json.dumps(body),
+    }
+
+
 def lambda_handler(event, context):
     client = boto3.client("dynamodb")
     settings = get_settings()
@@ -68,11 +79,4 @@ def lambda_handler(event, context):
     for service in settings.get("services", {}):
         body[service] = sorted(list(settings.get("services", {}).get(service).keys()))
 
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials": True,
-        },
-        "body": json.dumps(body),
-    }
+    return get_return(200, body)

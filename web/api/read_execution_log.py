@@ -58,19 +58,23 @@ def get_query_results(query):
         return False
 
 
+def get_return(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True,
+        },
+        "body": json.dumps(body),
+    }
+
+
 def lambda_handler(event, context):
     # get route parameter
     parameter = int(event.get("pathParameters").get("number"))
 
-    if parameter is None or parameter < 1:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": f"Execution number '{parameter}' is invalid.",
-        }
+    if parameter in (None, ""):
+        return get_return(400, f"Execution number '{parameter}' is invalid.")
 
     # get execution ID based on parameter
     execution_id = get_query_results(
@@ -97,11 +101,4 @@ def lambda_handler(event, context):
             WHERE  execution_id = '{execution_id}'"""
     )
 
-    return {
-        "statusCode": 200,
-        "headers": {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials": True,
-        },
-        "body": json.dumps(execution_log),
-    }
+    return get_return(200, execution_log)

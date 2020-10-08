@@ -59,6 +59,17 @@ def get_settings():
     return settings
 
 
+def get_return(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True,
+        },
+        "body": json.dumps(body),
+    }
+
+
 def lambda_handler(event, context):
     client = boto3.client("dynamodb")
     settings = get_settings()
@@ -66,44 +77,18 @@ def lambda_handler(event, context):
     try:
         service, resource, resource_id = event.get("resource_id").split(":")
     except:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": f"""Resource ID '{event.get("resource_id")}' is invalid.""",
-        }
+        return get_return(
+            400, f"""Resource ID '{event.get("resource_id")}' is invalid."""
+        )
 
     if settings.get("services", {}).get(service) is None:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": f"Service '{service}' is invalid.",
-        }
+        return get_return(400, f"Service '{service}' is invalid.")
 
     if settings.get("services", {}).get(service, {}).get(resource) is None:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": f"Resource '{resource}' is invalid.",
-        }
+        return get_return(400, f"Resource '{resource}' is invalid.")
 
     if resource_id is None or len(resource_id) == 0:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": f"Resource ID cannot be empty.",
-        }
+        return get_return(400, "Resource ID cannot be empty.")
 
     resource_days = (
         settings.get("services", {}).get(service, {}).get(resource, {}).get("ttl", 7)
@@ -120,19 +105,6 @@ def lambda_handler(event, context):
             },
         )
 
-        return {
-            "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-        }
+        return get_return(response["ResponseMetadata"]["HTTPStatusCode"], None)
     except:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": sys.exc_info()[1],
-        }
+        return get_return(400, sys.exc_info()[1])

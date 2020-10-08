@@ -7,6 +7,17 @@ import boto3
 from boto3.dynamodb.types import TypeDeserializer
 
 
+def get_return(code, body):
+    return {
+        "statusCode": code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": True,
+        },
+        "body": json.dumps(body),
+    }
+
+
 def lambda_handler(event, context):
     body = []
     client = boto3.client("dynamodb")
@@ -28,20 +39,6 @@ def lambda_handler(event, context):
 
             body.append(item)
 
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": json.dumps(body),
-        }
+        return get_return(200, body)
     except:
-        return {
-            "statusCode": 500,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Credentials": True,
-            },
-            "body": sys.exc_info()[1],
-        }
+        return get_return(400, sys.exc_info()[1])

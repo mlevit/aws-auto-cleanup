@@ -59,15 +59,19 @@ def get_settings():
     return settings
 
 
-def lambda_handler(event, context):
-    client = boto3.client("dynamodb")
-    settings = get_settings()
-
+def get_return(code, body):
     return {
-        "statusCode": 200,
+        "statusCode": code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
         },
-        "body": json.dumps(sorted(list(settings.get("services", {}).keys()))),
+        "body": json.dumps(body),
     }
+
+
+def lambda_handler(event, context):
+    client = boto3.client("dynamodb")
+    settings = get_settings()
+
+    return get_return(200, sorted(list(settings.get("services", {}).keys())))
