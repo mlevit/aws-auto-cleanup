@@ -37,7 +37,7 @@ npm install serverless --global
 pip3 install awscli --upgrade --user
 ```
 
-3.  Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. It is best for administrators to deploy Auto Cleanup.
+3.  Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. Administrators should deploy Auto Cleanup.
 
 4.  Install Auto Cleanup
 
@@ -118,21 +118,21 @@ The `enabled` attribute allows you to quickly enable or disable the scheduling f
 
 ## Tables
 
-Auto Cleanup uses two Amazon DynamoDB tables `auto-cleanup-settings` and `auto-cleanup-whitelist`.
+Auto Cleanup uses two DynamoDB tables `auto-cleanup-settings` and `auto-cleanup-whitelist`.
 
 ### Settings
 
-The Settings table contains all key-value pair settings used by Auto Cleanup during runtime.
+The settings table contains all key-value pair settings used by Auto Cleanup during runtime.
 
-The **resource** category holds all the time to live settings for each service and resource pair. By default they are all set to 7 days.
+The **resource** map holds all the time to live settings for each service and resource pair. By default, they are all set to 7 days.
 
-The **region** category allows users to turn region scanning on and off to either expand their search or reduce the run-time of Auto Cleanup.
+The **region** map allows users to turn region scanning on and off to either expand their search or reduce the run-time of Auto Cleanup.
 
 By default, the below settings are automatically inserted when Auto Cleanup is run.
 
 #### Version
 
-The version is used to inform Auto Cleanup if new settings exist in the default data file that should be loaded into DynamoDB. If the version present in the default data file is greater than the version in DynamoDB table, the load will commence.
+Version is used to inform Auto Cleanup if new settings exist in the default data file that should be loaded into DynamoDB. If the version number present in the default data file is greater than the version number stored in the DynamoDB table, the load will commence.
 
 | Key     | Value |
 | ------- | ----- |
@@ -146,7 +146,7 @@ The version is used to inform Auto Cleanup if new settings exist in the default 
 
 #### Services
 
-Table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned and the `ttl` attribute which stores the time to live in days for that service resource pair.
+The table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned and the `ttl` attribute which stores the time to live in days for that service resource pair.
 
 | Service           | Resource Type   | Clean | TTL |
 | ----------------- | --------------- | ----- | --- |
@@ -170,7 +170,7 @@ Table includes the `clean` attribute which informs Auto Cleanup if the service s
 
 #### Regions
 
-Table includes the `clean` attribute which informs Auto Cleanup if the region should be cleaned up or not.
+The table includes the `clean` attribute which informs Auto Cleanup if the region should be cleaned up or not.
 
 | Region            | Clean |
 | ----------------- | ----- |
@@ -194,34 +194,34 @@ Table includes the `clean` attribute which informs Auto Cleanup if the region sh
 | us-west-1         | True  |
 | us-west-2         | True  |
 
-_Note: Some regions have `clean` set to `false` by default as they required special access from AWS_
+_Note: Some regions have `clean` set to `false` by default as they required special access from AWS._
 
 #### Dry Run
 
-The `dry_run` setting is used to inform Auto Cleanup if it should be removing resources it finds to have overstayed their welcome. By default, `dry_run` is set to `true`. This means that no resource removal will occur, however Auto Cleanup will output relevant logs as if it had removed resources. This allows you inspect the resources Auto Cleanup will be removing as well as giving you ample opportunity to add those that shouldn't be removed to the Whitelist table.
+The `dry_run` setting is used to inform Auto Cleanup if it should be removing resources it finds to have overstayed their welcome. By default, `dry_run` is set to `true`. This means that no resource removal will occur, however Auto Cleanup will output relevant logs as if it had removed resources. This allows you to inspect the resources Auto Cleanup will be removing as well as giving you ample opportunity to add resources to the whitelist table.
 
 #### Time to Live (TTL)
 
-In order to understand which resources have overstayed their welcome, Auto Cleanup will look at the resources created date time or last modified date time (which ever exists) and compare that to the time to live setting for that particular service resource. If the resources was created or last modified longer than the number of days for that resources time to live setting, it will be removed.
+To understand which resources have overstayed their welcome, Auto Cleanup will look at the resources created date time or last modified date time (whichever exists) and compare that to the time to live setting for that particular service resource. If the resources were created or last modified longer than the number of days for that resources time to live setting, it will be removed.
 
-At any time, you may modify the time to live settings for any service resource within the `auto-cleanup-settings` Amazon DynamoDB table.
+At any time, you may modify the time to live settings for any service resource within the `auto-cleanup-settings` DynamoDB table.
 
 ### Whitelist
 
-The Whitelist table allows users to add their resources to prevent removal.
+The whitelist table allows users to add their resources to prevent removal.
 
-The Whitelist table has the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself.
+The whitelist table has the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself.
 
 | Column      | Format                      | Description                                                                                                                                                      |
 | ----------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource>:<id>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., `ec2`, `s3`), the resource<br>(e.g., `instance`, `bucket`) and `id`. |
-| expiration  | EPOCH timestamp             | EPOCH timestamp when the the record<br>will be removed from the Settings table                                                                                   |
+| expiration  | EPOCH timestamp             | EPOCH timestamp when the record<br>will be removed from the settings table                                                                                       |
 | comment     | Text field                  | Comment field describing the resource<br>and why it has been whitelisted                                                                                         |
 | owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                                   |
 
-Adding resources to the Whitelist table will ensure those resources are not removed by Auto Cleanup.
+Adding resources to the whitelist table will ensure those resources are not removed by Auto Cleanup.
 
-The below table lists the resource attribute that should be used for unique identification of resources for whitelisting.
+The below table lists the resource attribute that should be used for the unique identification of resources for whitelisting.
 
 | Resource                       | ID Attribute           | Example Value                                  |
 | ------------------------------ | ---------------------- | ---------------------------------------------- |
@@ -247,7 +247,7 @@ _Note:_ Resources that are a part of a CloudFormation Stack will be automaticall
 
 ## Execution Log
 
-Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `execution-log` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `execution_log` Glue Table have been created to query the data via Amazon Athena.
+Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `execution-log` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `execution_log` Glue Table have been created to query the data via Athena.
 
 The `execution_log` table has the following schema:
 
