@@ -73,7 +73,7 @@ def lambda_handler(event, context):
         f"""WITH cte_max 
                  AS (SELECT execution_id, 
                             MAX(timestamp) AS execution_timestamp 
-                     FROM   {os.environ["AUTOCLEANUPDATABASE"]}.{os.environ["EXECUTIONLOGTABLE"]} 
+                     FROM   "{os.environ["AUTOCLEANUPDATABASE"]}".{os.environ["EXECUTIONLOGTABLE"]} 
                      GROUP  BY execution_id 
                      ORDER  BY MAX(timestamp) DESC), 
                  cte_order 
@@ -89,7 +89,7 @@ def lambda_handler(event, context):
     # get execution log based on execution ID
     execution_log = get_query_results(
         f"""SELECT * 
-            FROM   {os.environ["AUTOCLEANUPDATABASE"]}.{os.environ["EXECUTIONLOGTABLE"]}
+            FROM   "{os.environ["AUTOCLEANUPDATABASE"]}".{os.environ["EXECUTIONLOGTABLE"]}
             WHERE  execution_id = '{execution_id}'"""
     )
 
