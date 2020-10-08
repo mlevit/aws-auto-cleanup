@@ -9,6 +9,7 @@
     "serverless-s3-remover": "^0.6.0"
   },
   "devDependencies": {
+    "serverless-api-gateway-caching": "^1.5.1",
     "serverless-python-requirements": "^5.1.0"
   },
   "repository": {
