@@ -2,11 +2,9 @@
 
 [![Build Status](https://travis-ci.org/servian/aws-auto-cleanup.svg?branch=master)](https://travis-ci.org/servian/aws-auto-cleanup) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4f20fbbb03464b9aa6c558a4415d2288)](https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Grade) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/4f20fbbb03464b9aa6c558a4415d2288)](https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Coverage)
 
-![Release](https://img.shields.io/github/release/servian/aws-auto-cleanup.svg) ![Release Date](https://img.shields.io/github/release-date/servian/aws-auto-cleanup.svg)
-
-![Language](https://img.shields.io/github/languages/top/servian/aws-auto-cleanup.svg) [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com) [![Python Black](https://img.shields.io/badge/code%20style-black-000000.svg?label=Python%20code%20style)](https://github.com/python/black) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?label=Markdown%2FYAML%20code%20style)](https://github.com/prettier/prettier)
-
 Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings.
+
+![](./static/architecture.drawio.svg)
 
 ## Table of Contents
 
