@@ -26,7 +26,7 @@ Returns the entire whitelist table.
 ]
 ```
 
-**Content example**
+### Content example
 
 ```json
 [

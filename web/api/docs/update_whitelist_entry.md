@@ -21,7 +21,7 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 }
 ```
 
-**Content example**
+### Content example
 
 ```json
 [

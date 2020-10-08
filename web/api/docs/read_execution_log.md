@@ -31,7 +31,7 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 ]
 ```
 
-**Content example**
+### Content example
 
 ```json
 [

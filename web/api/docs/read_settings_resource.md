@@ -21,7 +21,7 @@ Returns a dictionary of each AWS services and resources that are supported by Au
 }
 ```
 
-**Content example**
+### Content example
 
 ```json
 {

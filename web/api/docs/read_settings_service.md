@@ -18,7 +18,7 @@ Returns a list AWS services that are supported by Auto Cleanup.
 ["[service]", "..."]
 ```
 
-**Content example**
+### Content example
 
 ```json
 [

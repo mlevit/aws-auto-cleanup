@@ -20,7 +20,7 @@ Inserts a new whitelist entry into DynamoDB.
 }
 ```
 
-**Content example**
+### Content example
 
 ```json
 {
