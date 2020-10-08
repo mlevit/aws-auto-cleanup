@@ -298,7 +298,7 @@ class Cleanup:
         except:
             self.logging.error(sys.exc_info()[1])
 
-    def export_actions_taken(self, resource_tree, aws_request_id):
+    def export_execution_log(self, resource_tree, aws_request_id):
         """Export a CSV file with all actions taken during run.
 
         Args:
@@ -355,8 +355,8 @@ class Cleanup:
                     return False
 
                 client = boto3.client("s3")
-                bucket = os.environ["ACTIONSTAKENBUCKET"]
-                key = f"""{datetime.datetime.now().strftime("%Y")}/{datetime.datetime.now().strftime("%m")}/actions_taken_{datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.txt"""
+                bucket = os.environ["EXECUTIONLOGBUCKET"]
+                key = f"""{datetime.datetime.now().strftime("%Y")}/{datetime.datetime.now().strftime("%m")}/execution_log_{datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.txt"""
 
                 try:
                     client.upload_file(temp_file, bucket, key)
@@ -402,4 +402,4 @@ def lambda_handler(event, context):
     cleanup.run_cleanup()
 
     # export actions taken
-    cleanup.export_actions_taken(cleanup.resource_tree, context.aws_request_id)
+    cleanup.export_execution_log(cleanup.resource_tree, context.aws_request_id)
