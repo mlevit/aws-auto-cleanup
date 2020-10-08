@@ -100,7 +100,7 @@ serverless remove [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 
 #### Default Values
 
-When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `auto_cleanup/data/auto-cleanup-settings.json` and `auto_cleanup/data/auto-cleanup-whitelist.json`.
+When Auto Cleanup runs, it will populate `auto-cleanup-settings` or `auto-cleanup-whitelist` DynamoDB tables from then data files `app/data/auto-cleanup-settings.json` and `app/data/auto-cleanup-whitelist.json`.
 
 #### Logging
 
@@ -210,14 +210,14 @@ At any time, you may modify the time to live settings for any service resource t
 
 The Whitelist table allows users to add their resources to prevent removal.
 
-The Whitelist table as the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself.
+The Whitelist table has the following schema and comes pre-populated with Auto Cleanup resources to ensure Auto Cleanup does not remove itself.
 
-| Column      | Format                                      | Description                                                                                                                                                   |
-| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| resource_id | `<service>:<resource type>:<resource name>` | Unique identifier of the resource. This is a custom format base on the service (e.g., EC2, S3), the resource type (e.g., Instance, Bucket) and resource name. |
-| expiration  | EPOCH timestamp                             | EPOCH timestamp no later than 7 days from insert date                                                                                                         |
-| comment     | Text field                                  | Comment field describing the resource and why it has been whitelisted                                                                                         |
-| owner       | Text field                                  | Email address or name of the resource owner in case they need to be contacted regarding the whitelisting                                                      |
+| Column      | Format                                      | Description                                                                                                                                                            |
+| ----------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| resource_id | `<service>:<resource type>:<resource name>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., EC2, S3), the resource type<br>(e.g., Instance, Bucket) and resource name. |
+| expiration  | EPOCH timestamp                             | EPOCH timestamp no later than 7 days<br>from insert date                                                                                                               |
+| comment     | Text field                                  | Comment field describing the resource<br>and why it has been whitelisted                                                                                               |
+| owner       | Text field                                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                                         |
 
 Adding resources to the Whitelist table will ensure those resources are not removed by Auto Cleanup.
 
