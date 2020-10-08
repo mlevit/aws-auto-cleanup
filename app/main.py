@@ -298,7 +298,7 @@ class Cleanup:
         except:
             self.logging.error(sys.exc_info()[1])
 
-    def export_actions_taken(self, resource_tree):
+    def export_actions_taken(self, resource_tree, aws_request_id):
         """Export a CSV file with all actions taken during run.
 
         Args:
@@ -324,7 +324,8 @@ class Cleanup:
                                 "resource_id",
                                 "action",
                                 "timestamp",
-                                "is_dry_run",
+                                "dry_run_flag",
+                                "execution_id",
                             ]
                         )
 
@@ -344,6 +345,7 @@ class Cleanup:
                                                     action["action"],
                                                     action["timestamp"],
                                                     self.dry_run,
+                                                    aws_request_id,
                                                 ]
                                             )
 
@@ -400,4 +402,4 @@ def lambda_handler(event, context):
     cleanup.run_cleanup()
 
     # export actions taken
-    cleanup.export_actions_taken(cleanup.resource_tree)
+    cleanup.export_actions_taken(cleanup.resource_tree, context.aws_request_id)
