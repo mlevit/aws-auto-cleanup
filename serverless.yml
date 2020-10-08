@@ -153,7 +153,7 @@ functions:
           rate: rate(3 days)
           enabled: true
   CreateWhitelistEntry:
-    handler: create_whitelist_entry.lambda_handler
+    handler: api/create_whitelist_entry.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-create-whitelist-entry
     description: Creates a new whitelist entry
@@ -161,7 +161,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/create_whitelist_entry.py
+        - web/api/create_whitelist_entry.py
       exclude:
         - "**"
     environment:
@@ -176,7 +176,7 @@ functions:
           path: /whitelist/entry
           cors: true
   ReadWhitelist:
-    handler: read_whitelist.lambda_handler
+    handler: api/read_whitelist.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-read-whitelist
     description: Returns the entire whitelist
@@ -184,7 +184,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/read_whitelist.py
+        - web/api/read_whitelist.py
       exclude:
         - "**"
     environment:
@@ -197,7 +197,7 @@ functions:
           path: /whitelist
           cors: true
   UpdateWhitelistEntry:
-    handler: update_whitelist_entry.lambda_handler
+    handler: api/update_whitelist_entry.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-update-whitelist-entry
     description: Updates an existing whitelist entry
@@ -205,7 +205,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/update_whitelist_entry.py
+        - web/api/update_whitelist_entry.py
       exclude:
         - "**"
     environment:
@@ -220,7 +220,7 @@ functions:
           path: /whitelist/entry
           cors: true
   DeleteWhitelistEntry:
-    handler: delete_whitelist_entry.lambda_handler
+    handler: api/delete_whitelist_entry.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-delete-whitelist-entry
     description: Deletes an existing whitelist entry
@@ -228,7 +228,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/delete_whitelist_entry.py
+        - web/api/delete_whitelist_entry.py
       exclude:
         - "**"
     environment:
@@ -241,7 +241,7 @@ functions:
           path: /whitelist/entry
           cors: true
   ReadSettingsService:
-    handler: read_settings_service.lambda_handler
+    handler: api/read_settings_service.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-read-settings-service
     description: Returns AWS services supported by Auto Cleanup
@@ -249,7 +249,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/read_settings_service.py
+        - web/api/read_settings_service.py
       exclude:
         - "**"
     environment:
@@ -264,7 +264,7 @@ functions:
           caching:
             enabled: true
   ReadSettingsResource:
-    handler: read_settings_resource.lambda_handler
+    handler: api/read_settings_resource.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-read-settings-resource
     description: Returns AWS resources supported by Auto Cleanup
@@ -272,7 +272,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/read_settings_resource.py
+        - web/api/read_settings_resource.py
       exclude:
         - "**"
     environment:
@@ -287,7 +287,7 @@ functions:
           caching:
             enabled: true
   ReadExecutionLog:
-    handler: read_execution_log.lambda_handler
+    handler: api/read_execution_log.lambda_handler
     module: web
     name: ${self:service}-${self:provider.stage}-api-read-execution-log
     description: Returns execution logs
@@ -295,7 +295,7 @@ functions:
     timeout: 30
     package:
       include:
-        - web/read_execution_log.py
+        - web/api/read_execution_log.py
       exclude:
         - "**"
     environment:
