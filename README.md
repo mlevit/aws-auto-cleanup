@@ -15,7 +15,7 @@ Open-source application to programmatically clean your AWS resources based on a 
   - [Removal](#removal)
   - [Configuration](#configuration)
 - [Tables](#tables)
-- [Actions Taken](#actions-taken)
+- [Execution Log](#execution-log)
 - [Web Application](#web-application)
 - [Contributing](CONTRIBUTING.md)
 
@@ -52,9 +52,10 @@ cd aws-auto-cleanup
 8.  Install Serverless plugins needed for deployment
 
 ```bash
-serverless plugin install --name serverless-python-requirements
 npm install serverless-iam-roles-per-function
 npm install serverless-s3-remover
+serverless plugin install --name serverless-api-gateway-caching
+serverless plugin install --name serverless-python-requirements
 ```
 
 9.  Deploy Auto Cleanup to your AWS account
@@ -242,11 +243,11 @@ The below table lists the resource attribute that should be used for unique iden
 
 _Note:_ Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions.
 
-## Actions Taken
+## Execution Log
 
-Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `actionstaken` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `actions_taken` Glue Table have been created to query the data via Amazon Athena.
+Each action taken by Auto Cleanup is recorded and stored as a flat CSV file within the `execution-log` S3 Bucket. Alongside the S3 Bucket, a new `auto_cleanup` Glue Database and `execution_log` Glue Table have been created to query the data via Amazon Athena.
 
-The `actions_taken` table has the following schema:
+The `execution_log` table has the following schema:
 
 | Column      | Format    | Description                                                                                         |
 | ----------- | --------- | --------------------------------------------------------------------------------------------------- |
@@ -276,3 +277,7 @@ A simple CRUD API has been built to work alongside the web application.
 
 - [Read Settings Service](./web/docs/read_settings_service.md)
 - [Read Settings Service](./web/docs/read_settings_resource.md)
+
+**Execution Log**
+
+- [Read Execution Log](./web/docs/read_execution_log.md)
