@@ -215,7 +215,7 @@ The Whitelist table has the following schema and comes pre-populated with Auto C
 | Column      | Format                      | Description                                                                                                                                                      |
 | ----------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource>:<id>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., `ec2`, `s3`), the resource<br>(e.g., `instance`, `bucket`) and `id`. |
-| expiration  | EPOCH timestamp             | EPOCH timestamp when the the record will be removed from the Settings table                                                                                      |
+| expiration  | EPOCH timestamp             | EPOCH timestamp when the the record<br>will be removed from the Settings table                                                                                   |
 | comment     | Text field                  | Comment field describing the resource<br>and why it has been whitelisted                                                                                         |
 | owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                                   |
 
