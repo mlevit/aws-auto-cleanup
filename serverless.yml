@@ -1,26 +1,15 @@
 service: auto-cleanup
 
 custom:
-  company: servian # change to your company name
   log_level: INFO # DEBUG for dev | INFO for prod
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
   pythonRequirements: # allows us to deploy a newer version of boto3
-    noDeploy:
-      [
-        "docutils",
-        "jmespath",
-        "pip",
-        "python-dateutil",
-        "s3transfer",
-        "setuptools",
-        "six",
-      ]
     slim: true
   remover:
     prompt: false
     buckets:
-      - ${self:service}-${self:provider.stage}-athena-results-${self:custom.company}
-      - ${self:service}-${self:provider.stage}-execution-log-${self:custom.company}
+      - Ref: AthenaResultsBucket
+      - Ref: ExecutionLogBucket
 
 provider:
   name: aws
@@ -141,7 +130,7 @@ functions:
   AutoCleanup:
     handler: main.lambda_handler
     module: app
-    name: ${self:service}-app-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-app
     description: Removes unused AWS resources based on time of creation
     memorySize: 256
     timeout: 300
@@ -166,7 +155,7 @@ functions:
   CreateWhitelistEntry:
     handler: create_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-api-create-whitelist-entry-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-create-whitelist-entry
     description: Creates a new whitelist entry
     memorySize: 128
     timeout: 30
@@ -188,7 +177,7 @@ functions:
   ReadWhitelist:
     handler: read_whitelist.lambda_handler
     module: web
-    name: ${self:service}-api-read-whitelist-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-read-whitelist
     description: Returns the entire whitelist
     memorySize: 128
     timeout: 30
@@ -208,7 +197,7 @@ functions:
   UpdateWhitelistEntry:
     handler: update_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-api-update-whitelist-entry-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-update-whitelist-entry
     description: Updates an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -230,7 +219,7 @@ functions:
   DeleteWhitelistEntry:
     handler: delete_whitelist_entry.lambda_handler
     module: web
-    name: ${self:service}-api-delete-whitelist-entry-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-delete-whitelist-entry
     description: Deletes an existing whitelist entry
     memorySize: 128
     timeout: 30
@@ -250,7 +239,7 @@ functions:
   ReadSettingsService:
     handler: read_settings_service.lambda_handler
     module: web
-    name: ${self:service}-api-read-settings-service-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-read-settings-service
     description: Returns AWS services supported by Auto Cleanup
     memorySize: 128
     timeout: 30
@@ -272,7 +261,7 @@ functions:
   ReadSettingsResource:
     handler: read_settings_resource.lambda_handler
     module: web
-    name: ${self:service}-api-read-settings-resource-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-read-settings-resource
     description: Returns AWS resources supported by Auto Cleanup
     memorySize: 128
     timeout: 30
@@ -294,7 +283,7 @@ functions:
   ReadExecutionLog:
     handler: read_execution_log.lambda_handler
     module: web
-    name: ${self:service}-api-read-execution-log-${self:provider.stage}
+    name: ${self:service}-${self:provider.stage}-api-read-execution-log
     description: Returns execution logs
     memorySize: 128
     timeout: 30
@@ -323,7 +312,7 @@ resources:
     SettingsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:service}-settings-${self:provider.stage}
+        TableName: ${self:service}-${self:provider.stage}-settings
         AttributeDefinitions:
           - AttributeName: key
             AttributeType: S
@@ -334,7 +323,7 @@ resources:
     WhitelistTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:service}-whitelist-${self:provider.stage}
+        TableName: ${self:service}-${self:provider.stage}-whitelist
         AttributeDefinitions:
           - AttributeName: resource_id
             AttributeType: S
@@ -348,16 +337,16 @@ resources:
     ExecutionLogBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:service}-${self:provider.stage}-execution-log-${self:custom.company}
+        BucketName: !Sub ${self:service}-${self:provider.stage}-execution-log-${AWS::AccountId}
     AthenaResultsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:service}-${self:provider.stage}-athena-results-${self:custom.company}
+        BucketName: !Sub ${self:service}-${self:provider.stage}-athena-results-${AWS::AccountId}
     AutoCleanupDatabase:
       Type: "AWS::Glue::Database"
       Properties:
         DatabaseInput:
-          Name: auto_cleanup_${self:provider.stage}
+          Name: ${self:service}-${self:provider.stage}
         CatalogId: !Ref AWS::AccountId
     ExecutionLogTable:
       Type: AWS::Glue::Table
@@ -387,7 +376,7 @@ resources:
               - Name: execution_id
                 Type: string
             Compressed: False
-            Location: s3://${self:service}-${self:provider.stage}-execution-log-${self:custom.company}/
+            Location: !Join ["", ["s3://", !Ref ExecutionLogBucket, "/"]]
             InputFormat: org.apache.hadoop.mapred.TextInputFormat
             OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
             SerdeInfo:
