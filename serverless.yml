@@ -338,10 +338,25 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: !Sub ${self:service}-${self:provider.stage}-execution-log-${AWS::AccountId}
+        AccessControl: Private
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
     AthenaResultsBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: !Sub ${self:service}-${self:provider.stage}-athena-results-${AWS::AccountId}
+        AccessControl: Private
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteAfter7Days
+              Status: "Enabled"
+              ExpirationInDays: 7
     AutoCleanupDatabase:
       Type: "AWS::Glue::Database"
       Properties:
