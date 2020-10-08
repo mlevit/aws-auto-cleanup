@@ -249,16 +249,17 @@ Each action taken by Auto Cleanup is recorded and stored as a flat CSV file with
 
 The `execution_log` table has the following schema:
 
-| Column      | Format    | Description                                                                                         |
-| ----------- | --------- | --------------------------------------------------------------------------------------------------- |
-| platform    | string    | Always `AWS`                                                                                        |
-| region      | string    | Region (e.g. `ap-southeast-2`)                                                                      |
-| service     | string    | Service (e.g., `S3`)                                                                                |
-| resource    | string    | Resource (e.g., `Bucket`)                                                                           |
-| resource_id | string    | Resource ID (e.g., ARN)                                                                             |
-| action      | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
-| timestamp   | timestamp | Timestamp when action was performed                                                                 |
-| is_dry_run  | boolean   | Dry run activated                                                                                   |
+| Column       | Format    | Description                                                                                         |
+| ------------ | --------- | --------------------------------------------------------------------------------------------------- |
+| platform     | string    | Always `AWS`                                                                                        |
+| region       | string    | Region (e.g. `ap-southeast-2`)                                                                      |
+| service      | string    | Service (e.g., `S3`)                                                                                |
+| resource     | string    | Resource (e.g., `Bucket`)                                                                           |
+| resource_id  | string    | Resource ID (e.g., ARN)                                                                             |
+| action       | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
+| timestamp    | timestamp | Timestamp when action was performed                                                                 |
+| dry_run_flag | boolean   | Dry run activated                                                                                   |
+| execution_id | string    | Lambda execution ID                                                                                 |
 
 ## Web Application
 
@@ -266,18 +267,18 @@ The `execution_log` table has the following schema:
 
 A simple CRUD API has been built to work alongside the web application.
 
-**Whitelist**
+**Execution Log**
 
-- [Create Whitelist Entry](./web/docs/create_whitelist_entry.md)
-- [Read Whitelist Entries](./web/docs/read_whitelist.md)
-- [Update Whitelist Entry](./web/docs/update_whitelist_entry.md)
-- [Delete Whitelist Entry](./web/docs/delete_whitelist_entry.md)
+- [Read Execution Log](./web/docs/read_execution_log.md)
 
 **Settings**
 
 - [Read Settings Service](./web/docs/read_settings_service.md)
-- [Read Settings Service](./web/docs/read_settings_resource.md)
+- [Read Settings Resource](./web/docs/read_settings_resource.md)
 
-**Execution Log**
+**Whitelist**
 
-- [Read Execution Log](./web/docs/read_execution_log.md)
+- [Create Whitelist Entry](./web/docs/create_whitelist_entry.md)
+- [Read Whitelist](./web/docs/read_whitelist.md)
+- [Update Whitelist Entry](./web/docs/update_whitelist_entry.md)
+- [Delete Whitelist Entry](./web/docs/delete_whitelist_entry.md)
