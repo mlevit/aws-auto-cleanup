@@ -28,6 +28,7 @@ def lambda_handler(event, context):
 
     client = boto3.client("s3")
 
+    # get all files in bucket
     response = client.list_objects_v2(
         Bucket=os.environ["EXECUTIONLOGBUCKET"],
     ).get("Contents")
@@ -36,8 +37,10 @@ def lambda_handler(event, context):
     for row in response:
         files.append(row["Key"])
 
+    # sort file names in desc
     files.sort(reverse=True)
 
+    # retrieve file contents
     file_contents = (
         client.get_object(
             Bucket=os.environ["EXECUTIONLOGBUCKET"],
