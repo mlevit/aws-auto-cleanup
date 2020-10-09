@@ -303,13 +303,9 @@ functions:
       exclude:
         - "**"
     environment:
-      ATHENARESULTSBUCKET:
-        Ref: AthenaResultsBucket
-      AUTOCLEANUPDATABASE:
-        Ref: AutoCleanupDatabase
-      EXECUTIONLOGTABLE:
-        Ref: ExecutionLogTable
       LOGLEVEL: ${self:custom.log_level}
+      EXECUTIONLOGBUCKET:
+        Ref: ExecutionLogBucket
     events:
       - http:
           method: GET
