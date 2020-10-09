@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "serverless": "^1.83.0",
+    "serverless": "^2.5.0",
     "serverless-iam-roles-per-function": "^2.0.2",
+    "serverless-pseudo-parameters": "^2.5.0",
     "serverless-s3-remover": "^0.6.0"
   },
   "devDependencies": {
