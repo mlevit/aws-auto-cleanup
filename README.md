@@ -209,26 +209,26 @@ Adding resources to the whitelist table will ensure those resources are not remo
 
 The below table lists the resource attribute that should be used for the unique identification of resources for whitelisting.
 
-| Resource                       | ID Attribute           | Example Value                                  |
-| ------------------------------ | ---------------------- | ---------------------------------------------- |
-| CloudFormation Stacks          | Stack Name             | `cloudformation:stack:my_cloudformation_stack` |
-| DynamoDB Tables                | Table Name             | `dynamodb:table:my_dynamodb_table`             |
-| EC2 Elastic IPs                | Allocation ID          | `ec2:address:eipalloc-03e6c42893296972f`       |
-| EC2 Instances                  | Instance ID            | `ec2:instance:i-0326701a029dbf9d0`             |
-| EC2 Security Groups            | Group ID               | `ec2:security_group:sg-09ef7b767c3ff4071`      |
-| EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snap-00c8c90db9fdceb3c`          |
-| EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`             |
-| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:my-app`          |
-| EMR Clusters                   | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
-| Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:my_endpoint`                |
-| IAM Roles                      | Role Name              | `iam:role:auto-cleanup-role`                   |
-| Kinesis Streams                | Stream Name            | `kinesis:stream:my_stream_name`                |
-| Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
-| Redshift Instances             | Cluster Identifier     | `redshift:instance:my_cluster`                 |
-| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:my_cluster_snapshot`        |
-| RDS Instances                  | DB Instance Identifier | `rds:instance:my_rds_instance`                 |
-| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                |
-| S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                        |
+| Resource                       | ID Attribute           | Example Value                                   |
+| ------------------------------ | ---------------------- | ----------------------------------------------- |
+| CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`               |
+| DynamoDB Tables                | Table Name             | `dynamodb:table:table_name`                     |
+| EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                     |
+| EC2 Instances                  | Instance ID            | `ec2:instance:instance_id`                      |
+| EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                   |
+| EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                      |
+| EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`              |
+| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name` |
+| EMR Clusters                   | ID                     | `emr:cluster:id`                                |
+| Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`               |
+| IAM Roles                      | Role Name              | `iam:role:role_name`                            |
+| Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                    |
+| Lambda Functions               | Function Name          | `lambda:function:function_name`                 |
+| Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`          |
+| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:snapshot_identifier`         |
+| RDS Instances                  | DB Instance Identifier | `rds:instance:db_instance_identifier`           |
+| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                 |
+| S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                         |
 
 _Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
 
