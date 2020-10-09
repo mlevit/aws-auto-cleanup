@@ -45,7 +45,17 @@ class Cleanup:
 
         for region in self.settings.get("regions"):
             if self.settings.get("regions").get(region).get("clean"):
-                self.logging.info(f"Switching region to '%s'." % region)
+                self.logging.info(f"Switching to '{region}' region.")
+
+                # check if the region is enabled within the account
+                try:
+                    client_sts = boto3.client("sts", region_name=region)
+                    client_sts.get_caller_identity()
+                except:
+                    self.logging.info(
+                        f"Skipping region '{region}' as it is not enabled within the current account."
+                    )
+                    continue
 
                 # threads list
                 threads = []
