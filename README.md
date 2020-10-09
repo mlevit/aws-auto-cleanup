@@ -142,15 +142,15 @@ The table includes the `clean` attribute which informs Auto Cleanup if the servi
 | EMR               | Clusters           | True  | 7   |
 | Glue              | Dev Endpoints      | True  | 7   |
 | IAM               | Roles              | True  | 30  |
-| :new: Kinesis     | Streams            | True  | 7   |
+| Kinesis :new:     | Streams            | True  | 7   |
 | Lambda            | Functions          | True  | 30  |
 | RDS               | Instances          | True  | 7   |
 | RDS               | Snapshots          | True  | 7   |
 | Redshift          | Clusters           | True  | 7   |
 | Redshift          | Snapshots          | True  | 7   |
 | S3                | Buckets            | True  | 30  |
-| :new: SageMaker   | Endpoints          | True  | 7   |
-| :new: SageMaker   | Notebook Instances | True  | 7   |
+| SageMaker :new:   | Endpoints          | True  | 7   |
+| SageMaker :new:   | Notebook Instances | True  | 7   |
 
 #### Regions
 
