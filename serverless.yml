@@ -91,6 +91,12 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - kinesis:DeleteStream
+        - kinesis:DescribeStream
+        - kinesis:ListStreams
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - lambda:DeleteFunction
         - lambda:ListFunctions
       Resource: "*"

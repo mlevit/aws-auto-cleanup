@@ -142,6 +142,7 @@ The table includes the `clean` attribute which informs Auto Cleanup if the servi
 | EMR               | Clusters        | True  | 7   |
 | Glue              | Dev Endpoints   | True  | 7   |
 | IAM               | Roles           | True  | 30  |
+| Kinesis           | Streams         | True  | 7   |
 | Lambda            | Functions       | True  | 30  |
 | RDS               | Instances       | True  | 7   |
 |                   | Snapshots       | True  | 7   |
@@ -221,12 +222,13 @@ The below table lists the resource attribute that should be used for the unique 
 | EMR Clusters                   | ID                     | `emr:cluster:j-KCXVNHG2W4QK`                   |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:my_endpoint`                |
 | IAM Roles                      | Role Name              | `iam:role:auto-cleanup-role`                   |
+| Kinesis Streams                | Stream Name            | `kinesis:stream:my_stream_name`                |
 | Lambda Functions               | Function Name          | `lambda:function:my_lambda_function`           |
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:my_cluster`                 |
 | Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:my_cluster_snapshot`        |
 | RDS Instances                  | DB Instance Identifier | `rds:instance:my_rds_instance`                 |
-| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:my_rds_instance_snapshot`        |
-| S3 Buckets                     | Bucket Name            | `s3:bucket:auto-cleanup-bucket`                |
+| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                |
+| S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                        |
 
 _Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
 

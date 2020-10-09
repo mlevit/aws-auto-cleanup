@@ -157,6 +157,20 @@
             }
           }
         },
+        "kinesis": {
+          "M": {
+            "stream": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "lambda": {
           "M": {
             "function": {

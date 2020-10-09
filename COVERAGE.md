@@ -12,6 +12,7 @@
 | Elastic Beanstalk | Applications    | Done               | No Moto support                                                       |
 | EMR               | Clusters        | Done               | Done                                                                  |
 | Glue              | Dev Endpoints   | Done               |                                                                       |
+| Kinesis           | Streams         | Done               |                                                                       |
 | IAM               | Roles           | Done               | No Moto support                                                       |
 | Lambda            | Functions       | Done               |                                                                       |
 | RDS               | Instances       | Done               | No Moto support ([issue](https://github.com/spulec/moto/issues/2220)) |
@@ -30,6 +31,5 @@
 | EKS                        | Clusters             |
 | Elasticsearch Service      | Domain               |
 | Glue                       | Crawlers             |
-| Kinesis                    | Data Streams         |
 | SageMaker                  | Endpoints            |
 | SageMaker                  | Notebook             |

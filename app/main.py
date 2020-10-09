@@ -18,6 +18,7 @@ import emr_cleanup
 import glue_cleanup
 import helper
 import iam_cleanup
+import kinesis_cleanup
 import lambda_cleanup
 import rds_cleanup
 import redshift_cleanup
@@ -116,6 +117,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=glue_class.run, args=())
+                threads.append(thread)
+
+                # Kinesis
+                kinesis_class = kinesis_cleanup.KinesisCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=kinesis_class.run, args=())
                 threads.append(thread)
 
                 # Lambda
