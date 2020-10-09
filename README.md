@@ -25,51 +25,45 @@ Open-source application to programmatically clean your AWS resources based on a 
 
 ### Deployment
 
-1.  Install the [Serverless Framework](https://serverless.com/)
-
-```bash
-npm install serverless --global
-```
-
-2.  Install [AWS CLI](https://aws.amazon.com/cli/)
+1.  Install [AWS CLI](https://aws.amazon.com/cli/)
 
 ```bash
 pip3 install awscli --upgrade --user
 ```
 
-3.  Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, and CloudFormation Stacks. Administrators should deploy Auto Cleanup.
+2.  Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, CloudFormation Stacks and more. Administrators should deploy Auto Cleanup.
 
-4.  Install Auto Cleanup
+3.  Install Auto Cleanup
 
 ```bash
 serverless create --template-url https://github.com/servian/aws-auto-cleanup --path aws-auto-cleanup
 ```
 
-5.  Change into the Auto Cleanup directory
+4.  Change into the Auto Cleanup directory
 
 ```bash
 cd aws-auto-cleanup
 ```
 
-8.  Install Serverless plugins needed for deployment
+5.  Install Serverless plugins needed for deployment
 
 ```bash
 npm install
 ```
 
-9.  Deploy Auto Cleanup to your AWS account
+6.  Deploy Auto Cleanup to your AWS account
 
 ```bash
 serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 ```
 
-10. Invoke Auto Cleanup for the first time to create the necessary AWS Config rules and settings
+7. Invoke Auto Cleanup for the first time to create the necessary AWS Config rules and settings
 
 ```bash
 serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>] --type Event
 ```
 
-11. Check Auto Cleanup logs
+8. Check Auto Cleanup logs
 
 ```bash
 serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
