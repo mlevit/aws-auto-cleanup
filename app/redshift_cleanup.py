@@ -7,11 +7,11 @@ import helper
 
 
 class RedshiftCleanup:
-    def __init__(self, logging, whitelist, settings, resource_tree, region):
+    def __init__(self, logging, whitelist, settings, execution_log, region):
         self.logging = logging
         self.whitelist = whitelist
         self.settings = settings
-        self.resource_tree = resource_tree
+        self.execution_log = execution_log
         self.region = region
 
         self._client_redshift = None
@@ -103,7 +103,7 @@ class RedshiftCleanup:
                     )
                     resource_action = "skip - whitelist"
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
                 ).setdefault("Cluster", []).append(
                     {
@@ -196,7 +196,7 @@ class RedshiftCleanup:
                     )
                     resource_action = "skip - whitelist"
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "Redshift", {}
                 ).setdefault("Snapshot", []).append(
                     {

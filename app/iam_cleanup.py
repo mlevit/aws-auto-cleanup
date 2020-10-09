@@ -8,11 +8,11 @@ import helper
 
 
 class IAMCleanup:
-    def __init__(self, logging, whitelist, settings, resource_tree):
+    def __init__(self, logging, whitelist, settings, execution_log):
         self.logging = logging
         self.whitelist = whitelist
         self.settings = settings
-        self.resource_tree = resource_tree
+        self.execution_log = execution_log
         self.region = "global"
 
         self._client_iam = None
@@ -301,7 +301,7 @@ class IAMCleanup:
                     )
                     resource_action = "skip - whitelist"
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "IAM", {}
                 ).setdefault("Role", []).append(
                     {

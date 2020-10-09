@@ -16,10 +16,10 @@ class TestBucketsMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = s3_cleanup.S3Cleanup(
-                logging, whitelist, settings, resource_tree
+                logging, whitelist, settings, execution_log
             )
             yield test_class
 
@@ -48,10 +48,10 @@ class TestBucketsLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"s3": {"buckets": {"clean": True, "ttl": 5000}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = s3_cleanup.S3Cleanup(
-                logging, whitelist, settings, resource_tree
+                logging, whitelist, settings, execution_log
             )
             yield test_class
 
@@ -80,10 +80,10 @@ class TestBucketsWhitelist:
                 "general": {"dry_run": False},
                 "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = s3_cleanup.S3Cleanup(
-                logging, whitelist, settings, resource_tree
+                logging, whitelist, settings, execution_log
             )
             yield test_class
 

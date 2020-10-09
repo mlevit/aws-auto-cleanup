@@ -16,10 +16,10 @@ class TestClustersMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"redshift": {"clusters": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -55,10 +55,10 @@ class TestClustersLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"redshift": {"clusters": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -94,10 +94,10 @@ class TestClustersWhitelist:
                 "general": {"dry_run": False},
                 "services": {"redshift": {"clusters": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -133,10 +133,10 @@ class TestSnapshotsMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -177,10 +177,10 @@ class TestSnapshotsLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"redshift": {"snapshots": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -221,10 +221,10 @@ class TestSnapshotsWhitelist:
                 "general": {"dry_run": False},
                 "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

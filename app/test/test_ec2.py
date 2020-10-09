@@ -16,10 +16,10 @@ class TestInstancesMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"instances": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -59,10 +59,10 @@ class TestInstancesLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"instances": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -93,10 +93,10 @@ class TestInstancesWhitelist:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"instances": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -134,10 +134,10 @@ class TestSecurityGroupsNotWhitelist:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"security_groups": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -169,10 +169,10 @@ class TestSecurityGroupsWhitelist:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"security_groups": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -208,10 +208,10 @@ class TestVolumesMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"volumes": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -240,10 +240,10 @@ class TestVolumesLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"volumes": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -272,10 +272,10 @@ class TestVolumesWhitelist:
                 "general": {"dry_run": False},
                 "services": {"ec2": {"volumes": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

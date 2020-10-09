@@ -32,7 +32,7 @@ class Cleanup:
         self.setup_dynamodb()
 
         # create dictionaries and variables
-        self.resource_tree = {"AWS": {}}
+        self.execution_log = {"AWS": {}}
         self.settings = self.get_settings()
         self.whitelist = self.get_whitelist()
         self.dry_run = self.settings.get("general", {}).get("dry_run", True)
@@ -67,7 +67,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 cloudformation_class.run()
@@ -77,7 +77,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 thread = threading.Thread(target=dynamodb_class.run, args=())
@@ -89,7 +89,7 @@ class Cleanup:
                         self.logging,
                         self.whitelist,
                         self.settings,
-                        self.resource_tree,
+                        self.execution_log,
                         region,
                     )
                 )
@@ -101,7 +101,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 thread = threading.Thread(target=emr_class.run, args=())
@@ -112,7 +112,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 thread = threading.Thread(target=glue_class.run, args=())
@@ -123,7 +123,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 thread = threading.Thread(target=lambda_class.run, args=())
@@ -134,7 +134,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 thread = threading.Thread(target=rds_class.run, args=())
@@ -145,7 +145,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 thread = threading.Thread(target=redshift_class.run, args=())
@@ -166,7 +166,7 @@ class Cleanup:
                     self.logging,
                     self.whitelist,
                     self.settings,
-                    self.resource_tree,
+                    self.execution_log,
                     region,
                 )
                 ec2_class.run()
@@ -178,7 +178,7 @@ class Cleanup:
 
         # S3
         s3_class = s3_cleanup.S3Cleanup(
-            self.logging, self.whitelist, self.settings, self.resource_tree
+            self.logging, self.whitelist, self.settings, self.execution_log
         )
         s3_class.run()
 
@@ -186,7 +186,7 @@ class Cleanup:
         # IAM will run after all other cleanup operations as there is a potential
         # through the removal of other services, IAM resources will be freed up
         iam_class = iam_cleanup.IAMCleanup(
-            self.logging, self.whitelist, self.settings, self.resource_tree
+            self.logging, self.whitelist, self.settings, self.execution_log
         )
         iam_class.run()
 
@@ -308,11 +308,11 @@ class Cleanup:
         except:
             self.logging.error(sys.exc_info()[1])
 
-    def export_execution_log(self, resource_tree, aws_request_id):
-        """Export a CSV file with all actions taken during run.
+    def export_execution_log(self, execution_log, aws_request_id):
+        """Export a CSV file with all execution logs during run.
 
         Args:
-            resource_tree (dict): Dictionary of all actions taken
+            execution_log (dict): Dictionary of all execution logs
         """
         try:
             os.chdir(tempfile.gettempdir())
@@ -340,7 +340,7 @@ class Cleanup:
                         )
 
                         # write each action
-                        for platform, platform_dict in resource_tree.items():
+                        for platform, platform_dict in execution_log.items():
                             for region, region_dict in platform_dict.items():
                                 for service, service_dict in region_dict.items():
                                     for resource in service_dict:
@@ -360,30 +360,31 @@ class Cleanup:
                                             )
 
                 except:
-                    self.logging.error("Could not generate actions taken.")
+                    self.logging.error("Could not generate execution log.")
                     self.logging.error(sys.exc_info()[1])
                     return False
 
+                now = datetime.datetime.now()
                 client = boto3.client("s3")
                 bucket = os.environ["EXECUTIONLOGBUCKET"]
-                key = f"""{datetime.datetime.now().strftime("%Y")}/{datetime.datetime.now().strftime("%m")}/execution_log_{datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.txt"""
+                key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.txt"""
 
                 try:
                     client.upload_file(temp_file, bucket, key)
                 except:
                     self.logging.error(
-                        f"Could not upload actions taken to S3 's3://{bucket}/{key}."
+                        f"Could not upload the execution log to S3 's3://{bucket}/{key}."
                     )
                     return False
 
                 self.logging.info(
-                    f"Actions taken has been built and uploaded to S3 's3://{bucket}/{key}."
+                    f"Execution log has been uploaded to S3 's3://{bucket}/{key}."
                 )
             finally:
                 os.remove(temp_file)
             return True
         except:
-            self.logging.error("Could not generate actions taken.")
+            self.logging.error("Could not generate the execution log.")
             self.logging.error(sys.exc_info()[1])
             return False
 
@@ -411,5 +412,5 @@ def lambda_handler(event, context):
     # run cleanup
     cleanup.run_cleanup()
 
-    # export actions taken
-    cleanup.export_execution_log(cleanup.resource_tree, context.aws_request_id)
+    # export execution log
+    cleanup.export_execution_log(cleanup.execution_log, context.aws_request_id)

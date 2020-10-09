@@ -16,10 +16,10 @@ class TestSnapshotsMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"rds": {"snapshots": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = rds_cleanup.RDSCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -61,10 +61,10 @@ class TestSnapshotsLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = rds_cleanup.RDSCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -106,10 +106,10 @@ class TestSnapshotsWhitelist:
                 "general": {"dry_run": False},
                 "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = rds_cleanup.RDSCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

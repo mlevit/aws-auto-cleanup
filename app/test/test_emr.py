@@ -16,10 +16,10 @@ class TestClustersMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = emr_cleanup.EMRCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -55,10 +55,10 @@ class TestClustersLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"emr": {"clusters": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = emr_cleanup.EMRCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -94,10 +94,10 @@ class TestClustersWhitelist:
                 "general": {"dry_run": False},
                 "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = emr_cleanup.EMRCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

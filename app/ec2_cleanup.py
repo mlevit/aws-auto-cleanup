@@ -7,11 +7,11 @@ import helper
 
 
 class EC2Cleanup:
-    def __init__(self, logging, whitelist, settings, resource_tree, region):
+    def __init__(self, logging, whitelist, settings, execution_log, region):
         self.logging = logging
         self.whitelist = whitelist
         self.settings = settings
-        self.resource_tree = resource_tree
+        self.execution_log = execution_log
         self.region = region
 
         self._client_ec2 = None
@@ -103,7 +103,7 @@ class EC2Cleanup:
                     )
                     resource_action = "skip - whitelist"
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Address", []).append(
                     {
@@ -250,7 +250,7 @@ class EC2Cleanup:
                         )
                         resource_action = "skip - whitelist"
 
-                    self.resource_tree.get("AWS").setdefault(
+                    self.execution_log.get("AWS").setdefault(
                         self.region, {}
                     ).setdefault("EC2", {}).setdefault("Instance", []).append(
                         {
@@ -332,7 +332,7 @@ class EC2Cleanup:
                     )
                     resource_action = "skip - whitelist"
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Security Group", []).append(
                     {
@@ -449,7 +449,7 @@ class EC2Cleanup:
                         f"EC2 Snapshot '{resource_id}' has been whitelisted and has not been deleted."
                     )
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Snapshot", []).append(
                     {
@@ -536,7 +536,7 @@ class EC2Cleanup:
                     )
                     resource_action = "skip - whitelist"
 
-                self.resource_tree.get("AWS").setdefault(self.region, {}).setdefault(
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
                 ).setdefault("Volume", []).append(
                     {

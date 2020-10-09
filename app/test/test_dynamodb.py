@@ -16,10 +16,10 @@ class TestTablesMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"dynamodb": {"tables": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = dynamodb_cleanup.DynamoDBCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -53,10 +53,10 @@ class TestTablesLessThanTTL:
                 "general": {"dry_run": False},
                 "services": {"dynamodb": {"tables": {"clean": True, "ttl": 7}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = dynamodb_cleanup.DynamoDBCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -90,10 +90,10 @@ class TestTablesWhitelist:
                 "general": {"dry_run": False},
                 "services": {"dynamodb": {"tables": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = dynamodb_cleanup.DynamoDBCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

@@ -16,10 +16,10 @@ class TestStacksMoreThanTTL:
                 "general": {"dry_run": False},
                 "services": {"cloudformation": {"stacks": {"clean": True, "ttl": -1}}},
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = cloudformation_cleanup.CloudFormationCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -54,10 +54,10 @@ class TestStacksLessThanTTL:
                     "cloudformation": {"stacks": {"clean": True, "ttl": 5000}}
                 },
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = cloudformation_cleanup.CloudFormationCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -92,10 +92,10 @@ class TestStacksWhitelist:
                     "cloudformation": {"stacks": {"clean": True, "ttl": 5000}}
                 },
             }
-            resource_tree = {"AWS": {}}
+            execution_log = {"AWS": {}}
 
             test_class = cloudformation_cleanup.CloudFormationCleanup(
-                logging, whitelist, settings, resource_tree, "ap-southeast-2"
+                logging, whitelist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
