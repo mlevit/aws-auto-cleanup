@@ -33,37 +33,33 @@ pip3 install awscli --upgrade --user
 
 2.  Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, CloudFormation Stacks and more. Administrators should deploy Auto Cleanup.
 
-3.  Install Auto Cleanup
+3.  Clone Auto Cleanup
 
 ```bash
-serverless create --template-url https://github.com/servian/aws-auto-cleanup --path aws-auto-cleanup
+git clone https://github.com/servian/aws-auto-cleanup && cd aws-auto-cleanup
 ```
 
-4.  Change into the Auto Cleanup directory
-
-```bash
-cd aws-auto-cleanup
-```
-
-5.  Install Serverless plugins needed for deployment
+4.  Install Auto Cleanup dependencies
 
 ```bash
 npm install
 ```
 
-6.  Deploy Auto Cleanup to your AWS account
+5.  Deploy Auto Cleanup
 
 ```bash
 serverless deploy [--region <AWS region>] [--aws-profile <AWS CLI profile>]
 ```
 
-7. Invoke Auto Cleanup for the first time to create the necessary AWS Config rules and settings
+6. Invoke Auto Cleanup
+
+_Note: This will populate the settings and whitelist tables and run a clean in dry run mode_
 
 ```bash
 serverless invoke --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>] --type Event
 ```
 
-8. Check Auto Cleanup logs
+7. Inspect invocation logs
 
 ```bash
 serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <AWS CLI profile>]
@@ -73,15 +69,9 @@ serverless logs --function AutoCleanup [--region <AWS region>] [--aws-profile <A
 
 Auto Cleanup is deployed using the Serverless Framework which under the hood creates an AWS CloudFormation Stack allowing for a clean and simple removal process.
 
-To remove Auto Cleanup from your AWS account, follow the below steps:
+To remove Auto Cleanup from your AWS account, run the following command from the `aws-auto-cleanup` directory.
 
-1.  Change into the Auto Cleanup directory
-
-```bash
-cd aws-auto-cleanup
-```
-
-2.  Remove Auto Cleanup from your AWS account
+_Note: This will remove all provisioned resources including the excution logs folder. If you'd rather keep the logs, make a copy prior._
 
 ```bash
 serverless remove [--region <AWS region>] [--aws-profile <AWS CLI profile>]
@@ -165,6 +155,8 @@ The table includes the `clean` attribute which informs Auto Cleanup if the regio
 
 | Region            | Clean |
 | ----------------- | ----- |
+| af-south-1        | True  |
+| ap-east-1         | True  |
 | ap-northeast-1    | True  |
 | ap-northeast-2    | True  |
 | ap-northeast-3 \* | False |
@@ -176,9 +168,11 @@ The table includes the `clean` attribute which informs Auto Cleanup if the regio
 | cn-northwest-1 \* | False |
 | eu-central-1      | True  |
 | eu-north-1        | True  |
+| eu-south-1        | True  |
 | eu-west-1         | True  |
 | eu-west-2         | True  |
 | eu-west-3         | True  |
+| me-south-1        | True  |
 | sa-east-1         | True  |
 | us-east-1         | True  |
 | us-east-2         | True  |

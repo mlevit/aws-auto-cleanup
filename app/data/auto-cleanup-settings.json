@@ -242,6 +242,20 @@
     },
     "value": {
       "M": {
+        "af-south-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-east-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
         "ap-northeast-1": {
           "M": {
             "clean": {
@@ -319,6 +333,13 @@
             }
           }
         },
+        "eu-south-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
         "eu-west-1": {
           "M": {
             "clean": {
@@ -334,6 +355,13 @@
           }
         },
         "eu-west-3": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "me-south-1": {
           "M": {
             "clean": {
               "BOOL": true
