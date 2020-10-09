@@ -23,11 +23,101 @@ class SageMakerCleanup:
         return self._client_sagemaker
 
     def run(self):
+        self.endpoints()
         self.notebook_instances()
+
+    def endpoints(self):
+        """
+        Deletes SageMaker Endpoints.
+        """
+
+        clean = (
+            self.settings.get("services", {})
+            .get("sagemaker", {})
+            .get("endpoint", {})
+            .get("clean", False)
+        )
+        if clean:
+            try:
+                resources = self.client_sagemaker.list_endpoints().get("Endpoints")
+            except:
+                self.logging.error("Could not list all SageMaker Endpoints.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            ttl_days = (
+                self.settings.get("services", {})
+                .get("sagemaker", {})
+                .get("endpoint", {})
+                .get("ttl", 7)
+            )
+
+            for resource in resources:
+                resource_id = resource.get("EndpointName")
+                resource_status = resource.get("EndpointStatus")
+                resource_date = resource.get("LastModifiedTime")
+                resource_action = "skip"
+
+                if resource_id not in self.whitelist.get("sagemaker", {}).get(
+                    "endpoint", []
+                ):
+                    delta = helper.Helper.get_day_delta(resource_date)
+
+                    if delta.days > ttl_days:
+                        if not self.settings.get("general", {}).get("dry_run", True):
+                            if resource_status in (
+                                "OutOfService",
+                                "InService",
+                                "Failed",
+                            ):
+                                try:
+                                    self.client_sagemaker.delete_endpoint(
+                                        EndpointName=resource_id,
+                                    )
+                                except:
+                                    self.logging.error(
+                                        f"Could not delete SageMaker Endpoint '{resource_id}'."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "error"
+                                    continue
+                                else:
+                                    self.logging.info(
+                                        f"SageMaker Endpoint '{resource_id}' was last modified {delta.days} days ago "
+                                        "and has been deleted."
+                                    )
+                                    resource_action = "delete"
+                    else:
+                        self.logging.debug(
+                            f"SageMaker Endpoint '{resource_id}' was created {delta.days} days ago "
+                            "(less than TTL setting) and has not been deleted."
+                        )
+                        resource_action = "skip - TTL"
+                else:
+                    self.logging.debug(
+                        f"SageMaker Endpoint '{resource_id}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "skip - whitelist"
+
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
+                    "sagemaker", {}
+                ).setdefault("endpoint", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
+            return True
+        else:
+            self.logging.info("Skipping cleanup of SageMaker Endpoints.")
+            return True
 
     def notebook_instances(self):
         """
-        Deletes Sagemaker Notebook Instances.
+        Deletes SageMaker Notebook Instances.
         """
 
         clean = (
@@ -42,7 +132,7 @@ class SageMakerCleanup:
                     "NotebookInstances"
                 )
             except:
-                self.logging.error("Could not list all Sagemaker Notebook Instances.")
+                self.logging.error("Could not list all SageMaker Notebook Instances.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
@@ -73,14 +163,14 @@ class SageMakerCleanup:
                                     )
                                 except:
                                     self.logging.error(
-                                        f"Could not stop Sagemaker Notebook Instance '{resource_id}'."
+                                        f"Could not stop SageMaker Notebook Instance '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "error"
                                     continue
                                 else:
                                     self.logging.info(
-                                        f"Sagemaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
+                                        f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
                                         "and has been stopped."
                                     )
                                     resource_action = "stop"
@@ -91,26 +181,26 @@ class SageMakerCleanup:
                                     )
                                 except:
                                     self.logging.error(
-                                        f"Could not delete Sagemaker Notebook Instance '{resource_id}'."
+                                        f"Could not delete SageMaker Notebook Instance '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "error"
                                     continue
                                 else:
                                     self.logging.info(
-                                        f"Sagemaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
+                                        f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
                                         "and has been deleted."
                                     )
                                     resource_action = "delete"
                     else:
                         self.logging.debug(
-                            f"Sagemaker Notebook Instance '{resource_id}' was created {delta.days} days ago "
+                            f"SageMaker Notebook Instance '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
-                        f"Sagemaker Notebook Instance '{resource_id}' has been whitelisted and has not been deleted."
+                        f"SageMaker Notebook Instance '{resource_id}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "skip - whitelist"
 
@@ -127,5 +217,5 @@ class SageMakerCleanup:
                 )
             return True
         else:
-            self.logging.info("Skipping cleanup of Sagemaker Notebook Instances.")
+            self.logging.info("Skipping cleanup of SageMaker Notebook Instances.")
             return True

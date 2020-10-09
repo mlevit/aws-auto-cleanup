@@ -249,6 +249,16 @@
         },
         "sagemaker": {
           "M": {
+            "endpoint": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
             "notebook_instance": {
               "M": {
                 "clean": {

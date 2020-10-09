@@ -149,6 +149,7 @@ The table includes the `clean` attribute which informs Auto Cleanup if the servi
 | Redshift          | Clusters           | True  | 7   |
 | Redshift          | Snapshots          | True  | 7   |
 | S3                | Buckets            | True  | 30  |
+| :new: SageMaker   | Endpoints          | True  | 7   |
 | :new: SageMaker   | Notebook Instances | True  | 7   |
 
 #### Regions
@@ -230,6 +231,7 @@ The below table lists the resource attribute that should be used for the unique 
 | RDS Instances                  | DB Instance Identifier | `rds:instance:db_instance_identifier`                |
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                      |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                              |
+| SageMaker Endpoints            | Endpoint Name          | `sagemaker:endpoint:endpoint_name`                   |
 | SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
 
 _Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
