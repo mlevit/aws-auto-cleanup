@@ -246,6 +246,20 @@
               }
             }
           }
+        },
+        "sagemaker": {
+          "M": {
+            "notebook_instance": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
         }
       }
     }

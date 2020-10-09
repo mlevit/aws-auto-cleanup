@@ -126,6 +126,12 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - sagemaker:ListNotebookInstances
+        - sagemaker:DeleteNotebookInstance
+        - sagemaker:StopNotebookInstance
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - sts:GetCallerIdentity
       Resource: "*"
   tracing:

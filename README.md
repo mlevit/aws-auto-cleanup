@@ -129,26 +129,27 @@ Version is used to inform Auto Cleanup if new settings exist in the default data
 
 The table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned and the `ttl` attribute which stores the time to live in days for that service resource pair.
 
-| Service           | Resource Type   | Clean | TTL |
-| ----------------- | --------------- | ----- | --- |
-| CloudFormation    | Stacks          | True  | 7   |
-| DynamoDB          | Tables          | True  | 7   |
-| EC2               | Addresses       | True  | N/A |
-|                   | Instances       | True  | 7   |
-|                   | Security Groups | True  | N/A |
-|                   | Snapshots       | True  | 7   |
-|                   | Volumes         | True  | 7   |
-| Elastic Beanstalk | Applications    | True  | 7   |
-| EMR               | Clusters        | True  | 7   |
-| Glue              | Dev Endpoints   | True  | 7   |
-| IAM               | Roles           | True  | 30  |
-| Kinesis           | Streams         | True  | 7   |
-| Lambda            | Functions       | True  | 30  |
-| RDS               | Instances       | True  | 7   |
-|                   | Snapshots       | True  | 7   |
-| Redshift          | Clusters        | True  | 7   |
-|                   | Snapshots       | True  | 7   |
-| S3                | Buckets         | True  | 30  |
+| Service           | Resource Type      | Clean | TTL |
+| ----------------- | ------------------ | ----- | --- |
+| CloudFormation    | Stacks             | True  | 7   |
+| DynamoDB          | Tables             | True  | 7   |
+| EC2               | Addresses          | True  | N/A |
+| EC2               | Instances          | True  | 7   |
+| EC2               | Security Groups    | True  | N/A |
+| EC2               | Snapshots          | True  | 7   |
+| EC2               | Volumes            | True  | 7   |
+| Elastic Beanstalk | Applications       | True  | 7   |
+| EMR               | Clusters           | True  | 7   |
+| Glue              | Dev Endpoints      | True  | 7   |
+| IAM               | Roles              | True  | 30  |
+| :new: Kinesis     | Streams            | True  | 7   |
+| Lambda            | Functions          | True  | 30  |
+| RDS               | Instances          | True  | 7   |
+| RDS               | Snapshots          | True  | 7   |
+| Redshift          | Clusters           | True  | 7   |
+| Redshift          | Snapshots          | True  | 7   |
+| S3                | Buckets            | True  | 30  |
+| :new: SageMaker   | Notebook Instances | True  | 7   |
 
 #### Regions
 
@@ -209,26 +210,27 @@ Adding resources to the whitelist table will ensure those resources are not remo
 
 The below table lists the resource attribute that should be used for the unique identification of resources for whitelisting.
 
-| Resource                       | ID Attribute           | Example Value                                   |
-| ------------------------------ | ---------------------- | ----------------------------------------------- |
-| CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`               |
-| DynamoDB Tables                | Table Name             | `dynamodb:table:table_name`                     |
-| EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                     |
-| EC2 Instances                  | Instance ID            | `ec2:instance:instance_id`                      |
-| EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                   |
-| EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                      |
-| EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`              |
-| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name` |
-| EMR Clusters                   | ID                     | `emr:cluster:id`                                |
-| Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`               |
-| IAM Roles                      | Role Name              | `iam:role:role_name`                            |
-| Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                    |
-| Lambda Functions               | Function Name          | `lambda:function:function_name`                 |
-| Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`          |
-| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:snapshot_identifier`         |
-| RDS Instances                  | DB Instance Identifier | `rds:instance:db_instance_identifier`           |
-| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                 |
-| S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                         |
+| Resource                       | ID Attribute           | Example Value                                        |
+| ------------------------------ | ---------------------- | ---------------------------------------------------- |
+| CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`                    |
+| DynamoDB Tables                | Table Name             | `dynamodb:table:table_name`                          |
+| EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                          |
+| EC2 Instances                  | Instance ID            | `ec2:instance:instance_id`                           |
+| EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                        |
+| EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                           |
+| EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`                   |
+| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
+| EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
+| Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
+| IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
+| Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                         |
+| Lambda Functions               | Function Name          | `lambda:function:function_name`                      |
+| Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`               |
+| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:snapshot_identifier`              |
+| RDS Instances                  | DB Instance Identifier | `rds:instance:db_instance_identifier`                |
+| RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                      |
+| S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                              |
+| SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
 
 _Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
 

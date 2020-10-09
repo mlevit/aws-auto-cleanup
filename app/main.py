@@ -23,6 +23,7 @@ import lambda_cleanup
 import rds_cleanup
 import redshift_cleanup
 import s3_cleanup
+import sagemaker_cleanup
 
 
 class Cleanup:
@@ -161,6 +162,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=redshift_class.run, args=())
+                threads.append(thread)
+
+                # SageMaker
+                sagemaker_class = sagemaker_cleanup.SageMakerCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=sagemaker_class.run, args=())
                 threads.append(thread)
 
                 # start all threads
