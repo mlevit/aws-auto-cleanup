@@ -129,28 +129,28 @@ Version is used to inform Auto Cleanup if new settings exist in the default data
 
 The table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned and the `ttl` attribute which stores the time to live in days for that service resource pair.
 
-| Service           | Resource Type      | Clean | TTL |
-| ----------------- | ------------------ | ----- | --- |
-| CloudFormation    | Stacks             | True  | 7   |
-| DynamoDB          | Tables             | True  | 7   |
-| EC2               | Addresses          | True  | N/A |
-| EC2               | Instances          | True  | 7   |
-| EC2               | Security Groups    | True  | N/A |
-| EC2               | Snapshots          | True  | 7   |
-| EC2               | Volumes            | True  | 7   |
-| Elastic Beanstalk | Applications       | True  | 7   |
-| EMR               | Clusters           | True  | 7   |
-| Glue              | Dev Endpoints      | True  | 7   |
-| IAM               | Roles              | True  | 30  |
-| Kinesis :new:     | Streams            | True  | 7   |
-| Lambda            | Functions          | True  | 30  |
-| RDS               | Instances          | True  | 7   |
-| RDS               | Snapshots          | True  | 7   |
-| Redshift          | Clusters           | True  | 7   |
-| Redshift          | Snapshots          | True  | 7   |
-| S3                | Buckets            | True  | 30  |
-| SageMaker :new:   | Endpoints          | True  | 7   |
-| SageMaker :new:   | Notebook Instances | True  | 7   |
+| Service           | Resource Type            | Clean | TTL |
+| ----------------- | ------------------------ | ----- | --- |
+| CloudFormation    | Stacks                   | True  | 7   |
+| DynamoDB          | Tables                   | True  | 7   |
+| EC2               | Addresses                | True  | N/A |
+| EC2               | Instances                | True  | 7   |
+| EC2               | Security Groups          | True  | N/A |
+| EC2               | Snapshots                | True  | 7   |
+| EC2               | Volumes                  | True  | 7   |
+| Elastic Beanstalk | Applications             | True  | 7   |
+| EMR               | Clusters                 | True  | 7   |
+| Glue              | Dev Endpoints            | True  | 7   |
+| IAM               | Roles                    | True  | 30  |
+| Kinesis           | Streams :new:            | True  | 7   |
+| Lambda            | Functions                | True  | 30  |
+| RDS               | Instances                | True  | 7   |
+| RDS               | Snapshots                | True  | 7   |
+| Redshift          | Clusters                 | True  | 7   |
+| Redshift          | Snapshots                | True  | 7   |
+| S3                | Buckets                  | True  | 30  |
+| SageMaker         | Endpoints :new:          | True  | 7   |
+| SageMaker         | Notebook Instances :new: | True  | 7   |
 
 #### Regions
 
