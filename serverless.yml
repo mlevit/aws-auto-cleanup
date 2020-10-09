@@ -118,6 +118,10 @@ provider:
         - s3:List*
         - s3:PutObject
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - sts:GetCallerIdentity
+      Resource: "*"
   tracing:
     lambda: true
 
