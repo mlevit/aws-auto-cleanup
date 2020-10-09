@@ -344,7 +344,7 @@ resources:
     ExecutionLogBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: !Sub ${self:service}-${self:provider.stage}-execution-log-${AWS::AccountId}
+        BucketName: ${self:service}-${self:provider.stage}-execution-log-#{AWS::AccountId}
         AccessControl: Private
         BucketEncryption:
           ServerSideEncryptionConfiguration:
@@ -353,7 +353,7 @@ resources:
     AthenaResultsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: !Sub ${self:service}-${self:provider.stage}-athena-results-${AWS::AccountId}
+        BucketName: ${self:service}-${self:provider.stage}-athena-results-#{AWS::AccountId}
         AccessControl: Private
         BucketEncryption:
           ServerSideEncryptionConfiguration:
@@ -412,5 +412,6 @@ resources:
 
 plugins:
   - serverless-api-gateway-caching
+  - serverless-pseudo-parameters
   - serverless-python-requirements
   - serverless-s3-remover
