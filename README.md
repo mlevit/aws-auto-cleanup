@@ -54,10 +54,7 @@ cd aws-auto-cleanup
 8.  Install Serverless plugins needed for deployment
 
 ```bash
-npm install serverless-iam-roles-per-function
-npm install serverless-s3-remover
-serverless plugin install --name serverless-api-gateway-caching
-serverless plugin install --name serverless-python-requirements
+npm install
 ```
 
 9.  Deploy Auto Cleanup to your AWS account
