@@ -365,7 +365,7 @@ class EC2Cleanup:
                     OwnerIds=[self.account_number]
                 ).get("Snapshots")
             except:
-                self.logging.errpr("Could not list all EC2 Snapshots.")
+                self.logging.error("Could not list all EC2 Snapshots.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 

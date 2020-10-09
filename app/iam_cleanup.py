@@ -297,8 +297,7 @@ class IAMCleanup:
                         resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
-                        f"IAM Role '%s' has been whitelisted and has not been deleted."
-                        % (resource_id)
+                        f"IAM Role '{resource_id}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "skip - whitelist"
 

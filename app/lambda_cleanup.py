@@ -89,8 +89,7 @@ class LambdaCleanup:
                         resource_action = "skip - TTL"
                 else:
                     self.logging.debug(
-                        f"Lambda Function '%s' has been whitelisted and has not been deleted."
-                        % (resource_id)
+                        f"Lambda Function '{resource_id}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "skip - whitelist"
 
