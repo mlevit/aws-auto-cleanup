@@ -101,6 +101,27 @@
             }
           }
         },
+        "ecs": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                }
+              }
+            },
+            "service": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "elasticbeanstalk": {
           "M": {
             "application": {

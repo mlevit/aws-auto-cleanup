@@ -61,6 +61,15 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - ecs:DeleteCluster
+        - ecs:DeleteService
+        - ecs:DescribeClusters
+        - ecs:DescribeServices
+        - ecs:ListClusters
+        - ecs:ListServices
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - elasticbeanstalk:DeleteApplication
         - elasticbeanstalk:DescribeApplications
       Resource: "*"

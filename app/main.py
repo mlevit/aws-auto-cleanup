@@ -13,6 +13,7 @@ import boto3
 import cloudformation_cleanup
 import dynamodb_cleanup
 import ec2_cleanup
+import ecs_cleanup
 import elasticbeanstalk_cleanup
 import emr_cleanup
 import glue_cleanup
@@ -83,6 +84,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=dynamodb_class.run, args=())
+                threads.append(thread)
+
+                # ECS
+                ecs_class = ecs_cleanup.ECSCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=ecs_class.run, args=())
                 threads.append(thread)
 
                 # Elastic Beanstalk

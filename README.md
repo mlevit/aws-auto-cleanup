@@ -138,6 +138,8 @@ The table includes the `clean` attribute which informs Auto Cleanup if the servi
 | EC2               | Security Groups          | True  | N/A |
 | EC2               | Snapshots                | True  | 7   |
 | EC2               | Volumes                  | True  | 7   |
+| ECS               | Clusters                 | True  | N/A |
+| ECS               | Services                 | True  | 7   |
 | Elastic Beanstalk | Applications             | True  | 7   |
 | EMR               | Clusters                 | True  | 7   |
 | Glue              | Dev Endpoints            | True  | 7   |
@@ -219,7 +221,9 @@ The below table lists the resource attribute that should be used for the unique 
 | EC2 Instances                  | Instance ID            | `ec2:instance:instance_id`                           |
 | EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                        |
 | EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                           |
-| EC2 Volumes                    | Volume ID              | `ec2:volume:vol-0e1a431b9503a43aa`                   |
+| EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
+| ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
+| ECS Services                   | Service Name           | `ecs:cluster:service_name`                           |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
