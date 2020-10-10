@@ -223,7 +223,7 @@ The below table lists the resource attribute that should be used for the unique 
 | EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                           |
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
-| ECS Services                   | Service Name           | `ecs:cluster:service_name`                           |
+| ECS Services                   | Service Name           | `ecs:service:service_name`                           |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
