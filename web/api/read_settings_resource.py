@@ -47,16 +47,19 @@ def unmarshal_dynamodb_json(node):
 
 def get_settings():
     settings = {}
-    try:
-        for record in boto3.client("dynamodb").scan(
-            TableName=os.environ["SETTINGSTABLE"]
-        )["Items"]:
-            record_json = unmarshal_dynamodb_json(record)
-            settings[record_json.get("key")] = record_json.get("value")
-    except:
-        pass
 
-    return settings
+    try:
+        items = boto3.client("dynamodb").scan(
+            TableName=os.environ.get("SETTINGSTABLE")
+        )["Items"]
+    except Exception as error:
+        raise error
+    else:
+        for item in items:
+            item_json = unmarshal_dynamodb_json(item)
+            settings[item_json.get("key")] = item_json.get("value")
+
+        return settings
 
 
 def get_return(code, message, request, response):
@@ -73,7 +76,13 @@ def get_return(code, message, request, response):
 
 
 def lambda_handler(event, context):
-    settings = get_settings()  # TODO better error handling for functions
+    try:
+        settings = get_settings()
+    except Exception as error:
+        print(f"[ERROR] {error}")
+        return get_return(
+            400, "Could not read Auto Cleanup Settings.", parameters, None
+        )
 
     body = {}
     for service in settings.get("services", {}):

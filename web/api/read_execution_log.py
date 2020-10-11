@@ -34,10 +34,16 @@ def lambda_handler(event, context):
     # get all files in bucket
     try:
         response = client.list_objects_v2(
-            Bucket=os.environ["EXECUTIONLOGBUCKET"],
+            Bucket=os.environ.get("EXECUTIONLOGBUCKET"),
         ).get("Contents")
-    except:
-        return get_return(400, sys.exc_info()[1], parameters, None)
+    except Exception as error:
+        print(f"[ERROR] {error}")
+        return get_return(
+            400,
+            f"""Could not list files in S3 Bucket '{os.environ.get("EXECUTIONLOGBUCKET")}'""",
+            parameters,
+            None,
+        )
 
     files = []
     for row in response:
@@ -50,15 +56,18 @@ def lambda_handler(event, context):
     try:
         file_contents = (
             client.get_object(
-                Bucket=os.environ["EXECUTIONLOGBUCKET"],
+                Bucket=os.environ.get("EXECUTIONLOGBUCKET"),
                 Key=files[run_number - 1],
             )
             .get("Body")
             .read()
             .decode("utf-8")
         )
-    except:
-        return get_return(400, sys.exc_info()[1], parameters, None)
+    except Exception as error:
+        print(f"[ERROR] {error}")
+        return get_return(
+            400, f"Could not read S3 file '{files[run_number - 1]}'", parameters, None
+        )
 
     return get_return(
         200,

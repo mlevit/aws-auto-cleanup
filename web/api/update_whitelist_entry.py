@@ -47,16 +47,19 @@ def unmarshal_dynamodb_json(node):
 
 def get_settings():
     settings = {}
-    try:
-        for record in boto3.client("dynamodb").scan(
-            TableName=os.environ["SETTINGSTABLE"]
-        )["Items"]:
-            record_json = unmarshal_dynamodb_json(record)
-            settings[record_json.get("key")] = record_json.get("value")
-    except:
-        pass
 
-    return settings
+    try:
+        items = boto3.client("dynamodb").scan(
+            TableName=os.environ.get("SETTINGSTABLE")
+        )["Items"]
+    except Exception as error:
+        raise error
+    else:
+        for item in items:
+            item_json = unmarshal_dynamodb_json(item)
+            settings[item_json.get("key")] = item_json.get("value")
+
+        return settings
 
 
 def get_return(code, message, request, response):
@@ -67,15 +70,21 @@ def get_return(code, message, request, response):
             "Access-Control-Allow-Credentials": True,
         },
         "body": json.dumps(
-            {"message": message, "request": request, "response": response}
+            {"message": str(message), "request": request, "response": response}
         ),
     }
 
 
 def lambda_handler(event, context):
-    client = boto3.client("dynamodb")
     parameters = event.get("queryStringParameters")
-    settings = get_settings()
+
+    try:
+        settings = get_settings()
+    except Exception as error:
+        print(f"[ERROR] {error}")
+        return get_return(
+            400, "Could not read Auto Cleanup Settings.", parameters, None
+        )
 
     try:
         service, resource, resource_id = parameters.get("resource_id").split(":")
@@ -115,8 +124,8 @@ def lambda_handler(event, context):
 
     try:
         expiration = int(parameters.get("expiration")) + (resource_ttl * 86400)
-        response = client.put_item(
-            TableName=os.environ["WHITELISTTABLE"],
+        response = boto3.client("dynamodb").put_item(
+            TableName=os.environ.get("WHITELISTTABLE"),
             Item={
                 "resource_id": {"S": parameters.get("resource_id")},
                 "expiration": {"N": str(expiration)},
@@ -136,5 +145,11 @@ def lambda_handler(event, context):
                 "comment": parameters.get("comment"),
             },
         )
-    except:
-        return get_return(400, sys.exc_info()[1], parameters, None)
+    except Exception as error:
+        print(f"[ERROR] {error}")
+        return get_return(
+            400,
+            f"""Could not extend whitelist entry '{parameters.get("resource_id")}'""",
+            parameters,
+            None,
+        )
