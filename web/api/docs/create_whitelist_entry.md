@@ -20,13 +20,15 @@ Inserts a new whitelist entry into DynamoDB.
 }
 ```
 
-## Parameters
+## Request Structure
 
-- **resource_id** (string) -- **[REQUIRED]** The Auto Cleanup ID of the resource in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
+- _(dict)_
 
-- **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+  - **resource_id** (string) -- **[REQUIRED]** The Auto Cleanup ID of the resource in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
-- **comment** (string) -- Comment associated with the whitelist entry.
+  - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+
+  - **comment** (string) -- Comment associated with the whitelist entry.
 
 ## Return type
 
@@ -59,11 +61,15 @@ dict
 
   - **message** (string) -- Message describing the action taken or an error messsage.
 
-  - **expiration** (EPOCH) -- EPOCH timestamp when the whitelist entry will expire.
+  - **request** (dict) -- Request payload.
 
-  - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+  - **response** (dict) -- Response payload.
 
-  - **comment** (string) -- Comment associated with the whitelist entry.
+    - **expiration** (EPOCH) -- EPOCH timestamp when the whitelist entry will expire.
+
+    - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+
+    - **comment** (string) -- Comment associated with the whitelist entry.
 
 ## Notes
 
