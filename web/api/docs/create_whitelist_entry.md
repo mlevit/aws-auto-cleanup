@@ -10,7 +10,7 @@ Inserts a new whitelist entry into DynamoDB.
 
 **Permissions required**: None
 
-## Request
+## Request Syntax
 
 ```json
 {
@@ -20,19 +20,21 @@ Inserts a new whitelist entry into DynamoDB.
 }
 ```
 
-### Content example
+## Parameters
 
-```json
-{
-  "resource_id": "s3:bucket:my_bucket",
-  "owner": "example@email.com",
-  "comment": "Projext X"
-}
-```
+- **resource_id** (string) -- **[REQUIRED]** The Auto Cleanup ID of the resource in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
-## Success Response
+- **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
 
-**Code**: `200 OK`
+- **comment** (string) -- Comment associated with the whitelist entry.
+
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
@@ -51,24 +53,17 @@ Inserts a new whitelist entry into DynamoDB.
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "New whitelist entry created.",
-  "request": {
-    "resource_id": "s3:bucket:my_bucket",
-    "owner": "example@email.com",
-    "comment": "Projext X"
-  },
-  "response": {
-    "resource_id": "s3:bucket:my_bucket",
-    "expiration": "1603015051",
-    "owner": "example@email.com",
-    "comment": "Projext X"
-  }
-}
-```
+- _(dict)_
+
+  - **message** (string) -- Message describing the action taken or an error messsage.
+
+  - **expiration** (EPOCH) -- EPOCH timestamp when the whitelist entry will expire.
+
+  - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+
+  - **comment** (string) -- Comment associated with the whitelist entry.
 
 ## Notes
 
