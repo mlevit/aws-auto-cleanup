@@ -32,6 +32,20 @@ Deletes a new whitelist entry into DynamoDB.
 
 ```json
 {
+  "message": "string",
+  "request": {
+    "resource_id": "string"
+  },
+  "response": {
+    "resource_id": "string"
+  }
+}
+```
+
+### Content example
+
+```json
+{
   "message": "Whitelist entry deleted",
   "request": {
     "resource_id": "s3:bucket:my_bucket"

@@ -36,11 +36,30 @@ Inserts a new whitelist entry into DynamoDB.
 
 ```json
 {
+  "message": "string",
+  "request": {
+    "resource_id": "string",
+    "owner": "string",
+    "comment": "string"
+  },
+  "response": {
+    "resource_id": "string",
+    "expiration": "EPOCH string",
+    "owner": "string",
+    "comment": "string"
+  }
+}
+```
+
+### Content example
+
+```json
+{
   "message": "New whitelist entry created.",
   "request": {
-    "comment": "Projext X",
+    "resource_id": "s3:bucket:my_bucket",
     "owner": "example@email.com",
-    "resource_id": "s3:bucket:my_bucket"
+    "comment": "Projext X"
   },
   "response": {
     "resource_id": "s3:bucket:my_bucket",

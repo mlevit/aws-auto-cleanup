@@ -38,6 +38,26 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 ```json
 {
+  "message": "string",
+  "request": {
+    "resource_id": "string",
+    "expiration": "EPOCH string",
+    "owner": "string",
+    "comment": "string"
+  },
+  "response": {
+    "resource_id": "string",
+    "expiration": "EPOCH string",
+    "owner": "string",
+    "comment": "string"
+  }
+}
+```
+
+### Content example
+
+```json
+{
   "message": "Whitelist entry updated",
   "request": {
     "comment": "Projext X",

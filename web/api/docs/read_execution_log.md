@@ -67,3 +67,7 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
   ]
 }
 ```
+
+## Notes
+
+- The first list in the the `response` list is the columns header.
