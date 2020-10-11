@@ -150,7 +150,7 @@ def lambda_handler(event, context):
         print(f"[ERROR] {error}")
         return get_return(
             400,
-            f"""Could not create new whitelist entry {parameters.get("resource_id")}""",
+            f"""Could not create new whitelist entry '{parameters.get("resource_id")}'""",
             parameters,
             None,
         )
