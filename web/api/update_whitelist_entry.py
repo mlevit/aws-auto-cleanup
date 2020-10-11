@@ -88,10 +88,20 @@ def lambda_handler(event, context):
         )
 
     if settings.get("services", {}).get(service) in (None, ""):
-        return get_return(400, f"Service '{service}' is invalid", parameters, None)
+        return get_return(
+            400,
+            f"Service '{service}' is either invalid or not supported",
+            parameters,
+            None,
+        )
 
     if settings.get("services", {}).get(service, {}).get(resource) in (None, ""):
-        return get_return(400, f"Resource '{resource}' is invalid", parameters, None)
+        return get_return(
+            400,
+            f"Resource '{resource}' is either invalid or not supported",
+            parameters,
+            None,
+        )
 
     if resource_id in (None, ""):
         return get_return(400, "Resource ID cannot be empty", parameters, None)
@@ -117,7 +127,7 @@ def lambda_handler(event, context):
 
         return get_return(
             200,
-            "Whitelist entry updated",
+            f"""Whitelist entry '{parameters.get("resource_id")}' has been extended by {resource_ttl} days""",
             parameters,
             {
                 "resource_id": parameters.get("resource_id"),

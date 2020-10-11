@@ -90,7 +90,7 @@ def lambda_handler(event, context):
     if settings.get("services", {}).get(service) in (None, ""):
         return get_return(
             400,
-            f"Service '{service}' is invalid",
+            f"Service '{service}' is either invalid or not supported",
             parameters,
             None,
         )
@@ -98,7 +98,7 @@ def lambda_handler(event, context):
     if settings.get("services", {}).get(service, {}).get(resource) in (None, ""):
         return get_return(
             400,
-            f"Resource '{resource}' is invalid",
+            f"Resource '{resource}' is either invalid or not supported",
             parameters,
             None,
         )
@@ -128,8 +128,8 @@ def lambda_handler(event, context):
         )
 
         return get_return(
-            response["ResponseMetadata"]["HTTPStatusCode"],
-            "Whitelist entry created",
+            200,
+            f"""Whitelist entry '{parameters.get("resource_id")}' has been created""",
             parameters,
             {
                 "resource_id": parameters.get("resource_id"),

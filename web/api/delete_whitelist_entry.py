@@ -35,7 +35,7 @@ def lambda_handler(event, context):
 
         return get_return(
             200,
-            "Whitelist entry deleted",
+            f"""Whitelist entry '{parameters.get("resource_id")}' has been deleted""",
             parameters,
             parameters,
         )
