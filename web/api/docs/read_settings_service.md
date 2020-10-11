@@ -15,7 +15,7 @@ Returns a list AWS services that are supported by Auto Cleanup.
 **Code**: `200 OK`
 
 ```json
-["[service]", "..."]
+["[service]"]
 ```
 
 ### Content example

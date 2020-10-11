@@ -14,10 +14,10 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 ```json
 {
-  "resource_id": "[service:resource:id]",
-  "expiration": "[epoch timestamp]",
-  "owner": "[string]", # optional
-  "comment": "[string]" # optional
+  "resource_id": "[service:resource:id]", # required
+  "expiration": "[epoch timestamp]",      # required
+  "owner": "[string]",                    # optional
+  "comment": "[string]"                   # optional
 }
 ```
 

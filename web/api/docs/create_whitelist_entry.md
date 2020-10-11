@@ -14,9 +14,9 @@ Inserts a new whitelist entry into DynamoDB.
 
 ```json
 {
-  "resource_id": "[service:resource:id]",
-  "owner": "[string]", # optional
-  "comment": "[string]" # optional
+  "resource_id": "[service:resource:id]", # required
+  "owner": "[string]",                    # optional
+  "comment": "[string]"                   # optional
 }
 ```
 
@@ -25,8 +25,8 @@ Inserts a new whitelist entry into DynamoDB.
 ```json
 {
   "resource_id": "s3:bucket:my_bucket",
-  "owner": "example@email.com", # optional
-  "comment": "Projext X" # optional
+  "owner": "example@email.com",
+  "comment": "Projext X"
 }
 ```
 

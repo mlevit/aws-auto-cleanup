@@ -17,10 +17,10 @@ Returns the entire whitelist table.
 ```json
 [
   {
-    "resource_id": "[service:resource:id]",
-    "expiration": "[epoch timestamp]",
-    "owner": "[string]", # optional
-    "comment": "[string]" # optional
+    "resource_id": "[service:resource:id]", # required
+    "expiration": "[epoch timestamp]",      # required
+    "owner": "[string]",                    # optional
+    "comment": "[string]"                   # optional
   }
 ]
 ```

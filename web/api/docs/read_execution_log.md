@@ -15,20 +15,7 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 **Code**: `200 OK`
 
 ```json
-[
-  [
-    "[string]",
-    "[string]",
-    "[string]",
-    "[string]",
-    "[string]",
-    "[string]",
-    "[string]",
-    "[string]",
-    "[string]",
-  ],
-  [...]
-]
+[["[string]"]]
 ```
 
 ### Content example

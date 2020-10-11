@@ -14,7 +14,7 @@ Deletes a new whitelist entry into DynamoDB.
 
 ```json
 {
-  "resource_id": "[service:resource:id]"
+  "resource_id": "[service:resource:id]" # required
 }
 ```
 

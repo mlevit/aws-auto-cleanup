@@ -16,8 +16,7 @@ Returns a dictionary of each AWS services and resources that are supported by Au
 
 ```json
 {
-  "[service]": ["list of resources"],
-  "...": "..."
+  "[service]": ["list of resources"]
 }
 ```
 
