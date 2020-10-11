@@ -34,6 +34,17 @@ Inserts a new whitelist entry into DynamoDB.
 
 **Code**: `200 OK`
 
+```json
+[
+  {
+    "resource_id": "s3:bucket:my_bucket",
+    "expiration": "123456789",
+    "owner": "example@email.com",
+    "comment": "Projext X"
+  }
+]
+```
+
 ## Notes
 
 - AWS service (e.g. `s3`) and resource (e.g. `bucket`) will be evaluated against the Settings table to ensure they are valid.

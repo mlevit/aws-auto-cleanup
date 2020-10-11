@@ -19,7 +19,6 @@ Returns the entire whitelist table.
   {
     "resource_id": "[service:resource:id]",
     "expiration": "[epoch timestamp]",
-    "expiration_human": "[%Y-%m-%d %H:%M:%S]",
     "owner": "[string]", # optional
     "comment": "[string]" # optional
   }
@@ -33,14 +32,12 @@ Returns the entire whitelist table.
   {
     "resource_id": "s3:bucket:my_bucket",
     "expiration": "123456789",
-    "expiration_human": "1973-11-29 09:33:09",
     "owner": "example@email.com",
     "comment": "Projext X"
   },
   {
     "resource_id": "ec2:instance:i-12345678",
     "expiration": "123456789",
-    "expiration_human": "1973-11-29 09:33:09",
     "owner": "example@email.com",
     "comment": "Projext X"
   }

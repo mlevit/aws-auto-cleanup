@@ -24,25 +24,24 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 ### Content example
 
 ```json
-[
-  {
-    "resource_id":"s3:bucket:my_bucket",
-    "expiration":"123456789",
-    "owner":"example@email.com",
-    "# optional""comment":"Projext X""# optional"
-  },
-  {
-    "resource_id":"s3:bucket:my_bucket",
-    "expiration":"123456789",
-    "owner":"example@email.com",
-    "# optional""comment":"Projext X""# optional"
-  }
-]
+{
+  "resource_id": "s3:bucket:my_bucket",
+  "expiration": "123456789",
+  "owner": "example@email.com",
+  "# optional""comment": "Projext X"
+}
 ```
 
 ## Success Response
 
 **Code**: `200 OK`
+
+{
+"resource_id": "s3:bucket:my_bucket",
+"expiration": "123456789",
+"owner": "example@email.com",
+"# optional""comment": "Projext X"
+}
 
 ## Notes
 

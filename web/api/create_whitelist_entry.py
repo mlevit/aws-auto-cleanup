@@ -72,13 +72,14 @@ def get_return(code, body):
 
 def lambda_handler(event, context):
     client = boto3.client("dynamodb")
+    parameters = event.get("queryStringParameters")
     settings = get_settings()
 
     try:
-        service, resource, resource_id = event.get("resource_id").split(":")
+        service, resource, resource_id = parameters.get("resource_id").split(":")
     except:
         return get_return(
-            400, f"""Resource ID '{event.get("resource_id")}' is invalid."""
+            400, f"""Resource ID '{parameters.get("resource_id")}' is invalid."""
         )
 
     if settings.get("services", {}).get(service) is None:
@@ -95,16 +96,25 @@ def lambda_handler(event, context):
     )
 
     try:
+        expiration = int(time.time()) + (resource_days * 86400)
         response = client.put_item(
             TableName=os.environ["WHITELISTTABLE"],
             Item={
-                "resource_id": {"S": event.get("resource_id")},
-                "expiration": {"N": str(int(time.time()) + (resource_days * 86400))},
-                "owner": {"S": event.get("owner")},
-                "comment": {"S": event.get("comment")},
+                "resource_id": {"S": parameters.get("resource_id")},
+                "expiration": {"N": str(expiration)},
+                "owner": {"S": parameters.get("owner")},
+                "comment": {"S": parameters.get("comment")},
             },
         )
 
-        return get_return(response["ResponseMetadata"]["HTTPStatusCode"], None)
+        return get_return(
+            response["ResponseMetadata"]["HTTPStatusCode"],
+            {
+                "resource_id": parameters.get("resource_id"),
+                "expiration": str(expiration),
+                "owner": parameters.get("owner"),
+                "comment": parameters.get("comment"),
+            },
+        )
     except:
         return get_return(400, sys.exc_info()[1])

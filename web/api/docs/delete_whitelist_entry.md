@@ -29,3 +29,9 @@ Deletes a new whitelist entry into DynamoDB.
 ## Success Response
 
 **Code**: `200 OK`
+
+```json
+{
+  "resource_id": "s3:bucket:my_bucket"
+}
+```
