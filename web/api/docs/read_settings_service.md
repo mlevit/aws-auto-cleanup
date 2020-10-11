@@ -15,23 +15,34 @@ Returns a list AWS services that are supported by Auto Cleanup.
 **Code**: `200 OK`
 
 ```json
-["[service]"]
+{
+  "message": "string",
+  "request": null,
+  "response": ["string"]
+}
 ```
 
 ### Content example
 
 ```json
-[
-  "cloudformation",
-  "dynamodb",
-  "ec2",
-  "elasticbeanstalk",
-  "emr",
-  "glue",
-  "iam",
-  "lambda",
-  "rds",
-  "redshift",
-  "s3"
-]
+{
+  "message": "Supported AWS services and resources list retrieved",
+  "request": null,
+  "response": [
+    "cloudformation",
+    "dynamodb",
+    "ec2",
+    "ecs",
+    "elasticbeanstalk",
+    "emr",
+    "glue",
+    "iam",
+    "kinesis",
+    "lambda",
+    "rds",
+    "redshift",
+    "s3",
+    "sagemaker"
+  ]
+}
 ```

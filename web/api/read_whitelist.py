@@ -7,23 +7,25 @@ import boto3
 from boto3.dynamodb.types import TypeDeserializer
 
 
-def get_return(code, body):
+def get_return(code, message, request, response):
     return {
         "statusCode": code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
         },
-        "body": json.dumps(body),
+        "body": json.dumps(
+            {"message": message, "request": request, "response": response}
+        ),
     }
 
 
 def lambda_handler(event, context):
-    body = []
     client = boto3.client("dynamodb")
     deserializer = TypeDeserializer()
 
     try:
+        body = []
         resources = client.scan(TableName=os.environ["WHITELISTTABLE"]).get("Items")
         for resource in resources:
             item = {}
@@ -32,6 +34,6 @@ def lambda_handler(event, context):
 
             body.append(item)
 
-        return get_return(200, body)
+        return get_return(200, "Whitelist retrieved", None, body)
     except:
-        return get_return(400, sys.exc_info()[1])
+        return get_return(400, sys.exc_info()[1], None, None)

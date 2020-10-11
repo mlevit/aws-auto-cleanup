@@ -15,34 +15,55 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 **Code**: `200 OK`
 
 ```json
-[["[string]"]]
+{
+  "message": "string",
+  "request": { "string": "string" },
+  "response": [["string"]]
+}
 ```
 
 ### Content example
 
 ```json
-[
-  [
-    "platform",
-    "region",
-    "service",
-    "resource",
-    "resource_id",
-    "action",
-    "timestamp",
-    "dry_run_flag",
-    "execution_id"
-  ],
-  [
-    "AWS",
-    "ap-south-1",
-    "CloudFormation",
-    "Stack",
-    "AutoTag-Collector",
-    "delete",
-    "2020-10-08 02:51:50.000",
-    "true",
-    "d84c6d69-a92c-45b9-a11e-dbd01c5a8ddd"
+{
+  "message": "Execution log 2 retrieved",
+  "request": {
+    "number": "2"
+  },
+  "response": [
+    [
+      "platform",
+      "region",
+      "service",
+      "resource",
+      "resource_id",
+      "action",
+      "timestamp",
+      "dry_run_flag",
+      "execution_id"
+    ],
+    [
+      "AWS",
+      "ap-southeast-2",
+      "ecs",
+      "service",
+      "test",
+      "delete",
+      "2020-10-10 07:23:11",
+      "False",
+      "5596d8c9-6434-4d65-aa2a-5df457066fea"
+    ],
+    [
+      "AWS",
+      "ap-southeast-2",
+      "ecs",
+      "cluster",
+      "airflow-dev",
+      "delete",
+      "2020-10-10 07:23:11",
+      "False",
+      "5596d8c9-6434-4d65-aa2a-5df457066fea"
+    ]
   ]
-]
+}
 ```

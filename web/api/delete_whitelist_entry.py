@@ -5,14 +5,16 @@ import sys
 import boto3
 
 
-def get_return(code, body):
+def get_return(code, message, request, response):
     return {
         "statusCode": code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
         },
-        "body": json.dumps(body),
+        "body": json.dumps(
+            {"message": message, "request": request, "response": response}
+        ),
     }
 
 
@@ -21,7 +23,7 @@ def lambda_handler(event, context):
     parameters = event.get("queryStringParameters")
 
     if parameters.get("resource_id") in (None, ""):
-        return get_return(400, "Resource ID cannot be null.")
+        return get_return(400, "Resource ID cannot be null", parameters, None)
 
     try:
         response = client.delete_item(
@@ -32,8 +34,10 @@ def lambda_handler(event, context):
         )
 
         return get_return(
-            response["ResponseMetadata"]["HTTPStatusCode"],
-            {"resource_id": parameters.get("resource_id")},
+            200,
+            "Whitelist entry deleted",
+            parameters,
+            parameters,
         )
     except:
-        return get_return(400, sys.exc_info()[1])
+        return get_return(400, sys.exc_info()[1], parameters, None)

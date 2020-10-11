@@ -59,24 +59,26 @@ def get_settings():
     return settings
 
 
-def get_return(code, body):
+def get_return(code, message, request, response):
     return {
         "statusCode": code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
         },
-        "body": json.dumps(body),
+        "body": json.dumps(
+            {"message": message, "request": request, "response": response}
+        ),
     }
 
 
 def lambda_handler(event, context):
-    client = boto3.client("dynamodb")
-    settings = get_settings()
+    settings = get_settings()  # TODO better error handling for functions
 
     body = {}
-
     for service in settings.get("services", {}):
         body[service] = sorted(list(settings.get("services", {}).get(service).keys()))
 
-    return get_return(200, body)
+    return get_return(
+        200, "Supported AWS services and resources list retrieved", None, body
+    )

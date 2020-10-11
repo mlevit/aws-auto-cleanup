@@ -59,19 +59,25 @@ def get_settings():
     return settings
 
 
-def get_return(code, body):
+def get_return(code, message, request, response):
     return {
         "statusCode": code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
         },
-        "body": json.dumps(body),
+        "body": json.dumps(
+            {"message": message, "request": request, "response": response}
+        ),
     }
 
 
 def lambda_handler(event, context):
-    client = boto3.client("dynamodb")
     settings = get_settings()
 
-    return get_return(200, sorted(list(settings.get("services", {}).keys())))
+    return get_return(
+        200,
+        "Supported AWS services list retrieved",
+        None,
+        sorted(list(settings.get("services", {}).keys())),
+    )

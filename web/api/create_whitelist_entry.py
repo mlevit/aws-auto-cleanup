@@ -59,14 +59,16 @@ def get_settings():
     return settings
 
 
-def get_return(code, body):
+def get_return(code, message, request, response):
     return {
         "statusCode": code,
         "headers": {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
         },
-        "body": json.dumps(body),
+        "body": json.dumps(
+            {"message": message, "request": request, "response": response}
+        ),
     }
 
 
@@ -79,17 +81,35 @@ def lambda_handler(event, context):
         service, resource, resource_id = parameters.get("resource_id").split(":")
     except:
         return get_return(
-            400, f"""Resource ID '{parameters.get("resource_id")}' is invalid."""
+            400,
+            f"""Resource ID '{parameters.get("resource_id")}' is invalid.""",
+            parameters,
+            None,
         )
 
     if settings.get("services", {}).get(service) in (None, ""):
-        return get_return(400, f"Service '{service}' is invalid.")
+        return get_return(
+            400,
+            f"Service '{service}' is invalid",
+            parameters,
+            None,
+        )
 
     if settings.get("services", {}).get(service, {}).get(resource) in (None, ""):
-        return get_return(400, f"Resource '{resource}' is invalid.")
+        return get_return(
+            400,
+            f"Resource '{resource}' is invalid",
+            parameters,
+            None,
+        )
 
     if resource_id in (None, ""):
-        return get_return(400, "Resource ID cannot be empty.")
+        return get_return(
+            400,
+            "Resource ID cannot be empty",
+            parameters,
+            None,
+        )
 
     resource_ttl = (
         settings.get("services", {}).get(service, {}).get(resource, {}).get("ttl", 7)
@@ -109,6 +129,8 @@ def lambda_handler(event, context):
 
         return get_return(
             response["ResponseMetadata"]["HTTPStatusCode"],
+            "Whitelist entry created",
+            parameters,
             {
                 "resource_id": parameters.get("resource_id"),
                 "expiration": str(expiration),
@@ -117,4 +139,4 @@ def lambda_handler(event, context):
             },
         )
     except:
-        return get_return(400, sys.exc_info()[1])
+        return get_return(400, sys.exc_info()[1], parameters, None)

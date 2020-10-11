@@ -14,9 +14,9 @@ Inserts a new whitelist entry into DynamoDB.
 
 ```json
 {
-  "resource_id": "[service:resource:id]", # required
-  "owner": "[string]",                    # optional
-  "comment": "[string]"                   # optional
+  "resource_id": "string",
+  "owner": "string",
+  "comment": "string"
 }
 ```
 
@@ -35,14 +35,20 @@ Inserts a new whitelist entry into DynamoDB.
 **Code**: `200 OK`
 
 ```json
-[
-  {
+{
+  "message": "New whitelist entry created.",
+  "request": {
+    "comment": "Projext X",
+    "owner": "example@email.com",
+    "resource_id": "s3:bucket:my_bucket"
+  },
+  "response": {
     "resource_id": "s3:bucket:my_bucket",
-    "expiration": "123456789",
+    "expiration": "1603015051",
     "owner": "example@email.com",
     "comment": "Projext X"
   }
-]
+}
 ```
 
 ## Notes

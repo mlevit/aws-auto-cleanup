@@ -15,31 +15,39 @@ Returns the entire whitelist table.
 **Code**: `200 OK`
 
 ```json
-[
-  {
-    "resource_id": "[service:resource:id]", # required
-    "expiration": "[epoch timestamp]",      # required
-    "owner": "[string]",                    # optional
-    "comment": "[string]"                   # optional
-  }
-]
+{
+  "message": "string",
+  "request": null,
+  "response": [
+    {
+      "resource_id": "string",
+      "expiration": "EPOCH string",
+      "owner": "string",
+      "comment": "string"
+    }
+  ]
+}
 ```
 
 ### Content example
 
 ```json
-[
-  {
-    "resource_id": "s3:bucket:my_bucket",
-    "expiration": "123456789",
-    "owner": "example@email.com",
-    "comment": "Projext X"
-  },
-  {
-    "resource_id": "ec2:instance:i-12345678",
-    "expiration": "123456789",
-    "owner": "example@email.com",
-    "comment": "Projext X"
-  }
-]
+{
+  "message": "Whitelist retrieved",
+  "request": null,
+  "response": [
+    {
+      "comment": "Auto Cleanup production CloudFormation stack",
+      "expiration": "99999999999",
+      "owner": "example@email.com",
+      "resource_id": "cloudformation:stack:auto-cleanup-prod"
+    },
+    {
+      "comment": "Auto Cleanup development CloudFormation stack",
+      "expiration": "99999999999",
+      "owner": "example@email.com",
+      "resource_id": "cloudformation:stack:auto-cleanup-dev"
+    }
+  ]
+}
 ```

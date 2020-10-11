@@ -14,10 +14,10 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 ```json
 {
-  "resource_id": "[service:resource:id]", # required
-  "expiration": "[epoch timestamp]",      # required
-  "owner": "[string]",                    # optional
-  "comment": "[string]"                   # optional
+  "resource_id": "string",
+  "expiration": "EPOCH string",
+  "owner": "string",
+  "comment": "string"
 }
 ```
 
@@ -38,10 +38,19 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 ```json
 {
-  "resource_id": "s3:bucket:my_bucket",
-  "expiration": "123456789",
-  "owner": "example@email.com",
-  "comment": "Projext X"
+  "message": "Whitelist entry updated",
+  "request": {
+    "comment": "Projext X",
+    "expiration": "1603010770",
+    "owner": "example@email.com",
+    "resource_id": "s3:bucket:my_bucket"
+  },
+  "response": {
+    "resource_id": "s3:bucket:my_bucket",
+    "expiration": "1603615570",
+    "owner": "example@email.com",
+    "comment": "Projext X"
+  }
 }
 ```
 

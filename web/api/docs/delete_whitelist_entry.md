@@ -14,7 +14,7 @@ Deletes a new whitelist entry into DynamoDB.
 
 ```json
 {
-  "resource_id": "[service:resource:id]" # required
+  "resource_id": "string"
 }
 ```
 
@@ -32,6 +32,12 @@ Deletes a new whitelist entry into DynamoDB.
 
 ```json
 {
-  "resource_id": "s3:bucket:my_bucket"
+  "message": "Whitelist entry deleted",
+  "request": {
+    "resource_id": "s3:bucket:my_bucket"
+  },
+  "response": {
+    "resource_id": "s3:bucket:my_bucket"
+  }
 }
 ```
