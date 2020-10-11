@@ -94,13 +94,12 @@ def lambda_handler(event, context):
     if parameters.get("expiration") in (None, ""):
         return get_return(400, "Expiration cannot be empty.")
 
-    resource_days = (
+    resource_ttl = (
         settings.get("services", {}).get(service, {}).get(resource, {}).get("ttl", 7)
     )
 
     try:
-        expiration = int(parameters.get("expiration")) + (resource_days * 86400)
-
+        expiration = int(parameters.get("expiration")) + (resource_ttl * 86400)
         response = client.put_item(
             TableName=os.environ["WHITELISTTABLE"],
             Item={

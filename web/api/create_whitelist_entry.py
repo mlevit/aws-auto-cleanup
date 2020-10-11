@@ -82,21 +82,21 @@ def lambda_handler(event, context):
             400, f"""Resource ID '{parameters.get("resource_id")}' is invalid."""
         )
 
-    if settings.get("services", {}).get(service) is None:
+    if settings.get("services", {}).get(service) in (None, ""):
         return get_return(400, f"Service '{service}' is invalid.")
 
-    if settings.get("services", {}).get(service, {}).get(resource) is None:
+    if settings.get("services", {}).get(service, {}).get(resource) in (None, ""):
         return get_return(400, f"Resource '{resource}' is invalid.")
 
-    if resource_id is None or len(resource_id) == 0:
+    if resource_id in (None, ""):
         return get_return(400, "Resource ID cannot be empty.")
 
-    resource_days = (
+    resource_ttl = (
         settings.get("services", {}).get(service, {}).get(resource, {}).get("ttl", 7)
     )
 
     try:
-        expiration = int(time.time()) + (resource_days * 86400)
+        expiration = int(time.time()) + (resource_ttl * 86400)
         response = client.put_item(
             TableName=os.environ["WHITELISTTABLE"],
             Item={
