@@ -28,7 +28,7 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
   "resource_id": "s3:bucket:my_bucket",
   "expiration": "123456789",
   "owner": "example@email.com",
-  "# optional""comment": "Projext X"
+  "comment": "Projext X"
 }
 ```
 
@@ -41,7 +41,7 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
   "resource_id": "s3:bucket:my_bucket",
   "expiration": "123456789",
   "owner": "example@email.com",
-  "# optional""comment": "Projext X"
+  "comment": "Projext X"
 }
 ```
 
