@@ -233,7 +233,7 @@ class Cleanup:
         settings = {}
         try:
             for record in boto3.client("dynamodb").scan(
-                TableName=os.environ["SETTINGSTABLE"]
+                TableName=os.environ.get("SETTINGSTABLE")
             )["Items"]:
                 record_json = helper.Helper.unmarshal_dynamodb_json(record)
                 settings[record_json.get("key")] = record_json.get("value")
@@ -248,7 +248,7 @@ class Cleanup:
         whitelist = {}
         try:
             for record in boto3.client("dynamodb").scan(
-                TableName=os.environ["WHITELISTTABLE"]
+                TableName=os.environ.get("WHITELISTTABLE")
             )["Items"]:
                 record_json = helper.Helper.unmarshal_dynamodb_json(record)
 
@@ -290,7 +290,7 @@ class Cleanup:
 
             # get current settings version
             current_version = client.get_item(
-                TableName=os.environ["SETTINGSTABLE"],
+                TableName=os.environ.get("SETTINGSTABLE"),
                 Key={"key": {"S": "version"}},
                 ConsistentRead=True,
             )
@@ -324,7 +324,7 @@ class Cleanup:
                 for setting in settings_json:
                     try:
                         client.put_item(
-                            TableName=os.environ["SETTINGSTABLE"], Item=setting
+                            TableName=os.environ.get("SETTINGSTABLE"), Item=setting
                         )
                     except:
                         self.logging.error(sys.exc_info()[1])
@@ -333,7 +333,7 @@ class Cleanup:
             for whitelist in whitelist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ["WHITELISTTABLE"], Item=whitelist
+                        TableName=os.environ.get("WHITELISTTABLE"), Item=whitelist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
@@ -402,7 +402,7 @@ class Cleanup:
 
                 now = datetime.datetime.now()
                 client = boto3.client("s3")
-                bucket = os.environ["EXECUTIONLOGBUCKET"]
+                bucket = os.environ.get("EXECUTIONLOGBUCKET")
                 key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.txt"""
 
                 try:
