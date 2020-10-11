@@ -59,11 +59,13 @@ dict
 
 - _(dict)_
 
-  - **message** (string) -- Message describing the action taken or an error messsage.
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
 
   - **request** (dict) -- Request payload.
 
   - **response** (dict) -- Response payload.
+
+    - **resource_id** (string) -- Whitelist entry resource ID.
 
     - **expiration** (EPOCH) -- EPOCH timestamp when the whitelist entry will expire.
 
@@ -75,4 +77,4 @@ dict
 
 - AWS service (e.g. `s3`) and resource (e.g. `bucket`) will be evaluated against the Settings table to ensure they are valid.
 
-- The `expiration` field is computed at insert time. Current time + `ttl` from the Settings table are used to compute the value.
+- The `expiration` field is computed at insert time. Current time plus `ttl` from the Settings table are used to compute the value.
