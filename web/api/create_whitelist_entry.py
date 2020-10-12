@@ -136,7 +136,7 @@ def lambda_handler(event, context):
         )
 
         return get_return(
-            200,
+            201,
             f"""Whitelist entry '{parameters.get("resource_id")}' has been created""",
             parameters,
             {
