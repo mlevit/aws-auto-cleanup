@@ -9,6 +9,7 @@ import threading
 import traceback
 
 import boto3
+from dynamodb_json import json_util as dynamodb_json
 
 import cloudformation_cleanup
 import dynamodb_cleanup
@@ -231,18 +232,22 @@ class Cleanup:
 
     def get_settings(self):
         settings = {}
+
         try:
-            for record in boto3.client("dynamodb").scan(
+            items = boto3.client("dynamodb").scan(
                 TableName=os.environ.get("SETTINGSTABLE")
-            )["Items"]:
-                record_json = helper.Helper.unmarshal_dynamodb_json(record)
-                settings[record_json.get("key")] = record_json.get("value")
+            )["Items"]
         except:
             self.logging.error(
                 f"""Could not read DynamoDB table '{os.environ.get("SETTINGSTABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
-        return settings
+        else:
+            for item in items:
+                item_json = dynamodb_json.loads(item, True)
+                settings[item_json.get("key")] = item_json.get("value")
+
+            return settings
 
     def get_whitelist(self):
         whitelist = {}
@@ -250,16 +255,10 @@ class Cleanup:
             for record in boto3.client("dynamodb").scan(
                 TableName=os.environ.get("WHITELISTTABLE")
             )["Items"]:
-                record_json = helper.Helper.unmarshal_dynamodb_json(record)
-
-                try:
-                    parsed_resource_id = helper.Helper.parse_resource_id(
-                        record_json.get("resource_id")
-                    )
-                except:
-                    self.logging.error(
-                        f"""Resource ID '{record_json.get("resource_id")}' is invalid."""
-                    )
+                record_json = dynamodb_json.loads(record, True)
+                parsed_resource_id = helper.Helper.parse_resource_id(
+                    record_json.get("resource_id")
+                )
 
                 whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
                     parsed_resource_id.get("resource_type"), set()

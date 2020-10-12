@@ -43,6 +43,8 @@ git clone https://github.com/servian/aws-auto-cleanup && cd aws-auto-cleanup
 
 ```bash
 npm install
+
+pip3 install -r ./layers/dynamodb_json/requirements.txt -t ./layers/dynamodb_json/python/lib/python3.8/site-packages/ --no-deps
 ```
 
 5.  Deploy Auto Cleanup

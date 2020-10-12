@@ -5,6 +5,7 @@ custom:
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
   pythonRequirements: # allows us to deploy a newer version of boto3
     slim: true
+    # layer: true
 
 provider:
   name: aws
@@ -164,6 +165,8 @@ functions:
         - app/**.py
       exclude:
         - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
     environment:
       LOGLEVEL: ${self:custom.log_level}
       EXECUTIONLOGBUCKET:
@@ -194,6 +197,8 @@ functions:
         Ref: SettingsTable
       WHITELISTTABLE:
         Ref: WhitelistTable
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
     events:
       - http:
           method: POST
@@ -232,6 +237,8 @@ functions:
         - web/api/update_whitelist_entry.py
       exclude:
         - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
     environment:
       LOGLEVEL: ${self:custom.log_level}
       SETTINGSTABLE:
@@ -276,6 +283,8 @@ functions:
         - web/api/read_settings_service.py
       exclude:
         - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
     environment:
       LOGLEVEL: ${self:custom.log_level}
       SETTINGSTABLE:
@@ -299,6 +308,8 @@ functions:
         - web/api/read_settings_resource.py
       exclude:
         - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
     environment:
       LOGLEVEL: ${self:custom.log_level}
       SETTINGSTABLE:
@@ -333,6 +344,16 @@ functions:
           cors: true
           caching:
             enabled: true
+
+layers:
+  DynamoDBJSON:
+    path: layers/dynamodb_json
+    name: ${self:service}-${self:provider.stage}-dynamodb-json
+    description: DynamoDB JSON utility to load and dump strings of DynamoDB JSON format to Python object and vise-versa
+    compatibleRuntimes:
+      - python3.8
+    licenseInfo: MPL 2.0
+    retain: false
 
 resources:
   Resources:

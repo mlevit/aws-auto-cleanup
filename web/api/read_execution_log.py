@@ -12,8 +12,9 @@ def get_return(code, message, request, response):
     return {
         "statusCode": code,
         "headers": {
-            "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": True,
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Origin": "*",
         },
         "body": json.dumps(
             {"message": message, "request": request, "response": response}
