@@ -24,12 +24,10 @@ def get_return(code, message, request, response):
 def lambda_handler(event, context):
     client = boto3.client("s3")
     parameters = event.get("pathParameters")
-    run_number = int(parameters.get("number"))
+    run = int(parameters.get("run"))
 
-    if run_number in (None, ""):
-        return get_return(
-            400, f"Execution number '{run_number}' is invalid", parameters, None
-        )
+    if run in (None, "") or run <= 0:
+        return get_return(400, f"Execution run '{run}' is invalid", parameters, None)
 
     # get all files in bucket
     try:
@@ -45,9 +43,23 @@ def lambda_handler(event, context):
             None,
         )
 
-    files = []
-    for row in response:
-        files.append(row["Key"])
+    files = [row["Key"] for row in response]
+
+    if len(files) == 0:
+        return get_return(
+            404,
+            "No execution logs to retrieve",
+            parameters,
+            {"header": None, "body": None},
+        )
+
+    if run > len(files):
+        return get_return(
+            404,
+            f"No execution log for run {run} exist",
+            parameters,
+            {"header": None, "body": None},
+        )
 
     # sort file names in desc
     files.sort(reverse=True)
@@ -57,7 +69,7 @@ def lambda_handler(event, context):
         file_contents = (
             client.get_object(
                 Bucket=os.environ.get("EXECUTIONLOGBUCKET"),
-                Key=files[run_number - 1],
+                Key=files[run - 1],
             )
             .get("Body")
             .read()
@@ -68,12 +80,12 @@ def lambda_handler(event, context):
     except Exception as error:
         print(f"[ERROR] {error}")
         return get_return(
-            400, f"Could not read S3 file '{files[run_number - 1]}'", parameters, None
+            400, f"Could not read S3 file '{files[run - 1]}'", parameters, None
         )
 
     return get_return(
         200,
-        f"Execution log {run_number} retrieved",
+        f"Execution log for run {run} retrieved",
         parameters,
         {"header": body[0], "body": body[1:None]},
     )

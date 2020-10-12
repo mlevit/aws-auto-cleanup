@@ -2,7 +2,7 @@
 
 Returns executions logs for a particular Auto Cleanup run. Each log is assigned a `{number}` at API runtime. The newest log is assigned `1`, the second newest `2` and so forth.
 
-**URL**: `/execution/{number}`
+**URL**: `/execution/{run}`
 
 **Method**: `GET`
 
@@ -12,11 +12,11 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 
 ## Request Syntax
 
-`{number}`
+`{run}`
 
 ## Request Structure
 
-- **number** -- **[REQUIRED]** Execution number. The newest log is assigned `1`, the second newest `2` and so forth.
+- **run** -- **[REQUIRED]** Execution number. The newest log is assigned `1`, the second newest `2` and so forth.
 
 ## Return type
 
@@ -29,7 +29,7 @@ dict
 ```json
 {
   "message": "string",
-  "request": { "number": "string" },
+  "request": { "run": "string" },
   "response": { "header": ["string"], "body": [["string"]] }
 }
 ```
