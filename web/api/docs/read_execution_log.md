@@ -1,6 +1,6 @@
 # Read Execution Log
 
-Returns executions logs for a particular Auto Cleanup run. Each log is assigned a `{number}` at API runtime. The newest log is assigned `1`, the second newest `2` and so forth.
+Returns executions logs for a particular Auto Cleanup run. Each log is assigned a `{run}` at API runtime. The newest log is assigned `1`, the second newest `2` and so forth.
 
 **URL**: `/execution/{run}`
 
