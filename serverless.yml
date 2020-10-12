@@ -5,11 +5,6 @@ custom:
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
   pythonRequirements: # allows us to deploy a newer version of boto3
     slim: true
-  remover:
-    prompt: false
-    buckets:
-      - Ref: AthenaResultsBucket
-      - Ref: ExecutionLogBucket
 
 provider:
   name: aws
@@ -332,7 +327,7 @@ functions:
     events:
       - http:
           method: GET
-          path: /execution/{number}
+          path: /execution/{run}
           cors: true
           caching:
             enabled: true
@@ -366,6 +361,7 @@ resources:
         BillingMode: PAY_PER_REQUEST
     ExecutionLogBucket:
       Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
       Properties:
         BucketName: ${self:service}-${self:provider.stage}-execution-log-#{AWS::AccountId}
         AccessControl: Private
@@ -375,6 +371,7 @@ resources:
                 SSEAlgorithm: AES256
     AthenaResultsBucket:
       Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
       Properties:
         BucketName: ${self:service}-${self:provider.stage}-athena-results-#{AWS::AccountId}
         AccessControl: Private
@@ -437,4 +434,3 @@ plugins:
   - serverless-api-gateway-caching
   - serverless-pseudo-parameters
   - serverless-python-requirements
-  - serverless-s3-remover
