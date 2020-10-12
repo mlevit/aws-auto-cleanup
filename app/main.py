@@ -239,7 +239,7 @@ class Cleanup:
                 settings[record_json.get("key")] = record_json.get("value")
         except:
             self.logging.error(
-                f"Could not read DynamoDB table '{os.environ['SETTINGSTABLE']}'."
+                f"""Could not read DynamoDB table '{os.environ.get("SETTINGSTABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         return settings
@@ -266,7 +266,7 @@ class Cleanup:
                 ).add(parsed_resource_id.get("resource"))
         except:
             self.logging.error(
-                f"Could not read DynamoDB table '{os.environ['WHITELISTTABLE']}'."
+                f"""Could not read DynamoDB table '{os.environ.get("WHITELISTTABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         return whitelist
@@ -292,7 +292,6 @@ class Cleanup:
             current_version = client.get_item(
                 TableName=os.environ.get("SETTINGSTABLE"),
                 Key={"key": {"S": "version"}},
-                ConsistentRead=True,
             )
 
             # get new settings version
@@ -307,17 +306,17 @@ class Cleanup:
                     update_settings = True
                     self.logging.info(
                         f"Existing settings with version {current_version} are being updated "
-                        f"to version {new_version} in DynamoDB Table '{os.environ['SETTINGSTABLE']}'."
+                        f"""to version {new_version} in DynamoDB Table '{os.environ.get("SETTINGSTABLE")}'."""
                     )
                 else:
                     self.logging.debug(
                         f"Existing settings are at the lastest version {current_version} in "
-                        f"DynamoDB Table '{os.environ['SETTINGSTABLE']}'."
+                        f"""DynamoDB Table '{os.environ.get("SETTINGSTABLE")}'."""
                     )
             else:
                 update_settings = True
                 self.logging.info(
-                    f"Settings are being inserted into DynamoDB Table '{os.environ['SETTINGSTABLE']}' for the first time."
+                    f"""Settings are being inserted into DynamoDB Table '{os.environ.get("SETTINGSTABLE")}' for the first time."""
                 )
 
             if update_settings:
@@ -345,10 +344,8 @@ class Cleanup:
             self.logging.error(sys.exc_info()[1])
 
     def export_execution_log(self, execution_log, aws_request_id):
-        """Export a CSV file with all execution logs during run.
-
-        Args:
-            execution_log (dict): Dictionary of all execution logs
+        """
+        Export a CSV file with all execution logs during run.
         """
         try:
             os.chdir(tempfile.gettempdir())
