@@ -4,7 +4,7 @@ Returns a dictionary of each AWS services and resources that are supported by Au
 
 **URL**: `/settings/resource`
 
-**Method**: `POST`
+**Method**: `GET`
 
 **Auth required**: No
 

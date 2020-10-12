@@ -4,7 +4,7 @@ Returns a list AWS services that are supported by Auto Cleanup.
 
 **URL**: `/settings/service`
 
-**Method**: `POST`
+**Method**: `GET`
 
 **Auth required**: No
 

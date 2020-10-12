@@ -4,7 +4,7 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 
 **URL**: `/execution/{number}`
 
-**Method**: `POST`
+**Method**: `GET`
 
 **Auth required**: No
 

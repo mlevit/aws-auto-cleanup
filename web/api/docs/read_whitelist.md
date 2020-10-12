@@ -4,7 +4,7 @@ Returns the entire whitelist table.
 
 **URL**: `/whitelist`
 
-**Method**: `POST`
+**Method**: `GET`
 
 **Auth required**: No
 
