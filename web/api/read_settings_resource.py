@@ -86,8 +86,13 @@ def lambda_handler(event, context):
 
     body = {}
     for service in settings.get("services", {}):
-        body[service] = sorted(list(settings.get("services", {}).get(service).keys()))
+        body[service] = {
+            "resources": sorted(list(settings.get("services", {}).get(service).keys()))
+        }
 
     return get_return(
-        200, "Supported AWS services and resources list retrieved", None, body
+        200,
+        "Supported AWS services and resources list retrieved",
+        None,
+        {"services": body},
     )

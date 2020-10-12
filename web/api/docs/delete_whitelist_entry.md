@@ -10,7 +10,7 @@ Deletes a new whitelist entry into DynamoDB.
 
 **Permissions required**: None
 
-## Request
+## Request Syntax
 
 ```json
 {
@@ -18,17 +18,19 @@ Deletes a new whitelist entry into DynamoDB.
 }
 ```
 
-### Content example
+## Request Structure
 
-```json
-{
-  "resource_id": "s3:bucket:my_bucket"
-}
-```
+- _(dict)_
 
-## Success Response
+  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
-**Code**: `200 OK`
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
@@ -42,16 +44,14 @@ Deletes a new whitelist entry into DynamoDB.
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "Whitelist entry deleted",
-  "request": {
-    "resource_id": "s3:bucket:my_bucket"
-  },
-  "response": {
-    "resource_id": "s3:bucket:my_bucket"
-  }
-}
-```
+- _(dict)_
+
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+
+  - **request** (dict) -- Request payload.
+
+  - **response** (dict) -- Response payload.
+
+    - **resource_id** (string) -- Whitelist entry resource ID that was deleted.

@@ -88,5 +88,5 @@ def lambda_handler(event, context):
         200,
         "Supported AWS services list retrieved",
         None,
-        sorted(list(settings.get("services", {}).keys())),
+        {"services": sorted(list(settings.get("services", {}).keys()))},
     )

@@ -63,6 +63,8 @@ def lambda_handler(event, context):
             .read()
             .decode("utf-8")
         )
+
+        body = list(csv.reader(file_contents.splitlines()))
     except Exception as error:
         print(f"[ERROR] {error}")
         return get_return(
@@ -73,5 +75,5 @@ def lambda_handler(event, context):
         200,
         f"Execution log {run_number} retrieved",
         parameters,
-        list(csv.reader(file_contents.splitlines())),
+        {"header": body[0], "body": body[1:None]},
     )

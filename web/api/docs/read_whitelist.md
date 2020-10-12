@@ -10,44 +10,57 @@ Returns the entire whitelist table.
 
 **Permissions required**: None
 
-## Success Response
+## Request Syntax
 
-**Code**: `200 OK`
+N/A
+
+## Request Structure
+
+N/A
+
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
   "message": "string",
   "request": null,
-  "response": [
-    {
-      "resource_id": "string",
-      "expiration": "EPOCH string",
-      "owner": "string",
-      "comment": "string"
-    }
-  ]
+  "response": {
+    "whitelist": [
+      {
+        "resource_id": "string",
+        "expiration": "epoch",
+        "owner": "string",
+        "comment": "string"
+      }
+    ]
+  }
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "Whitelist retrieved",
-  "request": null,
-  "response": [
-    {
-      "comment": "Auto Cleanup production CloudFormation stack",
-      "expiration": "99999999999",
-      "owner": "example@email.com",
-      "resource_id": "cloudformation:stack:auto-cleanup-prod"
-    },
-    {
-      "comment": "Auto Cleanup development CloudFormation stack",
-      "expiration": "99999999999",
-      "owner": "example@email.com",
-      "resource_id": "cloudformation:stack:auto-cleanup-dev"
-    }
-  ]
-}
-```
+- _(dict)_
+
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+
+  - **request** (dict) -- Request payload.
+
+  - **response** (dict) -- Response payload.
+
+    - **whitelist** (list) -- List of all whitelist entries.
+
+      - _(dict)_
+
+        - **resource_id** (string) -- Whitelist entry resource ID.
+
+        - **expiration** (epoch) -- Epoch timestamp when the whitelist entry will expire.
+
+        - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+
+        - **comment** (string) -- Comment associated with the whitelist entry.

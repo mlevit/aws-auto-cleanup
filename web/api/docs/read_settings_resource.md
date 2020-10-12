@@ -10,39 +10,42 @@ Returns a dictionary of each AWS services and resources that are supported by Au
 
 **Permissions required**: None
 
-## Success Response
+## Request Syntax
 
-**Code**: `200 OK`
+N/A
+
+## Request Structure
+
+N/A
+
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
   "message": "string",
   "request": null,
-  "response": { "string": ["string"] }
+  "response": { "services": { "resources": ["string"] } }
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "Supported AWS services and resources list retrieved",
-  "request": null,
-  "response": {
-    "rds": ["instance", "snapshot"],
-    "s3": ["bucket"],
-    "sagemaker": ["endpoint", "notebook_instance"],
-    "elasticbeanstalk": ["application"],
-    "glue": ["dev_endpoint"],
-    "emr": ["cluster"],
-    "kinesis": ["stream"],
-    "dynamodb": ["table"],
-    "lambda": ["function"],
-    "ecs": ["cluster", "service"],
-    "iam": ["role"],
-    "redshift": ["cluster", "snapshot"],
-    "ec2": ["address", "instance", "security_group", "snapshot", "volume"],
-    "cloudformation": ["stack"]
-  }
-}
-```
+- _(dict)_
+
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+
+  - **request** (dict) -- Request payload.
+
+  - **response** (dict) -- Response payload.
+
+    - **services** (dict) -- The names of AWS services supported by Auto Cleanup.
+
+      - **resources** (list) -- The names of AWS resources supported within the service.
+
+        - _(string)_

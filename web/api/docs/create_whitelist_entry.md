@@ -24,7 +24,7 @@ Inserts a new whitelist entry into DynamoDB.
 
 - _(dict)_
 
-  - **resource_id** (string) -- **[REQUIRED]** The Auto Cleanup ID of the resource in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
+  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
   - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
 
@@ -48,7 +48,7 @@ dict
   },
   "response": {
     "resource_id": "string",
-    "expiration": "EPOCH string",
+    "expiration": "epoch",
     "owner": "string",
     "comment": "string"
   }
@@ -67,7 +67,7 @@ dict
 
     - **resource_id** (string) -- Whitelist entry resource ID.
 
-    - **expiration** (EPOCH) -- EPOCH timestamp when the whitelist entry will expire.
+    - **expiration** (epoch) -- Epoch timestamp when the whitelist entry will expire.
 
     - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
 

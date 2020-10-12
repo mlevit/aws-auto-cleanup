@@ -10,64 +10,48 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 
 **Permissions required**: None
 
-## Success Response
+## Request Syntax
 
-**Code**: `200 OK`
+`{number}`
+
+## Request Structure
+
+- **number** -- **[REQUIRED]** Execution number. The newest log is assigned `1`, the second newest `2` and so forth.
+
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
   "message": "string",
-  "request": { "string": "string" },
-  "response": [["string"]]
+  "request": { "number": "string" },
+  "response": { "header": ["string"], "body": [["string"]] }
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "Execution log 2 retrieved",
-  "request": {
-    "number": "2"
-  },
-  "response": [
-    [
-      "platform",
-      "region",
-      "service",
-      "resource",
-      "resource_id",
-      "action",
-      "timestamp",
-      "dry_run_flag",
-      "execution_id"
-    ],
-    [
-      "AWS",
-      "ap-southeast-2",
-      "ecs",
-      "service",
-      "test",
-      "delete",
-      "2020-10-10 07:23:11",
-      "False",
-      "5596d8c9-6434-4d65-aa2a-5df457066fea"
-    ],
-    [
-      "AWS",
-      "ap-southeast-2",
-      "ecs",
-      "cluster",
-      "airflow-dev",
-      "delete",
-      "2020-10-10 07:23:11",
-      "False",
-      "5596d8c9-6434-4d65-aa2a-5df457066fea"
-    ]
-  ]
-}
-```
+- _(dict)_
 
-## Notes
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
 
-- The first list in the the `response` list is the columns header.
+  - **request** (dict) -- Request payload.
+
+  - **response** (list) -- Response payload.
+
+    - _(dict)_
+
+      - **header** (list) -- List of column headers.
+
+        - _string_
+
+      - **body** (list) -- List of execution log records.
+
+        - _(list)_
+
+          - _string_

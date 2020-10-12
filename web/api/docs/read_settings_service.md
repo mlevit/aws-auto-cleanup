@@ -10,39 +10,40 @@ Returns a list AWS services that are supported by Auto Cleanup.
 
 **Permissions required**: None
 
-## Success Response
+## Request Syntax
 
-**Code**: `200 OK`
+N/A
+
+## Request Structure
+
+N/A
+
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
   "message": "string",
   "request": null,
-  "response": ["string"]
+  "response": { "services": ["string"] }
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "Supported AWS services and resources list retrieved",
-  "request": null,
-  "response": [
-    "cloudformation",
-    "dynamodb",
-    "ec2",
-    "ecs",
-    "elasticbeanstalk",
-    "emr",
-    "glue",
-    "iam",
-    "kinesis",
-    "lambda",
-    "rds",
-    "redshift",
-    "s3",
-    "sagemaker"
-  ]
-}
-```
+- _(dict)_
+
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+
+  - **request** (dict) -- Request payload.
+
+  - **response** (dict) -- Response payload.
+
+    - **services** (list) -- The names of AWS services supported by Auto Cleanup.
+
+      - _(string)_

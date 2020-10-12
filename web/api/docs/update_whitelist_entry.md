@@ -10,69 +10,72 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 **Permissions required**: None
 
-## Request
+## Request Syntax
 
 ```json
 {
   "resource_id": "string",
-  "expiration": "EPOCH string",
+  "expiration": "epoch",
   "owner": "string",
   "comment": "string"
 }
 ```
 
-### Content example
+## Request Structure
 
-```json
-{
-  "resource_id": "s3:bucket:my_bucket",
-  "expiration": "123456789",
-  "owner": "example@email.com",
-  "comment": "Projext X"
-}
-```
+- _(dict)_
 
-## Success Response
+  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
-**Code**: `200 OK`
+  - **expiration** (epoch) -- **[REQUIRED]** Epoch timestamp of the existing whitelist entry.
+
+  - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+
+  - **comment** (string) -- Comment associated with the whitelist entry.
+
+## Return type
+
+dict
+
+## Returns
+
+### Response Syntax
 
 ```json
 {
   "message": "string",
   "request": {
     "resource_id": "string",
-    "expiration": "EPOCH string",
+    "expiration": "epoch",
     "owner": "string",
     "comment": "string"
   },
   "response": {
     "resource_id": "string",
-    "expiration": "EPOCH string",
+    "expiration": "epoch",
     "owner": "string",
     "comment": "string"
   }
 }
 ```
 
-### Content example
+### Response Structure
 
-```json
-{
-  "message": "Whitelist entry updated",
-  "request": {
-    "comment": "Projext X",
-    "expiration": "1603010770",
-    "owner": "example@email.com",
-    "resource_id": "s3:bucket:my_bucket"
-  },
-  "response": {
-    "resource_id": "s3:bucket:my_bucket",
-    "expiration": "1603615570",
-    "owner": "example@email.com",
-    "comment": "Projext X"
-  }
-}
-```
+- _(dict)_
+
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+
+  - **request** (dict) -- Request payload.
+
+  - **response** (dict) -- Response payload.
+
+    - **resource_id** (string) -- Whitelist entry resource ID.
+
+    - **expiration** (epoch) -- Extended Epoch timestamp when the whitelist entry will expire.
+
+    - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+
+    - **comment** (string) -- Comment associated with the whitelist entry.
 
 ## Notes
 
