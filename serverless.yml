@@ -12,6 +12,8 @@ provider:
   stage: ${opt:stage, "prod"} # Override via CLI "--stage dev"
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # Override via CLI "--aws-profile saml"
+  apiGateway:
+    minimumCompressionSize: 1024
   iamRoleStatements:
     - Effect: Allow
       Action:
