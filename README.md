@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings
+Open-source application to programmatically delete AWS resources based on a whitelist and time to live (TTL) settings
 </p>
 
 ![](./static/architecture.drawio.svg)
