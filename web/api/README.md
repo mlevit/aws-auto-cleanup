@@ -68,16 +68,9 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
 ## API
 
 - [Whitelist](#whitelist)
-  - [Create](#create)
-  - [Read](#read)
-  - [Update](#update)
-  - [Delete](#delete)
 - [Execution Log](#execution-log)
-  - [Read](#read)
 - [Service](#service)
-  - [Read](#read)
 - [Resource](#resource)
-  - [Read](#read)
 
 ### Whitelist
 
