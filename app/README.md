@@ -171,7 +171,7 @@ General settings.
 
 #### Services
 
-Service-specific settings. This includes which services and resources are cleaned, and how long they can remain active within AWS before Auto Cleanup deletes them.
+Service-specific settings indicating the supported AWS services and resources and their lifespan.
 
 | Service           | Resource Type            | Clean | TTL | Comment                                                        |
 | ----------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
@@ -200,7 +200,7 @@ Service-specific settings. This includes which services and resources are cleane
 
 #### Regions
 
-Region-specific settings. This includes which regions are cleaned, and which are skipped.
+Region-specific settings indicating the regions to be cleaned.
 
 | Region            | Clean |
 | ----------------- | ----- |
@@ -228,7 +228,7 @@ Region-specific settings. This includes which regions are cleaned, and which are
 | us-west-1         | True  |
 | us-west-2         | True  |
 
-_Note: Some regions have `clean` set to `False` by default as they required special access from AWS._
+_Note: Some regions are deactivated by default as they required special access from AWS._
 
 ### Execution Log
 
