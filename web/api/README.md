@@ -1,21 +1,84 @@
 # AWS Auto Cleanup API
 
+The Auto Cleanup API is a severless Lambda-based API built to faciliate the website. The architecture diagram below illustrates the various services and their relationships with one another.
+
 ## Table of contents
 
-- [Whitelist](#whitelist)
-  - [Create Whitelist Entry](#create-whitelist-entry)
-  - [Read Whitelist](#read-whitelist)
-  - [Update Whitelist Entry](#update-whitelist-entry)
-  - [Delete Whitelist Entry](#delete-whitelist-entry)
-- [Execution Log](#execution-log)
-  - [Read Execution Log](#read-execution-log)
-- [Settings](#settings)
-  - [Read Settings Service](#read-settings-service)
-  - [Read Settings Resource](#read-settings-resource)
+- [Deployment](#deployment)
+  - [Removal](#removal)
+- [API](#api)
+  - [Whitelist](#whitelist)
+    - [Create Whitelist Entry](#create-whitelist-entry)
+    - [Read Whitelist](#read-whitelist)
+    - [Update Whitelist Entry](#update-whitelist-entry)
+    - [Delete Whitelist Entry](#delete-whitelist-entry)
+  - [Execution Log](#execution-log)
+    - [Read Execution Log](#read-execution-log)
+  - [Settings](#settings)
+    - [Read Settings Service](#read-settings-service)
+    - [Read Settings Resource](#read-settings-resource)
 
-## Whitelist
+## Deployment
 
-### Create Whitelist Entry
+1. Install [AWS CLI](https://aws.amazon.com/cli/)
+
+   ```bash
+   pip install awscli
+   ```
+
+2. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
+
+   - _Auto Cleanup should be deployed by a user with administrative privileges._
+
+3. Install [Serverless Framework](https://www.serverless.com/)
+
+   ```bash
+   npm install serverless
+   ```
+
+4. Download
+
+   ```bash
+   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/web/api --p aws-auto-cleanup-api
+   ```
+
+5. Change directory
+
+   ```bash
+   cd aws-auto-cleanup-api
+   ```
+
+6. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+7. Deploy
+
+   ```bash
+   npm run deploy -- [--region] [--aws-profile]
+   ```
+
+### Removal
+
+1. Change directory
+
+   ```bash
+   cd aws-auto-cleanup-api
+   ```
+
+2. Remove
+
+   ```bash
+   npm run remove -- [--region] [--aws-profile]
+   ```
+
+## API
+
+### Whitelist
+
+#### Create Whitelist Entry
 
 Inserts a new whitelist entry into DynamoDB.
 
@@ -27,7 +90,7 @@ Inserts a new whitelist entry into DynamoDB.
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 ```json
 {
@@ -37,7 +100,7 @@ Inserts a new whitelist entry into DynamoDB.
 }
 ```
 
-#### Request Structure
+##### Request Structure
 
 - _(dict)_
 
@@ -47,13 +110,13 @@ Inserts a new whitelist entry into DynamoDB.
 
   - **comment** (string) -- Comment associated with the whitelist entry.
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -72,7 +135,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 
@@ -90,13 +153,13 @@ dict
 
     - **comment** (string) -- Comment associated with the whitelist entry.
 
-#### Notes
+##### Notes
 
 - AWS service (e.g. `s3`) and resource (e.g. `bucket`) will be evaluated against the Settings table to ensure they are valid.
 
 - The `expiration` field is computed at insert time. Current time plus `ttl` from the Settings table are used to compute the value.
 
-### Read Whitelist
+#### Read Whitelist
 
 Returns the entire whitelist table.
 
@@ -108,21 +171,21 @@ Returns the entire whitelist table.
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 N/A
 
-#### Request Structure
+##### Request Structure
 
 N/A
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -141,7 +204,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 
@@ -163,7 +226,7 @@ dict
 
         - **comment** (string) -- Comment associated with the whitelist entry.
 
-### Update Whitelist Entry
+#### Update Whitelist Entry
 
 Updates an existing whitelist entry into DynamoDB. This is not meant to be used to update the `owner` or `comment` fields, but rather to extend the `expiration` date to ensure the resources are kept alive for longer.
 
@@ -175,7 +238,7 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 ```json
 {
@@ -186,7 +249,7 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 }
 ```
 
-#### Request Structure
+##### Request Structure
 
 - _(dict)_
 
@@ -198,13 +261,13 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
   - **comment** (string) -- Comment associated with the whitelist entry.
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -224,7 +287,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 
@@ -242,13 +305,13 @@ dict
 
     - **comment** (string) -- Comment associated with the whitelist entry.
 
-#### Notes
+##### Notes
 
 - AWS service (e.g. `s3`) and resource (e.g. `bucket`) will be evaluated against the Settings table to ensure they are valid.
 
 - The new `expiration` field value is computed by using the value from the payload and adding to it the `ttl` value from the Settings table.
 
-### Delete Whitelist Entry
+#### Delete Whitelist Entry
 
 Deletes a new whitelist entry into DynamoDB.
 
@@ -260,7 +323,7 @@ Deletes a new whitelist entry into DynamoDB.
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 ```json
 {
@@ -268,19 +331,19 @@ Deletes a new whitelist entry into DynamoDB.
 }
 ```
 
-#### Request Structure
+##### Request Structure
 
 - _(dict)_
 
   - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -294,7 +357,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 
@@ -306,9 +369,9 @@ dict
 
     - **resource_id** (string) -- Whitelist entry resource ID that was deleted.
 
-## Execution Log
+### Execution Log
 
-### Read Execution Log
+#### Read Execution Log
 
 Returns executions logs for a particular Auto Cleanup run. Each log is assigned a `{run}` at API runtime. The newest log is assigned `1`, the second newest `2` and so forth.
 
@@ -320,21 +383,21 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 `{run}`
 
-#### Request Structure
+##### Request Structure
 
 - **run** -- **[REQUIRED]** Execution number. The newest log is assigned `1`, the second newest `2` and so forth.
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -344,7 +407,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 
@@ -366,9 +429,9 @@ dict
 
           - _string_
 
-## Settings
+### Settings
 
-### Read Settings Service
+#### Read Settings Service
 
 Returns a list AWS services that are supported by Auto Cleanup.
 
@@ -380,21 +443,21 @@ Returns a list AWS services that are supported by Auto Cleanup.
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 N/A
 
-#### Request Structure
+##### Request Structure
 
 N/A
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -404,7 +467,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 
@@ -418,7 +481,7 @@ dict
 
       - _(string)_
 
-### Read Settings Resource
+#### Read Settings Resource
 
 Returns a dictionary of each AWS services and resources that are supported by Auto Cleanup.
 
@@ -430,21 +493,21 @@ Returns a dictionary of each AWS services and resources that are supported by Au
 
 **Permissions required**: None
 
-#### Request Syntax
+##### Request Syntax
 
 N/A
 
-#### Request Structure
+##### Request Structure
 
 N/A
 
-#### Return type
+##### Return type
 
 dict
 
-#### Returns
+##### Returns
 
-##### Response Syntax
+###### Response Syntax
 
 ```json
 {
@@ -454,7 +517,7 @@ dict
 }
 ```
 
-##### Response Structure
+###### Response Structure
 
 - _(dict)_
 

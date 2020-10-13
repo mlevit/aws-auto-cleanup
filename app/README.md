@@ -1,6 +1,6 @@
-# AWS Auto Cleanup Core
+# AWS Auto Cleanup App
 
-The Auto Cleanup Core consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
+The Auto Cleanup App consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
 
 ![architecture](./static/architecture.drawio.svg)
 
@@ -45,28 +45,20 @@ The Auto Cleanup Core consists of several serverless AWS resource that all work 
 
 6. Install dependencies
 
-   - Node
-
-     ```bash
-     npm install
-     ```
-
-   - Python
-
-     ```bash
-     pip install -r ./util/dynamodb_json/requirements.txt -t ./util/dynamodb_json/python/lib/python3.8/site-packages/ --no-deps
-     ```
+   ```bash
+   npm install
+   ```
 
 7. Deploy
 
    ```bash
-   serverless deploy [--region] [--aws-profile]
+   npm run deploy -- [--region] [--aws-profile]
    ```
 
 8. Run
 
    ```shell
-   serverless invoke --function AutoCleanup [--region] [--aws-profile] --type Event
+   npm run invoke -- [--region] [--aws-profile]
    ```
 
    - _Settings and Whitelist tables will be populated at the start of the first run._
@@ -90,7 +82,7 @@ The Auto Cleanup Core consists of several serverless AWS resource that all work 
 2. Remove
 
    ```bash
-   serverless remove [--region] [--aws-profile]
+   npm run remove -- [--region] [--aws-profile]
    ```
 
    - _S3 buckets provisioned by Serverless will not be deleted through this process. To finalise removal, please delete the `athena-results` and `execution-log` buckets manually._
