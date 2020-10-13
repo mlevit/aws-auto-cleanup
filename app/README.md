@@ -4,17 +4,28 @@ The Auto Cleanup Application consists of several serverless AWS resource that al
 
 ![architecture](./static/architecture.drawio.svg)
 
+## Table of contents
+
+- [Deployment](#deployment)
+- [Removal](#removal)
+- [Features](#features)
+  - [Whitelist](#whitelist)
+  - [Settings](#settings)
+  - [Execution Log](#execution-log)
+
 ## Deployment
 
 1. Install [AWS CLI](https://aws.amazon.com/cli/)
 
    ```bash
-   pip install awscli --upgrade --user
+   pip install awscli
    ```
 
-2. Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, CloudFormation Stacks and more. Administrators should deploy Auto Cleanup.
+2. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
 
-3. Install [Serverless](https://www.serverless.com/)
+   - _Auto Cleanup should be deployed by a user with administrative privileges._
+
+3. Install [Serverless Framework](https://www.serverless.com/)
 
    ```bash
    npm install serverless
@@ -54,11 +65,13 @@ The Auto Cleanup Application consists of several serverless AWS resource that al
 
 8. Run
 
-   ```bash
+   ```shell
    serverless invoke --function AutoCleanup [--region] [--aws-profile] --type Event
    ```
 
-   _Note: This will populate the settings and whitelist tables and run a clean in dry run mode_
+   - _Settings and Whitelist tables will be populated at the start of the first run._
+
+   - _Dry run mode is automatically activated by default._
 
 9. Inspect
 
@@ -66,9 +79,21 @@ The Auto Cleanup Application consists of several serverless AWS resource that al
    serverless logs --function AutoCleanup [--region] [--aws-profile]
    ```
 
-   or
+## Removal
 
-   Check CloudWatch
+1. Change directory
+
+   ```bash
+   cd aws-auto-cleanup-app
+   ```
+
+2. Remove
+
+   ```bash
+   serverless remove [--region] [--aws-profile]
+   ```
+
+   - _S3 buckets provisioned by Serverless will not be deleted through this process. To finalise removal, please delete the `athena-results` and `execution-log` buckets manually._
 
 ## Features
 
@@ -126,11 +151,11 @@ This has been designed in such a way as to prevent AWS resources from being whit
 
 ### Settings
 
-The settings table contains all key-value pair settings used by Auto Cleanup during runtime.
+The settings table contains several key-value pairs records including `version`, `general`, `services`, and `regions`.
 
 #### Version
 
-Version is used to inform Auto Cleanup if new settings exist in the default data file that should be loaded into DynamoDB. If the version number present in the default data file is greater than the version number stored in the DynamoDB table, the load will commence.
+Version number of the settings. If the version number within the `app/src/data/auto-cleanup-settings.json` file is greater than in the database, the settings will be refreshed.
 
 | Key     | Value |
 | ------- | ----- |
@@ -138,13 +163,15 @@ Version is used to inform Auto Cleanup if new settings exist in the default data
 
 #### General
 
+General settings.
+
 | Key     | Value |
 | ------- | ----- |
 | Dry Run | True  |
 
 #### Services
 
-The table includes the `clean` attribute which informs Auto Cleanup if the service should be cleaned and the `ttl` attribute which stores the time to live in days for that service resource pair.
+Service-specific settings. This includes which services and resources are cleaned, and how long they can remain active within AWS before Auto Cleanup deletes them.
 
 | Service           | Resource Type            | Clean | TTL | Comment                                                        |
 | ----------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
@@ -173,7 +200,7 @@ The table includes the `clean` attribute which informs Auto Cleanup if the servi
 
 #### Regions
 
-The table includes the `clean` attribute which informs Auto Cleanup if the region should be cleaned up or not.
+Region-specific settings. This includes which regions are cleaned, and which are skipped.
 
 | Region            | Clean |
 | ----------------- | ----- |
@@ -201,7 +228,7 @@ The table includes the `clean` attribute which informs Auto Cleanup if the regio
 | us-west-1         | True  |
 | us-west-2         | True  |
 
-_Note: Some regions have `clean` set to `false` by default as they required special access from AWS._
+_Note: Some regions have `clean` set to `False` by default as they required special access from AWS._
 
 ### Execution Log
 
