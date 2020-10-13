@@ -4,6 +4,72 @@ The Auto Cleanup Application consists of several serverless AWS resource that al
 
 ![architecture](./static/architecture.drawio.svg)
 
+## Deployment
+
+1. Install [AWS CLI](https://aws.amazon.com/cli/)
+
+   ```bash
+   pip install awscli --upgrade --user
+   ```
+
+2. Configure the AWS CLI following the instruction at [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration). Ensure the user you're configuring has the appropriate IAM permissions to create Lambda Functions, S3 Buckets, IAM Roles, CloudFormation Stacks and more. Administrators should deploy Auto Cleanup.
+
+3. Install [Serverless](https://www.serverless.com/)
+
+   ```bash
+   npm install serverless
+   ```
+
+4. Download
+
+   ```bash
+   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/app --p aws-auto-cleanup-app
+   ```
+
+5. Change directory
+
+   ```bash
+   cd aws-auto-cleanup-app
+   ```
+
+6. Install dependencies
+
+   - Node
+
+     ```bash
+     npm install
+     ```
+
+   - Python
+
+     ```bash
+     pip install -r ./util/dynamodb_json/requirements.txt -t ./util/dynamodb_json/python/lib/python3.8/site-packages/ --no-deps
+     ```
+
+7. Deploy
+
+   ```bash
+   serverless deploy [--region] [--aws-profile]
+   ```
+
+8. Run
+
+   ```bash
+   serverless invoke --function AutoCleanup [--region] [--aws-profile] --type Event
+   ```
+
+   _Note: This will populate the settings and whitelist tables and run a clean in dry run mode_
+
+9. Inspect
+
+   ```bash
+   serverless logs --function AutoCleanup [--region] [--aws-profile]
+   ```
+
+   or
+
+   Check CloudWatch
+
 ## Features
 
 ### Whitelist
@@ -68,7 +134,7 @@ Version is used to inform Auto Cleanup if new settings exist in the default data
 
 | Key     | Value |
 | ------- | ----- |
-| Version | x.x   |
+| Version | 123   |
 
 #### General
 
