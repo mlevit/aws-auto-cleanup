@@ -1,0 +1,200 @@
+service: auto-cleanup-api
+
+custom:
+  log_level: INFO # DEBUG for dev | INFO for prod
+  region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
+  region: ${self:custom.region}
+  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
+  apiGateway:
+    minimumCompressionSize: 1024
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:GetItem
+        - dynamodb:ListTables
+        - dynamodb:PutItem
+        - dynamodb:Scan
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - s3:Get*
+        - s3:List*
+      Resource: "*"
+  tracing:
+    lambda: true
+
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
+functions:
+  WhitelistCreate:
+    handler: api/src/whitelist/create.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-create
+    description: Create whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/whitelist/create.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
+    events:
+      - http:
+          method: POST
+          path: /whitelist/entry
+          cors: true
+  WhitelistRead:
+    handler: api/src/whitelist/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-read
+    description: Read whitelist
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/whitelist/read.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    events:
+      - http:
+          method: GET
+          path: /whitelist
+          cors: true
+  WhitelistUpdate:
+    handler: api/src/whitelist/update.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-update
+    description: Update whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/whitelist/update.py
+      exclude:
+        - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    events:
+      - http:
+          method: PUT
+          path: /whitelist/entry
+          cors: true
+  WhitelistDelete:
+    handler: api/src/whitelist/delete.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-delete
+    description: Delete whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/whitelist/delete.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    events:
+      - http:
+          method: DELETE
+          path: /whitelist/entry
+          cors: true
+  ServiceRead:
+    handler: api/src/service/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-service-read
+    description: Returns AWS services supported by Auto Cleanup
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/service/read.py
+      exclude:
+        - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+    events:
+      - http:
+          method: GET
+          path: /settings/service
+          cors: true
+          caching:
+            enabled: true
+  ResourceRead:
+    handler: api/src/resource/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-resource-read
+    description: Returns AWS resources supported by Auto Cleanup
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/resource/read.py
+      exclude:
+        - "**"
+    layers:
+      - Ref: DynamoDBJSONLambdaLayer
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+    events:
+      - http:
+          method: GET
+          path: /settings/resource
+          cors: true
+          caching:
+            enabled: true
+  ExecutionLogRead:
+    handler: api/src/execution_log/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-execution-log-read
+    description: Returns execution logs
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - api/src/execution_log/read.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      EXECUTIONLOGBUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+    events:
+      - http:
+          method: GET
+          path: /execution/{run}
+          cors: true
+          caching:
+            enabled: true
+
+layers:
+  DynamoDBJSON:
+    path: util/dynamodb_json
+    name: ${self:service}-${self:provider.stage}-dynamodb-json
+    description: DynamoDB JSON utility to load and dump strings of DynamoDB JSON format to Python object and vise-versa
+    compatibleRuntimes:
+      - python3.8
+    licenseInfo: MPL 2.0
+    retain: false
+
+plugins:
+  - serverless-api-gateway-caching
+  - serverless-pseudo-parameters

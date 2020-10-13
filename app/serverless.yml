@@ -1,11 +1,10 @@
-service: auto-cleanup
+service: auto-cleanup-app
 
 custom:
   log_level: INFO # DEBUG for dev | INFO for prod
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
   pythonRequirements: # allows us to deploy a newer version of boto3
     slim: true
-    # layer: true
 
 provider:
   name: aws
@@ -13,8 +12,6 @@ provider:
   stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
-  # stackName: ${self:service}-${self:provider.stage}-stack
-  # apiName: ${self:service}-${self:provider.stage}-api
   apiGateway:
     minimumCompressionSize: 1024
   iamRoleStatements:
@@ -156,15 +153,15 @@ package:
 functions:
   AutoCleanup:
     handler: main.lambda_handler
-    module: app
-    name: ${self:service}-${self:provider.stage}-app
+    module: src
+    name: ${self:service}-${self:provider.stage}
     description: Removes unused AWS resources based on time of creation
     memorySize: 256
     timeout: 300
     package:
       include:
-        - app/data/**
-        - app/**.py
+        - src/data/**
+        - src/**.py
       exclude:
         - "**"
     layers:
@@ -181,175 +178,10 @@ functions:
       - schedule:
           rate: rate(3 days)
           enabled: true
-  CreateWhitelistEntry:
-    handler: api/create_whitelist_entry.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-create-whitelist-entry
-    description: Creates a new whitelist entry
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/create_whitelist_entry.py
-      exclude:
-        - "**"
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE:
-        Ref: SettingsTable
-      WHITELISTTABLE:
-        Ref: WhitelistTable
-    layers:
-      - Ref: DynamoDBJSONLambdaLayer
-    events:
-      - http:
-          method: POST
-          path: /whitelist/entry
-          cors: true
-  ReadWhitelist:
-    handler: api/read_whitelist.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-read-whitelist
-    description: Returns the entire whitelist
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/read_whitelist.py
-      exclude:
-        - "**"
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      WHITELISTTABLE:
-        Ref: WhitelistTable
-    events:
-      - http:
-          method: GET
-          path: /whitelist
-          cors: true
-  UpdateWhitelistEntry:
-    handler: api/update_whitelist_entry.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-update-whitelist-entry
-    description: Updates an existing whitelist entry
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/update_whitelist_entry.py
-      exclude:
-        - "**"
-    layers:
-      - Ref: DynamoDBJSONLambdaLayer
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE:
-        Ref: SettingsTable
-      WHITELISTTABLE:
-        Ref: WhitelistTable
-    events:
-      - http:
-          method: PUT
-          path: /whitelist/entry
-          cors: true
-  DeleteWhitelistEntry:
-    handler: api/delete_whitelist_entry.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-delete-whitelist-entry
-    description: Deletes an existing whitelist entry
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/delete_whitelist_entry.py
-      exclude:
-        - "**"
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      WHITELISTTABLE:
-        Ref: WhitelistTable
-    events:
-      - http:
-          method: DELETE
-          path: /whitelist/entry
-          cors: true
-  ReadSettingsService:
-    handler: api/read_settings_service.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-read-settings-service
-    description: Returns AWS services supported by Auto Cleanup
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/read_settings_service.py
-      exclude:
-        - "**"
-    layers:
-      - Ref: DynamoDBJSONLambdaLayer
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE:
-        Ref: SettingsTable
-    events:
-      - http:
-          method: GET
-          path: /settings/service
-          cors: true
-          caching:
-            enabled: true
-  ReadSettingsResource:
-    handler: api/read_settings_resource.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-read-settings-resource
-    description: Returns AWS resources supported by Auto Cleanup
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/read_settings_resource.py
-      exclude:
-        - "**"
-    layers:
-      - Ref: DynamoDBJSONLambdaLayer
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE:
-        Ref: SettingsTable
-    events:
-      - http:
-          method: GET
-          path: /settings/resource
-          cors: true
-          caching:
-            enabled: true
-  ReadExecutionLog:
-    handler: api/read_execution_log.lambda_handler
-    module: web
-    name: ${self:service}-${self:provider.stage}-api-read-execution-log
-    description: Returns execution logs
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - web/api/read_execution_log.py
-      exclude:
-        - "**"
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      EXECUTIONLOGBUCKET:
-        Ref: ExecutionLogBucket
-    events:
-      - http:
-          method: GET
-          path: /execution/{run}
-          cors: true
-          caching:
-            enabled: true
 
 layers:
   DynamoDBJSON:
-    path: layers/dynamodb_json
+    path: util/dynamodb_json
     name: ${self:service}-${self:provider.stage}-dynamodb-json
     description: DynamoDB JSON utility to load and dump strings of DynamoDB JSON format to Python object and vise-versa
     compatibleRuntimes:
@@ -453,9 +285,24 @@ resources:
           Parameters:
             delimiter: ","
             classification: csv
-            "skip.header.line.count": 1
+            "skip.header.line.count": 1'
+  Outputs:
+    ExecutionLogBucketName:
+      Value:
+        Ref: ExecutionLogBucket
+      Export:
+        Name: ExecutionLogBucketName
+    SettingsTableName:
+      Value:
+        Ref: SettingsTable
+      Export:
+        Name: SettingsTableName
+    WhitelistTableName:
+      Value:
+        Ref: WhitelistTable
+      Export:
+        Name: WhitelistTableName
 
 plugins:
-  - serverless-api-gateway-caching
   - serverless-pseudo-parameters
   - serverless-python-requirements

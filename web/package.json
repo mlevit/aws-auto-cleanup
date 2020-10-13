@@ -1,16 +1,14 @@
 {
-  "name": "auto-cleanup",
+  "name": "auto-cleanup-web",
   "description": "Open source application to programatically clean your AWS resources based on a whitelist and time to live (TTL) settings",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "serverless": "^2.5.0",
     "serverless-iam-roles-per-function": "^2.0.2",
     "serverless-pseudo-parameters": "^2.5.0"
   },
   "devDependencies": {
-    "serverless-api-gateway-caching": "^1.5.1",
-    "serverless-python-requirements": "^5.1.0"
+    "serverless-api-gateway-caching": "^1.5.1"
   },
   "repository": {
     "type": "git",
