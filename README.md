@@ -73,7 +73,7 @@ Auto Cleanup is deployed using the Serverless Framework which under the hood cre
 
 To remove Auto Cleanup from your AWS account, run the following command from the `aws-auto-cleanup` directory.
 
-_Note: This will remove all provisioned resources including the excution logs folder. If you'd rather keep the logs, make a copy prior._
+_Note: The execution log and athena results S3 Buckets will not be removed._
 
 ```bash
 serverless remove [--region <AWS region>] [--aws-profile <AWS CLI profile>]
