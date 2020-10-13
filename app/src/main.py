@@ -399,7 +399,7 @@ class Cleanup:
                 now = datetime.datetime.now()
                 client = boto3.client("s3")
                 bucket = os.environ.get("EXECUTIONLOGBUCKET")
-                key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.txt"""
+                key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.csv"""
 
                 try:
                     client.upload_file(temp_file, bucket, key)
