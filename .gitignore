@@ -282,6 +282,10 @@ dmypy.json
 # Ignore build directory
 .serverless
 
+# Ignore serverless manifest files
+serverless.manifest.json
+.serverless/manifest.json
+
 ### vscode ###
 .vscode/*
 !.vscode/settings.json

@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "serverless-iam-roles-per-function": "^2.0.2",
+    "serverless-manifest-plugin": "^1.0.6",
     "serverless-pseudo-parameters": "^2.5.0"
   },
   "devDependencies": {

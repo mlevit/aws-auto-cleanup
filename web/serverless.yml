@@ -3,6 +3,9 @@ service: auto-cleanup-api
 custom:
   log_level: INFO # DEBUG for dev | INFO for prod
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+  manifest:
+    output: ./site/serverless.manifest.json
+    silent: false
 
 provider:
   name: aws
@@ -197,4 +200,5 @@ layers:
 
 plugins:
   - serverless-api-gateway-caching
+  - serverless-manifest-plugin
   - serverless-pseudo-parameters
