@@ -1,22 +1,24 @@
 # AWS Auto Cleanup API
 
-The Auto Cleanup API is a severless Lambda-based API built to faciliate the website. The architecture diagram below illustrates the various services and their relationships with one another.
+The Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships with one another.
 
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Deployment](#deployment)
-  - [Removal](#removal)
+- [Removal](#removal)
 - [API](#api)
   - [Whitelist](#whitelist)
-    - [Create Whitelist Entry](#create-whitelist-entry)
-    - [Read Whitelist](#read-whitelist)
-    - [Update Whitelist Entry](#update-whitelist-entry)
-    - [Delete Whitelist Entry](#delete-whitelist-entry)
+    - [Create](#create)
+    - [Read](#read)
+    - [Update](#update)
+    - [Delete](#delete)
   - [Execution Log](#execution-log)
-    - [Read Execution Log](#read-execution-log)
-  - [Settings](#settings)
-    - [Read Settings Service](#read-settings-service)
-    - [Read Settings Resource](#read-settings-resource)
+    - [Read](#read)
+  - [Service](#service)
+    - [Read](#read)
+  - [Resource](#resource)
+    - [Read](#read)
 
 ## Deployment
 
@@ -60,7 +62,7 @@ The Auto Cleanup API is a severless Lambda-based API built to faciliate the webs
    npm run deploy -- [--region] [--aws-profile]
    ```
 
-### Removal
+## Removal
 
 1. Change directory
 
@@ -78,7 +80,7 @@ The Auto Cleanup API is a severless Lambda-based API built to faciliate the webs
 
 ### Whitelist
 
-#### Create Whitelist Entry
+#### Create
 
 Inserts a new whitelist entry into DynamoDB.
 
@@ -139,7 +141,7 @@ dict
 
 - _(dict)_
 
-  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+  - **message** (string) -- If the operation was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
 
   - **request** (dict) -- Request payload.
 
@@ -159,7 +161,7 @@ dict
 
 - The `expiration` field is computed at insert time. Current time plus `ttl` from the Settings table are used to compute the value.
 
-#### Read Whitelist
+#### Read
 
 Returns the entire whitelist table.
 
@@ -226,7 +228,7 @@ dict
 
         - **comment** (string) -- Comment associated with the whitelist entry.
 
-#### Update Whitelist Entry
+#### Update
 
 Updates an existing whitelist entry into DynamoDB. This is not meant to be used to update the `owner` or `comment` fields, but rather to extend the `expiration` date to ensure the resources are kept alive for longer.
 
@@ -311,7 +313,7 @@ dict
 
 - The new `expiration` field value is computed by using the value from the payload and adding to it the `ttl` value from the Settings table.
 
-#### Delete Whitelist Entry
+#### Delete
 
 Deletes a new whitelist entry into DynamoDB.
 
@@ -371,7 +373,7 @@ dict
 
 ### Execution Log
 
-#### Read Execution Log
+#### Read
 
 Returns executions logs for a particular Auto Cleanup run. Each log is assigned a `{run}` at API runtime. The newest log is assigned `1`, the second newest `2` and so forth.
 
@@ -429,9 +431,9 @@ dict
 
           - _string_
 
-### Settings
+### Service
 
-#### Read Settings Service
+#### Read
 
 Returns a list AWS services that are supported by Auto Cleanup.
 
@@ -481,7 +483,9 @@ dict
 
       - _(string)_
 
-#### Read Settings Resource
+### Resource
+
+#### Read
 
 Returns a dictionary of each AWS services and resources that are supported by Auto Cleanup.
 
