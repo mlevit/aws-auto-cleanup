@@ -10,9 +10,11 @@ custom:
 provider:
   name: aws
   runtime: python3.8
-  stage: ${opt:stage, "prod"} # Override via CLI "--stage dev"
+  stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
-  profile: ${opt:profile, ""} # Override via CLI "--aws-profile saml"
+  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
+  # stackName: ${self:service}-${self:provider.stage}-stack
+  # apiName: ${self:service}-${self:provider.stage}-api
   apiGateway:
     minimumCompressionSize: 1024
   iamRoleStatements:
