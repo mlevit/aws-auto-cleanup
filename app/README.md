@@ -1,6 +1,6 @@
-# AWS Auto Cleanup Application
+# AWS Auto Cleanup Core
 
-The Auto Cleanup Application consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
+The Auto Cleanup Core consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
 
 ![architecture](./static/architecture.drawio.svg)
 

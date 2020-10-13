@@ -3,7 +3,15 @@ service: auto-cleanup-app
 custom:
   log_level: INFO # DEBUG for dev | INFO for prod
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
-  pythonRequirements: # allows us to deploy a newer version of boto3
+  pythonRequirements:
+    layer:
+      name: ${self:service}-${self:provider.stage}-requirements
+      compatibleRuntimes:
+        - python3.8
+    noDeploy:
+      - boto
+      - boto3
+      - botocore
     slim: true
 
 provider:
@@ -152,8 +160,7 @@ package:
 
 functions:
   AutoCleanup:
-    handler: main.lambda_handler
-    module: src
+    handler: src/main.lambda_handler
     name: ${self:service}-${self:provider.stage}
     description: Removes unused AWS resources based on time of creation
     memorySize: 256
@@ -165,7 +172,7 @@ functions:
       exclude:
         - "**"
     layers:
-      - Ref: DynamoDBJSONLambdaLayer
+      - Ref: PythonRequirementsLambdaLayer
     environment:
       LOGLEVEL: ${self:custom.log_level}
       EXECUTIONLOGBUCKET:
@@ -178,16 +185,6 @@ functions:
       - schedule:
           rate: rate(3 days)
           enabled: true
-
-layers:
-  DynamoDBJSON:
-    path: util/dynamodb_json
-    name: ${self:service}-${self:provider.stage}-dynamodb-json
-    description: DynamoDB JSON utility to load and dump strings of DynamoDB JSON format to Python object and vise-versa
-    compatibleRuntimes:
-      - python3.8
-    licenseInfo: MPL 2.0
-    retain: false
 
 resources:
   Resources:
