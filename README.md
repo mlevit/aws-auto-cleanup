@@ -12,6 +12,6 @@ Open-source application to programmatically delete AWS resources based on a whit
 Auto Cleanup is comprised of three systems, app, web, and API. Click through to learn more and follow the steps to deploy the applications to your environment.
 </p>
 
-| [![app](./static/app.png)](./app/) | [![web](./static/web.png)](./web/) |    [![api](./static/api.png)](./api/)    |
-| :--------------------------------: | :--------------------------------: | :--------------------------------------: |
-|    deletes abandoned resources     |      enables user interaction      | exposes data via a programming interface |
+| [![app](./static/app.png)](./app/) | [![web](./static/web.png)](./web/) | [![api](./static/api.png)](./api/) |
+| :--------------------------------: | :--------------------------------: | :--------------------------------: |
+|    deletes abandoned resources     |      enables user interaction      |            exposes data            |
