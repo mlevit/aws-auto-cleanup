@@ -13,4 +13,4 @@ Auto Cleanup is comprised of three systems, APP, WEB, and API. Click through to 
 
 | [![app](./static/app.png)](./app/) | [![web](./static/web.png)](./web/) | [![api](./static/api.png)](./api/) |
 | :--------------------------------: | :--------------------------------: | :--------------------------------: |
-|    deletes abandoned resources     |      enables user interaction      |            exposes data            |
+
