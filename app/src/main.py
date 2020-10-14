@@ -11,21 +11,21 @@ import traceback
 import boto3
 from dynamodb_json import json_util as dynamodb_json
 
-import cloudformation_cleanup
-import dynamodb_cleanup
-import ec2_cleanup
-import ecs_cleanup
-import elasticbeanstalk_cleanup
-import emr_cleanup
-import glue_cleanup
-import helper
-import iam_cleanup
-import kinesis_cleanup
-import lambda_cleanup
-import rds_cleanup
-import redshift_cleanup
-import s3_cleanup
-import sagemaker_cleanup
+from src.cloudformation_cleanup import CloudFormationCleanup
+from src.dynamodb_cleanup import DynamoDBCleanup
+from src.ec2_cleanup import EC2Cleanup
+from src.ecs_cleanup import ECSCleanup
+from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
+from src.emr_cleanup import EMRCleanup
+from src.glue_cleanup import GlueCleanup
+from src.helper import Helper
+from src.iam_cleanup import IAMCleanup
+from src.kinesis_cleanup import KinesisCleanup
+from src.lambda_cleanup import LambdaCleanup
+from src.rds_cleanup import RDSCleanup
+from src.redshift_cleanup import RedshiftCleanup
+from src.s3_cleanup import S3Cleanup
+from src.sagemaker_cleanup import SageMakerCleanup
 
 
 class Cleanup:
@@ -67,7 +67,7 @@ class Cleanup:
                 # CloudFormation
                 # CloudFormation will run before all other cleanup operations as there is a potential
                 # through the removal of CloudFormation Stacks, many of the other resource will be removed
-                cloudformation_class = cloudformation_cleanup.CloudFormationCleanup(
+                cloudformation_class = CloudFormationCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -77,7 +77,7 @@ class Cleanup:
                 cloudformation_class.run()
 
                 # DynamoDB
-                dynamodb_class = dynamodb_cleanup.DynamoDBCleanup(
+                dynamodb_class = DynamoDBCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -88,7 +88,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # ECS
-                ecs_class = ecs_cleanup.ECSCleanup(
+                ecs_class = ECSCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -99,20 +99,18 @@ class Cleanup:
                 threads.append(thread)
 
                 # Elastic Beanstalk
-                elasticbeanstalk_class = (
-                    elasticbeanstalk_cleanup.ElasticBeanstalkCleanup(
-                        self.logging,
-                        self.whitelist,
-                        self.settings,
-                        self.execution_log,
-                        region,
-                    )
+                elasticbeanstalk_class = ElasticBeanstalkCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
                 )
                 thread = threading.Thread(target=elasticbeanstalk_class.run, args=())
                 threads.append(thread)
 
                 # EMR
-                emr_class = emr_cleanup.EMRCleanup(
+                emr_class = EMRCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -123,7 +121,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # Glue
-                glue_class = glue_cleanup.GlueCleanup(
+                glue_class = GlueCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -134,7 +132,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # Kinesis
-                kinesis_class = kinesis_cleanup.KinesisCleanup(
+                kinesis_class = KinesisCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -145,7 +143,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # Lambda
-                lambda_class = lambda_cleanup.LambdaCleanup(
+                lambda_class = LambdaCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -156,7 +154,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # RDS
-                rds_class = rds_cleanup.RDSCleanup(
+                rds_class = RDSCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -167,7 +165,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # Redshift
-                redshift_class = redshift_cleanup.RedshiftCleanup(
+                redshift_class = RedshiftCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -178,7 +176,7 @@ class Cleanup:
                 threads.append(thread)
 
                 # SageMaker
-                sagemaker_class = sagemaker_cleanup.SageMakerCleanup(
+                sagemaker_class = SageMakerCleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -199,7 +197,7 @@ class Cleanup:
                 # EC2
                 # EC2 will run after most cleanup operations as there is a potential
                 # through the removal of other services, EC2 instances will be cleaned up
-                ec2_class = ec2_cleanup.EC2Cleanup(
+                ec2_class = EC2Cleanup(
                     self.logging,
                     self.whitelist,
                     self.settings,
@@ -214,7 +212,7 @@ class Cleanup:
         self.logging.info("Switching region to 'global'.")
 
         # S3
-        s3_class = s3_cleanup.S3Cleanup(
+        s3_class = S3Cleanup(
             self.logging, self.whitelist, self.settings, self.execution_log
         )
         s3_class.run()
@@ -222,7 +220,7 @@ class Cleanup:
         # IAM
         # IAM will run after all other cleanup operations as there is a potential
         # through the removal of other services, IAM resources will be freed up
-        iam_class = iam_cleanup.IAMCleanup(
+        iam_class = IAMCleanup(
             self.logging, self.whitelist, self.settings, self.execution_log
         )
         iam_class.run()
@@ -256,7 +254,7 @@ class Cleanup:
                 TableName=os.environ.get("WHITELISTTABLE")
             )["Items"]:
                 record_json = dynamodb_json.loads(record, True)
-                parsed_resource_id = helper.Helper.parse_resource_id(
+                parsed_resource_id = Helper.parse_resource_id(
                     record_json.get("resource_id")
                 )
 
@@ -279,8 +277,8 @@ class Cleanup:
 
         try:
             client = boto3.client("dynamodb")
-            settings_data = open("./data/auto-cleanup-settings.json")
-            whitelist_data = open("./data/auto-cleanup-whitelist.json")
+            settings_data = open("./src/data/auto-cleanup-settings.json")
+            whitelist_data = open("./src/data/auto-cleanup-whitelist.json")
 
             settings_json = json.loads(settings_data.read())
             whitelist_json = json.loads(whitelist_data.read())

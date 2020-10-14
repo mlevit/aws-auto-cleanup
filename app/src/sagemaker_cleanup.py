@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-import helper
+from src.helper import Helper
 
 
 class SageMakerCleanup:
@@ -61,7 +61,7 @@ class SageMakerCleanup:
                 if resource_id not in self.whitelist.get("sagemaker", {}).get(
                     "endpoint", []
                 ):
-                    delta = helper.Helper.get_day_delta(resource_date)
+                    delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
@@ -152,7 +152,7 @@ class SageMakerCleanup:
                 if resource_id not in self.whitelist.get("sagemaker", {}).get(
                     "notebook_instance", []
                 ):
-                    delta = helper.Helper.get_day_delta(resource_date)
+                    delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):

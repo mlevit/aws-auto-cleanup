@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-import helper
+from src.helper import Helper
 
 
 class GlueCleanup:
@@ -59,7 +59,7 @@ class GlueCleanup:
                 if resource_id not in self.whitelist.get("glue", {}).get(
                     "dev_endpoint", []
                 ):
-                    delta = helper.Helper.get_day_delta(resource_date)
+                    delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):

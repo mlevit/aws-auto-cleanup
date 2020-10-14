@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-import helper
+from src.helper import Helper
 
 
 class CloudFormationCleanup:
@@ -65,7 +65,7 @@ class CloudFormationCleanup:
                 if resource_id not in self.whitelist.get("cloudformation", {}).get(
                     "stack", []
                 ):
-                    delta = helper.Helper.get_day_delta(resource_date)
+                    delta = Helper.get_day_delta(resource_date)
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:

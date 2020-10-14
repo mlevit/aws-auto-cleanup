@@ -32,6 +32,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "stack_name"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -46,6 +49,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "table_name"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -59,6 +65,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "allocation_id"
                 }
               }
             },
@@ -66,6 +75,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "instance_id"
                 },
                 "ttl": {
                   "N": "7"
@@ -76,6 +88,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "group_id"
                 }
               }
             },
@@ -83,6 +98,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "snapshot_id"
                 },
                 "ttl": {
                   "N": "7"
@@ -93,6 +111,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "volume_id"
                 },
                 "ttl": {
                   "N": "7"
@@ -107,6 +128,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "cluster_name"
                 }
               }
             },
@@ -114,6 +138,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "service_name"
                 },
                 "ttl": {
                   "N": "7"
@@ -129,6 +156,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "application_name"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -142,6 +172,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "id"
                 },
                 "ttl": {
                   "N": "7"
@@ -157,6 +190,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "endpoint_name"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -170,6 +206,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "role_name"
                 },
                 "ttl": {
                   "N": "30"
@@ -185,6 +224,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "stream_name"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -198,6 +240,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "function_name"
                 },
                 "ttl": {
                   "N": "30"
@@ -213,6 +258,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "db_instance_identifier"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -222,6 +270,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "db_snapshot_name"
                 },
                 "ttl": {
                   "N": "7"
@@ -237,6 +288,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "cluster_identifier"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -246,6 +300,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "snapshot_identifier"
                 },
                 "ttl": {
                   "N": "7"
@@ -261,6 +318,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "bucket_name"
+                },
                 "ttl": {
                   "N": "30"
                 }
@@ -275,6 +335,9 @@
                 "clean": {
                   "BOOL": true
                 },
+                "id": {
+                  "S": "endpoint_name"
+                },
                 "ttl": {
                   "N": "7"
                 }
@@ -284,6 +347,9 @@
               "M": {
                 "clean": {
                   "BOOL": true
+                },
+                "id": {
+                  "S": "notebook_instance_name"
                 },
                 "ttl": {
                   "N": "7"

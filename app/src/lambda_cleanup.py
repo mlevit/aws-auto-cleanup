@@ -3,7 +3,7 @@ import datetime
 
 import boto3
 
-import helper
+from src.helper import Helper
 
 
 class LambdaCleanup:
@@ -60,7 +60,7 @@ class LambdaCleanup:
                 if resource_id not in self.whitelist.get("lambda", {}).get(
                     "function", []
                 ):
-                    delta = helper.Helper.get_day_delta(resource_date)
+                    delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):

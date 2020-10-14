@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from operator import itemgetter
 
 import boto3
 from boto3.dynamodb.types import TypeDeserializer
@@ -37,7 +38,12 @@ def lambda_handler(event, context):
 
             body.append(item)
 
-        return get_return(200, "Whitelist retrieved", None, {"whitelist": body})
+        return get_return(
+            200,
+            "Whitelist retrieved",
+            None,
+            {"whitelist": sorted(body, key=itemgetter("resource_id", "expiration"))},
+        )
     except Exception as error:
         print(f"[ERROR] {error}")
         return get_return(400, "Could not retrieve whitelist", None, None)
