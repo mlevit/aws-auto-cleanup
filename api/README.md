@@ -474,9 +474,9 @@ dict
 
   - **response** (dict) -- Response payload.
 
-    - _(dict)_
+    - _service (dict)_
 
-      - _(dict)_
+      - _resource (dict)_
 
         - **clean** (boo) -- Indicator if the AWS service resource will be cleaned
 
