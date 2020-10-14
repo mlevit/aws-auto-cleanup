@@ -9,9 +9,9 @@ Open-source application to programmatically delete AWS resources based on a whit
 </p>
 <br/>
 <p align="center">
-Auto Cleanup is comprised of two applications, core and web. Click through to learn more and follow the steps to deploy the applications to your environment.
+Auto Cleanup is comprised of three systems, app, web, and API. Click through to learn more and follow the steps to deploy the applications to your environment.
 </p>
 
-|                                                 [![app](./static/app.png)](./app/)                                                  |                                                      [![web](./static/web.png)](./web/)                                                       |
-| :---------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------: |
-| The core application is a serverless stack running within a Lambda environment with supporting DynamoDB tables, S3 buckets and more | The web application is a supported serverless stack that enables users to more easily whitelist AWS resources, view executions logs, and more |
+| [![app](./static/app.png)](./app/) | [![web](./static/web.png)](./web/) |    [![api](./static/api.png)](./api/)    |
+| :--------------------------------: | :--------------------------------: | :--------------------------------------: |
+|    deletes abandoned resources     |      enables user interaction      | exposes data via a programming interface |

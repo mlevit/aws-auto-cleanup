@@ -4,7 +4,7 @@ custom:
   log_level: INFO # DEBUG for dev | INFO for prod
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
   manifest:
-    output: ../site/serverless.manifest.json
+    output: ../src/serverless.manifest.json
     silent: true
   pythonRequirements:
     layer:
