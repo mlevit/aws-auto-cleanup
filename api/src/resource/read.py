@@ -43,9 +43,7 @@ def lambda_handler(event, context):
         settings = get_settings()
     except Exception as error:
         print(f"[ERROR] {error}")
-        return get_return(
-            400, "Could not read Auto Cleanup settings.", parameters, None
-        )
+        return get_return(400, "Could not read Auto Cleanup settings.", None, None)
 
     body = {}
     for service in settings.get("services", {}):
