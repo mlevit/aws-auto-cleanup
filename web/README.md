@@ -44,7 +44,13 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    npm install
    ```
 
-7. Deploy
+7. Build
+
+   ```bash
+   npm run build
+   ```
+
+8. Deploy
 
    ```bash
    npm run deploy -- [--region] [--aws-profile]
