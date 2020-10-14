@@ -153,29 +153,6 @@ functions:
           cors: true
           caching:
             enabled: true
-  ResourceRead:
-    handler: src/resource/read.lambda_handler
-    name: ${self:service}-${self:provider.stage}-resource-read
-    description: Returns AWS resources supported by Auto Cleanup
-    memorySize: 128
-    timeout: 30
-    package:
-      include:
-        - src/resource/read.py
-      exclude:
-        - "**"
-    layers:
-      - Ref: PythonRequirementsLambdaLayer
-    environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-    events:
-      - http:
-          method: GET
-          path: /settings/resource
-          cors: true
-          caching:
-            enabled: true
   ExecutionLogRead:
     handler: src/execution_log/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-read

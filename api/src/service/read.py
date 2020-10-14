@@ -7,6 +7,16 @@ import boto3
 from dynamodb_json import json_util as dynamodb_json
 
 
+def sort_dict(item):
+    """
+    Sort nested dict
+    https://gist.github.com/gyli/f60f0374defc383aa098d44cfbd318eb
+    """
+    return {
+        k: sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(item.items())
+    }
+
+
 def get_settings():
     settings = {}
 
@@ -43,13 +53,11 @@ def lambda_handler(event, context):
         settings = get_settings()
     except Exception as error:
         print(f"[ERROR] {error}")
-        return get_return(
-            400, "Could not read Auto Cleanup settings.", parameters, None
-        )
+        return get_return(400, "Could not read Auto Cleanup settings.", None, None)
 
     return get_return(
         200,
         "Supported AWS services list retrieved",
         None,
-        {"services": sorted(list(settings.get("services", {}).keys()))},
+        sort_dict(settings.get("services")),
     )
