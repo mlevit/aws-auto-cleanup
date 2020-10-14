@@ -4,8 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "serverless-finch": "^2.6.0",
-    "serverless-pseudo-parameters": "^2.5.0"
+    "serverless-finch": "^2.6.0"
   },
   "repository": {
     "type": "git",
