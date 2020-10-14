@@ -30,7 +30,7 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
 4. Download
 
    ```bash
-   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/web/api --p aws-auto-cleanup-api
+   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/api --p aws-auto-cleanup-api
    ```
 
 5. Change directory

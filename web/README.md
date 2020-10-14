@@ -1,3 +1,66 @@
 # AWS Auto Cleanup Website
 
 PLACEHOLDER
+
+## Table of contents
+
+- [Table of contents](#table-of-contents)
+- [Deployment](#deployment)
+- [Removal](#removal)
+- [web](#web)
+
+## Deployment
+
+1. Install [AWS CLI](https://aws.amazon.com/cli/)
+
+   ```bash
+   pip install awscli
+   ```
+
+2. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
+
+   - _Auto Cleanup should be deployed by a user with administrative privileges._
+
+3. Install [Serverless Framework](https://www.serverless.com/)
+
+   ```bash
+   npm install serverless
+   ```
+
+4. Download
+
+   ```bash
+   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/web --p aws-auto-cleanup-web
+   ```
+
+5. Change directory
+
+   ```bash
+   cd aws-auto-cleanup-web
+   ```
+
+6. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+7. Deploy
+
+   ```bash
+   npm run deploy -- [--region] [--aws-profile]
+   ```
+
+## Removal
+
+1. Change directory
+
+   ```bash
+   cd aws-auto-cleanup-web
+   ```
+
+2. Remove
+
+   ```bash
+   npm run remove -- [--region] [--aws-profile]
+   ```

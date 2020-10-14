@@ -1,0 +1,25 @@
+service: auto-cleanup-web
+
+custom:
+  log_level: INFO # DEBUG for dev | INFO for prod
+  region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+  client:
+    bucketName: ${self:service}-${self:provider.stage}-site-${cf.${self:custom.region}:auto-cleanup-api-${self:provider.stage}.AccountID}
+    distributionFolder: ./build
+    sse: AES256
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
+  region: ${self:custom.region}
+  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
+
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
+plugins:
+  - serverless-finch
+  - serverless-pseudo-parameters

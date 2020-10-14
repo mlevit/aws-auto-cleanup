@@ -1,0 +1,20 @@
+{
+  "name": "auto-cleanup-web",
+  "description": "Auto Cleanup Web",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "serverless-finch": "^2.6.0",
+    "serverless-pseudo-parameters": "^2.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:servian/aws-auto-cleanup.git",
+    "directory": "web/"
+  },
+  "bugs": "https://github.com/servian/aws-auto-cleanup/issues",
+  "scripts": {
+    "deploy": "serverless client deploy --no-confirm",
+    "remove": "serverless client remove"
+  }
+}

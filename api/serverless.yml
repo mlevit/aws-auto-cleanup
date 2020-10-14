@@ -198,6 +198,11 @@ functions:
           caching:
             enabled: true
 
+resources:
+  Outputs:
+    AccountID:
+      Value: !Ref AWS::AccountId
+
 plugins:
   - serverless-api-gateway-caching
   - serverless-manifest-plugin
