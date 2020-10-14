@@ -1,7 +1,7 @@
 {
   "name": "auto-cleanup-app",
   "description": "Auto Cleanup App",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "serverless-iam-roles-per-function": "^2.0.2",

@@ -8,7 +8,7 @@
 Open-source application to programmatically delete AWS resources based on a whitelist and time to live (TTL) settings
 </p>
 <p align="center">
-Auto Cleanup is comprised of three systems, app, web, and API. Click through to learn more and follow the steps to deploy the systems to your environment
+Auto Cleanup is comprised of three systems, APP, WEB, and API. Click through to learn more and follow the steps to deploy the systems to your environment
 </p>
 
 | [![app](./static/app.png)](./app/) | [![web](./static/web.png)](./web/) | [![api](./static/api.png)](./api/) |
