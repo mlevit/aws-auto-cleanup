@@ -28,9 +28,8 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
+        - dynamodb:DeleteItem
         - dynamodb:GetItem
-        - dynamodb:ListTables
         - dynamodb:PutItem
         - dynamodb:Scan
       Resource: "*"
