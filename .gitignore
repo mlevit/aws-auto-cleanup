@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/macos,serverless,node,python,vscode,git
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,serverless,node,python,vscode,git
+# Created by https://www.toptal.com/developers/gitignore/api/git,node,macos,python,vscode,serverless,vuejs,vue
+# Edit at https://www.toptal.com/developers/gitignore?templates=git,node,macos,python,vscode,serverless,vuejs,vue
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:
@@ -309,4 +309,21 @@ serverless.manifest.json
 !.vscode/extensions.json
 *.code-workspace
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,serverless,node,python,vscode,git
+### Vue ###
+# gitignore template for Vue.js projects
+#
+# Recommended template: Node.gitignore
+
+# TODO: where does this rule come from?
+docs/_book
+
+# TODO: where does this rule come from?
+test/
+
+### Vuejs ###
+# Recommended template: Node.gitignore
+
+npm-debug.log
+yarn-error.log
+
+# End of https://www.toptal.com/developers/gitignore/api/git,node,macos,python,vscode,serverless,vuejs,vue
