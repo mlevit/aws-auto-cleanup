@@ -424,7 +424,7 @@ dict
 
 #### Read
 
-Returns executions logs for a particular Auto Cleanup S3 key. Each log is assigned a `{key}` at API runtime.
+Returns executions logs for a particular Auto Cleanup execution log S3 key.
 
 **URL**: `/execution/{key}`
 
