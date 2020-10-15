@@ -3,8 +3,8 @@
   "description": "Auto Cleanup App",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "serverless-iam-roles-per-function": "^2.0.2",
+  "dependencies": {},
+  "devDependencies": {
     "serverless-pseudo-parameters": "^2.5.0",
     "serverless-python-requirements": "^5.1.0"
   },

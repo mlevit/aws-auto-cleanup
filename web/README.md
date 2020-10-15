@@ -25,19 +25,19 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
 3. Install [Serverless Framework](https://www.serverless.com/)
 
    ```bash
-   npm install serverless
+   npm install -g serverless
    ```
 
 4. Download
 
    ```bash
-   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/web --p aws-auto-cleanup-web
+   git clone https://github.com/servian/aws-auto-cleanup.git
    ```
 
 5. Change directory
 
    ```bash
-   cd aws-auto-cleanup-web
+   cd aws-auto-cleanup/web/
    ```
 
 6. Install dependencies

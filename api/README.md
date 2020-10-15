@@ -26,19 +26,19 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
 3. Install [Serverless Framework](https://www.serverless.com/)
 
    ```bash
-   npm install serverless
+   npm install -g serverless
    ```
 
 4. Download
 
    ```bash
-   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/api --p aws-auto-cleanup-api
+   git clone https://github.com/servian/aws-auto-cleanup.git
    ```
 
 5. Change directory
 
    ```bash
-   cd aws-auto-cleanup-api
+   cd aws-auto-cleanup/api/
    ```
 
 6. Install dependencies

@@ -28,19 +28,19 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 3. Install [Serverless Framework](https://www.serverless.com/)
 
    ```bash
-   npm install serverless
+   npm install -g serverless
    ```
 
 4. Download
 
    ```bash
-   serverless create -u https://github.com/servian/aws-auto-cleanup/tree/master/app --p aws-auto-cleanup-app
+   git clone https://github.com/servian/aws-auto-cleanup.git
    ```
 
 5. Change directory
 
    ```bash
-   cd aws-auto-cleanup-app
+   cd aws-auto-cleanup/app/
    ```
 
 6. Install dependencies
