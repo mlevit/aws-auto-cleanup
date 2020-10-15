@@ -178,7 +178,7 @@ Service-specific settings indicating the supported AWS services and resources an
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
-| Elasticsearch Service | Domain Name              | True  | 7   |                                                                |
+| Elasticsearch Service | Domain Name :new:        | True  | 7   |                                                                |
 | EMR                   | Clusters                 | True  | 7   |                                                                |
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
