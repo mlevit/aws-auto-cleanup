@@ -2,6 +2,8 @@
 
 The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The website utilises the Auto Cleanup API to serve content and enable user interaction.
 
+![architecture](./static/architecture.drawio.svg)
+
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
