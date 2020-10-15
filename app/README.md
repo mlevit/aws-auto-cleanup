@@ -120,6 +120,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
 | ECS Services                   | Service Name           | `ecs:service:service_name`                           |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
+| Elasticsearch Service          | Domain Name            | `elasticsearch:domain:domain_name`                   |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
@@ -165,30 +166,31 @@ General settings.
 
 Service-specific settings indicating the supported AWS services and resources and their lifespan.
 
-| Service           | Resource Type            | Clean | TTL | Comment                                                        |
-| ----------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
-| CloudFormation    | Stacks                   | True  | 7   |                                                                |
-| DynamoDB          | Tables                   | True  | 7   |                                                                |
-| EC2               | Addresses                | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
-| EC2               | Instances                | True  | 7   |                                                                |
-| EC2               | Security Groups          | True  | N/A | Deletes Security Group if not associated with an EC2 instance. |
-| EC2               | Snapshots                | True  | 7   |                                                                |
-| EC2               | Volumes                  | True  | 7   |                                                                |
-| ECS               | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
-| ECS               | Services :new:           | True  | 7   |                                                                |
-| Elastic Beanstalk | Applications             | True  | 7   |                                                                |
-| EMR               | Clusters                 | True  | 7   |                                                                |
-| Glue              | Dev Endpoints            | True  | 7   |                                                                |
-| IAM               | Roles                    | True  | 30  |                                                                |
-| Kinesis           | Streams :new:            | True  | 7   |                                                                |
-| Lambda            | Functions                | True  | 30  |                                                                |
-| RDS               | Instances                | True  | 7   |                                                                |
-| RDS               | Snapshots                | True  | 7   |                                                                |
-| Redshift          | Clusters                 | True  | 7   |                                                                |
-| Redshift          | Snapshots                | True  | 7   |                                                                |
-| S3                | Buckets                  | True  | 30  |                                                                |
-| SageMaker         | Endpoints :new:          | True  | 7   |                                                                |
-| SageMaker         | Notebook Instances :new: | True  | 7   |                                                                |
+| Service               | Resource Type            | Clean | TTL | Comment                                                        |
+| --------------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
+| CloudFormation        | Stacks                   | True  | 7   |                                                                |
+| DynamoDB              | Tables                   | True  | 7   |                                                                |
+| EC2                   | Addresses                | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
+| EC2                   | Instances                | True  | 7   |                                                                |
+| EC2                   | Security Groups          | True  | N/A | Deletes Security Group if not associated with an EC2 instance. |
+| EC2                   | Snapshots                | True  | 7   |                                                                |
+| EC2                   | Volumes                  | True  | 7   |                                                                |
+| ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
+| ECS                   | Services :new:           | True  | 7   |                                                                |
+| Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
+| Elasticsearch Service | Domain Name              | True  | 7   |                                                                |
+| EMR                   | Clusters                 | True  | 7   |                                                                |
+| Glue                  | Dev Endpoints            | True  | 7   |                                                                |
+| IAM                   | Roles                    | True  | 30  |                                                                |
+| Kinesis               | Streams :new:            | True  | 7   |                                                                |
+| Lambda                | Functions                | True  | 30  |                                                                |
+| RDS                   | Instances                | True  | 7   |                                                                |
+| RDS                   | Snapshots                | True  | 7   |                                                                |
+| Redshift              | Clusters                 | True  | 7   |                                                                |
+| Redshift              | Snapshots                | True  | 7   |                                                                |
+| S3                    | Buckets                  | True  | 30  |                                                                |
+| SageMaker             | Endpoints :new:          | True  | 7   |                                                                |
+| SageMaker             | Notebook Instances :new: | True  | 7   |                                                                |
 
 #### Regions
 

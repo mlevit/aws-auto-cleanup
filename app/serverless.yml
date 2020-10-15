@@ -85,6 +85,12 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - es:DeleteElasticsearchDomain
+        - es:DescribeElasticsearchDomainConfig
+        - es:ListDomainNames
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - glue:DeleteDevEndPoint
         - glue:GetDevEndpoints
         - glue:GetTable

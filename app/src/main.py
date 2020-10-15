@@ -16,6 +16,7 @@ from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
 from src.ecs_cleanup import ECSCleanup
 from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
+from src.elasticsearch_cleanup import ElasticsearchServiceCleanup
 from src.emr_cleanup import EMRCleanup
 from src.glue_cleanup import GlueCleanup
 from src.helper import Helper
@@ -107,6 +108,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=elasticbeanstalk_class.run, args=())
+                threads.append(thread)
+
+                # Elasticsearch Service
+                elasticsearch_class = ElasticsearchServiceCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=elasticsearch_class.run, args=())
                 threads.append(thread)
 
                 # EMR

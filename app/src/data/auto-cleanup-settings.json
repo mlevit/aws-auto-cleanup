@@ -166,6 +166,23 @@
             }
           }
         },
+        "elasticsearch": {
+          "M": {
+            "domain": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "domain_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "emr": {
           "M": {
             "cluster": {
