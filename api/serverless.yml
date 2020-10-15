@@ -152,6 +152,27 @@ functions:
           cors: true
           caching:
             enabled: true
+  ExecutionLogList:
+    handler: src/execution_log/list.lambda_handler
+    name: ${self:service}-${self:provider.stage}-execution-log-list
+    description: Returns execution logs
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/execution_log/list.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      EXECUTIONLOGBUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+    events:
+      - http:
+          method: GET
+          path: /execution
+          cors: true
+          caching:
+            enabled: true
   ExecutionLogRead:
     handler: src/execution_log/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-read
@@ -169,7 +190,7 @@ functions:
     events:
       - http:
           method: GET
-          path: /execution/{run}
+          path: /execution/{key}
           cors: true
           caching:
             enabled: true

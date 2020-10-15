@@ -368,11 +368,11 @@ dict
 
 ### Execution Log
 
-#### Read
+#### List
 
-Returns executions logs for a particular Auto Cleanup run. Each log is assigned a `{run}` at API runtime. The newest log is assigned `1`, the second newest `2` and so forth.
+Returns a list of all Auto Cleanup App executions in descending order
 
-**URL**: `/execution/{run}`
+**URL**: `/execution`
 
 **Method**: `GET`
 
@@ -382,11 +382,11 @@ Returns executions logs for a particular Auto Cleanup run. Each log is assigned 
 
 ##### Request Syntax
 
-`{run}`
+N/A
 
 ##### Request Structure
 
-- **run** -- **[REQUIRED]** Execution number. The newest log is assigned `1`, the second newest `2` and so forth.
+N/A
 
 ##### Return type
 
@@ -399,7 +399,61 @@ dict
 ```json
 {
   "message": "string",
-  "request": { "run": "string" },
+  "request": null,
+  "response": { "logs": [{ "key": "string", "date": "string" }] }
+}
+```
+
+###### Response Structure
+
+- _(dict)_
+
+  - **message** (string) -- If the operational was successful, the value will denote the action taken. Otherwise, the value will contain an error message.
+
+  - **request** (dict) -- Request payload.
+
+  - **response** (list) -- Response payload.
+
+    - **logs** (list) -- List of all execution logs.
+
+      - _(dict)_
+
+        - **key** (string) -- S3 key.
+
+        - **date** (string) -- Locale’s appropriate date and time representation.
+
+#### Read
+
+Returns executions logs for a particular Auto Cleanup S3 key. Each log is assigned a `{key}` at API runtime.
+
+**URL**: `/execution/{key}`
+
+**Method**: `GET`
+
+**Auth required**: No
+
+**Permissions required**: None
+
+##### Request Syntax
+
+`{key}`
+
+##### Request Structure
+
+- **key** -- **[REQUIRED]** S3 key, URL encoded.
+
+##### Return type
+
+dict
+
+##### Returns
+
+###### Response Syntax
+
+```json
+{
+  "message": "string",
+  "request": { "key": "string" },
   "response": { "header": ["string"], "body": [["string"]] }
 }
 ```
