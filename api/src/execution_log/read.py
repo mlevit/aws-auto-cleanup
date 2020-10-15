@@ -25,6 +25,14 @@ def lambda_handler(event, context):
     parameters = event.get("pathParameters")
     key = unquote(parameters.get("key"))
 
+    if parameters.get("key").strip() in (None, ""):
+        return get_return(
+            400,
+            f"""Key '{parameters.get("key")}' is invalid""",
+            parameters,
+            None,
+        )
+
     try:
         file_contents = (
             client.get_object(

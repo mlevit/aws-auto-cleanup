@@ -22,7 +22,7 @@ def get_return(code, message, request, response):
 def lambda_handler(event, context):
     parameters = event.get("queryStringParameters")
 
-    if parameters.get("resource_id") in (None, ""):
+    if parameters.get("resource_id").strip() in (None, ""):
         return get_return(400, "Resource ID cannot be null", parameters, None)
 
     try:

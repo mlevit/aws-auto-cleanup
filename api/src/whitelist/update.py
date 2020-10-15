@@ -59,7 +59,7 @@ def lambda_handler(event, context):
             None,
         )
 
-    if settings.get("services", {}).get(service) in (None, ""):
+    if settings.get("services", {}).get(service).strip() in (None, ""):
         return get_return(
             400,
             f"Service '{service}' is either invalid or not supported",
@@ -67,7 +67,10 @@ def lambda_handler(event, context):
             None,
         )
 
-    if settings.get("services", {}).get(service, {}).get(resource) in (None, ""):
+    if settings.get("services", {}).get(service, {}).get(resource).strip() in (
+        None,
+        "",
+    ):
         return get_return(
             400,
             f"Resource '{resource}' is either invalid or not supported",
@@ -75,10 +78,10 @@ def lambda_handler(event, context):
             None,
         )
 
-    if resource_id in (None, ""):
+    if resource_id.strip() in (None, ""):
         return get_return(400, "Resource ID cannot be empty", parameters, None)
 
-    if parameters.get("expiration") in (None, ""):
+    if parameters.get("expiration").strip() in (None, ""):
         return get_return(400, "Expiration cannot be empty", parameters, None)
 
     resource_ttl = (
