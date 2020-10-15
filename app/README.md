@@ -148,7 +148,7 @@ The settings table contains several key-value pairs records including `version`,
 
 #### Version
 
-Version number of the settings. If the version number within the `app/src/data/auto-cleanup-settings.json` file is greater than in the database, the settings will be refreshed.
+The version number of the settings. If the version number within the `app/src/data/auto-cleanup-settings.json` file is greater than in the database, the settings will be refreshed.
 
 | Key     | Value |
 | ------- | ----- |
@@ -164,7 +164,7 @@ General settings.
 
 #### Services
 
-Service-specific settings indicating the supported AWS services and resources and their lifespan.
+Service-specific settings indicating the supported AWS services, resources, and their lifespan.
 
 | Service               | Resource Type            | Clean | TTL | Comment                                                        |
 | --------------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
