@@ -89,7 +89,7 @@ def lambda_handler(event, context):
     )
 
     try:
-        expiration = int(parameters.get("expiration")) + (resource_ttl * 86400)
+        expiration = int(time.time()) + (resource_ttl * 86400)
         response = boto3.client("dynamodb").put_item(
             TableName=os.environ.get("WHITELISTTABLE"),
             Item={
