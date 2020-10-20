@@ -48,7 +48,7 @@
             class="button is-warning"
             v-on:click="openWhitelistInsertPopup()"
           >
-            <i class="fas fa-plus-circle"></i>&nbsp;Add New Whitelist Entry
+            <i class="fas fa-plus-square"></i>&nbsp;Add New Whitelist Entry
           </button>
         </div>
         <table class="table" id="whitelist">
@@ -73,7 +73,7 @@
                   v-on:click="extendWhitelistEntry( item.id )"
                   class="button is-warning"
                 >
-                  <i class="fas fa-clock"></i>
+                  <i class="fas fa-calendar-plus"></i>
                 </a>
               </td>
               <td>
@@ -81,7 +81,7 @@
                   v-on:click="deleteWhitelistEntry( item.resource_id )"
                   class="button is-danger"
                 >
-                  <i class="fas fa-minus-circle"></i>
+                  <i class="fas fa-minus-square"></i>
                 </button>
               </td>
             </tr>
@@ -118,7 +118,7 @@
                   v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
-                  ><i class="fa fa-list"></i
+                  ><i class="fas fa-list-alt"></i
                 ></a>
               </td>
             </tr>
@@ -144,7 +144,9 @@
           ></div>
           <div class="modal-content execlog-modal">
             <header class="modal-card-head">
-              <p class="modal-card-title">Execution Log Details</p>
+              <p class="modal-card-title">
+                {{execution_log_key}} - {{execution_log_mode}}
+              </p>
               <button
                 class="delete"
                 aria-label="close"
@@ -161,7 +163,6 @@
                     <th>Resource</th>
                     <th>Resource ID</th>
                     <th>Action</th>
-                    <th>Dry run</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -172,7 +173,6 @@
                     <td>{{ item[3] }}</td>
                     <td>{{ item[4] }}</td>
                     <td>{{ item[5] }}</td>
-                    <td>{{ item[7] }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -242,7 +242,7 @@
 
                   <div class="column">
                     <div class="field">
-                      <label class="label">Resource ID (required)</label>
+                      <label class="label">Resource ID</label>
                       <div class="control has-icons-left">
                         <input
                           class="input"
@@ -260,7 +260,7 @@
                 </div>
 
                 <div class="field">
-                  <label class="label">Owner (Optional)</label>
+                  <label class="label">Owner</label>
                   <div class="control has-icons-left">
                     <input
                       class="input"
@@ -276,16 +276,16 @@
                 </div>
 
                 <div class="field">
-                  <label class="label">Comment (Optional)</label>
+                  <label class="label">Comment</label>
                   <div class="control has-icons-left">
                     <input
                       class="input"
                       type="text"
-                      placeholder="Example comment"
+                      placeholder=""
                       v-model="selected_comment"
                     />
                     <span class="icon is-small is-left">
-                      <i class="fas fa-comment"></i>
+                      <i class="fas fa-comment-alt"></i>
                     </span>
                   </div>
                 </div>
