@@ -7,7 +7,7 @@ var API_EXECLOG = "/execution/";
 fetch("serverless.manifest.json")
   .then(function (response) {
     response.json().then(function (data) {
-      var API_BASE = data["dev"]["urls"]["apiGatewayBaseURL"];
+      var API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
 
       API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
       API_SERVICES = API_BASE + API_SERVICES;
