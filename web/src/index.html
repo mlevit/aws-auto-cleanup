@@ -15,16 +15,15 @@
       integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
       crossorigin="anonymous"
     />
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/fontawesome.min.css"
-      integrity="sha512-kJ30H6g4NGhWopgdseRb8wTsyllFUYIx3hiUwmGAkgA9B/JbzUBDQVr2VVlWGde6sdBVOG7oU8AL35ORDuMm8g=="
-      crossorigin="anonymous"
-    /> -->
     <link
       rel="stylesheet"
       href="https://cdn.datatables.net/1.10.22/css/dataTables.bulma.min.css"
       crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="//db.onlinewebfonts.com/c/157c6cc36dd65b1b2adc9e7f3329c761?family=Amazon+Ember"
+      type="text/css"
     />
     <link rel="stylesheet" href="css/style.css" />
     <title>AWS Auto Cleanup</title>
@@ -34,10 +33,7 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <a class="navbar-item" href="#">
-          <!-- <img src="img/logo.svg" alt="AWS Auto Cleanup" style="height: 18px" /> -->
-          <span style="color: white">
-            <i class="fab fa-aws fa-3x"></i>
-          </span>
+          <img src="img/logo.svg" alt="AWS Auto Cleanup" style="height: 18px" />
         </a>
         <h1>AWS Auto Cleanup</h1>
       </div>
@@ -100,8 +96,7 @@
         </div>
 
         <!-- Execution Log -->
-        <hr />
-        <h2 class="title">Execution Log</h2>
+        <h2 class="title">Execution Logs</h2>
 
         <table class="table" id="execution_log_list_table">
           <thead>
@@ -119,7 +114,7 @@
               <td>{{ item.date }}</td>
               <td>
                 <a
-                  v-on:click="openEXLog( item.key_escape )"
+                  v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
                   ><i class="fa fa-list"></i
@@ -142,34 +137,41 @@
           v-bind:class="{ 'is-active': show_execution_log }"
           id="execlog-popup"
         >
-          <div class="modal-background" v-on:click="closeEXpopup()"></div>
+          <div
+            class="modal-background"
+            v-on:click="closeExecutionLogPopup()"
+          ></div>
           <div class="modal-content execlog-modal">
-            <div class="box">
-              <table class="table" id="execlog-table">
+            <header class="modal-card-head">
+              <p class="modal-card-title">Execution Log Details</p>
+              <button
+                class="delete"
+                aria-label="close"
+                v-on:click="closeExecutionLogPopup()"
+              ></button>
+            </header>
+            <div class="box" style="border-radius: 0px !important">
+              <table class="table" id="execution_log_table">
                 <thead>
                   <tr>
-                    <th>Platform</th>
+                    <th>Timestamp</th>
                     <th>Region</th>
                     <th>Service</th>
                     <th>Resource</th>
                     <th>Resource ID</th>
                     <th>Action</th>
-                    <th>Timestamp</th>
-                    <th>Dry run flag</th>
-                    <th>Execution ID</th>
+                    <th>Dry run</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in execlog_table" :key="item.id">
-                    <td>{{ item[0] }}</td>
+                  <tr v-for="item in execution_log_table" :key="item.id">
+                    <td>{{ item[6] }}</td>
                     <td>{{ item[1] }}</td>
                     <td>{{ item[2] }}</td>
                     <td>{{ item[3] }}</td>
                     <td>{{ item[4] }}</td>
                     <td>{{ item[5] }}</td>
-                    <td>{{ item[6] }}</td>
                     <td>{{ item[7] }}</td>
-                    <td>{{ item[8] }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -177,11 +179,6 @@
             <!-- .box -->
           </div>
           <!-- .model-content -->
-          <button
-            class="modal-close is-large"
-            aria-label="close"
-            v-on:click="closeEXpopup()"
-          ></button>
         </div>
 
         <!-- Popup: Add Whitelist Rule -->
@@ -190,118 +187,21 @@
           v-bind:class="{ 'is-active': show_whitelist_popup }"
           id="add-whitelist"
         >
-          <div class="modal-background"></div>
+          <div
+            class="modal-background"
+            v-on:click="closeWhitelistInsertPopup()"
+          ></div>
           <div class="modal-card">
-            <header class="modal-card-head">
-              <p class="modal-card-title">Add New Whitelist Entry</p>
-              <button
-                class="delete"
-                aria-label="close"
-                v-on:click="closeWhitelistInsertPopup()"
-              ></button>
-            </header>
-            <section class="modal-card-body">
-              <div class="columns">
-                <div class="column">
-                  <div class="field">
-                    <label class="label">Service</label>
-                    <div class="control">
-                      <div class="select">
-                        <select
-                          v-model="selected_service"
-                          v-on:change="updateResourceList(selected_service)"
-                        >
-                          <option v-for="item of service_list">
-                            {{ item }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="column">
-                  <div class="field">
-                    <label class="label">Resource</label>
-                    <div class="control">
-                      <div class="select">
-                        <select
-                          v-model="selected_resource"
-                          v-on:change="updateResourceID(selected_service, selected_resource)"
-                        >
-                          <option v-for="item of resource_list">
-                            {{ item }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="column">
-                  <div class="field">
-                    <label class="label">Resource ID (required)</label>
-                    <div class="control has-icons-left">
-                      <input
-                        class="input"
-                        type="text"
-                        :placeholder="[[ resource_id_placeholder ]]"
-                        required
-                        v-model="selected_resource_id"
-                      />
-                      <span class="icon is-small is-left"
-                        ><i class="fas fa-id-card"></i
-                      ></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="label">Owner (Optional)</label>
-                <div class="control has-icons-left">
-                  <input
-                    class="input"
-                    type="text"
-                    placeholder="@example.com"
-                    value=""
-                    v-model="selected_owner"
-                  />
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-envelope"></i>
-                  </span>
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="label">Comment (Optional)</label>
-                <div class="control has-icons-left">
-                  <input
-                    class="input"
-                    type="text"
-                    placeholder="Example comment"
-                    v-model="selected_comment"
-                  />
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-comment"></i>
-                  </span>
-                </div>
-              </div>
-            </section>
-            <footer class="modal-card-foot">
-              <button class="button is-success">Add</button>
-              <button class="button" v-on:click="closeWhitelistInsertPopup()">
-                Cancel
-              </button>
-            </footer>
-          </div>
-
-          <!-- <div class="modal-content">
-            <div class="box">
-              <form action="#" v-on:submit.prevent="createWhitelistEntry()">
-                <h3 class="subtitle">Add New Whitelist Entry</h3>
-                <hr />
-
+            <form action="#" v-on:submit.prevent="createWhitelistEntry()">
+              <header class="modal-card-head">
+                <p class="modal-card-title">Add New Whitelist Entry</p>
+                <button
+                  class="delete"
+                  aria-label="close"
+                  v-on:click="closeWhitelistInsertPopup()"
+                ></button>
+              </header>
+              <section class="modal-card-body">
                 <div class="columns">
                   <div class="column">
                     <div class="field">
@@ -342,7 +242,7 @@
                   <div class="column">
                     <div class="field">
                       <label class="label">Resource ID (required)</label>
-                      <div class="control">
+                      <div class="control has-icons-left">
                         <input
                           class="input"
                           type="text"
@@ -350,6 +250,9 @@
                           required
                           v-model="selected_resource_id"
                         />
+                        <span class="icon is-small is-left"
+                          ><i class="fas fa-id-card"></i
+                        ></span>
                       </div>
                     </div>
                   </div>
@@ -357,7 +260,7 @@
 
                 <div class="field">
                   <label class="label">Owner (Optional)</label>
-                  <div class="control has-icons-left has-icons-right">
+                  <div class="control has-icons-left">
                     <input
                       class="input"
                       type="text"
@@ -366,38 +269,34 @@
                       v-model="selected_owner"
                     />
                     <span class="icon is-small is-left">
-                      <i class="fa fa-envelope"></i>
+                      <i class="fas fa-envelope"></i>
                     </span>
                   </div>
                 </div>
 
                 <div class="field">
                   <label class="label">Comment (Optional)</label>
-                  <div class="control">
+                  <div class="control has-icons-left">
                     <input
                       class="input"
                       type="text"
                       placeholder="Example comment"
                       v-model="selected_comment"
                     />
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-comment"></i>
+                    </span>
                   </div>
                 </div>
-
-                <div class="field is-grouped">
-                  <div class="control">
-                    <button class="button is-link">Submit</button>
-                  </div>
-                </div>
-              </form>
-            </div> -->
-          <!-- .box -->
-          <!-- </div> -->
-          <!-- .model-content -->
-          <!-- <button
-            class="modal-close"
-            aria-label="close"
-            v-on:click="closeWhitelistInsertPopup()"
-          ></button> -->
+              </section>
+              <footer class="modal-card-foot">
+                <button class="button is-success">Add</button>
+                <button class="button" v-on:click="closeWhitelistInsertPopup()">
+                  Cancel
+                </button>
+              </footer>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -406,12 +305,13 @@
     <footer class="footer">
       <div class="content has-text-centered">
         <p>
-          <strong>This beautiful dashboard</strong> by Perth Ngarmtrakulchol.
+          <a href="https://github.com/servian/aws-auto-cleanup/"
+            ><i class="fab fa-github"></i> / aws-auto-cleanup</a
+          >
         </p>
       </div>
     </footer>
 
-    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script> -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"
       integrity="sha512-BKbSR+cfyxLdMAsE0naLReFSLg8/pjbgfxHh/k/kUC82Hy7r6HtR5hLhobaln2gcTvzkyyehrdREdjpsQwy2Jw=="

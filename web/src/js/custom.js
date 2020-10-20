@@ -46,10 +46,8 @@ var app = new Vue({
     selected_expiration: 0,
 
     execution_log_list: [],
-    api_execlog_url: API_EXECLOG,
-
+    execution_log_table: [],
     show_execution_log: false,
-    execlog_table: [],
   },
   methods: {
     // Whitelist
@@ -73,15 +71,20 @@ var app = new Vue({
 
       form_url = convert_json_to_get(form_data);
       send_api_request(form_url, "POST");
+
+      this.selected_service = "";
+      this.selected_resource = "";
+      this.selected_resource_id = "";
+      this.selected_owner = "";
+      this.selected_comment = "";
+      this.selected_expiration = 0;
     },
     deleteWhitelistEntry: function (resource_id) {
-      if (confirm("Are you sure you would like to delete the entry?")) {
-        let form_data = {
-          resource_id: resource_id,
-        };
-        form_url = convert_json_to_get(form_data);
-        send_api_request(form_url, "DELETE");
-      }
+      let form_data = {
+        resource_id: resource_id,
+      };
+      form_url = convert_json_to_get(form_data);
+      send_api_request(form_url, "DELETE");
     },
     extendWhitelistEntry: function (row_id) {
       let row = this.whitelist[row_id - 1];
@@ -107,10 +110,11 @@ var app = new Vue({
       this.resource_id_placeholder = "";
     },
     // Execution Log
-    openEXLog: function (key_url) {
+    openExecutionLog: function (key_url) {
       get_execution_log(key_url);
     },
-    closeEXpopup: function () {
+    closeExecutionLogPopup: function () {
+      $("#execution_log_table").DataTable().destroy();
       this.show_execution_log = false;
     },
   },
@@ -121,11 +125,14 @@ function get_execution_log(execlog_url) {
   fetch(API_EXECLOG + execlog_url)
     .then((response) => response.json())
     .then((data) => {
-      app.execlog_table = data["response"]["body"];
+      app.execution_log_table = data["response"]["body"];
       setTimeout(function () {
-        $("#execlog-table").DataTable();
+        $("#execution_log_table").DataTable({
+          paging: false,
+          columnDefs: [{ orderable: false, targets: [6] }],
+        });
         app.show_execution_log = true;
-      }, 1);
+      }, 10);
     })
     .catch((error) => {
       console.error("Error API_RESOURCES:", error);
@@ -143,7 +150,12 @@ function get_execution_log_list() {
         return row;
       });
       setTimeout(function () {
-        $("#execution_log_list_table").DataTable();
+        $("#execution_log_list_table").DataTable({
+          columnDefs: [
+            { orderable: false, targets: [2] },
+            { className: "dt-center", targets: [2] },
+          ],
+        });
       }, 10);
       app.show_execution_log_list_loading_gif = false;
     })
@@ -187,6 +199,7 @@ function get_whitelist() {
         );
         return item;
       });
+
       setTimeout(function () {
         $("#whitelist").DataTable({
           columnDefs: [
@@ -199,7 +212,32 @@ function get_whitelist() {
           ],
         });
       }, 10);
+
       app.show_whitelist_loading_gif = false;
+    })
+    .catch((error) => {
+      console.error("Error API_GET_WHITELIST:", error);
+    });
+}
+
+function refresh_whitelist() {
+  fetch(API_GET_WHITELIST)
+    .then((response) => response.json())
+    .then((data) => {
+      let i = 1;
+      let whitelist_raw = data["response"]["whitelist"];
+      app.whitelist = whitelist_raw.map((item) => {
+        item["id"] = i++;
+        dayjs.extend(dayjs_plugin_utc);
+        dayjs.extend(dayjs_plugin_timezone);
+        let readable_date = dayjs
+          .unix(item["expiration"])
+          .tz("Australia/Melbourne");
+        item["expiration_readable"] = readable_date.format(
+          "ddd MMM DD HH:mm:ss YYYY"
+        );
+        return item;
+      });
     })
     .catch((error) => {
       console.error("Error API_GET_WHITELIST:", error);
@@ -223,8 +261,7 @@ function send_api_request(form_url, request_method) {
     .then((response) => response.json())
     .then((data) => {
       $.notify(data.message, "success");
-      get_whitelist();
-      get_execution_log_list();
+      refresh_whitelist();
       app.closeWhitelistInsertPopup();
     })
     .catch((error) => {
@@ -235,7 +272,3 @@ function send_api_request(form_url, request_method) {
       console.error("Error Submitting Form:", error);
     });
 }
-
-// get_whitelist();
-// get_execution_log_list();
-// get_settings();

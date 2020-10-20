@@ -1,38 +1,48 @@
 html {
-    background: #fafafa;
+  background: #fafafa;
 }
 
 .navbar {
-    background: #25292a;
+  background: #232f3e;
 }
 
 .navbar-brand {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .navbar h1 {
-    color: #fff;
+  color: #d5dbdb;
+  font-family: "Amazon Ember";
+  font-size: 14px;
+  line-height: 1;
+  font-weight: bold;
+}
+
+.navbar img {
+  padding-left: 28px;
+  margin-right: 6px;
+  height: 20px;
 }
 
 .body-container {
-    margin: 50px auto;
+  margin: 50px auto;
 }
 
 table.table {
-    width: 100%;
+  width: 100%;
 }
 
 .add-btn-wrap {
-    text-align: center;
-    margin: 50px 0;
+  text-align: center;
+  margin: 50px 0;
 }
 
 .execlog-modal {
-    width: 80% !important;
+  width: 80% !important;
 }
 
 .execlog-modal .table {
-    width: 100%;
+  width: 100%;
 }
