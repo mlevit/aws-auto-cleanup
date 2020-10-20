@@ -71,13 +71,6 @@ var app = new Vue({
 
       form_url = convert_json_to_get(form_data);
       send_api_request(form_url, "POST");
-
-      this.selected_service = "";
-      this.selected_resource = "";
-      this.selected_resource_id = "";
-      this.selected_owner = "";
-      this.selected_comment = "";
-      this.selected_expiration = 0;
     },
     deleteWhitelistEntry: function (resource_id) {
       let form_data = {
@@ -129,7 +122,13 @@ function get_execution_log(execlog_url) {
       setTimeout(function () {
         $("#execution_log_table").DataTable({
           paging: false,
-          columnDefs: [{ orderable: false, targets: [6] }],
+          columnDefs: [
+            { orderable: false, targets: [6] },
+            {
+              className: "dt-body-nowrap",
+              targets: [1, 2, 3, 5],
+            },
+          ],
         });
         app.show_execution_log = true;
       }, 10);
@@ -263,6 +262,13 @@ function send_api_request(form_url, request_method) {
       $.notify(data.message, "success");
       refresh_whitelist();
       app.closeWhitelistInsertPopup();
+
+      app.selected_service = "";
+      app.selected_resource = "";
+      app.selected_resource_id = "";
+      app.selected_owner = "";
+      app.selected_comment = "";
+      app.selected_expiration = 0;
     })
     .catch((error) => {
       $.notify(
