@@ -191,7 +191,112 @@
           id="add-whitelist"
         >
           <div class="modal-background"></div>
-          <div class="modal-content">
+          <div class="modal-card">
+            <header class="modal-card-head">
+              <p class="modal-card-title">Add New Whitelist Entry</p>
+              <button
+                class="delete"
+                aria-label="close"
+                v-on:click="closeWhitelistInsertPopup()"
+              ></button>
+            </header>
+            <section class="modal-card-body">
+              <div class="columns">
+                <div class="column">
+                  <div class="field">
+                    <label class="label">Service</label>
+                    <div class="control">
+                      <div class="select">
+                        <select
+                          v-model="selected_service"
+                          v-on:change="updateResourceList(selected_service)"
+                        >
+                          <option v-for="item of service_list">
+                            {{ item }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <label class="label">Resource</label>
+                    <div class="control">
+                      <div class="select">
+                        <select
+                          v-model="selected_resource"
+                          v-on:change="updateResourceID(selected_service, selected_resource)"
+                        >
+                          <option v-for="item of resource_list">
+                            {{ item }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <label class="label">Resource ID (required)</label>
+                    <div class="control has-icons-left">
+                      <input
+                        class="input"
+                        type="text"
+                        :placeholder="[[ resource_id_placeholder ]]"
+                        required
+                        v-model="selected_resource_id"
+                      />
+                      <span class="icon is-small is-left"
+                        ><i class="fas fa-id-card"></i
+                      ></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Owner (Optional)</label>
+                <div class="control has-icons-left">
+                  <input
+                    class="input"
+                    type="text"
+                    placeholder="@example.com"
+                    value=""
+                    v-model="selected_owner"
+                  />
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-envelope"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Comment (Optional)</label>
+                <div class="control has-icons-left">
+                  <input
+                    class="input"
+                    type="text"
+                    placeholder="Example comment"
+                    v-model="selected_comment"
+                  />
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-comment"></i>
+                  </span>
+                </div>
+              </div>
+            </section>
+            <footer class="modal-card-foot">
+              <button class="button is-success">Add</button>
+              <button class="button" v-on:click="closeWhitelistInsertPopup()">
+                Cancel
+              </button>
+            </footer>
+          </div>
+
+          <!-- <div class="modal-content">
             <div class="box">
               <form action="#" v-on:submit.prevent="createWhitelistEntry()">
                 <h3 class="subtitle">Add New Whitelist Entry</h3>
@@ -284,15 +389,15 @@
                   </div>
                 </div>
               </form>
-            </div>
-            <!-- .box -->
-          </div>
+            </div> -->
+          <!-- .box -->
+          <!-- </div> -->
           <!-- .model-content -->
-          <button
-            class="modal-close is-large"
+          <!-- <button
+            class="modal-close"
             aria-label="close"
             v-on:click="closeWhitelistInsertPopup()"
-          ></button>
+          ></button> -->
         </div>
       </div>
     </div>

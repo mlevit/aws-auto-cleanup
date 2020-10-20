@@ -55,6 +55,9 @@ var app = new Vue({
     // Whitelist
     closeWhitelistInsertPopup: function () {
       this.show_whitelist_popup = false;
+      this.selected_service = "";
+      this.resource_list = [];
+      this.resource_id_placeholder = "";
     },
     createWhitelistEntry: function () {
       let form_data = {
@@ -97,6 +100,7 @@ var app = new Vue({
     },
     updateResourceList: function (service) {
       this.resource_list = Object.keys(this.settings[service]);
+      this.resource_id_placeholder = "";
     },
     openWhitelistInsertPopup: function () {
       this.show_whitelist_popup = true;
@@ -185,7 +189,14 @@ function get_whitelist() {
       });
       setTimeout(function () {
         $("#whitelist").DataTable({
-          columnDefs: [{ orderable: false, targets: [3, 4, 5] }],
+          columnDefs: [
+            { orderable: false, targets: [3, 4, 5] },
+            { className: "dt-center", targets: [4, 5] },
+            {
+              className: "dt-body-nowrap",
+              targets: [0, 1, 2],
+            },
+          ],
         });
       }, 10);
       app.show_whitelist_loading_gif = false;
