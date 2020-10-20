@@ -6,7 +6,6 @@ import os
 import sys
 import tempfile
 import threading
-import traceback
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json

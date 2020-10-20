@@ -45,13 +45,6 @@ class ECSCleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ecs", {})
-                .get("cluster", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 try:
                     resource_details = self.client_ecs.describe_clusters(

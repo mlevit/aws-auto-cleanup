@@ -1,7 +1,5 @@
 import json
 import os
-import sys
-import time
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json

@@ -4,26 +4,20 @@ var API_CRUD_WHITELIST = "/whitelist/entry/";
 var API_EXECLOG = "/execution/";
 
 // Get the API Gateway Base URL from manifest file
-fetch("serverless.manifest.json")
-  .then(function (response) {
-    response.json().then(function (data) {
-      var API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
+fetch("serverless.manifest.json").then(function (response) {
+  response.json().then(function (data) {
+    var API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
 
-      API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
-      API_SERVICES = API_BASE + API_SERVICES;
-      API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
-      API_EXECLOG = API_BASE + API_EXECLOG;
+    API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
+    API_SERVICES = API_BASE + API_SERVICES;
+    API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
+    API_EXECLOG = API_BASE + API_EXECLOG;
 
-      get_whitelist();
-      get_execution_log_list();
-      get_settings();
-    });
-  })
-  .catch(function (err) {
-    console.log(
-      "Could not retrieve 'apiGatewayBaseURL' from 'serverless.manifest.json' file."
-    );
+    get_whitelist();
+    get_execution_log_list();
+    get_settings();
   });
+});
 
 // Init Vue instance
 var app = new Vue({

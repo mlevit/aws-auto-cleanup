@@ -70,11 +70,6 @@ class ElasticsearchServiceCleanup:
                     self.logging.error(sys.exc_info()[1])
                     return False
 
-                resource_status = (
-                    resource_details.get("ElasticsearchVersion")
-                    .get("Status")
-                    .get("State")
-                )
                 resource_date = (
                     resource_details.get("ElasticsearchVersion")
                     .get("Status")
