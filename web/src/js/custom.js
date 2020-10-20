@@ -3,22 +3,6 @@ var API_SERVICES = "/settings/service";
 var API_CRUD_WHITELIST = "/whitelist/entry/";
 var API_EXECLOG = "/execution/";
 
-// Get the API Gateway Base URL from manifest file
-fetch("serverless.manifest.json").then(function (response) {
-  response.json().then(function (data) {
-    var API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
-
-    API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
-    API_SERVICES = API_BASE + API_SERVICES;
-    API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
-    API_EXECLOG = API_BASE + API_EXECLOG;
-
-    get_whitelist();
-    get_execution_log_list();
-    get_settings();
-  });
-});
-
 // Init Vue instance
 var app = new Vue({
   el: "#app",
@@ -41,6 +25,8 @@ var app = new Vue({
 
     execution_log_list: [],
     execution_log_table: [],
+    execution_log_key: "",
+    execution_log_mode: false,
     show_execution_log: false,
   },
   methods: {
@@ -107,17 +93,60 @@ var app = new Vue({
   },
 });
 
+// Utility functions
+function convert_json_to_get(form_json) {
+  let form_url = "";
+  for (var key in form_json) {
+    form_url += key + "=" + form_json[key] + "&";
+  }
+  form_url.substr(0, form_url.length - 1);
+  return form_url;
+}
+
+function send_api_request(form_url, request_method) {
+  fetch(API_CRUD_WHITELIST + "?" + form_url, {
+    method: request_method,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      $.notify(data.message, "success");
+      refresh_whitelist();
+      app.closeWhitelistInsertPopup();
+
+      app.selected_service = "";
+      app.selected_resource = "";
+      app.selected_resource_id = "";
+      app.selected_owner = "";
+      app.selected_comment = "";
+      app.selected_expiration = 0;
+    })
+    .catch((error) => {
+      $.notify(
+        "The request has failed. Please see console log for more info.",
+        "error"
+      );
+      console.error("Error Submitting Form:", error);
+    });
+}
+
 // Get execution log for a single instance
 function get_execution_log(execlog_url) {
   fetch(API_EXECLOG + execlog_url)
     .then((response) => response.json())
     .then((data) => {
       app.execution_log_table = data["response"]["body"];
+      app.execution_log_key = decodeURIComponent(execlog_url);
+
+      if (data["response"]["body"][0][7] == "True") {
+        app.execution_log_mode = "Dry Run";
+      } else {
+        app.execution_log_mode = "Destroy";
+      }
+
       setTimeout(function () {
         $("#execution_log_table").DataTable({
           paging: false,
           columnDefs: [
-            { orderable: false, targets: [6] },
             {
               className: "dt-body-nowrap",
               targets: [1, 2, 3, 5],
@@ -237,38 +266,18 @@ function refresh_whitelist() {
     });
 }
 
-// Utility functions
-function convert_json_to_get(form_json) {
-  let form_url = "";
-  for (var key in form_json) {
-    form_url += key + "=" + form_json[key] + "&";
-  }
-  form_url.substr(0, form_url.length - 1);
-  return form_url;
-}
+// Get the API Gateway Base URL from manifest file
+fetch("serverless.manifest.json").then(function (response) {
+  response.json().then(function (data) {
+    var API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
 
-function send_api_request(form_url, request_method) {
-  fetch(API_CRUD_WHITELIST + "?" + form_url, {
-    method: request_method,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      $.notify(data.message, "success");
-      refresh_whitelist();
-      app.closeWhitelistInsertPopup();
+    API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
+    API_SERVICES = API_BASE + API_SERVICES;
+    API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
+    API_EXECLOG = API_BASE + API_EXECLOG;
 
-      app.selected_service = "";
-      app.selected_resource = "";
-      app.selected_resource_id = "";
-      app.selected_owner = "";
-      app.selected_comment = "";
-      app.selected_expiration = 0;
-    })
-    .catch((error) => {
-      $.notify(
-        "The request has failed. Please see console log for more info.",
-        "error"
-      );
-      console.error("Error Submitting Form:", error);
-    });
-}
+    get_whitelist();
+    get_execution_log_list();
+    get_settings();
+  });
+});
