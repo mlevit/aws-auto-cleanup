@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 
 import boto3
 
@@ -26,7 +25,7 @@ def lambda_handler(event, context):
         return get_return(400, "Resource ID cannot be null", parameters, None)
 
     try:
-        response = boto3.client("dynamodb").delete_item(
+        boto3.client("dynamodb").delete_item(
             TableName=os.environ.get("WHITELISTTABLE"),
             Key={
                 "resource_id": {"S": parameters.get("resource_id")},
