@@ -14,7 +14,9 @@
   },
   "bugs": "https://github.com/servian/aws-auto-cleanup/issues",
   "scripts": {
-    "deploy": "serverless client deploy --no-confirm",
-    "remove": "serverless client remove"
+    "deploy": "serverless deploy",
+    "remove": "serverless remove",
+    "deploy-client": "serverless client deploy --no-confirm",
+    "remove-client": "serverless client remove"
   }
 }

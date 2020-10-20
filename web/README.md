@@ -47,6 +47,12 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    npm run deploy -- [--region] [--aws-profile]
    ```
 
+7. Deploy
+
+   ```bash
+   npm run deploy-client -- [--region] [--aws-profile]
+   ```
+
 ## Removal
 
 1. Change directory
@@ -56,6 +62,12 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    ```
 
 2. Remove
+
+   ```bash
+   npm run remove-client -- [--region] [--aws-profile]
+   ```
+
+3. Remove
 
    ```bash
    npm run remove -- [--region] [--aws-profile]
