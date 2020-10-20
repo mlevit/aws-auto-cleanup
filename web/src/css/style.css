@@ -1,0 +1,38 @@
+html {
+    background: #fafafa;
+}
+
+.navbar {
+    background: #25292a;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.navbar h1 {
+    color: #fff;
+}
+
+.body-container {
+    margin: 50px auto;
+}
+
+table.table {
+    width: 100%;
+}
+
+.add-btn-wrap {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.execlog-modal {
+    width: 80% !important;
+}
+
+.execlog-modal .table {
+    width: 100%;
+}

@@ -5,7 +5,7 @@ custom:
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
   client:
     bucketName: ${self:service}-${self:provider.stage}-site-${cf.${self:custom.region}:auto-cleanup-api-${self:provider.stage}.AccountID}
-    distributionFolder: ./build
+    distributionFolder: ./src
     sse: AES256
 
 provider:
@@ -22,4 +22,3 @@ package:
 
 plugins:
   - serverless-finch
-  - serverless-pseudo-parameters

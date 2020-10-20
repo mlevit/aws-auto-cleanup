@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css"
+      integrity="sha512-ZRv40llEogRmoWgZwnsqke3HNzJ0kiI0+pcMgiz2bxO6Ew1DVBtWjVn0qjrXdT3+u+pSN36gLgmJiiQ3cQtyzA=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+      integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+      crossorigin="anonymous"
+    />
+    <!-- <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/fontawesome.min.css"
+      integrity="sha512-kJ30H6g4NGhWopgdseRb8wTsyllFUYIx3hiUwmGAkgA9B/JbzUBDQVr2VVlWGde6sdBVOG7oU8AL35ORDuMm8g=="
+      crossorigin="anonymous"
+    /> -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.22/css/dataTables.bulma.min.css"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>AWS Auto Cleanup</title>
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+          <!-- <img src="img/logo.svg" alt="AWS Auto Cleanup" style="height: 18px" /> -->
+          <span style="color: white">
+            <i class="fab fa-aws fa-3x"></i>
+          </span>
+        </a>
+        <h1>AWS Auto Cleanup</h1>
+      </div>
+    </nav>
+
+    <!-- Body -->
+    <div class="container body-container">
+      <h2 class="title">Whitelist</h2>
+      <div id="app">
+        <div class="add-btn-wrap">
+          <button
+            class="button is-warning"
+            v-on:click="openWhitelistInsertPopup()"
+          >
+            <i class="fas fa-plus-circle"></i>&nbsp;Add New Whitelist Entry
+          </button>
+        </div>
+        <table class="table" id="whitelist">
+          <thead>
+            <tr>
+              <th>Resource ID</th>
+              <th>Expiration</th>
+              <th>Owner</th>
+              <th>Comment</th>
+              <th>Extend</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in whitelist" :key="item.id">
+              <td>{{ item.resource_id }}</td>
+              <td>{{ item.expiration_readable }}</td>
+              <td>{{ item.owner }}</td>
+              <td>{{ item.comment }}</td>
+              <td>
+                <a
+                  v-on:click="extendWhitelistEntry( item.id )"
+                  class="button is-warning"
+                >
+                  <i class="fas fa-clock"></i>
+                </a>
+              </td>
+              <td>
+                <button
+                  v-on:click="deleteWhitelistEntry( item.resource_id )"
+                  class="button is-danger"
+                >
+                  <i class="fas fa-minus-circle"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Refreshing Animation -->
+        <div
+          v-show="show_whitelist_loading_gif"
+          style="text-align: center; margin: 15px 0"
+        >
+          <img src="img/loading.gif" alt="" /> Loading whitelist...
+        </div>
+
+        <!-- Execution Log -->
+        <hr />
+        <h2 class="title">Execution Log</h2>
+
+        <table class="table" id="execution_log_list_table">
+          <thead>
+            <th>Key</th>
+            <th>Date</th>
+            <th>View</th>
+          </thead>
+          <tbody>
+            <tr
+              v-for="item in execution_log_list"
+              :value="item"
+              :key="item.key"
+            >
+              <td>{{ item.key }}</td>
+              <td>{{ item.date }}</td>
+              <td>
+                <a
+                  v-on:click="openEXLog( item.key_escape )"
+                  target="_blank"
+                  class="button"
+                  ><i class="fa fa-list"></i
+                ></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Refreshing Animation -->
+        <div
+          v-show="show_execution_log_list_loading_gif"
+          style="text-align: center; margin: 15px 0"
+        >
+          <img src="img/loading.gif" alt="" /> Loading execution log...
+        </div>
+
+        <!-- Popup: Exec Log Table -->
+        <div
+          class="modal"
+          v-bind:class="{ 'is-active': show_execution_log }"
+          id="execlog-popup"
+        >
+          <div class="modal-background" v-on:click="closeEXpopup()"></div>
+          <div class="modal-content execlog-modal">
+            <div class="box">
+              <table class="table" id="execlog-table">
+                <thead>
+                  <tr>
+                    <th>Platform</th>
+                    <th>Region</th>
+                    <th>Service</th>
+                    <th>Resource</th>
+                    <th>Resource ID</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                    <th>Dry run flag</th>
+                    <th>Execution ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in execlog_table" :key="item.id">
+                    <td>{{ item[0] }}</td>
+                    <td>{{ item[1] }}</td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ item[3] }}</td>
+                    <td>{{ item[4] }}</td>
+                    <td>{{ item[5] }}</td>
+                    <td>{{ item[6] }}</td>
+                    <td>{{ item[7] }}</td>
+                    <td>{{ item[8] }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- .box -->
+          </div>
+          <!-- .model-content -->
+          <button
+            class="modal-close is-large"
+            aria-label="close"
+            v-on:click="closeEXpopup()"
+          ></button>
+        </div>
+
+        <!-- Popup: Add Whitelist Rule -->
+        <div
+          class="modal"
+          v-bind:class="{ 'is-active': show_whitelist_popup }"
+          id="add-whitelist"
+        >
+          <div class="modal-background"></div>
+          <div class="modal-content">
+            <div class="box">
+              <form action="#" v-on:submit.prevent="createWhitelistEntry()">
+                <h3 class="subtitle">Add New Whitelist Entry</h3>
+                <hr />
+
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
+                      <label class="label">Service</label>
+                      <div class="control">
+                        <div class="select">
+                          <select
+                            v-model="selected_service"
+                            v-on:change="updateResourceList(selected_service)"
+                          >
+                            <option v-for="item of service_list">
+                              {{ item }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="field">
+                      <label class="label">Resource</label>
+                      <div class="control">
+                        <div class="select">
+                          <select
+                            v-model="selected_resource"
+                            v-on:change="updateResourceID(selected_service, selected_resource)"
+                          >
+                            <option v-for="item of resource_list">
+                              {{ item }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="field">
+                      <label class="label">Resource ID (required)</label>
+                      <div class="control">
+                        <input
+                          class="input"
+                          type="text"
+                          :placeholder="[[ resource_id_placeholder ]]"
+                          required
+                          v-model="selected_resource_id"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="label">Owner (Optional)</label>
+                  <div class="control has-icons-left has-icons-right">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="@example.com"
+                      value=""
+                      v-model="selected_owner"
+                    />
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-envelope"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="label">Comment (Optional)</label>
+                  <div class="control">
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="Example comment"
+                      v-model="selected_comment"
+                    />
+                  </div>
+                </div>
+
+                <div class="field is-grouped">
+                  <div class="control">
+                    <button class="button is-link">Submit</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <!-- .box -->
+          </div>
+          <!-- .model-content -->
+          <button
+            class="modal-close is-large"
+            aria-label="close"
+            v-on:click="closeWhitelistInsertPopup()"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong>This beautiful dashboard</strong> by Perth Ngarmtrakulchol.
+        </p>
+      </div>
+    </footer>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script> -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"
+      integrity="sha512-BKbSR+cfyxLdMAsE0naLReFSLg8/pjbgfxHh/k/kUC82Hy7r6HtR5hLhobaln2gcTvzkyyehrdREdjpsQwy2Jw=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+      integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"
+      integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.datatables.net/1.10.22/js/dataTables.bulma.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/dayjs.min.js"
+      integrity="sha512-u7elBfdMr+7LhU4rvUk3IM28QZDKTyUxba4Nx2IJ1W9cj4shfRSPq7EZXD2ULD9cBoizw2FQyeR6YBog6LcnHg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/plugin/utc.min.js"
+      integrity="sha512-+lztPB4upMyG9pLdOWl8MFsBhXM1V9vFTDhXV3/4VSdoqpR5RfA2bNdrl8n0F9HmbzFkNqmOBdZw580qfRU01Q=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/plugin/timezone.min.js"
+      integrity="sha512-3QnyXIdU85C6rOXhHzVsXinI5/qM/LniMr5actNRUwyp1Tuurw7rOn7fX7WWoNyZuM7KlQxITGQI4ITCgXKGQA=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"
+      integrity="sha512-efUTj3HdSPwWJ9gjfGR71X9cvsrthIA78/Fvd/IN+fttQVy7XWkOAXb295j8B3cmm/kFKVxjiNYzKw9IQJHIuQ=="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/custom.js"></script>
+  </body>
+</html>
