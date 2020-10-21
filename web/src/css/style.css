@@ -40,7 +40,7 @@ table.table {
 }
 
 .execution-log-modal {
-  width: 80% !important;
+  width: calc(100vw - 40px) !important;
 }
 
 .execution-log-modal .table {
