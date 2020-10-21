@@ -1,48 +1,6 @@
 [
   {
     "resource_id": {
-      "S": "cloudformation:stack:auto-cleanup-app-dev"
-    },
-    "comment": {
-      "S": "Auto Cleanup App development CloudFormation stack"
-    },
-    "expiration": {
-      "N": "99999999999"
-    },
-    "owner": {
-      "S": "example@email.com"
-    }
-  },
-  {
-    "resource_id": {
-      "S": "cloudformation:stack:auto-cleanup-api-dev"
-    },
-    "comment": {
-      "S": "Auto Cleanup API development CloudFormation stack"
-    },
-    "expiration": {
-      "N": "99999999999"
-    },
-    "owner": {
-      "S": "example@email.com"
-    }
-  },
-  {
-    "resource_id": {
-      "S": "cloudformation:stack:auto-cleanup-web-dev"
-    },
-    "comment": {
-      "S": "Auto Cleanup Web development CloudFormation stack"
-    },
-    "expiration": {
-      "N": "99999999999"
-    },
-    "owner": {
-      "S": "example@email.com"
-    }
-  },
-  {
-    "resource_id": {
       "S": "cloudformation:stack:auto-cleanup-app-prod"
     },
     "comment": {
