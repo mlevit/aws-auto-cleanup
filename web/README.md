@@ -2,8 +2,6 @@
 
 The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The website utilises the Auto Cleanup API to serve content and enable user interaction.
 
-**This module is to be deployed third.**
-
 ![architecture](./static/architecture.drawio.svg)
 
 ## Table of contents
@@ -15,41 +13,43 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
 
 ## Deployment
 
-1. Install [AWS CLI](https://aws.amazon.com/cli/)
+1. Ensure the [API module](../api) has been deployed prior to deploying this module
+
+2. Install [AWS CLI](https://aws.amazon.com/cli/)
 
    ```bash
    pip install awscli
    ```
 
-2. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
+3. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
 
    - _Auto Cleanup should be deployed by a user with administrative privileges._
 
-3. Install [Serverless Framework](https://www.serverless.com/)
+4. Install [Serverless Framework](https://www.serverless.com/)
 
    ```bash
    npm install -g serverless
    ```
 
-4. Download
+5. Download
 
    ```bash
    git clone https://github.com/servian/aws-auto-cleanup.git
    ```
 
-5. Change directory
+6. Change directory
 
    ```bash
    cd aws-auto-cleanup/web/
    ```
 
-6. Deploy
+7. Deploy
 
    ```bash
    npm run deploy -- [--region] [--aws-profile]
    ```
 
-7. Deploy
+8. Deploy
 
    ```bash
    npm run deploy-client -- [--region] [--aws-profile]

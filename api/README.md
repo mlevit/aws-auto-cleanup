@@ -2,8 +2,6 @@
 
 The Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships with one another.
 
-**This module is to be deployed second.**
-
 ![architecture](./static/architecture.drawio.svg)
 
 ## Table of contents
@@ -15,41 +13,43 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
 
 ## Deployment
 
-1. Install [AWS CLI](https://aws.amazon.com/cli/)
+1. Ensure the [APP module](../app) has been deployed and invoked at least once prior to deploying this module
+
+2. Install [AWS CLI](https://aws.amazon.com/cli/)
 
    ```bash
    pip install awscli
    ```
 
-2. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
+3. [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
 
    - _Auto Cleanup should be deployed by a user with administrative privileges._
 
-3. Install [Serverless Framework](https://www.serverless.com/)
+4. Install [Serverless Framework](https://www.serverless.com/)
 
    ```bash
    npm install -g serverless
    ```
 
-4. Download
+5. Download
 
    ```bash
    git clone https://github.com/servian/aws-auto-cleanup.git
    ```
 
-5. Change directory
+6. Change directory
 
    ```bash
    cd aws-auto-cleanup/api/
    ```
 
-6. Install dependencies
+7. Install dependencies
 
    ```bash
    npm install
    ```
 
-7. Deploy
+8. Deploy
 
    ```bash
    npm run deploy -- [--region] [--aws-profile]

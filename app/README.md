@@ -2,8 +2,6 @@
 
 The Auto Cleanup App consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
 
-**This module is to be deployed first.**
-
 ![architecture](./static/architecture.drawio.svg)
 
 ## Table of contents
