@@ -97,7 +97,7 @@
         </table>
         <!-- Refreshing Animation -->
         <div
-          v-show="show_whitelist_loading_gif"
+          v-show="showWhitelistLoadingGIF"
           style="text-align: center; margin: 15px 0"
         >
           <img src="img/loading.gif" alt="" /> Loading whitelist...
@@ -114,11 +114,7 @@
             <th>View</th>
           </thead>
           <tbody>
-            <tr
-              v-for="item in execution_log_list"
-              :value="item"
-              :key="item.key"
-            >
+            <tr v-for="item in executionLogList" :value="item" :key="item.key">
               <td>{{ item.key }}</td>
               <td>{{ item.date }}</td>
               <td>
@@ -134,7 +130,7 @@
         </table>
         <!-- Refreshing Animation -->
         <div
-          v-show="show_execution_log_list_loading_gif"
+          v-show="showExecutionLogLoadingGIF"
           style="text-align: center; margin: 15px 0"
         >
           <img src="img/loading.gif" alt="" /> Loading execution log...
@@ -157,18 +153,18 @@
                 style="line-height: unset !important"
               >
                 <button
-                  v-if="execution_log_mode === 'Destroy'"
+                  v-if="executionLogMode === 'Destroy'"
                   class="button is-danger"
                 >
-                  {{execution_log_mode}}
+                  {{executionLogMode}}
                 </button>
                 <button
-                  v-if="execution_log_mode === 'Dry Run'"
+                  v-if="executionLogMode === 'Dry Run'"
                   class="button is-success"
                 >
-                  {{execution_log_mode}}
+                  {{executionLogMode}}
                 </button>
-                {{execution_log_key}}
+                {{executionLogKey}}
               </p>
               <button
                 class="delete"
@@ -177,7 +173,7 @@
               ></button>
             </header>
             <div class="box" style="border-radius: 0px !important">
-              <table class="table" id="execution_log_table">
+              <table class="table" id="executionLogTable">
                 <thead>
                   <tr>
                     <th>Timestamp</th>
@@ -189,7 +185,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in execution_log_table" :key="item.id">
+                  <tr v-for="item in executionLogTable" :key="item.id">
                     <td>{{ item[6] }}</td>
                     <td>{{ item[1] }}</td>
                     <td>{{ item[2] }}</td>
@@ -208,7 +204,7 @@
         <!-- Popup: Add Whitelist Rule -->
         <div
           class="modal"
-          v-bind:class="{ 'is-active': show_whitelist_popup }"
+          v-bind:class="{ 'is-active': showWhitelistPopup }"
           id="add-whitelist"
         >
           <div
@@ -234,10 +230,10 @@
                         <div class="select">
                           <select
                             required
-                            v-model="selected_service"
-                            v-on:change="updateResourceList(selected_service)"
+                            v-model="selectedService"
+                            v-on:change="updateResourceList(selectedService)"
                           >
-                            <option v-for="item of service_list">
+                            <option v-for="item of serviceList">
                               {{ item }}
                             </option>
                           </select>
@@ -253,10 +249,10 @@
                         <div class="select">
                           <select
                             required
-                            v-model="selected_resource"
-                            v-on:change="updateResourceID(selected_service, selected_resource)"
+                            v-model="selectedResource"
+                            v-on:change="updateResourceID(selectedService, selectedResource)"
                           >
-                            <option v-for="item of resource_list">
+                            <option v-for="item of resourceList">
                               {{ item }}
                             </option>
                           </select>
@@ -270,11 +266,11 @@
                       <label class="label">ID</label>
                       <div class="control has-icons-left">
                         <input
-                          :placeholder="[[ resource_id_placeholder ]]"
+                          :placeholder="[[ resourceIDPlaceholder ]]"
                           class="input"
                           required
                           type="text"
-                          v-model="selected_resource_id"
+                          v-model="selectedResourceID"
                         />
                         <span class="icon is-small is-left"
                           ><i class="fas fa-id-card"></i
@@ -292,7 +288,7 @@
                       placeholder="@example.com"
                       required
                       type="email"
-                      v-model="selected_owner"
+                      v-model="selectedOwner"
                     />
                     <span class="icon is-small is-left">
                       <i class="fas fa-envelope"></i>
@@ -307,7 +303,7 @@
                       class="input"
                       required
                       type="text"
-                      v-model="selected_comment"
+                      v-model="selectedComment"
                     />
                     <span class="icon is-small is-left">
                       <i class="fas fa-comment-alt"></i>

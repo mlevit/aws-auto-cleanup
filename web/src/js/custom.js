@@ -9,49 +9,49 @@ var app = new Vue({
   data: {
     whitelist: [],
     settings: [],
-    service_list: [],
-    resource_list: [],
-    resource_id_placeholder: "",
-    show_whitelist_popup: false,
-    show_whitelist_loading_gif: false,
-    show_execution_log_list_loading_gif: false,
+    serviceList: [],
+    resourceList: [],
+    resourceIDPlaceholder: "",
+    showWhitelistPopup: false,
+    showWhitelistLoadingGIF: false,
+    showExecutionLogLoadingGIF: false,
 
-    selected_service: "",
-    selected_resource: "",
-    selected_resource_id: "",
-    selected_owner: "",
-    selected_comment: "",
-    selected_expiration: 0,
+    selectedService: "",
+    selectedResource: "",
+    selectedResourceID: "",
+    selectedOwner: "",
+    selectedComment: "",
+    selectedExpiration: 0,
 
-    execution_log_list: [],
-    execution_log_table: [],
-    execution_log_key: "",
-    execution_log_mode: false,
+    executionLogList: [],
+    executionLogTable: [],
+    executionLogKey: "",
+    executionLogMode: false,
     show_execution_log: false,
   },
   methods: {
     // Whitelist
     closeWhitelistInsertPopup: function () {
-      this.show_whitelist_popup = false;
-      this.resource_id_placeholder = "";
-      this.resource_list = [];
-      this.selected_comment = "";
-      this.selected_expiration = 0;
-      this.selected_owner = "";
-      this.selected_resource = "";
-      this.selected_resource_id = "";
-      this.selected_service = "";
+      this.showWhitelistPopup = false;
+      this.resourceIDPlaceholder = "";
+      this.resourceList = [];
+      this.selectedComment = "";
+      this.selectedExpiration = 0;
+      this.selectedOwner = "";
+      this.selectedResource = "";
+      this.selectedResourceID = "";
+      this.selectedService = "";
     },
     createWhitelistEntry: function () {
       let form_data = {
         resource_id:
-          this.selected_service +
+          this.selectedService +
           ":" +
-          this.selected_resource +
+          this.selectedResource +
           ":" +
-          this.selected_resource_id,
-        owner: this.selected_owner,
-        comment: this.selected_comment,
+          this.selectedResourceID,
+        owner: this.selectedOwner,
+        comment: this.selectedComment,
       };
 
       form_url = convert_json_to_get(form_data);
@@ -77,22 +77,22 @@ var app = new Vue({
       send_api_request(form_url, "PUT");
     },
     updateResourceID: function (service, resource) {
-      this.resource_id_placeholder = this.settings[service][resource]["id"];
+      this.resourceIDPlaceholder = this.settings[service][resource]["id"];
     },
     updateResourceList: function (service) {
-      this.resource_list = Object.keys(this.settings[service]);
-      this.resource_id_placeholder = "";
+      this.resourceList = Object.keys(this.settings[service]);
+      this.resourceIDPlaceholder = "";
     },
     openWhitelistInsertPopup: function () {
-      this.show_whitelist_popup = true;
-      this.resource_id_placeholder = "";
+      this.showWhitelistPopup = true;
+      this.resourceIDPlaceholder = "";
     },
     // Execution Log
     openExecutionLog: function (key_url) {
       get_execution_log(key_url);
     },
     closeExecutionLogPopup: function () {
-      $("#execution_log_table").DataTable().destroy();
+      $("#executionLogTable").DataTable().destroy();
       this.show_execution_log = false;
     },
   },
@@ -139,17 +139,17 @@ function get_execution_log(execlog_url) {
   fetch(API_EXECLOG + execlog_url)
     .then((response) => response.json())
     .then((data) => {
-      app.execution_log_table = data["response"]["body"];
-      app.execution_log_key = decodeURIComponent(execlog_url);
+      app.executionLogTable = data["response"]["body"];
+      app.executionLogKey = decodeURIComponent(execlog_url);
 
       if (data["response"]["body"][0][7] == "True") {
-        app.execution_log_mode = "Dry Run";
+        app.executionLogMode = "Dry Run";
       } else {
-        app.execution_log_mode = "Destroy";
+        app.executionLogMode = "Destroy";
       }
 
       setTimeout(function () {
-        $("#execution_log_table").DataTable({
+        $("#executionLogTable").DataTable({
           paging: false,
           columnDefs: [
             {
@@ -167,12 +167,12 @@ function get_execution_log(execlog_url) {
 }
 
 // Get execution logs list
-function get_execution_log_list() {
-  app.show_execution_log_list_loading_gif = true;
+function get_executionLogList() {
+  app.showExecutionLogLoadingGIF = true;
   fetch(API_EXECLOG)
     .then((response) => response.json())
     .then((data) => {
-      app.execution_log_list = data["response"]["logs"].map((row) => {
+      app.executionLogList = data["response"]["logs"].map((row) => {
         row["key_escape"] = encodeURIComponent(row["key"]);
         return row;
       });
@@ -184,7 +184,7 @@ function get_execution_log_list() {
           ],
         });
       }, 10);
-      app.show_execution_log_list_loading_gif = false;
+      app.showExecutionLogLoadingGIF = false;
     })
     .catch((error) => {
       console.error("Error API_RESOURCES:", error);
@@ -197,7 +197,7 @@ function get_settings() {
     .then((response) => response.json())
     .then((data) => {
       app.settings = data["response"];
-      app.service_list = Object.keys(data["response"]);
+      app.serviceList = Object.keys(data["response"]);
     })
     .catch((error) => {
       console.error("Error API_SERVICES:", error);
@@ -207,7 +207,7 @@ function get_settings() {
 // Get whitelist
 function get_whitelist() {
   app.whitelist = [];
-  app.show_whitelist_loading_gif = true;
+  app.showWhitelistLoadingGIF = true;
   fetch(API_GET_WHITELIST)
     .then((response) => response.json())
     .then((data) => {
@@ -240,7 +240,7 @@ function get_whitelist() {
         });
       }, 10);
 
-      app.show_whitelist_loading_gif = false;
+      app.showWhitelistLoadingGIF = false;
     })
     .catch((error) => {
       console.error("Error API_GET_WHITELIST:", error);
@@ -282,7 +282,7 @@ fetch("serverless.manifest.json").then(function (response) {
     API_EXECLOG = API_BASE + API_EXECLOG;
 
     get_whitelist();
-    get_execution_log_list();
+    get_executionLogList();
     get_settings();
   });
 });

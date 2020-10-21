@@ -76,7 +76,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 1. Change directory
 
    ```bash
-   cd aws-auto-cleanup-app
+   cd aws-auto-cleanup/app/
    ```
 
 2. Remove
