@@ -33,9 +33,14 @@ var app = new Vue({
     // Whitelist
     closeWhitelistInsertPopup: function () {
       this.show_whitelist_popup = false;
-      this.selected_service = "";
-      this.resource_list = [];
       this.resource_id_placeholder = "";
+      this.resource_list = [];
+      this.selected_comment = "";
+      this.selected_expiration = 0;
+      this.selected_owner = "";
+      this.selected_resource = "";
+      this.selected_resource_id = "";
+      this.selected_service = "";
     },
     createWhitelistEntry: function () {
       let form_data = {
@@ -117,13 +122,6 @@ function send_api_request(form_url, request_method) {
         color: "#3FBF61",
         messageColor: "white",
       });
-
-      app.selected_service = "";
-      app.selected_resource = "";
-      app.selected_resource_id = "";
-      app.selected_owner = "";
-      app.selected_comment = "";
-      app.selected_expiration = 0;
     })
     .catch((error) => {
       iziToast.show({
