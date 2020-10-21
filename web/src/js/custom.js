@@ -31,6 +31,8 @@ var app = new Vue({
     selectedService: "",
     serviceList: [],
     settings: [],
+    showWhitelistDeletePopup: false,
+    showExecutionLogListLoadingGif: false,
     showExecutionLogLoadingGif: false,
     showExecutionLogPopup: false,
     showWhitelistLoadingGif: false,
@@ -39,6 +41,10 @@ var app = new Vue({
   },
   methods: {
     // Whitelist
+    closeWhitelistDeletePopup: function () {
+      this.selectedResourceId = "";
+      this.showWhitelistDeletePopup = false;
+    },
     closeWhitelistInsertPopup: function () {
       this.resourceIdPlaceholder = "";
       this.resourceList = [];
@@ -89,6 +95,11 @@ var app = new Vue({
       this.resourceList = Object.keys(this.settings[service]);
       this.resourceIdPlaceholder = "";
     },
+    openWhitelistDeletePopup: function (resourceId) {
+      this.selectedResourceId = resourceId;
+      this.showWhitelistDeletePopup = true;
+      this.resourceIdPlaceholder = "";
+    },
     openWhitelistInsertPopup: function () {
       this.showWhitelistPopup = true;
       this.resourceIdPlaceholder = "";
@@ -112,6 +123,7 @@ function sendApiRequest(formURL, requestMethod) {
     .then((data) => {
       refreshWhitelist();
       app.closeWhitelistInsertPopup();
+      app.closeWhitelistDeletePopup();
 
       iziToast.show({
         message: data.message,
@@ -132,6 +144,9 @@ function sendApiRequest(formURL, requestMethod) {
 
 // Get execution log for a single instance
 function getExecutionLog(executionLogURL) {
+  app.showExecutionLogPopup = true;
+  app.showExecutionLogLoadingGif = true;
+
   fetch(API_EXECLOG + executionLogURL)
     .then((response) => response.json())
     .then((data) => {
@@ -154,7 +169,7 @@ function getExecutionLog(executionLogURL) {
             },
           ],
         });
-        app.showExecutionLogPopup = true;
+        app.showExecutionLogLoadingGif = false;
       }, 10);
     })
     .catch((error) => {
@@ -164,7 +179,7 @@ function getExecutionLog(executionLogURL) {
 
 // Get execution logs list
 function getExecutionLogList() {
-  app.showExecutionLogLoadingGif = true;
+  app.showExecutionLogListLoadingGif = true;
   fetch(API_EXECLOG)
     .then((response) => response.json())
     .then((data) => {
@@ -180,7 +195,7 @@ function getExecutionLogList() {
           ],
         });
       }, 10);
-      app.showExecutionLogLoadingGif = false;
+      app.showExecutionLogListLoadingGif = false;
     })
     .catch((error) => {
       console.error("Error API_RESOURCES:", error);

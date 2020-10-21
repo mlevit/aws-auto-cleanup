@@ -85,7 +85,7 @@
                 </a>
                 <button
                   v-if="item.expiration !== '99999999999'"
-                  v-on:click="deleteWhitelistEntry( item.resource_id )"
+                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
                   class="button is-danger"
                 >
                   <span class="icon">
@@ -98,10 +98,10 @@
         </table>
         <!-- Refreshing Animation -->
         <div
+          class="container has-text-centered"
           v-show="showWhitelistLoadingGif"
-          style="text-align: center; margin: 15px 0"
         >
-          <img src="img/loading.gif" alt="" /> Loading whitelist...
+          <button class="button is-warning is-loading">Loading</button>
         </div>
         <br />
 
@@ -131,10 +131,12 @@
         </table>
         <!-- Refreshing Animation -->
         <div
-          v-show="showExecutionLogLoadingGif"
-          style="text-align: center; margin: 15px 0"
+          class="container has-text-centered"
+          v-show="showExecutionLogListLoadingGif"
         >
-          <img src="img/loading.gif" alt="" /> Loading execution log...
+          <button class="button is-normal is-warning is-loading">
+            Loading
+          </button>
         </div>
 
         <!-- Popup: Exec Log Table -->
@@ -196,6 +198,12 @@
                   </tr>
                 </tbody>
               </table>
+              <div
+                class="container has-text-centered"
+                v-show="showExecutionLogLoadingGif"
+              >
+                <button class="button is-warning is-loading">Loading</button>
+              </div>
             </div>
             <!-- .box -->
           </div>
@@ -215,7 +223,7 @@
           <div class="modal-card">
             <form action="#" v-on:submit.prevent="createWhitelistEntry()">
               <header class="modal-card-head">
-                <p class="modal-card-title">Add New Whitelist Entry</p>
+                <p class="modal-card-title">Add Whitelist Entry</p>
                 <button
                   class="delete"
                   aria-label="close"
@@ -319,6 +327,45 @@
                 </button>
               </footer>
             </form>
+          </div>
+        </div>
+
+        <!-- Popup: Delete Whitelist Rule -->
+        <div
+          class="modal"
+          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
+          id="delete-whitelist"
+        >
+          <div
+            class="modal-background"
+            v-on:click="closeWhitelistDeletePopup()"
+          ></div>
+          <div class="modal-card">
+            <header class="modal-card-head">
+              <p class="modal-card-title">Delete Whitelist Entry</p>
+              <button
+                class="delete"
+                aria-label="close"
+                v-on:click="closeWhitelistDeletePopup()"
+              ></button>
+            </header>
+            <section class="modal-card-body">
+              <span
+                >Are you sure you want to delete
+                <strong>{{selectedResourceId}}</strong>?</span
+              >
+            </section>
+            <footer class="modal-card-foot">
+              <button
+                class="button is-danger"
+                v-on:click="deleteWhitelistEntry(selectedResourceId)"
+              >
+                Delete
+              </button>
+              <button class="button" v-on:click="closeWhitelistDeletePopup()">
+                Cancel
+              </button>
+            </footer>
           </div>
         </div>
       </div>
