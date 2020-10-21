@@ -156,7 +156,6 @@
                 class="modal-card-title is-vcentered"
                 style="line-height: unset !important"
               >
-                {{execution_log_key}}
                 <button
                   v-if="execution_log_mode === 'Destroy'"
                   class="button is-danger"
@@ -169,6 +168,7 @@
                 >
                   {{execution_log_mode}}
                 </button>
+                {{execution_log_key}}
               </p>
               <button
                 class="delete"
@@ -235,6 +235,7 @@
                           <select
                             v-model="selected_service"
                             v-on:change="updateResourceList(selected_service)"
+                            required
                           >
                             <option v-for="item of service_list">
                               {{ item }}
@@ -253,6 +254,7 @@
                           <select
                             v-model="selected_resource"
                             v-on:change="updateResourceID(selected_service, selected_resource)"
+                            required
                           >
                             <option v-for="item of resource_list">
                               {{ item }}
@@ -271,6 +273,7 @@
                           class="input"
                           type="text"
                           :placeholder="[[ resource_id_placeholder ]]"
+                          value=""
                           required
                           v-model="selected_resource_id"
                         />
@@ -290,6 +293,7 @@
                       type="text"
                       placeholder="@example.com"
                       value=""
+                      required
                       v-model="selected_owner"
                     />
                     <span class="icon is-small is-left">
@@ -304,7 +308,8 @@
                     <input
                       class="input"
                       type="text"
-                      placeholder=""
+                      value=""
+                      required
                       v-model="selected_comment"
                     />
                     <span class="icon is-small is-left">
