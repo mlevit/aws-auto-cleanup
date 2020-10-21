@@ -25,6 +25,12 @@
       href="//db.onlinewebfonts.com/c/157c6cc36dd65b1b2adc9e7f3329c761?family=Amazon+Ember"
       type="text/css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
+      integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="css/style.css" />
     <title>AWS Auto Cleanup</title>
   </head>
@@ -70,6 +76,7 @@
               <td>{{ item.comment }}</td>
               <td>
                 <a
+                  v-if="item.expiration !== '99999999999'"
                   v-on:click="extendWhitelistEntry( item.id )"
                   class="button is-warning"
                 >
@@ -78,6 +85,7 @@
               </td>
               <td>
                 <button
+                  v-if="item.expiration !== '99999999999'"
                   v-on:click="deleteWhitelistEntry( item.resource_id )"
                   class="button is-danger"
                 >
@@ -144,8 +152,23 @@
           ></div>
           <div class="modal-content execlog-modal">
             <header class="modal-card-head">
-              <p class="modal-card-title">
-                {{execution_log_key}} - {{execution_log_mode}}
+              <p
+                class="modal-card-title is-vcentered"
+                style="line-height: unset !important"
+              >
+                {{execution_log_key}}
+                <button
+                  v-if="execution_log_mode === 'Destroy'"
+                  class="button is-danger"
+                >
+                  {{execution_log_mode}}
+                </button>
+                <button
+                  v-if="execution_log_mode === 'Dry Run'"
+                  class="button is-success"
+                >
+                  {{execution_log_mode}}
+                </button>
               </p>
               <button
                 class="delete"
@@ -349,8 +372,8 @@
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.min.js"
-      integrity="sha512-efUTj3HdSPwWJ9gjfGR71X9cvsrthIA78/Fvd/IN+fttQVy7XWkOAXb295j8B3cmm/kFKVxjiNYzKw9IQJHIuQ=="
+      src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+      integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA=="
       crossorigin="anonymous"
     ></script>
     <script src="js/custom.js"></script>

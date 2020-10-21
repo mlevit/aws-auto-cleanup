@@ -109,9 +109,14 @@ function send_api_request(form_url, request_method) {
   })
     .then((response) => response.json())
     .then((data) => {
-      $.notify(data.message, "success");
       refresh_whitelist();
       app.closeWhitelistInsertPopup();
+
+      iziToast.show({
+        message: data.message,
+        color: "#3FBF61",
+        messageColor: "white",
+      });
 
       app.selected_service = "";
       app.selected_resource = "";
@@ -121,10 +126,12 @@ function send_api_request(form_url, request_method) {
       app.selected_expiration = 0;
     })
     .catch((error) => {
-      $.notify(
-        "The request has failed. Please see console log for more info.",
-        "error"
-      );
+      iziToast.show({
+        message:
+          "The request has failed. Please see console log for more info.",
+        color: "#EC2B55",
+        messageColor: "white",
+      });
       console.error("Error Submitting Form:", error);
     });
 }
