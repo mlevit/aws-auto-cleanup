@@ -39,10 +39,10 @@ table.table {
   margin: 50px 0;
 }
 
-.execlog-modal {
+.execution-log-modal {
   width: 80% !important;
 }
 
-.execlog-modal .table {
+.execution-log-modal .table {
   width: 100%;
 }

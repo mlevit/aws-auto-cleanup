@@ -17,3 +17,11 @@ Auto Cleanup is comprised of three modues, APP, API, and WEB. Click through to l
 | [![app](./static/app.png)](./app/) | [![api](./static/api.png)](./api/) | [![web](./static/web.png)](./web/) |
 | :--------------------------------: | :--------------------------------: | :--------------------------------: |
 
+
+## Maintainers
+
+- [Marat Levit](https://github.com/mlevit)
+
+## Contributors
+
+- [Perth Ngarmtrakulchol](https://github.com/woraperth)

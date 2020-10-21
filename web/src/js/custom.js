@@ -13,32 +13,6 @@ function convertJsonToGet(formJSON) {
   return formURL;
 }
 
-function sendApiRequest(formURL, requestMethod) {
-  fetch(API_CRUD_WHITELIST + "?" + formURL, {
-    method: requestMethod,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      refreshWhitelist();
-      app.closeWhitelistInsertPopup();
-
-      iziToast.show({
-        message: data.message,
-        color: "#3FBF61",
-        messageColor: "white",
-      });
-    })
-    .catch((error) => {
-      iziToast.show({
-        message:
-          "The request has failed. Please see console log for more info.",
-        color: "#EC2B55",
-        messageColor: "white",
-      });
-      console.error("Error Submitting Form:", error);
-    });
-}
-
 // Init Vue instance
 var app = new Vue({
   el: "#app",
@@ -124,11 +98,37 @@ var app = new Vue({
       getExecutionLog(keyURL);
     },
     closeExecutionLogPopup: function () {
-      $("#executionLogTable").DataTable().destroy();
+      $("#execution-log-table").DataTable().destroy();
       this.showExecutionLogPopup = false;
     },
   },
 });
+
+function sendApiRequest(formURL, requestMethod) {
+  fetch(API_CRUD_WHITELIST + "?" + formURL, {
+    method: requestMethod,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      refreshWhitelist();
+      app.closeWhitelistInsertPopup();
+
+      iziToast.show({
+        message: data.message,
+        color: "#3FBF61",
+        messageColor: "white",
+      });
+    })
+    .catch((error) => {
+      iziToast.show({
+        message:
+          "The request has failed. Please see console log for more info.",
+        color: "#EC2B55",
+        messageColor: "white",
+      });
+      console.error("Error Submitting Form:", error);
+    });
+}
 
 // Get execution log for a single instance
 function getExecutionLog(executionLogURL) {
@@ -145,7 +145,7 @@ function getExecutionLog(executionLogURL) {
       }
 
       setTimeout(function () {
-        $("#executionLogTable").DataTable({
+        $("#execution-log-table").DataTable({
           paging: false,
           columnDefs: [
             {
@@ -173,7 +173,7 @@ function getExecutionLogList() {
         return row;
       });
       setTimeout(function () {
-        $("#execution_log_list_table").DataTable({
+        $("#execution-log-list-table").DataTable({
           columnDefs: [
             { orderable: false, targets: [2] },
             { className: "dt-center", targets: [2] },
@@ -226,8 +226,8 @@ function getWhitelist() {
       setTimeout(function () {
         $("#whitelist").DataTable({
           columnDefs: [
-            { orderable: false, targets: [3, 4, 5] },
-            { className: "dt-center", targets: [4, 5] },
+            { orderable: false, targets: [3, 4] },
+            { className: "dt-center", targets: [4] },
             {
               className: "dt-body-nowrap",
               targets: [0, 1, 2],
@@ -270,7 +270,7 @@ function refreshWhitelist() {
 // Get the API Gateway Base URL from manifest file
 fetch("serverless.manifest.json").then(function (response) {
   response.json().then(function (data) {
-    var API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
+    let API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
 
     API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
     API_SERVICES = API_BASE + API_SERVICES;

@@ -47,16 +47,16 @@
 
     <!-- Body -->
     <div class="container body-container">
-      <h2 class="title">Whitelist</h2>
       <div id="app">
-        <div class="add-btn-wrap">
-          <button
+        <h2 class="title">
+          Whitelist&nbsp;<button
             class="button is-warning"
             v-on:click="openWhitelistInsertPopup()"
           >
-            <i class="fas fa-plus-square"></i>&nbsp;Add New Whitelist Entry
+            <span class="icon"> <i class="fas fa-plus-square"></i> </span>
+            <span>New Entry</span>
           </button>
-        </div>
+        </h2>
         <table class="table" id="whitelist">
           <thead>
             <tr>
@@ -64,8 +64,7 @@
               <th>Expiration</th>
               <th>Owner</th>
               <th>Comment</th>
-              <th>Extend</th>
-              <th>Delete</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -80,16 +79,18 @@
                   v-on:click="extendWhitelistEntry( item.id )"
                   class="button is-warning"
                 >
-                  <i class="fas fa-calendar-plus"></i>
+                  <span class="icon">
+                    <i class="fas fa-calendar-plus"></i>
+                  </span>
                 </a>
-              </td>
-              <td>
                 <button
                   v-if="item.expiration !== '99999999999'"
                   v-on:click="deleteWhitelistEntry( item.resource_id )"
                   class="button is-danger"
                 >
-                  <i class="fas fa-minus-square"></i>
+                  <span class="icon">
+                    <i class="fas fa-minus-square"></i>
+                  </span>
                 </button>
               </td>
             </tr>
@@ -107,7 +108,7 @@
         <!-- Execution Log -->
         <h2 class="title">Execution Logs</h2>
 
-        <table class="table" id="execution_log_list_table">
+        <table class="table" id="execution-log-list-table">
           <thead>
             <th>Key</th>
             <th>Date</th>
@@ -122,7 +123,7 @@
                   v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
-                  ><i class="fas fa-list-alt"></i
+                  ><span class="icon"> <i class="fas fa-list-alt"></i> </span
                 ></a>
               </td>
             </tr>
@@ -139,14 +140,14 @@
         <!-- Popup: Exec Log Table -->
         <div
           class="modal"
+          id="execution-log-popup"
           v-bind:class="{ 'is-active': showExecutionLogPopup }"
-          id="execlog-popup"
         >
           <div
             class="modal-background"
             v-on:click="closeExecutionLogPopup()"
           ></div>
-          <div class="modal-content execlog-modal">
+          <div class="modal-content execution-log-modal">
             <header class="modal-card-head">
               <p
                 class="modal-card-title is-vcentered"
@@ -156,13 +157,13 @@
                   v-if="executionLogMode === 'Destroy'"
                   class="button is-danger"
                 >
-                  {{executionLogMode}}
+                  <span>{{executionLogMode}}</span>
                 </button>
                 <button
                   v-if="executionLogMode === 'Dry Run'"
                   class="button is-success"
                 >
-                  {{executionLogMode}}
+                  <span>{{executionLogMode}}</span>
                 </button>
                 {{executionLogKey}}
               </p>
@@ -173,7 +174,7 @@
               ></button>
             </header>
             <div class="box" style="border-radius: 0px !important">
-              <table class="table" id="executionLogTable">
+              <table class="table" id="execution-log-table">
                 <thead>
                   <tr>
                     <th>Timestamp</th>
@@ -326,12 +327,12 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="content has-text-centered">
-        <p>
-          <i class="fab fa-github"></i>
-          <a href="https://github.com/servian/aws-auto-cleanup/"
-            >&nbsp;servian/aws-auto-cleanup</a
-          >
-        </p>
+        <a class="button" href="https://github.com/servian/aws-auto-cleanup/">
+          <span class="icon">
+            <i class="fab fa-github"></i>
+          </span>
+          <span>servian/aws-auto-cleanup</span>
+        </a>
       </div>
     </footer>
 
