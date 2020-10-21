@@ -161,8 +161,8 @@ function getExecutionLog(executionLogURL) {
 
       setTimeout(function () {
         $("#execution-log-table").DataTable({
-          paging: false,
           autoWidth: true,
+          paging: false,
           columnDefs: [
             {
               className: "dt-body-nowrap",
@@ -271,9 +271,9 @@ function refreshWhitelist() {
         item["id"] = i++;
         dayjs.extend(dayjs_plugin_utc);
         dayjs.extend(dayjs_plugin_timezone);
-        let readable_date = dayjs
-          .unix(item["expiration"])
-          .tz("Australia/Melbourne");
+
+        let readable_date = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
+
         item["expiration_readable"] = readable_date.format(
           "ddd MMM DD HH:mm:ss YYYY"
         );
