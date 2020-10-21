@@ -233,9 +233,9 @@
                       <div class="control">
                         <div class="select">
                           <select
+                            required
                             v-model="selected_service"
                             v-on:change="updateResourceList(selected_service)"
-                            required
                           >
                             <option v-for="item of service_list">
                               {{ item }}
@@ -252,9 +252,9 @@
                       <div class="control">
                         <div class="select">
                           <select
+                            required
                             v-model="selected_resource"
                             v-on:change="updateResourceID(selected_service, selected_resource)"
-                            required
                           >
                             <option v-for="item of resource_list">
                               {{ item }}
@@ -270,11 +270,10 @@
                       <label class="label">ID</label>
                       <div class="control has-icons-left">
                         <input
-                          class="input"
-                          type="text"
                           :placeholder="[[ resource_id_placeholder ]]"
-                          value=""
+                          class="input"
                           required
+                          type="text"
                           v-model="selected_resource_id"
                         />
                         <span class="icon is-small is-left"
@@ -290,10 +289,9 @@
                   <div class="control has-icons-left">
                     <input
                       class="input"
-                      type="text"
                       placeholder="@example.com"
-                      value=""
                       required
+                      type="email"
                       v-model="selected_owner"
                     />
                     <span class="icon is-small is-left">
@@ -307,9 +305,8 @@
                   <div class="control has-icons-left">
                     <input
                       class="input"
-                      type="text"
-                      value=""
                       required
+                      type="text"
                       v-model="selected_comment"
                     />
                     <span class="icon is-small is-left">
