@@ -162,11 +162,13 @@ function getExecutionLog(executionLogURL) {
       setTimeout(function () {
         $("#execution-log-table").DataTable({
           paging: false,
+          autoWidth: true,
           columnDefs: [
             {
               className: "dt-body-nowrap",
               targets: [1, 2, 3, 5],
             },
+            { className: "dt-nowrap", targets: [1, 2, 3, 5] },
           ],
         });
         app.showExecutionLogLoadingGif = false;
@@ -229,12 +231,13 @@ function getWhitelist() {
         item["id"] = i++;
         dayjs.extend(dayjs_plugin_utc);
         dayjs.extend(dayjs_plugin_timezone);
-        let readable_date = dayjs
-          .unix(item["expiration"])
-          .tz("Australia/Melbourne");
+
+        let readable_date = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
+
         item["expiration_readable"] = readable_date.format(
           "ddd MMM DD HH:mm:ss YYYY"
         );
+
         return item;
       });
 
