@@ -3,118 +3,23 @@ var API_SERVICES = "/settings/service";
 var API_CRUD_WHITELIST = "/whitelist/entry/";
 var API_EXECLOG = "/execution/";
 
-// Init Vue instance
-var app = new Vue({
-  el: "#app",
-  data: {
-    whitelist: [],
-    settings: [],
-    serviceList: [],
-    resourceList: [],
-    resourceIDPlaceholder: "",
-    showWhitelistPopup: false,
-    showWhitelistLoadingGIF: false,
-    showExecutionLogLoadingGIF: false,
-
-    selectedService: "",
-    selectedResource: "",
-    selectedResourceID: "",
-    selectedOwner: "",
-    selectedComment: "",
-    selectedExpiration: 0,
-
-    executionLogList: [],
-    executionLogTable: [],
-    executionLogKey: "",
-    executionLogMode: false,
-    show_execution_log: false,
-  },
-  methods: {
-    // Whitelist
-    closeWhitelistInsertPopup: function () {
-      this.showWhitelistPopup = false;
-      this.resourceIDPlaceholder = "";
-      this.resourceList = [];
-      this.selectedComment = "";
-      this.selectedExpiration = 0;
-      this.selectedOwner = "";
-      this.selectedResource = "";
-      this.selectedResourceID = "";
-      this.selectedService = "";
-    },
-    createWhitelistEntry: function () {
-      let form_data = {
-        resource_id:
-          this.selectedService +
-          ":" +
-          this.selectedResource +
-          ":" +
-          this.selectedResourceID,
-        owner: this.selectedOwner,
-        comment: this.selectedComment,
-      };
-
-      form_url = convert_json_to_get(form_data);
-      send_api_request(form_url, "POST");
-    },
-    deleteWhitelistEntry: function (resource_id) {
-      let form_data = {
-        resource_id: resource_id,
-      };
-      form_url = convert_json_to_get(form_data);
-      send_api_request(form_url, "DELETE");
-    },
-    extendWhitelistEntry: function (row_id) {
-      let row = this.whitelist[row_id - 1];
-      let form_data = {
-        resource_id: row.resource_id,
-        expiration: row.expiration,
-        owner: row.owner,
-        comment: row.comment,
-      };
-
-      form_url = convert_json_to_get(form_data);
-      send_api_request(form_url, "PUT");
-    },
-    updateResourceID: function (service, resource) {
-      this.resourceIDPlaceholder = this.settings[service][resource]["id"];
-    },
-    updateResourceList: function (service) {
-      this.resourceList = Object.keys(this.settings[service]);
-      this.resourceIDPlaceholder = "";
-    },
-    openWhitelistInsertPopup: function () {
-      this.showWhitelistPopup = true;
-      this.resourceIDPlaceholder = "";
-    },
-    // Execution Log
-    openExecutionLog: function (key_url) {
-      get_execution_log(key_url);
-    },
-    closeExecutionLogPopup: function () {
-      $("#executionLogTable").DataTable().destroy();
-      this.show_execution_log = false;
-    },
-  },
-});
-
 // Utility functions
-function convert_json_to_get(form_json) {
-  let form_url = "";
-  for (var key in form_json) {
-    form_url += key + "=" + form_json[key] + "&";
+function convertJsonToGet(formJSON) {
+  let formURL = "";
+  for (var key in formJSON) {
+    formURL += key + "=" + formJSON[key] + "&";
   }
-  form_url.substr(0, form_url.length - 1);
-  return form_url;
+  formURL.substr(0, formURL.length - 1);
+  return formURL;
 }
 
-function send_api_request(form_url, request_method) {
-  fetch(API_CRUD_WHITELIST + "?" + form_url, {
-    method: request_method,
+function sendApiRequest(formURL, requestMethod) {
+  fetch(API_CRUD_WHITELIST + "?" + formURL, {
+    method: requestMethod,
   })
     .then((response) => response.json())
     .then((data) => {
-      refresh_whitelist();
+      refreshWhitelist();
       app.closeWhitelistInsertPopup();
 
       iziToast.show({
@@ -134,13 +39,104 @@ function send_api_request(form_url, request_method) {
     });
 }
 
+// Init Vue instance
+var app = new Vue({
+  el: "#app",
+  data: {
+    executionLogKey: "",
+    executionLogList: [],
+    executionLogMode: false,
+    executionLogTable: [],
+    resourceIdPlaceholder: "",
+    resourceList: [],
+    selectedComment: "",
+    selectedExpiration: 0,
+    selectedOwner: "",
+    selectedResource: "",
+    selectedResourceId: "",
+    selectedService: "",
+    serviceList: [],
+    settings: [],
+    showExecutionLogLoadingGif: false,
+    showExecutionLogPopup: false,
+    showWhitelistLoadingGif: false,
+    showWhitelistPopup: false,
+    whitelist: [],
+  },
+  methods: {
+    // Whitelist
+    closeWhitelistInsertPopup: function () {
+      this.resourceIdPlaceholder = "";
+      this.resourceList = [];
+      this.selectedComment = "";
+      this.selectedExpiration = 0;
+      this.selectedOwner = "";
+      this.selectedResource = "";
+      this.selectedResourceId = "";
+      this.selectedService = "";
+      this.showWhitelistPopup = false;
+    },
+    createWhitelistEntry: function () {
+      let formData = {
+        resource_id:
+          this.selectedService +
+          ":" +
+          this.selectedResource +
+          ":" +
+          this.selectedResourceId,
+        owner: this.selectedOwner,
+        comment: this.selectedComment,
+      };
+
+      sendApiRequest(convertJsonToGet(formData), "POST");
+    },
+    deleteWhitelistEntry: function (resourceID) {
+      let formData = {
+        resource_id: resourceID,
+      };
+
+      sendApiRequest(convertJsonToGet(formData), "DELETE");
+    },
+    extendWhitelistEntry: function (rowID) {
+      let row = this.whitelist[rowID - 1];
+      let formData = {
+        resource_id: row.resource_id,
+        expiration: row.expiration,
+        owner: row.owner,
+        comment: row.comment,
+      };
+
+      sendApiRequest(convertJsonToGet(formData), "PUT");
+    },
+    updateResourceID: function (service, resource) {
+      this.resourceIdPlaceholder = this.settings[service][resource]["id"];
+    },
+    updateResourceList: function (service) {
+      this.resourceList = Object.keys(this.settings[service]);
+      this.resourceIdPlaceholder = "";
+    },
+    openWhitelistInsertPopup: function () {
+      this.showWhitelistPopup = true;
+      this.resourceIdPlaceholder = "";
+    },
+    // Execution Log
+    openExecutionLog: function (keyURL) {
+      getExecutionLog(keyURL);
+    },
+    closeExecutionLogPopup: function () {
+      $("#executionLogTable").DataTable().destroy();
+      this.showExecutionLogPopup = false;
+    },
+  },
+});
+
 // Get execution log for a single instance
-function get_execution_log(execlog_url) {
-  fetch(API_EXECLOG + execlog_url)
+function getExecutionLog(executionLogURL) {
+  fetch(API_EXECLOG + executionLogURL)
     .then((response) => response.json())
     .then((data) => {
       app.executionLogTable = data["response"]["body"];
-      app.executionLogKey = decodeURIComponent(execlog_url);
+      app.executionLogKey = decodeURIComponent(executionLogURL);
 
       if (data["response"]["body"][0][7] == "True") {
         app.executionLogMode = "Dry Run";
@@ -158,7 +154,7 @@ function get_execution_log(execlog_url) {
             },
           ],
         });
-        app.show_execution_log = true;
+        app.showExecutionLogPopup = true;
       }, 10);
     })
     .catch((error) => {
@@ -167,8 +163,8 @@ function get_execution_log(execlog_url) {
 }
 
 // Get execution logs list
-function get_executionLogList() {
-  app.showExecutionLogLoadingGIF = true;
+function getExecutionLogList() {
+  app.showExecutionLogLoadingGif = true;
   fetch(API_EXECLOG)
     .then((response) => response.json())
     .then((data) => {
@@ -184,7 +180,7 @@ function get_executionLogList() {
           ],
         });
       }, 10);
-      app.showExecutionLogLoadingGIF = false;
+      app.showExecutionLogLoadingGif = false;
     })
     .catch((error) => {
       console.error("Error API_RESOURCES:", error);
@@ -192,7 +188,7 @@ function get_executionLogList() {
 }
 
 // Get settings
-function get_settings() {
+function getSettings() {
   fetch(API_SERVICES)
     .then((response) => response.json())
     .then((data) => {
@@ -205,9 +201,9 @@ function get_settings() {
 }
 
 // Get whitelist
-function get_whitelist() {
+function getWhitelist() {
   app.whitelist = [];
-  app.showWhitelistLoadingGIF = true;
+  app.showWhitelistLoadingGif = true;
   fetch(API_GET_WHITELIST)
     .then((response) => response.json())
     .then((data) => {
@@ -240,14 +236,14 @@ function get_whitelist() {
         });
       }, 10);
 
-      app.showWhitelistLoadingGIF = false;
+      app.showWhitelistLoadingGif = false;
     })
     .catch((error) => {
       console.error("Error API_GET_WHITELIST:", error);
     });
 }
 
-function refresh_whitelist() {
+function refreshWhitelist() {
   fetch(API_GET_WHITELIST)
     .then((response) => response.json())
     .then((data) => {
@@ -281,8 +277,8 @@ fetch("serverless.manifest.json").then(function (response) {
     API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
     API_EXECLOG = API_BASE + API_EXECLOG;
 
-    get_whitelist();
-    get_executionLogList();
-    get_settings();
+    getWhitelist();
+    getExecutionLogList();
+    getSettings();
   });
 });

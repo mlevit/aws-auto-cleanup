@@ -97,7 +97,7 @@
         </table>
         <!-- Refreshing Animation -->
         <div
-          v-show="showWhitelistLoadingGIF"
+          v-show="showWhitelistLoadingGif"
           style="text-align: center; margin: 15px 0"
         >
           <img src="img/loading.gif" alt="" /> Loading whitelist...
@@ -130,7 +130,7 @@
         </table>
         <!-- Refreshing Animation -->
         <div
-          v-show="showExecutionLogLoadingGIF"
+          v-show="showExecutionLogLoadingGif"
           style="text-align: center; margin: 15px 0"
         >
           <img src="img/loading.gif" alt="" /> Loading execution log...
@@ -139,7 +139,7 @@
         <!-- Popup: Exec Log Table -->
         <div
           class="modal"
-          v-bind:class="{ 'is-active': show_execution_log }"
+          v-bind:class="{ 'is-active': showExecutionLogPopup }"
           id="execlog-popup"
         >
           <div
@@ -266,11 +266,11 @@
                       <label class="label">ID</label>
                       <div class="control has-icons-left">
                         <input
-                          :placeholder="[[ resourceIDPlaceholder ]]"
+                          :placeholder="[[ resourceIdPlaceholder ]]"
                           class="input"
                           required
                           type="text"
-                          v-model="selectedResourceID"
+                          v-model="selectedResourceId"
                         />
                         <span class="icon is-small is-left"
                           ><i class="fas fa-id-card"></i
