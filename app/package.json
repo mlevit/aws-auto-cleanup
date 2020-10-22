@@ -1,0 +1,23 @@
+{
+  "name": "auto-cleanup-app",
+  "description": "Auto Cleanup App",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-pseudo-parameters": "^2.5.0",
+    "serverless-python-requirements": "^5.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:servian/aws-auto-cleanup.git",
+    "directory": "app/"
+  },
+  "bugs": "https://github.com/servian/aws-auto-cleanup/issues",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "invoke": "serverless invoke --function AutoCleanup --type Event",
+    "logs": "serverless logs --function AutoCleanup --type Event",
+    "remove": "serverless remove"
+  }
+}

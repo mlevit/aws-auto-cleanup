@@ -1,0 +1,311 @@
+service: auto-cleanup-app
+
+custom:
+  log_level: INFO # DEBUG for dev | INFO for prod
+  region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+  pythonRequirements:
+    layer:
+      name: ${self:service}-${self:provider.stage}-requirements
+      compatibleRuntimes:
+        - python3.8
+    noDeploy:
+      - boto
+      - boto3
+      - botocore
+    slim: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
+  region: ${self:custom.region}
+  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
+  apiGateway:
+    minimumCompressionSize: 1024
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - athena:GetQueryExecution
+        - athena:GetQueryResults
+        - athena:StartQueryExecution
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - cloudformation:DeleteStack
+        - cloudformation:DescribeStacks
+        - cloudformation:DescribeStackResources
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - dynamodb:BatchWriteItem
+        - dynamodb:DeleteItem
+        - dynamodb:DeleteTable
+        - dynamodb:DescribeTable
+        - dynamodb:GetItem
+        - dynamodb:ListTables
+        - dynamodb:PutItem
+        - dynamodb:Scan
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - ec2:DeleteSecurityGroup
+        - ec2:DeleteSnapshot
+        - ec2:DeleteVolume
+        - ec2:DescribeAddresses
+        - ec2:DescribeImages
+        - ec2:DescribeInstanceAttribute
+        - ec2:DescribeInstances
+        - ec2:DescribeSecurityGroups
+        - ec2:DescribeSnapshots
+        - ec2:DescribeVolumes
+        - ec2:DescribeVolumes
+        - ec2:ModifyInstanceAttribute
+        - ec2:ReleaseAddress
+        - ec2:StopInstances
+        - ec2:TerminateInstances
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - ecs:DeleteCluster
+        - ecs:DeleteService
+        - ecs:DescribeClusters
+        - ecs:DescribeServices
+        - ecs:ListClusters
+        - ecs:ListServices
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - elasticbeanstalk:DeleteApplication
+        - elasticbeanstalk:DescribeApplications
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - elasticmapreduce:ListClusters
+        - elasticmapreduce:TerminateJobFlows
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - es:DeleteElasticsearchDomain
+        - es:DescribeElasticsearchDomainConfig
+        - es:ListDomainNames
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - glue:DeleteDevEndPoint
+        - glue:GetDevEndpoints
+        - glue:GetTable
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - iam:DeleteInstanceProfile
+        - iam:DeleteRole
+        - iam:DeleteRolePolicy
+        - iam:DetachRolePolicy
+        - iam:GenerateServiceLastAccessedDetails
+        - iam:GetServiceLastAccessedDetails
+        - iam:ListAttachedRolePolicies
+        - iam:ListInstanceProfilesForRole
+        - iam:ListRolePolicies
+        - iam:ListRoles
+        - iam:RemoveRoleFromInstanceProfile
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - kinesis:DeleteStream
+        - kinesis:DescribeStream
+        - kinesis:ListStreams
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - lambda:DeleteFunction
+        - lambda:ListFunctions
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - redshift:DeleteCluster
+        - redshift:DeleteClusterSnapshot
+        - redshift:DescribeClusterSnapshots
+        - redshift:DescribeClusters
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - rds:DeleteDBInstance
+        - rds:DeleteDBSnapshot
+        - rds:DescribeDBInstances
+        - rds:DescribeDBSnapshots
+        - rds:ModifyDBInstance
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - s3:DeleteBucket
+        - s3:DeleteObject
+        - s3:DeleteObjectVersion
+        - s3:Get*
+        - s3:List*
+        - s3:PutObject
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - sagemaker:DeleteEndpoint
+        - sagemaker:DeleteNotebookInstance
+        - sagemaker:ListEndpoints
+        - sagemaker:ListNotebookInstances
+        - sagemaker:StopNotebookInstance
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - sts:GetCallerIdentity
+      Resource: "*"
+  tracing:
+    lambda: true
+
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
+functions:
+  AutoCleanup:
+    handler: src/main.lambda_handler
+    name: ${self:service}-${self:provider.stage}
+    description: Removes unused AWS resources based on time of creation
+    memorySize: 256
+    timeout: 300
+    package:
+      include:
+        - src/data/**
+        - src/**.py
+      exclude:
+        - "**"
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      EXECUTIONLOGBUCKET:
+        Ref: ExecutionLogBucket
+      SETTINGSTABLE:
+        Ref: SettingsTable
+      WHITELISTTABLE:
+        Ref: WhitelistTable
+    events:
+      - schedule:
+          rate: rate(3 days)
+          enabled: true
+
+resources:
+  Resources:
+    SettingsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-settings
+        AttributeDefinitions:
+          - AttributeName: key
+            AttributeType: S
+        KeySchema:
+          - AttributeName: key
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    WhitelistTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-whitelist
+        AttributeDefinitions:
+          - AttributeName: resource_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: resource_id
+            KeyType: HASH
+        TimeToLiveSpecification:
+          AttributeName: expiration
+          Enabled: true
+        BillingMode: PAY_PER_REQUEST
+    ExecutionLogBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-execution-log-#{AWS::AccountId}
+        AccessControl: Private
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+    AthenaResultsBucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-athena-results-#{AWS::AccountId}
+        AccessControl: Private
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteAfter7Days
+              Status: "Enabled"
+              ExpirationInDays: 7
+    AutoCleanupDatabase:
+      Type: "AWS::Glue::Database"
+      Properties:
+        DatabaseInput:
+          Name: ${self:service}-${self:provider.stage}
+        CatalogId: !Ref AWS::AccountId
+    ExecutionLogTable:
+      Type: AWS::Glue::Table
+      Properties:
+        CatalogId: !Ref AWS::AccountId
+        DatabaseName: !Ref AutoCleanupDatabase
+        TableInput:
+          Name: execution_log
+          StorageDescriptor:
+            Columns:
+              - Name: platform
+                Type: string
+              - Name: region
+                Type: string
+              - Name: service
+                Type: string
+              - Name: resource
+                Type: string
+              - Name: resource_id
+                Type: string
+              - Name: action
+                Type: string
+              - Name: timestamp
+                Type: timestamp
+              - Name: dry_run_flag
+                Type: boolean
+              - Name: execution_id
+                Type: string
+            Compressed: False
+            Location: !Join ["", ["s3://", !Ref ExecutionLogBucket, "/"]]
+            InputFormat: org.apache.hadoop.mapred.TextInputFormat
+            OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+            SerdeInfo:
+              SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+              Parameters:
+                field.delim: ","
+          Parameters:
+            delimiter: ","
+            classification: csv
+            "skip.header.line.count": 1'
+  Outputs:
+    ExecutionLogBucketName:
+      Value:
+        Ref: ExecutionLogBucket
+      Export:
+        Name: ExecutionLogBucketName
+    SettingsTableName:
+      Value:
+        Ref: SettingsTable
+      Export:
+        Name: SettingsTableName
+    WhitelistTableName:
+      Value:
+        Ref: WhitelistTable
+      Export:
+        Name: WhitelistTableName
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-python-requirements

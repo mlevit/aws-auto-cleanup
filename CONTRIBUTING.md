@@ -6,8 +6,6 @@ Thank you for your interest in contributing to AWS Auto Cleanup. To start contri
 
 ### Developing
 
-Before developing your cleanup function, please refer to our [COVERAGE.md](COVERAGE.md) page which includes all cleanup functions and their development/testing status'.
-
 Please ensure you create a **single** cleanup function with the same name as the resource with the service class.
 
 Each function should contain a [Python docstring](https://www.python.org/dev/peps/pep-0257/) matching the formatting found inside the repository.

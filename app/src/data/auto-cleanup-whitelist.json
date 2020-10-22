@@ -1,0 +1,44 @@
+[
+  {
+    "resource_id": {
+      "S": "cloudformation:stack:auto-cleanup-app-prod"
+    },
+    "comment": {
+      "S": "Auto Cleanup App"
+    },
+    "expiration": {
+      "N": "99999999999"
+    },
+    "owner": {
+      "S": ""
+    }
+  },
+  {
+    "resource_id": {
+      "S": "cloudformation:stack:auto-cleanup-api-prod"
+    },
+    "comment": {
+      "S": "Auto Cleanup API"
+    },
+    "expiration": {
+      "N": "99999999999"
+    },
+    "owner": {
+      "S": ""
+    }
+  },
+  {
+    "resource_id": {
+      "S": "cloudformation:stack:auto-cleanup-web-prod"
+    },
+    "comment": {
+      "S": "Auto Cleanup Web"
+    },
+    "expiration": {
+      "N": "99999999999"
+    },
+    "owner": {
+      "S": ""
+    }
+  }
+]

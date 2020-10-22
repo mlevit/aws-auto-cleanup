@@ -1,0 +1,551 @@
+[
+  {
+    "key": {
+      "S": "version"
+    },
+    "value": {
+      "N": "2"
+    }
+  },
+  {
+    "key": {
+      "S": "general"
+    },
+    "value": {
+      "M": {
+        "dry_run": {
+          "BOOL": true
+        }
+      }
+    }
+  },
+  {
+    "key": {
+      "S": "services"
+    },
+    "value": {
+      "M": {
+        "cloudformation": {
+          "M": {
+            "stack": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "stack_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "dynamodb": {
+          "M": {
+            "table": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "table_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "ec2": {
+          "M": {
+            "address": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "allocation_id"
+                }
+              }
+            },
+            "instance": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "instance_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "security_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "group_id"
+                }
+              }
+            },
+            "snapshot": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "snapshot_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "volume": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "volume_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "ecs": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cluster_name"
+                }
+              }
+            },
+            "service": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "service_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "elasticbeanstalk": {
+          "M": {
+            "application": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "application_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "elasticsearch": {
+          "M": {
+            "domain": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "domain_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "emr": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "glue": {
+          "M": {
+            "dev_endpoint": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "endpoint_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "iam": {
+          "M": {
+            "role": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "role_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            }
+          }
+        },
+        "kinesis": {
+          "M": {
+            "stream": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "stream_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "lambda": {
+          "M": {
+            "function": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "function_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            }
+          }
+        },
+        "rds": {
+          "M": {
+            "instance": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "db_instance_identifier"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "snapshot": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "db_snapshot_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "redshift": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cluster_identifier"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "snapshot": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "snapshot_identifier"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "s3": {
+          "M": {
+            "bucket": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "bucket_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            }
+          }
+        },
+        "sagemaker": {
+          "M": {
+            "endpoint": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "endpoint_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "notebook_instance": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "notebook_instance_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "key": {
+      "S": "regions"
+    },
+    "value": {
+      "M": {
+        "af-south-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-east-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-northeast-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-northeast-2": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-northeast-3": {
+          "M": {
+            "clean": {
+              "BOOL": false
+            }
+          }
+        },
+        "ap-south-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-southeast-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ap-southeast-2": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "ca-central-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "cn-north-1": {
+          "M": {
+            "clean": {
+              "BOOL": false
+            }
+          }
+        },
+        "cn-northwest-1": {
+          "M": {
+            "clean": {
+              "BOOL": false
+            }
+          }
+        },
+        "eu-central-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "eu-north-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "eu-south-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "eu-west-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "eu-west-2": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "eu-west-3": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "me-south-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "sa-east-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "us-east-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "us-east-2": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "us-west-1": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        },
+        "us-west-2": {
+          "M": {
+            "clean": {
+              "BOOL": true
+            }
+          }
+        }
+      }
+    }
+  }
+]

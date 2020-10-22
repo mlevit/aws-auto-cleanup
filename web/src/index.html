@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Primary Meta Tags -->
+    <title>AWS Auto Cleanup</title>
+    <meta name="title" content="AWS Auto Cleanup" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AWS Auto Cleanup" />
+    <meta
+      property="og:description"
+      content="Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings"
+    />
+    <meta
+      property="og:image"
+      content="https://github.com/servian/aws-auto-cleanup/raw/master/static/banner.png"
+    />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="AWS Auto Cleanup" />
+    <meta
+      property="twitter:description"
+      content="Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings"
+    />
+    <meta
+      property="twitter:image"
+      content="https://github.com/servian/aws-auto-cleanup/raw/master/static/banner.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./img/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./img/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./img/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./img/site.webmanifest" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css"
+      integrity="sha512-ZRv40llEogRmoWgZwnsqke3HNzJ0kiI0+pcMgiz2bxO6Ew1DVBtWjVn0qjrXdT3+u+pSN36gLgmJiiQ3cQtyzA=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+      integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.22/css/dataTables.bulma.min.css"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="//db.onlinewebfonts.com/c/157c6cc36dd65b1b2adc9e7f3329c761?family=Amazon+Ember"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
+      integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="#">
+          <img src="img/logo.svg" alt="AWS Auto Cleanup" style="height: 18px" />
+        </a>
+        <h1>AWS Auto Cleanup</h1>
+      </div>
+    </nav>
+
+    <!-- Body -->
+    <div class="container body-container">
+      <div id="app">
+        <h2 class="title">
+          Whitelist&nbsp;<button
+            class="button is-warning"
+            v-on:click="openWhitelistInsertPopup()"
+          >
+            <span class="icon"> <i class="fas fa-plus-square"></i> </span>
+            <span>New Entry</span>
+          </button>
+        </h2>
+        <table class="table" id="whitelist">
+          <thead>
+            <tr>
+              <th>Resource ID</th>
+              <th>Expiration</th>
+              <th>Owner</th>
+              <th>Comment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in whitelist" :key="item.id">
+              <td>{{ item.resource_id }}</td>
+              <td>{{ item.expiration_readable }}</td>
+              <td>{{ item.owner }}</td>
+              <td>{{ item.comment }}</td>
+              <td>
+                <a
+                  v-if="item.expiration !== '99999999999'"
+                  v-on:click="extendWhitelistEntry( item.id )"
+                  class="button is-warning"
+                >
+                  <span class="icon">
+                    <i class="fas fa-calendar-plus"></i>
+                  </span>
+                </a>
+                <button
+                  v-if="item.expiration !== '99999999999'"
+                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
+                  class="button is-danger"
+                >
+                  <span class="icon">
+                    <i class="fas fa-minus-square"></i>
+                  </span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Refreshing Animation -->
+        <div
+          class="container has-text-centered"
+          v-show="showWhitelistLoadingGif"
+        >
+          <button class="button is-warning is-loading">Loading</button>
+        </div>
+        <br />
+
+        <!-- Execution Log -->
+        <h2 class="title">Execution Logs</h2>
+
+        <table class="table" id="execution-log-list-table">
+          <thead>
+            <th>Key</th>
+            <th>Date</th>
+            <th>View</th>
+          </thead>
+          <tbody>
+            <tr v-for="item in executionLogList" :value="item" :key="item.key">
+              <td>{{ item.key }}</td>
+              <td>{{ item.date }}</td>
+              <td>
+                <a
+                  v-on:click="openExecutionLog( item.key_escape )"
+                  target="_blank"
+                  class="button"
+                  ><span class="icon"> <i class="fas fa-list-alt"></i> </span
+                ></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Refreshing Animation -->
+        <div
+          class="container has-text-centered"
+          v-show="showExecutionLogListLoadingGif"
+        >
+          <button class="button is-normal is-warning is-loading">
+            Loading
+          </button>
+        </div>
+
+        <!-- Popup: Exec Log Table -->
+        <div
+          class="modal"
+          id="execution-log-popup"
+          v-bind:class="{ 'is-active': showExecutionLogPopup }"
+        >
+          <div
+            class="modal-background"
+            v-on:click="closeExecutionLogPopup()"
+          ></div>
+          <div class="modal-content execution-log-modal">
+            <header class="modal-card-head">
+              <p
+                class="modal-card-title is-vcentered"
+                style="line-height: unset !important"
+              >
+                <button
+                  v-if="executionLogMode === 'Destroy'"
+                  class="button is-danger"
+                >
+                  <span>{{executionLogMode}}</span>
+                </button>
+                <button
+                  v-if="executionLogMode === 'Dry Run'"
+                  class="button is-success"
+                >
+                  <span>{{executionLogMode}}</span>
+                </button>
+                <span>{{executionLogKey}}</span>
+              </p>
+              <button
+                class="delete"
+                aria-label="close"
+                v-on:click="closeExecutionLogPopup()"
+              ></button>
+            </header>
+            <div class="box" style="border-radius: 0px !important">
+              <table class="table" id="execution-log-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Region</th>
+                    <th>Service</th>
+                    <th>Resource</th>
+                    <th>ID</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in executionLogTable" :key="item.id">
+                    <td>{{ item[6] }}</td>
+                    <td>{{ item[1] }}</td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ item[3] }}</td>
+                    <td>{{ item[4] }}</td>
+                    <td>{{ item[5] }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div
+                class="container has-text-centered"
+                v-show="showExecutionLogLoadingGif"
+              >
+                <button class="button is-warning is-loading">Loading</button>
+              </div>
+            </div>
+            <!-- .box -->
+          </div>
+          <!-- .model-content -->
+        </div>
+
+        <!-- Popup: Add Whitelist Rule -->
+        <div
+          class="modal"
+          v-bind:class="{ 'is-active': showWhitelistPopup }"
+          id="add-whitelist"
+        >
+          <div
+            class="modal-background"
+            v-on:click="closeWhitelistInsertPopup()"
+          ></div>
+          <div class="modal-card">
+            <form action="#" v-on:submit.prevent="createWhitelistEntry()">
+              <header class="modal-card-head">
+                <p class="modal-card-title">Add Whitelist Entry</p>
+                <button
+                  aria-label="close"
+                  class="delete"
+                  v-on:click="closeWhitelistInsertPopup()"
+                ></button>
+              </header>
+              <section class="modal-card-body">
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
+                      <label class="label">Service</label>
+                      <div class="control">
+                        <div class="select">
+                          <select
+                            required
+                            tabindex="1"
+                            v-model="selectedService"
+                            v-on:change="updateResourceList(selectedService)"
+                          >
+                            <option v-for="item of serviceList">
+                              {{ item }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="field">
+                      <label class="label">Resource</label>
+                      <div class="control">
+                        <div class="select">
+                          <select
+                            required
+                            tabindex="2"
+                            v-model="selectedResource"
+                            v-on:change="updateResourceID(selectedService, selectedResource)"
+                          >
+                            <option v-for="item of resourceList">
+                              {{ item }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="field">
+                      <label class="label">ID</label>
+                      <div class="control has-icons-left">
+                        <input
+                          :placeholder="[[ resourceIdPlaceholder ]]"
+                          class="input"
+                          required
+                          tabindex="3"
+                          type="text"
+                          v-model="selectedResourceId"
+                        />
+                        <span class="icon is-small is-left"
+                          ><i class="fas fa-id-card"></i
+                        ></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="label">Owner</label>
+                  <div class="control has-icons-left">
+                    <input
+                      class="input"
+                      placeholder="@example.com"
+                      required
+                      tabindex="4"
+                      type="email"
+                      v-model="selectedOwner"
+                    />
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-envelope"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="label">Comment</label>
+                  <div class="control has-icons-left">
+                    <input
+                      class="input"
+                      required
+                      tabindex="5"
+                      type="text"
+                      v-model="selectedComment"
+                    />
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-comment-alt"></i>
+                    </span>
+                  </div>
+                </div>
+              </section>
+              <footer class="modal-card-foot">
+                <button class="button is-success" tabindex="6">Add</button>
+                <button class="button" v-on:click="closeWhitelistInsertPopup()">
+                  Cancel
+                </button>
+              </footer>
+            </form>
+          </div>
+        </div>
+
+        <!-- Popup: Delete Whitelist Rule -->
+        <div
+          class="modal"
+          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
+          id="delete-whitelist"
+        >
+          <div
+            class="modal-background"
+            v-on:click="closeWhitelistDeletePopup()"
+          ></div>
+          <div class="modal-card">
+            <header class="modal-card-head">
+              <p class="modal-card-title">Delete Whitelist Entry</p>
+              <button
+                class="delete"
+                aria-label="close"
+                v-on:click="closeWhitelistDeletePopup()"
+              ></button>
+            </header>
+            <section class="modal-card-body">
+              <span
+                >Are you sure you want to delete
+                <strong>{{selectedResourceId}}</strong>?</span
+              >
+            </section>
+            <footer class="modal-card-foot">
+              <button
+                class="button is-danger"
+                v-on:click="deleteWhitelistEntry(selectedResourceId)"
+              >
+                Delete
+              </button>
+              <button class="button" v-on:click="closeWhitelistDeletePopup()">
+                Cancel
+              </button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <a class="button" href="https://github.com/servian/aws-auto-cleanup/">
+          <span class="icon">
+            <i class="fab fa-github"></i>
+          </span>
+          <span>servian/aws-auto-cleanup</span>
+        </a>
+      </div>
+    </footer>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"
+      integrity="sha512-BKbSR+cfyxLdMAsE0naLReFSLg8/pjbgfxHh/k/kUC82Hy7r6HtR5hLhobaln2gcTvzkyyehrdREdjpsQwy2Jw=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+      integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"
+      integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.datatables.net/1.10.22/js/dataTables.bulma.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/dayjs.min.js"
+      integrity="sha512-u7elBfdMr+7LhU4rvUk3IM28QZDKTyUxba4Nx2IJ1W9cj4shfRSPq7EZXD2ULD9cBoizw2FQyeR6YBog6LcnHg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/plugin/utc.min.js"
+      integrity="sha512-+lztPB4upMyG9pLdOWl8MFsBhXM1V9vFTDhXV3/4VSdoqpR5RfA2bNdrl8n0F9HmbzFkNqmOBdZw580qfRU01Q=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/plugin/timezone.min.js"
+      integrity="sha512-3QnyXIdU85C6rOXhHzVsXinI5/qM/LniMr5actNRUwyp1Tuurw7rOn7fX7WWoNyZuM7KlQxITGQI4ITCgXKGQA=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
+      integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA=="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

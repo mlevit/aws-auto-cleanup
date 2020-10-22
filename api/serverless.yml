@@ -1,0 +1,207 @@
+service: auto-cleanup-api
+
+custom:
+  log_level: INFO # DEBUG for dev | INFO for prod
+  region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+  manifest:
+    output: ../web/src/serverless.manifest.json
+    silent: true
+  pythonRequirements:
+    layer:
+      name: ${self:service}-${self:provider.stage}-requirements
+      compatibleRuntimes:
+        - python3.8
+    noDeploy:
+      - boto
+      - boto3
+      - botocore
+    slim: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
+  region: ${self:custom.region}
+  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
+  apiGateway:
+    minimumCompressionSize: 1024
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DeleteItem
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:Scan
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - s3:Get*
+        - s3:List*
+      Resource: "*"
+  tracing:
+    lambda: true
+
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
+functions:
+  WhitelistCreate:
+    handler: src/whitelist/create.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-create
+    description: Create whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/whitelist/create.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+    events:
+      - http:
+          method: POST
+          path: /whitelist/entry
+          cors: true
+  WhitelistRead:
+    handler: src/whitelist/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-read
+    description: Read whitelist
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/whitelist/read.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    events:
+      - http:
+          method: GET
+          path: /whitelist
+          cors: true
+  WhitelistUpdate:
+    handler: src/whitelist/update.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-update
+    description: Update whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/whitelist/update.py
+      exclude:
+        - "**"
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    events:
+      - http:
+          method: PUT
+          path: /whitelist/entry
+          cors: true
+  WhitelistDelete:
+    handler: src/whitelist/delete.lambda_handler
+    name: ${self:service}-${self:provider.stage}-whitelist-delete
+    description: Delete whitelist entry
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/whitelist/delete.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+    events:
+      - http:
+          method: DELETE
+          path: /whitelist/entry
+          cors: true
+  ServiceRead:
+    handler: src/service/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-service-read
+    description: Returns AWS services supported by Auto Cleanup
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/service/read.py
+      exclude:
+        - "**"
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+    events:
+      - http:
+          method: GET
+          path: /settings/service
+          cors: true
+          caching:
+            enabled: true
+  ExecutionLogList:
+    handler: src/execution_log/list.lambda_handler
+    name: ${self:service}-${self:provider.stage}-execution-log-list
+    description: Returns execution logs
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/execution_log/list.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      EXECUTIONLOGBUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+    events:
+      - http:
+          method: GET
+          path: /execution
+          cors: true
+          caching:
+            enabled: true
+  ExecutionLogRead:
+    handler: src/execution_log/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-execution-log-read
+    description: Returns execution logs
+    memorySize: 128
+    timeout: 30
+    package:
+      include:
+        - src/execution_log/read.py
+      exclude:
+        - "**"
+    environment:
+      LOGLEVEL: ${self:custom.log_level}
+      EXECUTIONLOGBUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+    events:
+      - http:
+          method: GET
+          path: /execution/{key}
+          cors: true
+          caching:
+            enabled: true
+
+resources:
+  Outputs:
+    AccountID:
+      Value: !Ref AWS::AccountId
+
+plugins:
+  - serverless-api-gateway-caching
+  - serverless-manifest-plugin
+  - serverless-pseudo-parameters
+  - serverless-python-requirements
