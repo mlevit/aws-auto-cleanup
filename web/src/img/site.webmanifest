@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "AWS Auto Cleanup",
+  "short_name": "Auto Cleanup",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
