@@ -55,10 +55,10 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
 
 ## Screenshots
 
-| ![main](./static/main.png) | ![main](./static/add.png) |
-| :------------------------: | :-----------------------: |
-|         dashboard          |    add whitelist entry    |
+| ![main](./static/main.png) | ![add](./static/add.png) |
+| :------------------------: | :----------------------: |
+|         dashboard          |   add whitelist entry    |
 
-| ![main](./static/delete.png) | ![main](./static/log.png) |
-| :--------------------------: | :-----------------------: |
-|    delete whitelist entry    |      execution logs       |
+| ![delete](./static/delete.png) | ![log](./static/log.png) |
+| :----------------------------: | :----------------------: |
+|     delete whitelist entry     |      execution logs      |
