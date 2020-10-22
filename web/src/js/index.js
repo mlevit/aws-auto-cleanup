@@ -125,20 +125,19 @@ function sendApiRequest(formURL, requestMethod) {
       app.closeWhitelistInsertPopup();
       app.closeWhitelistDeletePopup();
 
-      iziToast.show({
+      iziToast.success({
         message: data.message,
         color: "#3FBF61",
         messageColor: "white",
       });
     })
     .catch((error) => {
-      iziToast.show({
-        message:
-          "The request has failed. Please see console log for more info.",
+      iziToast.error({
+        title: "Something went wrong",
+        message: error,
         color: "#EC2B55",
         messageColor: "white",
       });
-      console.error("Error Submitting Form:", error);
     });
 }
 
@@ -161,8 +160,8 @@ function getExecutionLog(executionLogURL) {
 
       setTimeout(function () {
         $("#execution-log-table").DataTable({
-          autoWidth: true,
           paging: false,
+          autoWidth: true,
           columnDefs: [
             {
               className: "dt-body-nowrap",
@@ -175,7 +174,12 @@ function getExecutionLog(executionLogURL) {
       }, 10);
     })
     .catch((error) => {
-      console.error("Error API_RESOURCES:", error);
+      iziToast.error({
+        title: "Something went wrong",
+        message: error,
+        color: "#EC2B55",
+        messageColor: "white",
+      });
     });
 }
 
@@ -200,7 +204,12 @@ function getExecutionLogList() {
       app.showExecutionLogListLoadingGif = false;
     })
     .catch((error) => {
-      console.error("Error API_RESOURCES:", error);
+      iziToast.error({
+        title: "Something went wrong",
+        message: error,
+        color: "#EC2B55",
+        messageColor: "white",
+      });
     });
 }
 
@@ -213,7 +222,12 @@ function getSettings() {
       app.serviceList = Object.keys(data["response"]);
     })
     .catch((error) => {
-      console.error("Error API_SERVICES:", error);
+      iziToast.error({
+        title: "Something went wrong",
+        message: error,
+        color: "#EC2B55",
+        messageColor: "white",
+      });
     });
 }
 
@@ -257,7 +271,12 @@ function getWhitelist() {
       app.showWhitelistLoadingGif = false;
     })
     .catch((error) => {
-      console.error("Error API_GET_WHITELIST:", error);
+      iziToast.error({
+        title: "Something went wrong",
+        message: error,
+        color: "#EC2B55",
+        messageColor: "white",
+      });
     });
 }
 
@@ -281,7 +300,12 @@ function refreshWhitelist() {
       });
     })
     .catch((error) => {
-      console.error("Error API_GET_WHITELIST:", error);
+      iziToast.error({
+        title: "Something went wrong",
+        message: error,
+        color: "#EC2B55",
+        messageColor: "white",
+      });
     });
 }
 
