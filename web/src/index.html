@@ -243,8 +243,8 @@
               <header class="modal-card-head">
                 <p class="modal-card-title">Add Whitelist Entry</p>
                 <button
-                  class="delete"
                   aria-label="close"
+                  class="delete"
                   v-on:click="closeWhitelistInsertPopup()"
                 ></button>
               </header>
@@ -257,6 +257,7 @@
                         <div class="select">
                           <select
                             required
+                            tabindex="1"
                             v-model="selectedService"
                             v-on:change="updateResourceList(selectedService)"
                           >
@@ -276,6 +277,7 @@
                         <div class="select">
                           <select
                             required
+                            tabindex="2"
                             v-model="selectedResource"
                             v-on:change="updateResourceID(selectedService, selectedResource)"
                           >
@@ -296,6 +298,7 @@
                           :placeholder="[[ resourceIdPlaceholder ]]"
                           class="input"
                           required
+                          tabindex="3"
                           type="text"
                           v-model="selectedResourceId"
                         />
@@ -314,6 +317,7 @@
                       class="input"
                       placeholder="@example.com"
                       required
+                      tabindex="4"
                       type="email"
                       v-model="selectedOwner"
                     />
@@ -329,6 +333,7 @@
                     <input
                       class="input"
                       required
+                      tabindex="5"
                       type="text"
                       v-model="selectedComment"
                     />
@@ -339,7 +344,7 @@
                 </div>
               </section>
               <footer class="modal-card-foot">
-                <button class="button is-success">Add</button>
+                <button class="button is-success" tabindex="6">Add</button>
                 <button class="button" v-on:click="closeWhitelistInsertPopup()">
                   Cancel
                 </button>
