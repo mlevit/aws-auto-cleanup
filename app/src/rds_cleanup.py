@@ -144,7 +144,9 @@ class RDSCleanup:
         )
         if clean:
             try:
-                resources = self.client_rds.describe_db_snapshots().get("DBSnapshots")
+                resources = self.client_rds.describe_db_snapshots(
+                    SnapshotType="manual"
+                ).get("DBSnapshots")
             except:
                 self.logging.error("Could not list all RDS Snapshots.")
                 self.logging.error(sys.exc_info()[1])

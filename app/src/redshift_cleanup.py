@@ -87,10 +87,10 @@ class RedshiftCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"Redshift Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "warn"
                     else:
                         self.logging.debug(
                             f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
@@ -132,9 +132,9 @@ class RedshiftCleanup:
         )
         if clean:
             try:
-                resources = self.client_redshift.describe_cluster_snapshots().get(
-                    "Snapshots"
-                )
+                resources = self.client_redshift.describe_cluster_snapshots(
+                    SnapshotType="manual",
+                ).get("Snapshots")
             except:
                 self.logging.error("Could not list all Redshift Snapshots.")
                 self.logging.error(sys.exc_info()[1])
