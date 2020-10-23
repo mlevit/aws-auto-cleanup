@@ -71,11 +71,6 @@
     />
     <link
       rel="stylesheet"
-      href="//db.onlinewebfonts.com/c/157c6cc36dd65b1b2adc9e7f3329c761?family=Amazon+Ember"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
       integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
       crossorigin="anonymous"
@@ -83,25 +78,47 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- Header -->
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="#">
-          <img src="img/logo.svg" alt="AWS Auto Cleanup" style="height: 18px" />
-        </a>
-        <h1>AWS Auto Cleanup</h1>
-      </div>
-    </nav>
+    <div id="app">
+      <!-- Header -->
+      <nav
+        class="navbar is-dark"
+        role="navigation"
+        aria-label="main navigation"
+      >
+        <div class="navbar-brand">
+          <a class="navbar-item" href="">
+            <img src="img/logo.svg" style="height: 18px" />
+          </a>
+        </div>
 
-    <!-- Body -->
-    <div class="container body-container">
-      <div id="app">
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            <a class="navbar-item"> AWS Auto Cleanup </a>
+          </div>
+        </div>
+
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <button class="button is-light" v-on:click="openHelpPopup()">
+                <span class="icon">
+                  <i class="fas fa-question"></i>
+                </span>
+                <span>Help</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Body -->
+      <div class="container body-container">
         <h2 class="title">
           Whitelist&nbsp;<button
             class="button is-warning"
             v-on:click="openWhitelistInsertPopup()"
           >
-            <span class="icon"> <i class="fas fa-plus-square"></i> </span>
+            <span class="icon"> <i class="fas fa-plus"></i> </span>
             <span>New Entry</span>
           </button>
         </h2>
@@ -128,7 +145,7 @@
                   class="button is-warning"
                 >
                   <span class="icon">
-                    <i class="fas fa-calendar-plus"></i>
+                    <i class="far fa-calendar-plus"></i>
                   </span>
                 </a>
                 <button
@@ -137,7 +154,7 @@
                   class="button is-danger"
                 >
                   <span class="icon">
-                    <i class="fas fa-minus-square"></i>
+                    <i class="far fa-trash-alt"></i>
                   </span>
                 </button>
               </td>
@@ -171,7 +188,7 @@
                   v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
-                  ><span class="icon"> <i class="fas fa-list-alt"></i> </span
+                  ><span class="icon"> <i class="fas fa-list"></i> </span
                 ></a>
               </td>
             </tr>
@@ -386,8 +403,8 @@
         <!-- Popup: Delete Whitelist Rule -->
         <div
           class="modal"
-          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
           id="delete-whitelist"
+          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
         >
           <div
             class="modal-background"
@@ -420,6 +437,76 @@
               </button>
             </footer>
           </div>
+        </div>
+      </div>
+
+      <div
+        class="modal"
+        id="help"
+        v-bind:class="{ 'is-active': showHelpPopup }"
+      >
+        <div class="modal-background" v-on:click="closeHelpPopup()"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">AWS Auto Cleanup Help</p>
+            <button
+              class="delete"
+              aria-label="close"
+              v-on:click="closeHelpPopup()"
+            ></button>
+          </header>
+          <section class="modal-card-body">
+            <div class="content">
+              <p>
+                Open-source application to programmatically clean AWS resources
+                based on a Whitelist and time-to-live (TTL) settings.
+              </p>
+              <h2>How Does it Work</h2>
+              <p>
+                Every <i>n</i> number of days, AWS Auto Cleanup searches for AWS
+                resources that have been created or modified a number of days
+                ago. If the created or modified date is greater than the allowed
+                time-to-live (TTL), the resource will be deleted.
+              </p>
+              <p>
+                To preserve resources beyond the pre-determined TTL, they can be
+                added to the Whitelist. Resources added to the Whitelist are not
+                permanently preserved; they receive an expiration date upon
+                creation. Once that expiration date passes, they will be
+                deleted. However, resources within the Whitelist can have their
+                expiration date extended whenever necessary.
+              </p>
+              <h2>Supported Services</h2>
+              <p>
+                The below table details the AWS services, resources, their
+                default TTLs, and whether that particular resource is monitored
+                and cleaned up.
+              </p>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Resource</th>
+                    <th>TTL (days)</th>
+                    <th>Enabled</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in settingsFlat">
+                    <td>{{ item.service }}</td>
+                    <td>{{ item.resource }}</td>
+                    <td>{{ item.ttl }}</td>
+                    <td>{{ item.enabled }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <footer class="modal-card-foot">
+            <button class="button is-success" v-on:click="closeHelpPopup()">
+              OK
+            </button>
+          </footer>
         </div>
       </div>
     </div>

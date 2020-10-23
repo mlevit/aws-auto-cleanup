@@ -31,10 +31,12 @@ var app = new Vue({
     selectedService: "",
     serviceList: [],
     settings: [],
-    showWhitelistDeletePopup: false,
+    settingsFlat: [],
     showExecutionLogListLoadingGif: false,
     showExecutionLogLoadingGif: false,
     showExecutionLogPopup: false,
+    showHelpPopup: false,
+    showWhitelistDeletePopup: false,
     showWhitelistLoadingGif: false,
     showWhitelistPopup: false,
     whitelist: [],
@@ -111,6 +113,13 @@ var app = new Vue({
     closeExecutionLogPopup: function () {
       $("#execution-log-table").DataTable().destroy();
       this.showExecutionLogPopup = false;
+    },
+    // Help
+    closeHelpPopup: function () {
+      this.showHelpPopup = false;
+    },
+    openHelpPopup: function () {
+      this.showHelpPopup = true;
     },
   },
 });
@@ -221,12 +230,27 @@ function getSettings() {
     .then((data) => {
       app.settings = data["response"];
       app.serviceList = Object.keys(data["response"]);
+
+      // console.log(data["response"]);
+
+      for (service in data["response"]) {
+        console.log(service);
+        for (resource in data["response"][service]) {
+          app.settingsFlat.push({
+            service: service,
+            resource: resource,
+            ttl: data["response"][service][resource]["ttl"],
+            enabled: data["response"][service][resource]["clean"],
+          });
+        }
+      }
     })
     .catch((error) => {
       iziToast.error({
         title: "Something went wrong",
         message: error,
         color: "#EC2B55",
+        titleColor: "white",
         messageColor: "white",
       });
     });
