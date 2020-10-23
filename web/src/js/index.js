@@ -160,7 +160,6 @@ function getExecutionLog(executionLogURL) {
 
       setTimeout(function () {
         $("#execution-log-table").DataTable({
-          paging: false,
           autoWidth: true,
           columnDefs: [
             {
@@ -169,6 +168,7 @@ function getExecutionLog(executionLogURL) {
             },
             { className: "dt-nowrap", targets: [1, 2, 3, 5] },
           ],
+          paging: false,
         });
         app.showExecutionLogLoadingGif = false;
       }, 10);
@@ -199,6 +199,7 @@ function getExecutionLogList() {
             { orderable: false, targets: [2] },
             { className: "dt-center", targets: [2] },
           ],
+          order: [[0, "desc"]],
         });
       }, 10);
       app.showExecutionLogListLoadingGif = false;
