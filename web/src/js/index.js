@@ -17,6 +17,7 @@ function convertJsonToGet(formJSON) {
 var app = new Vue({
   el: "#app",
   data: {
+    accountId: "",
     executionLogKey: "",
     executionLogList: [],
     executionLogMode: false,
@@ -30,8 +31,8 @@ var app = new Vue({
     selectedResourceId: "",
     selectedService: "",
     serviceList: [],
-    settings: [],
-    settingsFlat: [],
+    serviceSettings: [],
+    serviceSettingsFlat: [],
     showExecutionLogListLoadingGif: false,
     showExecutionLogLoadingGif: false,
     showExecutionLogPopup: false,
@@ -91,10 +92,12 @@ var app = new Vue({
       sendApiRequest(convertJsonToGet(formData), "PUT");
     },
     updateResourceID: function (service, resource) {
-      this.resourceIdPlaceholder = this.settings[service][resource]["id"];
+      this.resourceIdPlaceholder = this.serviceSettings[service][resource][
+        "id"
+      ];
     },
     updateResourceList: function (service) {
-      this.resourceList = Object.keys(this.settings[service]);
+      this.resourceList = Object.keys(this.serviceSettings[service]);
       this.resourceIdPlaceholder = "";
     },
     openWhitelistDeletePopup: function (resourceId) {
@@ -223,19 +226,20 @@ function getExecutionLogList() {
     });
 }
 
-// Get settings
-function getSettings() {
+// Get supported services
+function getServices() {
   fetch(API_SERVICES)
     .then((response) => response.json())
     .then((data) => {
-      app.settings = data["response"];
+      app.serviceSettings = data["response"];
+
+      // get list of supported services
       app.serviceList = Object.keys(data["response"]);
 
-      // console.log(data["response"]);
-
+      // convert settings to flat table
       for (service in data["response"]) {
         for (resource in data["response"][service]) {
-          app.settingsFlat.push({
+          app.serviceSettingsFlat.push({
             service: service,
             resource: resource,
             ttl: data["response"][service][resource]["ttl"],
@@ -343,8 +347,17 @@ fetch("serverless.manifest.json").then(function (response) {
     API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
     API_EXECLOG = API_BASE + API_EXECLOG;
 
+    for (output of data["prod"]["outputs"]) {
+      console.log(output["OutputKey"]);
+      if (output["OutputKey"] === "AccountID") {
+        app.accountId = output["OutputValue"];
+        document.title = "AWS Auto Cleanup - " + output["OutputValue"];
+        break;
+      }
+    }
+
     getWhitelist();
     getExecutionLogList();
-    getSettings();
+    getServices();
   });
 });

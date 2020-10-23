@@ -100,7 +100,13 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <button class="button is-light" v-on:click="openHelpPopup()">
+              <button class="button is-light">
+                <span class="icon">
+                  <i class="fab fa-aws"></i>
+                </span>
+                <span>{{accountId}}</span>
+              </button>
+              <button class="button is-info" v-on:click="openHelpPopup()">
                 <span class="icon">
                   <i class="fas fa-question"></i>
                 </span>
@@ -485,7 +491,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in settingsFlat">
+                  <tr v-for="item in serviceSettingsFlat">
                     <td>{{ item.service }}</td>
                     <td>{{ item.resource }}</td>
                     <td>{{ item.ttl }}</td>
