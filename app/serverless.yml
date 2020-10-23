@@ -146,12 +146,10 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
-        - s3:DeleteBucket
-        - s3:DeleteObject
-        - s3:DeleteObjectVersion
+        - s3:Delete*
         - s3:Get*
         - s3:List*
-        - s3:PutObject
+        - s3:Put*
       Resource: "*"
     - Effect: Allow
       Action:
