@@ -458,29 +458,22 @@
           <section class="modal-card-body">
             <div class="content">
               <p>
-                Open-source application to programmatically clean AWS resources
-                based on a Whitelist and time-to-live (TTL) settings.
+                AWS Auto Cleanup is an open-source application to
+                programmatically clean AWS resources based on a Whitelist and
+                time-to-live (TTL) settings.
               </p>
-              <h2>How Does it Work</h2>
+              <h2>Whitelist</h2>
               <p>
-                Every <i>n</i> number of days, AWS Auto Cleanup searches for AWS
-                resources that have been created or modified a number of days
-                ago. If the created or modified date is greater than the allowed
-                time-to-live (TTL), the resource will be deleted.
+                The whitelist maintains a record of all AWS resources that have
+                been preserved. During the execution of Auto Cleanup, the
+                scanned resources will be checked against the whitelist. If the
+                resource exists within the whitelist table, it will not be
+                deleted.
               </p>
+              <h2>Services</h2>
               <p>
-                To preserve resources beyond the pre-determined TTL, they can be
-                added to the Whitelist. Resources added to the Whitelist are not
-                permanently preserved; they receive an expiration date upon
-                creation. Once that expiration date passes, they will be
-                deleted. However, resources within the Whitelist can have their
-                expiration date extended whenever necessary.
-              </p>
-              <h2>Supported Services</h2>
-              <p>
-                The below table details the AWS services, resources, their
-                default TTLs, and whether that particular resource is monitored
-                and cleaned up.
+                The table below details AWS services, resources, default TTLs,
+                and whether that particular resource is monitored and cleaned.
               </p>
               <table class="table">
                 <thead>
@@ -500,6 +493,13 @@
                   </tr>
                 </tbody>
               </table>
+              <h2>Execution Log</h2>
+              <p>
+                Post every Auto Cleanup run, an execution log is generated and
+                stored as a flat CSV file within an S3 Bucket. The execution log
+                details the actions taken for each AWS service and resource that
+                was scanned and identified.
+              </p>
             </div>
           </section>
           <footer class="modal-card-foot">
