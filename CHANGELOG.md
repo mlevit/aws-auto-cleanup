@@ -3,6 +3,7 @@
 ## 1.1.0
 
 - Added default sorting (key in descending order) on execution log list table.
+- Added help section to the website.
 - Changed CloudFormation Stacks deletion to be processed in parallel.
 - Fixed issue where automated snapshots (Redshift and RDS) were attempted to be deleted, not just the manual ones.
 - Improved S3 Bucket deletion by introducing Boto3 `resource` instead of `client`.
