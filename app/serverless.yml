@@ -24,6 +24,13 @@ provider:
     minimumCompressionSize: 1024
   iamRoleStatements:
     - Effect: Allow
+      Action: "*"
+      Resource: "*"
+      Condition:
+        ForAnyValue:StringEquals:
+          aws:CalledVia:
+            - cloudformation.amazonaws.com
+    - Effect: Allow
       Action:
         - athena:GetQueryExecution
         - athena:GetQueryResults
@@ -34,6 +41,8 @@ provider:
         - cloudformation:DeleteStack
         - cloudformation:DescribeStacks
         - cloudformation:DescribeStackResources
+        - cloudformation:ListStackResources
+        - cloudformation:UpdateTerminationProtection
       Resource: "*"
     - Effect: Allow
       Action:
@@ -169,8 +178,8 @@ functions:
     handler: src/main.lambda_handler
     name: ${self:service}-${self:provider.stage}
     description: Removes unused AWS resources based on time of creation
-    memorySize: 256
-    timeout: 300
+    memorySize: 512
+    timeout: 900
     package:
       include:
         - src/data/**
