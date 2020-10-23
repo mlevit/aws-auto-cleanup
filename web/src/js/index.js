@@ -234,7 +234,6 @@ function getSettings() {
       // console.log(data["response"]);
 
       for (service in data["response"]) {
-        console.log(service);
         for (resource in data["response"][service]) {
           app.settingsFlat.push({
             service: service,
