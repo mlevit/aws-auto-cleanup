@@ -15,12 +15,19 @@ class S3Cleanup:
         self.region = "global"
 
         self._client_s3 = None
+        self._resource_s3 = None
 
     @property
     def client_s3(self):
         if not self._client_s3:
             self._client_s3 = boto3.client("s3")
         return self._client_s3
+
+    @property
+    def resource_s3(self):
+        if not self._resource_s3:
+            self._resource_s3 = boto3.resource("s3")
+        return self._resource_s3
 
     def run(self):
         self.buckets()
@@ -62,50 +69,41 @@ class S3Cleanup:
 
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
-                            # delete all objects
+                            # delete bucket policy
                             try:
-                                response = self.client_s3.list_objects_v2(
-                                    Bucket=resource_id
+                                self.client_s3.delete_bucket_policy(Bucket=resource_id)
+                                self.logging.info(
+                                    f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
                                 )
                             except:
                                 self.logging.error(
-                                    f"Could not retrieve all Objects from S3 Bucket '{resource_id}'."
+                                    f"Could not delete Bucket Policy for S3 Bucket '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "error"
                                 continue
 
-                            while response.get("KeyCount") > 0:
-                                self.logging.debug(
-                                    f"S3 Bucket '{resource_id}' has {len(response.get('Contents'))} Objects that have been deleted."
-                                )
+                            bucket_resource = self.resource_s3.Bucket(resource_id)
 
-                                try:
-                                    self.client_s3.delete_objects(
-                                        Bucket=resource_id,
-                                        Delete={
-                                            "Objects": [
-                                                {"Key": obj.get("Key")}
-                                                for obj in response.get("Contents")
-                                            ],
-                                            "Quiet": True,
-                                        },
-                                    )
-                                except:
-                                    self.logging.error(
-                                        f"Could not delete Objects from S3 Bucket '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-
-                                response = self.client_s3.list_objects_v2(
-                                    Bucket=resource_id
+                            # delete all objects
+                            try:
+                                bucket_resource.objects.delete()
+                                self.logging.info(
+                                    f"Deleted all Objects from S3 Bucket '{resource_id}'."
                                 )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete all Objects from S3 Bucket '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
+                                continue
 
                             # delete all Versions and DeleteMarkers
                             try:
-                                response = self.client_s3.get_paginator(
-                                    "list_object_versions"
+                                bucket_resource.object_versions.delete()
+                                self.logging.info(
+                                    f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
                                 )
                             except:
                                 self.logging.error(
@@ -115,61 +113,16 @@ class S3Cleanup:
                                 resource_action = "error"
                                 continue
 
-                            delete_list = []
-
-                            for response_object in response.paginate(
-                                Bucket=resource_id
-                            ):
-                                if "DeleteMarkers" in response_object:
-                                    for delete_marker in response_object.get(
-                                        "DeleteMarkers"
-                                    ):
-                                        delete_list.append(
-                                            {
-                                                "Key": delete_marker["Key"],
-                                                "VersionId": delete_marker["VersionId"],
-                                            }
-                                        )
-
-                                if "Versions" in response_object:
-                                    for version in response_object["Versions"]:
-                                        delete_list.append(
-                                            {
-                                                "Key": version["Key"],
-                                                "VersionId": version["VersionId"],
-                                            }
-                                        )
-
-                            self.logging.debug(
-                                f"S3 Bucket '{resource_id}' has {len(delete_list)} Versions / Delete Markers that have been deleted."
-                            )
-
-                            for i in range(0, len(delete_list), 1000):
-                                try:
-                                    self.client_s3.delete_objects(
-                                        Bucket=resource_id,
-                                        Delete={
-                                            "Objects": delete_list[i : i + 1000],
-                                            "Quiet": True,
-                                        },
-                                    )
-                                except:
-                                    self.logging.error(
-                                        f"Could not delete Versions and Delete Markers from S3 Bucket '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-
                             # delete bucket
                             try:
                                 self.client_s3.delete_bucket(Bucket=resource_id)
                             except:
                                 self.logging.error(
-                                    f"Could not delete Bucket '{resource_id}'."
+                                    f"Could not delete S3 Bucket '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "error"
+                                continue
 
                         self.logging.info(
                             f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
