@@ -2,10 +2,10 @@
 
 ## 1.1.0
 
-- Added default sorting (key in descending order) on execution log list table.
+- Added default sorting (by Key in descending order) within the execution log list table. This ensures the latest execution logs are always first.
 - Added help section to the website.
-- Changed CloudFormation Stacks deletion to be processed in parallel.
-- Fixed issue where automated snapshots (Redshift and RDS) were attempted to be deleted, not just the manual ones.
+- Fixed an issue where Auto Cleanup was attempting to delete automated Redshift and RDS snapshots. Only manual snapshots can be deleted.
+- Improved CloudFormation Stacks deletion. Stack Deletions are now be processed in parallel.
 - Improved S3 Bucket deletion by introducing Boto3 `resource` instead of `client`.
 - Modified AWS Auto Cleanup App memory allocation from 256 MB to 512 MB.
 - Modified AWS Auto Cleanup App timeout from 5 minutes to 15 minutes.
