@@ -68,7 +68,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 9. Inspect
 
    ```bash
-   serverless logs --function AutoCleanup [--region] [--aws-profile]
+   npm run logs -- [--region] [--aws-profile]
    ```
 
 ## Removal
