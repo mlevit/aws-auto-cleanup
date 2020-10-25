@@ -18,9 +18,11 @@ var app = new Vue({
   el: "#app",
   data: {
     accountId: "",
+    executionLogActionStats: {},
     executionLogKey: "",
     executionLogList: [],
-    executionLogMode: false,
+    executionLogMode: "",
+    executionLogServicetats: {},
     executionLogTable: [],
     resourceIdPlaceholder: "",
     resourceList: [],
@@ -115,6 +117,8 @@ var app = new Vue({
     },
     closeExecutionLogPopup: function () {
       $("#execution-log-table").DataTable().destroy();
+      this.executionLogActionStats = {};
+      this.executionLogServicetats = {};
       this.showExecutionLogPopup = false;
     },
     // Help
@@ -164,12 +168,6 @@ function getExecutionLog(executionLogURL) {
       app.executionLogTable = data["response"]["body"];
       app.executionLogKey = decodeURIComponent(executionLogURL);
 
-      if (data["response"]["body"][0][7] == "True") {
-        app.executionLogMode = "Dry Run";
-      } else {
-        app.executionLogMode = "Destroy";
-      }
-
       setTimeout(function () {
         $("#execution-log-table").DataTable({
           autoWidth: true,
@@ -184,6 +182,21 @@ function getExecutionLog(executionLogURL) {
         });
         app.showExecutionLogLoadingGif = false;
       }, 10);
+
+      // Get execution mode
+      if (data["response"]["body"][0][7] == "True") {
+        app.executionLogMode = "Dry Run";
+      } else {
+        app.executionLogMode = "Destroy";
+      }
+
+      for (log of data["response"]["body"]) {
+        app.executionLogActionStats[log["5"]] =
+          ++app.executionLogActionStats[log["5"]] || 1;
+
+        app.executionLogServicetats[log["2"] + " " + log["3"]] =
+          ++app.executionLogServicetats[log["2"] + " " + log["3"]] || 1;
+      }
     })
     .catch((error) => {
       iziToast.error({
@@ -348,7 +361,6 @@ fetch("serverless.manifest.json").then(function (response) {
     API_EXECLOG = API_BASE + API_EXECLOG;
 
     for (output of data["prod"]["outputs"]) {
-      console.log(output["OutputKey"]);
       if (output["OutputKey"] === "AccountID") {
         app.accountId = output["OutputValue"];
         document.title = "AWS Auto Cleanup - " + output["OutputValue"];

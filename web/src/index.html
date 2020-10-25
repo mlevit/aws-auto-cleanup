@@ -181,7 +181,7 @@
 
         <table class="table" id="execution-log-list-table">
           <thead>
-            <th>Key</th>
+            <th>Log</th>
             <th>Date</th>
             <th>View</th>
           </thead>
@@ -247,33 +247,75 @@
               ></button>
             </header>
             <div class="box" style="border-radius: 0px !important">
-              <table class="table" id="execution-log-table">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>Region</th>
-                    <th>Service</th>
-                    <th>Resource</th>
-                    <th>ID</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in executionLogTable" :key="item.id">
-                    <td>{{ item[6] }}</td>
-                    <td>{{ item[1] }}</td>
-                    <td>{{ item[2] }}</td>
-                    <td>{{ item[3] }}</td>
-                    <td>{{ item[4] }}</td>
-                    <td>{{ item[5] }}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div
-                class="container has-text-centered"
-                v-show="showExecutionLogLoadingGif"
-              >
-                <button class="button is-warning is-loading">Loading</button>
+              <div class="content">
+                <h2>Log</h2>
+                <table class="table" id="execution-log-table">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Region</th>
+                      <th>Service</th>
+                      <th>Resource</th>
+                      <th>ID</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in executionLogTable" :key="item.id">
+                      <td>{{ item[6] }}</td>
+                      <td>{{ item[1] }}</td>
+                      <td>{{ item[2] }}</td>
+                      <td>{{ item[3] }}</td>
+                      <td>{{ item[4] }}</td>
+                      <td>{{ item[5] }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <h2>Statistics</h2>
+                <div class="columns">
+                  <div class="column">
+                    <table class="table" id="execution-log-table">
+                      <thead>
+                        <tr>
+                          <th>Resource</th>
+                          <th>Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="key in Object.keys(executionLogServicetats).sort()"
+                        >
+                          <td>{{key}}</td>
+                          <td>{{executionLogServicetats[key]}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="column">
+                    <table class="table" id="execution-log-table">
+                      <thead>
+                        <tr>
+                          <th>Action</th>
+                          <th>Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="key in Object.keys(executionLogActionStats).sort()"
+                        >
+                          <td>{{key}}</td>
+                          <td>{{executionLogActionStats[key]}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div
+                  class="container has-text-centered"
+                  v-show="showExecutionLogLoadingGif"
+                >
+                  <button class="button is-warning is-loading">Loading</button>
+                </div>
               </div>
             </div>
             <!-- .box -->
