@@ -22,7 +22,8 @@ var app = new Vue({
     executionLogKey: "",
     executionLogList: [],
     executionLogMode: "",
-    executionLogServicetats: {},
+    executionLogRegionStats: {},
+    executionLogServiceStats: {},
     executionLogTable: [],
     resourceIdPlaceholder: "",
     resourceList: [],
@@ -118,7 +119,8 @@ var app = new Vue({
     closeExecutionLogPopup: function () {
       $("#execution-log-table").DataTable().destroy();
       this.executionLogActionStats = {};
-      this.executionLogServicetats = {};
+      this.executionLogRegionStats = {};
+      this.executionLogServiceStats = {};
       this.showExecutionLogPopup = false;
     },
     // Help
@@ -191,11 +193,17 @@ function getExecutionLog(executionLogURL) {
       }
 
       for (log of data["response"]["body"]) {
+        // action taken
         app.executionLogActionStats[log["5"]] =
           ++app.executionLogActionStats[log["5"]] || 1;
 
-        app.executionLogServicetats[log["2"] + " " + log["3"]] =
-          ++app.executionLogServicetats[log["2"] + " " + log["3"]] || 1;
+        // service and resource
+        app.executionLogServiceStats[log["2"] + " " + log["3"]] =
+          ++app.executionLogServiceStats[log["2"] + " " + log["3"]] || 1;
+
+        // region
+        app.executionLogRegionStats[log["1"]] =
+          ++app.executionLogRegionStats[log["1"]] || 1;
       }
     })
     .catch((error) => {

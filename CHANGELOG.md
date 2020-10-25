@@ -3,7 +3,7 @@
 ## 1.1.0
 
 - Added default sorting (by Key in descending order) within the execution log list table. This ensures the latest execution logs are always first.
-- Added execution log statistics to the execution log popup. Statistic show counts of AWS resources, and actions taken.
+- Added execution log statistics to the execution log popup. Statistics include a breakdown of counts by service, action taken, and region.
 - Added help section to the website introducing new users to Auto Cleanup as well as exposing AWS service settings from the Settings table.
 - Fixed an issue where Auto Cleanup was attempting to delete automated Redshift and RDS snapshots. Only manual snapshots can be deleted.
 - Improved CloudFormation Stacks deletion. Stack Deletions are now be processed in parallel.

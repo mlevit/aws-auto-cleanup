@@ -283,10 +283,10 @@
                       </thead>
                       <tbody>
                         <tr
-                          v-for="key in Object.keys(executionLogServicetats).sort()"
+                          v-for="key in Object.keys(executionLogServiceStats).sort()"
                         >
                           <td>{{key}}</td>
-                          <td>{{executionLogServicetats[key]}}</td>
+                          <td>{{executionLogServiceStats[key]}}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -305,6 +305,24 @@
                         >
                           <td>{{key}}</td>
                           <td>{{executionLogActionStats[key]}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="column">
+                    <table class="table" id="execution-log-table">
+                      <thead>
+                        <tr>
+                          <th>Region</th>
+                          <th>Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="key in Object.keys(executionLogRegionStats).sort()"
+                        >
+                          <td>{{key}}</td>
+                          <td>{{executionLogRegionStats[key]}}</td>
                         </tr>
                       </tbody>
                     </table>
