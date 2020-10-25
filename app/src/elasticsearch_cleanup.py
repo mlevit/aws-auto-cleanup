@@ -114,8 +114,8 @@ class ElasticsearchServiceCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "elasticsearch", {}
-                ).setdefault("domain", []).append(
+                    "Elasticsearch Service", {}
+                ).setdefault("Domain", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

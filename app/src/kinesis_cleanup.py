@@ -113,8 +113,8 @@ class KinesisCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "kinesis", {}
-                ).setdefault("stream", []).append(
+                    "Kinesis", {}
+                ).setdefault("Stream", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,

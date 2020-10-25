@@ -111,8 +111,8 @@ class ECSCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "ecs", {}
-                ).setdefault("cluster", []).append(
+                    "ECS", {}
+                ).setdefault("Cluster", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -232,7 +232,7 @@ class ECSCleanup:
 
                     self.execution_log.get("AWS").setdefault(
                         self.region, {}
-                    ).setdefault("ecs", {}).setdefault("service", []).append(
+                    ).setdefault("ECS", {}).setdefault("Service", []).append(
                         {
                             "id": resource_id,
                             "action": resource_action,

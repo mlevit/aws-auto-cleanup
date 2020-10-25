@@ -100,8 +100,8 @@ class SageMakerCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "sagemaker", {}
-                ).setdefault("endpoint", []).append(
+                    "SageMaker", {}
+                ).setdefault("Endpoint", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -205,8 +205,8 @@ class SageMakerCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "sagemaker", {}
-                ).setdefault("notebook_instance", []).append(
+                    "SageMaker", {}
+                ).setdefault("Notebook Instance", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
