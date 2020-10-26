@@ -52,11 +52,19 @@ class DynamoDBCleanup:
             )
 
             for resource in resources:
-                resource_date = (
-                    self.client_dynamodb.describe_table(TableName=resource)
-                    .get("Table")
-                    .get("CreationDateTime")
-                )
+                try:
+                    resource_details = self.client_dynamodb.describe_table(
+                        TableName=resource
+                    ).get("Table")
+                except:
+                    self.logging.error(
+                        f"Could not get DynamoDB Table's '{resource}' details."
+                    )
+                    self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
+                    continue
+
+                resource_date = resource_details.get("CreationDateTime")
                 resource_action = "skip"
 
                 if resource not in self.whitelist.get("dynamodb", {}).get("table", []):

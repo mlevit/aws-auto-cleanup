@@ -149,12 +149,12 @@ class CloudFormationCleanup:
                                 WaiterConfig={"Delay": 5, "MaxAttempts": 6},
                             )
                         except:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"Did not delete CloudFormation Stack '{resource_id}' within 30 seconds. "
                                 "Stopped waiting, check progress manually."
                             )
                             self.logging.warn(sys.exc_info()[1])
-                            self.log_execution(resource_id, "warn")
+                            self.log_execution(resource_id, "delete - timeout")
                             return False
                     except:
                         self.logging.error(

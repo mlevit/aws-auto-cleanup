@@ -97,11 +97,11 @@ class ElasticsearchServiceCleanup:
                                 resource_action = "error"
                                 continue
 
-                            self.logging.info(
-                                f"Elasticsearch Service Domain '{resource_id}' was last modified {delta.days} days ago "
-                                "and has been deleted."
-                            )
-                            resource_action = "delete"
+                        self.logging.info(
+                            f"Elasticsearch Service Domain '{resource_id}' was last modified {delta.days} days ago "
+                            "and has been deleted."
+                        )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"Elasticsearch Service Domain '{resource_id}' was created {delta.days} days ago "

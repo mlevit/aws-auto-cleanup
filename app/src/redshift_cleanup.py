@@ -90,7 +90,7 @@ class RedshiftCleanup:
                             self.logging.warn(
                                 f"Redshift Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "warn"
+                            resource_action = "skip - in use"
                     else:
                         self.logging.debug(
                             f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
@@ -180,10 +180,10 @@ class RedshiftCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"Redshift Snapshot '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "skip - in use"
                     else:
                         self.logging.debug(
                             f"Redshift Snapshot '{resource_id}' was created {delta.days} days ago "

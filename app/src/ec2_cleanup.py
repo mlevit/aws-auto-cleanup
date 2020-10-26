@@ -91,11 +91,11 @@ class EC2Cleanup:
                         )
                         resource_action = "delete"
                     else:
-                        self.logging.debug(
+                        self.logging.warn(
                             f"EC2 Address '{resource_id}' is associated with an EC2 instance and has not "
                             "been deleted."
                         )
-                        resource_action = "skip"
+                        resource_action = "skip - in use"
                 else:
                     self.logging.debug(
                         f"EC2 Address '{resource_id}' has been whitelisted and has not "
@@ -390,6 +390,7 @@ class EC2Cleanup:
                     except:
                         self.logging.error(f"Could not retrieve EC2 AMIs.")
                         self.logging.error(sys.exc_info()[1])
+                        resource_action = "error"
                         continue
 
                     for image in images:
@@ -439,15 +440,16 @@ class EC2Cleanup:
                             )
                             resource_action = "skip - TTL"
                     else:
-                        self.logging.debug(
+                        self.logging.warn(
                             f"EC2 Snapshot '{resource_id}' is currently used by an AMI "
                             "and cannot been deleted without deleting the AMI first."
                         )
-                        resource_action = "skip"
+                        resource_action = "skip - in use"
                 else:
                     self.logging.debug(
                         f"EC2 Snapshot '{resource_id}' has been whitelisted and has not been deleted."
                     )
+                    resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
@@ -526,10 +528,11 @@ class EC2Cleanup:
                             )
                             resource_action = "skip - TTL"
                     else:
-                        self.logging.debug(
+                        self.logging.warn(
                             f"EC2 Volume '{resource_id}' is attached to an EC2 instance "
                             "and has not been deleted."
                         )
+                        resource_action = "skip - in use"
                 else:
                     self.logging.debug(
                         f"EC2 Volume '{resource_id}' has been whitelisted and has not been deleted."

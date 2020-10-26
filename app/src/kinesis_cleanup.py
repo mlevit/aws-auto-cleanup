@@ -91,10 +91,11 @@ class KinesisCleanup:
                                     resource_action = "error"
                                     continue
                             else:
-                                self.logging.error(
+                                self.logging.warn(
                                     f"Kinesis Stream '{resource_id}' in state '{resource_status}' cannot be deleted."
                                 )
-                                resource_action = "error"
+                                resource_action = "skip - in use"
+                                continue
 
                         self.logging.info(
                             f"Kinesis Stream '{resource_id}' was created {delta.days} days ago "

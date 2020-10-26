@@ -85,10 +85,10 @@ class EMRCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"EMR Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "skip - in use"
                     else:
                         self.logging.debug(
                             f"EMR Cluster '{resource_id}' was created {delta.days} days ago "

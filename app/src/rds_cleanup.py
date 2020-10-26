@@ -71,11 +71,6 @@ class RDSCleanup:
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False,
                                     )
-
-                                    self.logging.info(
-                                        f"RDS Instance '{resource_id}' had delete protection turned on "
-                                        "and now has been turned off."
-                                    )
                                 except:
                                     self.logging.error(
                                         f"Could not remove termination protection from RDS Instance '{resource_id}'."
@@ -83,6 +78,11 @@ class RDSCleanup:
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "error"
                                     continue
+                                else:
+                                    self.logging.info(
+                                        f"RDS Instance '{resource_id}' had delete protection turned on "
+                                        "and now has been turned off."
+                                    )
 
                             # delete instance
                             try:
