@@ -140,11 +140,13 @@
           </thead>
           <tbody>
             <tr v-for="item in whitelist" :key="item.id">
-              <td>{{ item.resource_id }}</td>
-              <td>{{ item.expiration_readable }}</td>
-              <td>{{ item.owner }}</td>
+              <td style="white-space: nowrap">{{ item.resource_id }}</td>
+              <td style="white-space: nowrap">
+                {{ item.expiration_readable }}
+              </td>
+              <td style="white-space: nowrap">{{ item.owner }}</td>
               <td>{{ item.comment }}</td>
-              <td>
+              <td style="white-space: nowrap">
                 <a
                   v-if="item.expiration !== '99999999999'"
                   v-on:click="extendWhitelistEntry( item.id )"
@@ -262,12 +264,12 @@
                   </thead>
                   <tbody>
                     <tr v-for="item in executionLogTable" :key="item.id">
-                      <td>{{ item[6] }}</td>
-                      <td>{{ item[1] }}</td>
-                      <td>{{ item[2] }}</td>
-                      <td>{{ item[3] }}</td>
+                      <td style="white-space: nowrap">{{ item[6] }}</td>
+                      <td style="white-space: nowrap">{{ item[1] }}</td>
+                      <td style="white-space: nowrap">{{ item[2] }}</td>
+                      <td style="white-space: nowrap">{{ item[3] }}</td>
                       <td>{{ item[4] }}</td>
-                      <td>{{ item[5] }}</td>
+                      <td style="white-space: nowrap">{{ item[5] }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -285,7 +287,7 @@
                         <tr
                           v-for="key in Object.keys(executionLogServiceStats).sort()"
                         >
-                          <td>{{key}}</td>
+                          <td style="white-space: nowrap">{{key}}</td>
                           <td>{{executionLogServiceStats[key]}}</td>
                         </tr>
                       </tbody>
@@ -303,7 +305,7 @@
                         <tr
                           v-for="key in Object.keys(executionLogActionStats).sort()"
                         >
-                          <td>{{key}}</td>
+                          <td style="white-space: nowrap">{{key}}</td>
                           <td>{{executionLogActionStats[key]}}</td>
                         </tr>
                       </tbody>
@@ -321,7 +323,7 @@
                         <tr
                           v-for="key in Object.keys(executionLogRegionStats).sort()"
                         >
-                          <td>{{key}}</td>
+                          <td style="white-space: nowrap">{{key}}</td>
                           <td>{{executionLogRegionStats[key]}}</td>
                         </tr>
                       </tbody>

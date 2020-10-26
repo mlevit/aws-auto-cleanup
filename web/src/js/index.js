@@ -173,13 +173,6 @@ function getExecutionLog(executionLogURL) {
       setTimeout(function () {
         $("#execution-log-table").DataTable({
           autoWidth: true,
-          columnDefs: [
-            {
-              className: "dt-body-nowrap",
-              targets: [1, 2, 3, 5],
-            },
-            { className: "dt-nowrap", targets: [1, 2, 3, 5] },
-          ],
           paging: false,
         });
         app.showExecutionLogLoadingGif = false;
@@ -309,10 +302,6 @@ function getWhitelist() {
           columnDefs: [
             { orderable: false, targets: [3, 4] },
             { className: "dt-center", targets: [4] },
-            {
-              className: "dt-body-nowrap",
-              targets: [0, 1, 2],
-            },
           ],
         });
       }, 10);
