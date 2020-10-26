@@ -256,9 +256,9 @@ class EC2Cleanup:
                         {
                             "id": resource_id,
                             "action": resource_action,
-                            "timestamp": datetime.datetime.now()
-                            .astimezone()
-                            .isoformat(),
+                            "timestamp": datetime.datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),
                         }
                     )
             return True
