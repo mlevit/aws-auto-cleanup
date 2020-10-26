@@ -63,6 +63,7 @@ class KinesisCleanup:
                         f"Could not get Kinesis Stream's '{resource_id}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
                     return False
 
                 resource_status = resource_details.get("StreamStatus")

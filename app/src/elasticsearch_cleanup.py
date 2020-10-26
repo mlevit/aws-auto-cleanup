@@ -68,6 +68,7 @@ class ElasticsearchServiceCleanup:
                         f"Could not get Elasticsearch Service Domain '{resource_id}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
                     return False
 
                 resource_date = (

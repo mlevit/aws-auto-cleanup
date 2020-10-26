@@ -57,6 +57,7 @@ class ECSCleanup:
                         f"Could not get ECS Cluster's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
                     return False
 
                 resource_id = resource_details.get("clusterName")
