@@ -230,47 +230,71 @@
                 style="line-height: unset !important"
               >
                 <button
-                  v-if="executionLogMode === 'Destroy'"
                   class="button is-danger"
+                  v-if="executionLogMode === 'Destroy'"
                 >
                   <span>{{executionLogMode}}</span>
                 </button>
                 <button
-                  v-if="executionLogMode === 'Dry Run'"
                   class="button is-success"
+                  v-if="executionLogMode === 'Dry Run'"
                 >
                   <span>{{executionLogMode}}</span>
                 </button>
                 <span>{{executionLogKey}}</span>
               </p>
               <button
-                class="delete"
                 aria-label="close"
+                class="delete"
                 v-on:click="closeExecutionLogPopup()"
               ></button>
             </header>
             <div class="box" style="border-radius: 0px !important">
               <div class="content">
-                <div class="tabs is-toggle">
-                  <ul style="margin: 0px !important">
-                    <li class="tab is-active" onclick="openTab(event,'logs')">
-                      <a>
-                        <span class="icon is-small"
-                          ><i class="fas fa-bars" aria-hidden="true"></i
-                        ></span>
-                        <span>Logs</span>
-                      </a>
-                    </li>
-                    <li class="tab" onclick="openTab(event,'statistics')">
-                      <a>
-                        <span class="icon is-small"
-                          ><i class="far fa-chart-bar" aria-hidden="true"></i
-                        ></span>
-                        <span>Statistics</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                <nav class="level">
+                  <div class="level-left">
+                    <div class="tabs is-toggle">
+                      <ul style="margin: 0px !important">
+                        <li
+                          class="tab is-active"
+                          onclick="openTab(event,'logs')"
+                        >
+                          <a>
+                            <span class="icon is-small"
+                              ><i class="fas fa-bars" aria-hidden="true"></i
+                            ></span>
+                            <span>Logs</span>
+                          </a>
+                        </li>
+                        <li class="tab" onclick="openTab(event,'statistics')">
+                          <a>
+                            <span class="icon is-small"
+                              ><i
+                                class="far fa-chart-bar"
+                                aria-hidden="true"
+                              ></i
+                            ></span>
+                            <span>Statistics</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="level-right">
+                    <div class="control has-icons-left is-right">
+                      <input
+                        class="input"
+                        placeholder="Search"
+                        type="text"
+                        v-model="executionLogSearchTerm"
+                        v-on:keyup="executionLogSearch()"
+                      />
+                      <span class="icon is-left">
+                        <i class="fas fa-search"></i>
+                      </span>
+                    </div>
+                  </div>
+                </nav>
                 <div class="container is-fluid" style="padding: 0px !important">
                   <div id="logs" class="content-tab">
                     <table class="table" id="execution-log-table">

@@ -23,8 +23,10 @@ var app = new Vue({
     executionLogList: [],
     executionLogMode: "",
     executionLogRegionStats: {},
+    executionLogSearchTerm: "",
     executionLogServiceStats: {},
     executionLogTable: [],
+    executionLogDataTables: "",
     resourceIdPlaceholder: "",
     resourceList: [],
     selectedComment: "",
@@ -113,15 +115,19 @@ var app = new Vue({
       this.resourceIdPlaceholder = "";
     },
     // Execution Log
-    openExecutionLog: function (keyURL) {
-      getExecutionLog(keyURL);
-    },
     closeExecutionLogPopup: function () {
-      $("#execution-log-table").DataTable().destroy();
+      this.executionLogDataTables.destroy();
+
       this.executionLogActionStats = {};
       this.executionLogRegionStats = {};
       this.executionLogServiceStats = {};
       this.showExecutionLogPopup = false;
+    },
+    executionLogSearch: function () {
+      this.executionLogDataTables.search(this.executionLogSearchTerm).draw();
+    },
+    openExecutionLog: function (keyURL) {
+      getExecutionLog(keyURL);
     },
     // Help
     closeHelpPopup: function () {
@@ -171,7 +177,8 @@ function getExecutionLog(executionLogURL) {
       app.executionLogKey = decodeURIComponent(executionLogURL);
 
       setTimeout(function () {
-        $("#execution-log-table").DataTable({
+        app.executionLogDataTables = $("#execution-log-table").DataTable({
+          dom: "lrti",
           autoWidth: true,
           paging: false,
         });
