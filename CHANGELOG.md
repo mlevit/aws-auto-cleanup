@@ -2,11 +2,13 @@
 
 ## 1.1.0
 
-- Added default sorting (by Key in descending order) within the execution log list table. This ensures the latest execution logs are always first.
+- Added AWS Account ID to the navigation bar and webpage title.
+- Added default sorting (by log name in descending order) within the execution log list table. This ensures the latest execution logs are always first.
 - Added execution log statistics to the execution log popup. Statistics include a breakdown of counts by service, action taken, and region.
 - Added help section to the website introducing new users to Auto Cleanup as well as exposing AWS service settings from the Settings table.
 - Fixed an issue where Auto Cleanup was attempting to delete automated Redshift and RDS snapshots. Only manual snapshots can be deleted.
-- Improved CloudFormation Stacks deletion. Stack Deletions are now be processed in parallel.
+- Fixed an issue where EC2 Snapshots were incorrectly marked as "in use" and not deleted.
+- Improved CloudFormation Stacks deletion. Stack deletions are now processed in parallel for a given region.
 - Improved execution logging with finer-grained information.
 - Improved S3 Bucket deletion by using Boto3 `resource` instead of `client`.
 - Modified AWS Auto Cleanup App memory allocation from 256 MB to 512 MB.
