@@ -30,6 +30,8 @@ class GlueCleanup:
         Deletes Glue Dev Endpoints.
         """
 
+        self.logging.debug("Started cleanup of Glue Dev Endpoints.")
+
         clean = (
             self.settings.get("services", {})
             .get("glue", {})
@@ -103,6 +105,8 @@ class GlueCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Glue Dev Endpoints.")
             return True
         else:
             self.logging.info("Skipping cleanup of Glue Dev Endpoints.")

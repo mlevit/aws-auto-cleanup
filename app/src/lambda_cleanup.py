@@ -31,6 +31,8 @@ class LambdaCleanup:
         Deletes Lambda Functions.
         """
 
+        self.logging.debug("Started cleanup of Lambda Functions.")
+
         clean = (
             self.settings.get("services", {})
             .get("lambda", {})
@@ -104,6 +106,8 @@ class LambdaCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Lambda Functions.")
             return True
         else:
             self.logging.info("Skipping cleanup of Lambda Functions.")

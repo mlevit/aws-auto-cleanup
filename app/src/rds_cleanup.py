@@ -33,6 +33,8 @@ class RDSCleanup:
         and then the Instance will be terminated.
         """
 
+        self.logging.debug("Started cleanup of RDS Instances.")
+
         clean = (
             self.settings.get("services", {})
             .get("rds", {})
@@ -126,6 +128,8 @@ class RDSCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of RDS Instances.")
             return True
         else:
             self.logging.info("Skipping cleanup of RDS Instances.")
@@ -135,6 +139,8 @@ class RDSCleanup:
         """
         Deletes RDS Snapshots.
         """
+
+        self.logging.debug("Started cleanup of RDS Snapshots.")
 
         clean = (
             self.settings.get("services", {})
@@ -209,6 +215,8 @@ class RDSCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of RDS Snapshots.")
             return True
         else:
             self.logging.debug("Skipping cleanup of RDS Snapshots.")

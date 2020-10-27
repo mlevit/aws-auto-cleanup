@@ -30,6 +30,8 @@ class EMRCleanup:
         Deletes EMR Clusters.
         """
 
+        self.logging.debug("Started cleanup of EMR Clusters.")
+
         clean = (
             self.settings.get("services", {})
             .get("emr", {})
@@ -112,6 +114,8 @@ class EMRCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of EMR Clusters.")
             return True
         else:
             self.logging.info("Skipping cleanup of EMR Clusters.")

@@ -113,6 +113,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`                    |
 | DynamoDB Tables                | Table Name             | `dynamodb:table:table_name`                          |
 | EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                          |
+| EC2 Images                     | Image ID               | `ec2:image:image_id`                                 |
 | EC2 Instances                  | Instance ID            | `ec2:instance:instance_id`                           |
 | EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                        |
 | EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                           |
@@ -171,6 +172,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | CloudFormation        | Stacks                   | True  | 7   |                                                                |
 | DynamoDB              | Tables                   | True  | 7   |                                                                |
 | EC2                   | Addresses                | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
+| EC2                   | Images :new:             | True  | 7   |                                                                |
 | EC2                   | Instances                | True  | 7   |                                                                |
 | EC2                   | Security Groups          | True  | N/A | Deletes Security Group if not associated with an EC2 instance. |
 | EC2                   | Snapshots                | True  | 7   |                                                                |

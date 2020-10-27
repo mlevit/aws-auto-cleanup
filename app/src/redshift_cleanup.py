@@ -31,6 +31,8 @@ class RedshiftCleanup:
         Deletes Redshift Clusters.
         """
 
+        self.logging.debug("Started cleanup of Redshift Clusters.")
+
         clean = (
             self.settings.get("services", {})
             .get("redshift", {})
@@ -114,6 +116,8 @@ class RedshiftCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Redshift Clusters.")
             return True
         else:
             self.logging.info("Skipping cleanup of Redshift Clusters.")
@@ -123,6 +127,8 @@ class RedshiftCleanup:
         """
         Deletes Redshift Snapshots.
         """
+
+        self.logging.debug("Started cleanup of Redshift Snapshots.")
 
         clean = (
             self.settings.get("services", {})
@@ -207,6 +213,8 @@ class RedshiftCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Redshift Snapshots.")
             return True
         else:
             self.logging.info("Skipping cleanup of Redshift Snapshots.")

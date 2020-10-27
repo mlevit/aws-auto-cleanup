@@ -31,6 +31,8 @@ class ECSCleanup:
         Deletes ECS Clusters.
         """
 
+        self.logging.debug("Started cleanup of ECS Clusters.")
+
         clean = (
             self.settings.get("services", {})
             .get("ecs", {})
@@ -120,6 +122,8 @@ class ECSCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of ECS Clusters.")
             return True
         else:
             self.logging.info("Skipping cleanup of ECS Clusters.")
@@ -129,6 +133,8 @@ class ECSCleanup:
         """
         Deletes ECS Services.
         """
+
+        self.logging.debug("Started cleanup of ECS Services.")
 
         clean = (
             self.settings.get("services", {})
@@ -241,7 +247,9 @@ class ECSCleanup:
                             ),
                         }
                     )
-                return True
+
+            self.logging.debug("Finished cleanup of ECS Services.")
+            return True
         else:
             self.logging.info("Skipping cleanup of ECS Services.")
             return True

@@ -42,6 +42,7 @@ class EC2Cleanup:
 
     def run(self):
         self.addresses()
+        self.images()
         self.instances()
         self.security_groups()
         self.snapshots()
@@ -51,6 +52,8 @@ class EC2Cleanup:
         """
         Deletes Addresses not allocated to an EC2 Instance.
         """
+
+        self.logging.debug("Started cleanup of EC2 Addresses.")
 
         clean = (
             self.settings.get("services", {})
@@ -114,9 +117,99 @@ class EC2Cleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of EC2 Addresses.")
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Addresses.")
+            return True
+
+    def images(self):
+        """
+        Deletes Images not allocated to an EC2 Instance.
+        """
+
+        self.logging.debug("Started cleanup of EC2 Images.")
+
+        clean = (
+            self.settings.get("services", {})
+            .get("ec2", {})
+            .get("image", {})
+            .get("clean", False)
+        )
+        if clean:
+            try:
+                resources = self.client_ec2.describe_images(
+                    Owners=[
+                        "self",
+                    ]
+                ).get("Images")
+            except:
+                self.logging.error("Could not list all EC2 Images.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            ttl_days = (
+                self.settings.get("services", {})
+                .get("ec2", {})
+                .get("image", {})
+                .get("ttl", 7)
+            )
+
+            for resource in resources:
+                resource_id = resource.get("ImageId")
+                resource_date = resource.get("CreationDate")
+                resource_action = "skip"
+
+                if resource_id not in self.whitelist.get("ec2", {}).get("image", []):
+                    delta = Helper.get_day_delta(resource_date)
+
+                    if delta.days > ttl_days:
+                        if not self.settings.get("general", {}).get("dry_run", True):
+                            try:
+                                self.client_ec2.deregister_image(ImageId=resource_id)
+                            except:
+                                self.logging.error(
+                                    f"Could not deregister EC2 Image '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "error"
+                                continue
+
+                        self.logging.info(
+                            f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
+                            "and has been deregistered."
+                        )
+                        resource_action = "delete"
+                    else:
+                        self.logging.debug(
+                            f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
+                            "(less than TTL setting) and has not been deregistered."
+                        )
+                        resource_action = "skip - TTL"
+                else:
+                    self.logging.debug(
+                        f"EC2 Image '{resource_id}' has been whitelisted and has not "
+                        "been deregistered."
+                    )
+                    resource_action = "skip - whitelist"
+
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
+                    "EC2", {}
+                ).setdefault("Image", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
+
+            self.logging.debug("Finished cleanup of EC2 Images.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of EC2 Images.")
             return True
 
     def instances(self):
@@ -125,6 +218,8 @@ class EC2Cleanup:
         If Instance has termination protection enabled, the protection will
         be first disabled and then the Instance will be terminated.
         """
+
+        self.logging.debug("Started cleanup of EC2 Instances.")
 
         clean = (
             self.settings.get("services", {})
@@ -261,6 +356,8 @@ class EC2Cleanup:
                             ),
                         }
                     )
+
+            self.logging.debug("Finished cleanup of EC2 Instances.")
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Instances.")
@@ -270,6 +367,8 @@ class EC2Cleanup:
         """
         Deletes Security Groups not attached to an EC2 Instance.
         """
+
+        self.logging.debug("Started cleanup of EC2 Security Groups.")
 
         clean = (
             self.settings.get("services", {})
@@ -343,6 +442,8 @@ class EC2Cleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of EC2 Security Groups.")
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Security Groups.")
@@ -352,6 +453,8 @@ class EC2Cleanup:
         """
         Deletes Snapshots not attached to EBS volumes.
         """
+
+        self.logging.debug("Started cleanup of EC2 Snapshots.")
 
         clean = (
             self.settings.get("services", {})
@@ -385,10 +488,12 @@ class EC2Cleanup:
                     snapshots_in_use = []
                     try:
                         images = self.client_ec2.describe_images(
-                            ExecutableUsers=[self.account_number]
+                            Owners=[
+                                "self",
+                            ]
                         ).get("Images")
                     except:
-                        self.logging.error(f"Could not retrieve EC2 AMIs.")
+                        self.logging.error(f"Could not retrieve EC2 Images.")
                         self.logging.error(sys.exc_info()[1])
                         resource_action = "error"
                         continue
@@ -404,8 +509,8 @@ class EC2Cleanup:
 
                     # cannot retrieve all image to snapshot mappings for whatever reason
                     # to work around this, looking at the Description field of the Snapshot
-                    # tells us if the Snapshot was made for an AMI hence prevention its deletion
-                    # without first deleting the AMI
+                    # tells us if the Snapshot was made for an Image hence prevention its deletion
+                    # without first deleting the Image
                     if (
                         resource_id not in snapshots_in_use
                         and "for ami-" not in resource.get("Description")
@@ -441,8 +546,8 @@ class EC2Cleanup:
                             resource_action = "skip - TTL"
                     else:
                         self.logging.warn(
-                            f"EC2 Snapshot '{resource_id}' is currently used by an AMI "
-                            "and cannot been deleted without deleting the AMI first."
+                            f"EC2 Snapshot '{resource_id}' is currently used by an Image "
+                            "and cannot been deleted without deleting the Image first."
                         )
                         resource_action = "skip - in use"
                 else:
@@ -462,6 +567,8 @@ class EC2Cleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of EC2 Snapshots.")
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Snapshots.")
@@ -471,6 +578,8 @@ class EC2Cleanup:
         """
         Deletes Volumes not attached to an EC2 Instance.
         """
+
+        self.logging.debug("Started cleanup of EC2 Volumes.")
 
         clean = (
             self.settings.get("services", {})
@@ -550,6 +659,8 @@ class EC2Cleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Started cleanup of EC2 Volumes.")
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Volumes.")

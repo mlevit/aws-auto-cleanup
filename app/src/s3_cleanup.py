@@ -38,6 +38,8 @@ class S3Cleanup:
         are first deleted before the Bucket can be deleted.
         """
 
+        self.logging.debug("Started cleanup of S3 Buckets.")
+
         clean = (
             self.settings.get("services", {})
             .get("s3", {})
@@ -152,6 +154,8 @@ class S3Cleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of S3 Buckets.")
             return True
         else:
             self.logging.info("Skipping cleanup of S3 Buckets.")

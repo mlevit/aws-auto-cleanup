@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "2"
+      "N": "3"
     }
   },
   {
@@ -68,6 +68,19 @@
                 },
                 "id": {
                   "S": "allocation_id"
+                }
+              }
+            },
+            "image": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "image_id"
+                },
+                "ttl": {
+                  "N": "7"
                 }
               }
             },

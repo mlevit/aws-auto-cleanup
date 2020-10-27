@@ -30,6 +30,8 @@ class DynamoDBCleanup:
         Deletes DynamoDB Tables.
         """
 
+        self.logging.debug("Started cleanup of DynamoDB Tables.")
+
         clean = (
             self.settings.get("services", {})
             .get("dynamodb", {})
@@ -110,6 +112,8 @@ class DynamoDBCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of DynamoDB Tables.")
             return True
         else:
             self.logging.info("Skipping cleanup of DynamoDB Tables.")

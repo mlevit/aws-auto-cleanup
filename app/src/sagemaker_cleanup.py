@@ -31,6 +31,8 @@ class SageMakerCleanup:
         Deletes SageMaker Endpoints.
         """
 
+        self.logging.debug("Started cleanup of SageMaker Endpoints.")
+
         clean = (
             self.settings.get("services", {})
             .get("sagemaker", {})
@@ -110,6 +112,8 @@ class SageMakerCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of SageMaker Endpoints.")
             return True
         else:
             self.logging.info("Skipping cleanup of SageMaker Endpoints.")
@@ -119,6 +123,8 @@ class SageMakerCleanup:
         """
         Deletes SageMaker Notebook Instances.
         """
+
+        self.logging.debug("Started cleanup of SageMaker Notebook Instances.")
 
         clean = (
             self.settings.get("services", {})
@@ -220,6 +226,8 @@ class SageMakerCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of SageMaker Notebook Instances.")
             return True
         else:
             self.logging.info("Skipping cleanup of SageMaker Notebook Instances.")

@@ -30,6 +30,8 @@ class ElasticsearchServiceCleanup:
         Deletes Elasticsearch Service Domains.
         """
 
+        self.logging.debug("Started cleanup of Elasticsearch Service Domains.")
+
         clean = (
             self.settings.get("services", {})
             .get("elasticsearch", {})
@@ -125,6 +127,8 @@ class ElasticsearchServiceCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Elasticsearch Service Domains.")
             return True
         else:
             self.logging.info("Skipping cleanup of Elasticsearch Service Domains.")

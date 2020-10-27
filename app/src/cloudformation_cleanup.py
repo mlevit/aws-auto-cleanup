@@ -33,6 +33,8 @@ class CloudFormationCleanup:
         Deletes CloudFormation Stacks.
         """
 
+        self.logging.debug("Started cleanup of CloudFormation Stacks.")
+
         clean = (
             self.settings.get("services", {})
             .get("cloudformation", {})
@@ -70,6 +72,8 @@ class CloudFormationCleanup:
             # make sure that all threads have finished
             for thread in threads:
                 thread.join()
+
+            self.logging.debug("Finished cleanup of CloudFormation Stacks.")
         else:
             self.logging.info("Skipping cleanup of CloudFormation Stacks.")
             return True

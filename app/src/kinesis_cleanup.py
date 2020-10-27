@@ -30,6 +30,8 @@ class KinesisCleanup:
         Deletes Kinesis Streams.
         """
 
+        self.logging.debug("Started cleanup of Kinesis Streams.")
+
         clean = (
             self.settings.get("services", {})
             .get("kinesis", {})
@@ -125,6 +127,8 @@ class KinesisCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Kinesis Streams.")
             return True
         else:
             self.logging.info("Skipping cleanup of Kinesis Streams.")

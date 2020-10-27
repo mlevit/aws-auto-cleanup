@@ -60,13 +60,13 @@ provider:
         - ec2:DeleteSecurityGroup
         - ec2:DeleteSnapshot
         - ec2:DeleteVolume
+        - ec2:DeregisterImage
         - ec2:DescribeAddresses
         - ec2:DescribeImages
         - ec2:DescribeInstanceAttribute
         - ec2:DescribeInstances
         - ec2:DescribeSecurityGroups
         - ec2:DescribeSnapshots
-        - ec2:DescribeVolumes
         - ec2:DescribeVolumes
         - ec2:ModifyInstanceAttribute
         - ec2:ReleaseAddress

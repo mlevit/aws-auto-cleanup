@@ -32,6 +32,8 @@ class ElasticBeanstalkCleanup:
         Deletes Elastic Beanstalk Applications.
         """
 
+        self.logging.debug("Started cleanup of Elastic Beanstalk Applications.")
+
         clean = (
             self.settings.get("services", {})
             .get("elasticbeanstalk", {})
@@ -108,6 +110,8 @@ class ElasticBeanstalkCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Elastic Beanstalk Applications.")
             return True
         else:
             self.logging.info("Skipping cleanup of Elastic Beanstalk Applications.")
