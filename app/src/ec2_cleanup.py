@@ -465,7 +465,9 @@ class EC2Cleanup:
         if clean:
             try:
                 resources = self.client_ec2.describe_snapshots(
-                    OwnerIds=[self.account_number]
+                    OwnerIds=[
+                        "self",
+                    ]
                 ).get("Snapshots")
             except:
                 self.logging.error("Could not list all EC2 Snapshots.")
@@ -507,14 +509,7 @@ class EC2Cleanup:
                                     block_device_mapping.get("Ebs").get("SnapshotId")
                                 )
 
-                    # cannot retrieve all image to snapshot mappings for whatever reason
-                    # to work around this, looking at the Description field of the Snapshot
-                    # tells us if the Snapshot was made for an Image hence prevention its deletion
-                    # without first deleting the Image
-                    if (
-                        resource_id not in snapshots_in_use
-                        and "for ami-" not in resource.get("Description")
-                    ):
+                    if resource_id not in snapshots_in_use:
                         delta = Helper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
