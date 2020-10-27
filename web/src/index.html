@@ -250,84 +250,112 @@
             </header>
             <div class="box" style="border-radius: 0px !important">
               <div class="content">
-                <h2>Log</h2>
-                <table class="table" id="execution-log-table">
-                  <thead>
-                    <tr>
-                      <th>Timestamp</th>
-                      <th>Region</th>
-                      <th>Service</th>
-                      <th>Resource</th>
-                      <th>ID</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="item in executionLogTable" :key="item.id">
-                      <td style="white-space: nowrap">{{ item[6] }}</td>
-                      <td style="white-space: nowrap">{{ item[1] }}</td>
-                      <td style="white-space: nowrap">{{ item[2] }}</td>
-                      <td style="white-space: nowrap">{{ item[3] }}</td>
-                      <td>{{ item[4] }}</td>
-                      <td style="white-space: nowrap">{{ item[5] }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <h2>Statistics</h2>
-                <div class="columns">
-                  <div class="column">
+                <div class="tabs is-toggle">
+                  <ul style="margin: 0px !important">
+                    <li class="tab is-active" onclick="openTab(event,'logs')">
+                      <a>
+                        <span class="icon is-small"
+                          ><i class="fas fa-bars" aria-hidden="true"></i
+                        ></span>
+                        <span>Logs</span>
+                      </a>
+                    </li>
+                    <li class="tab" onclick="openTab(event,'statistics')">
+                      <a>
+                        <span class="icon is-small"
+                          ><i class="far fa-chart-bar" aria-hidden="true"></i
+                        ></span>
+                        <span>Statistics</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="container is-fluid" style="padding: 0px !important">
+                  <div id="logs" class="content-tab">
                     <table class="table" id="execution-log-table">
                       <thead>
                         <tr>
-                          <th>Resource</th>
-                          <th>Count</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="key in Object.keys(executionLogServiceStats).sort()"
-                        >
-                          <td style="white-space: nowrap">{{key}}</td>
-                          <td>{{executionLogServiceStats[key]}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="column">
-                    <table class="table" id="execution-log-table">
-                      <thead>
-                        <tr>
-                          <th>Action</th>
-                          <th>Count</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="key in Object.keys(executionLogActionStats).sort()"
-                        >
-                          <td style="white-space: nowrap">{{key}}</td>
-                          <td>{{executionLogActionStats[key]}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="column">
-                    <table class="table" id="execution-log-table">
-                      <thead>
-                        <tr>
+                          <th>Timestamp</th>
                           <th>Region</th>
-                          <th>Count</th>
+                          <th>Service</th>
+                          <th>Resource</th>
+                          <th>ID</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr
-                          v-for="key in Object.keys(executionLogRegionStats).sort()"
-                        >
-                          <td style="white-space: nowrap">{{key}}</td>
-                          <td>{{executionLogRegionStats[key]}}</td>
+                        <tr v-for="item in executionLogTable" :key="item.id">
+                          <td style="white-space: nowrap">{{ item[6] }}</td>
+                          <td style="white-space: nowrap">{{ item[1] }}</td>
+                          <td style="white-space: nowrap">{{ item[2] }}</td>
+                          <td style="white-space: nowrap">{{ item[3] }}</td>
+                          <td>{{ item[4] }}</td>
+                          <td style="white-space: nowrap">{{ item[5] }}</td>
                         </tr>
                       </tbody>
                     </table>
+                  </div>
+                  <div
+                    id="statistics"
+                    class="content-tab"
+                    style="display: none"
+                  >
+                    <div class="columns">
+                      <div class="column">
+                        <table class="table" id="execution-log-table">
+                          <thead>
+                            <tr>
+                              <th>Resource</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="key in Object.keys(executionLogServiceStats).sort()"
+                            >
+                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{executionLogServiceStats[key]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="column">
+                        <table class="table" id="execution-log-table">
+                          <thead>
+                            <tr>
+                              <th>Action</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="key in Object.keys(executionLogActionStats).sort()"
+                            >
+                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{executionLogActionStats[key]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="column">
+                        <table class="table" id="execution-log-table">
+                          <thead>
+                            <tr>
+                              <th>Region</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="key in Object.keys(executionLogRegionStats).sort()"
+                            >
+                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{executionLogRegionStats[key]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div

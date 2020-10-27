@@ -12,6 +12,7 @@ table.table {
 
 .execution-log-modal {
   width: calc(100vw - 40px) !important;
+  height: calc(100vh - 40px) !important;
 }
 
 .execution-log-modal .table {
