@@ -128,15 +128,33 @@
 
       <!-- Body -->
       <div class="container body-container">
-        <h2 class="title">
-          Whitelist&nbsp;<button
-            class="button is-warning"
-            v-on:click="openWhitelistInsertPopup()"
-          >
-            <span class="icon"> <i class="fas fa-plus"></i> </span>
-            <span>New Entry</span>
-          </button>
-        </h2>
+        <nav class="level">
+          <div class="level-left">
+            <h3 class="title is-3 mb-0 mr-2">Whitelist</h3>
+            <!-- <h2 class="title">Whitelist</h2> -->
+            <button
+              class="button is-warning"
+              v-on:click="openWhitelistInsertPopup()"
+            >
+              <span class="icon"> <i class="fas fa-plus"></i> </span>
+              <span>New Entry</span>
+            </button>
+          </div>
+          <div class="level-right">
+            <div class="control has-icons-left is-right">
+              <input
+                class="input"
+                placeholder="Search"
+                type="text"
+                v-model="whitelistSearchTerm"
+                v-on:keyup="searchWhitelist()"
+              />
+              <span class="icon is-left">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+          </div>
+        </nav>
         <table class="table" id="whitelist">
           <thead>
             <tr>
@@ -188,7 +206,26 @@
         <br />
 
         <!-- Execution Log -->
-        <h2 class="title">Execution Logs</h2>
+        <!-- <h2 class="title"></h2> -->
+        <nav class="level">
+          <div class="level-left">
+            <h3 class="title is-3 mt-2 mb-0 mr-2">Execution Logs</h3>
+          </div>
+          <!-- <div class="level-right">
+            <div class="control has-icons-left is-right">
+              <input
+                class="input"
+                placeholder="Search"
+                type="text"
+                v-model="executionLogSearchTerm"
+                v-on:keyup="searchExecutionLog()"
+              />
+              <span class="icon is-left">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+          </div> -->
+        </nav>
 
         <table class="table" id="execution-log-list-table">
           <thead>
@@ -263,7 +300,7 @@
                 <nav class="level">
                   <div class="level-left">
                     <div class="tabs is-toggle">
-                      <ul style="margin: 0px !important">
+                      <ul class="m-0">
                         <li
                           class="tab is-active"
                           onclick="openTab(event,'logs')"
@@ -296,7 +333,7 @@
                         placeholder="Search"
                         type="text"
                         v-model="executionLogSearchTerm"
-                        v-on:keyup="executionLogSearch()"
+                        v-on:keyup="searchExecutionLog()"
                       />
                       <span class="icon is-left">
                         <i class="fas fa-search"></i>
@@ -304,7 +341,7 @@
                     </div>
                   </div>
                 </nav>
-                <div class="container is-fluid" style="padding: 0px !important">
+                <div class="container is-fluid p-0">
                   <div id="logs" class="content-tab">
                     <table class="table" id="execution-log-table">
                       <thead>

@@ -19,6 +19,7 @@ var app = new Vue({
   data: {
     accountId: "",
     executionLogActionStats: {},
+    executionLogDataTables: "",
     executionLogKey: "",
     executionLogList: [],
     executionLogMode: "",
@@ -26,7 +27,6 @@ var app = new Vue({
     executionLogSearchTerm: "",
     executionLogServiceStats: {},
     executionLogTable: [],
-    executionLogDataTables: "",
     resourceIdPlaceholder: "",
     resourceList: [],
     selectedComment: "",
@@ -46,6 +46,8 @@ var app = new Vue({
     showWhitelistLoadingGif: false,
     showWhitelistPopup: false,
     whitelist: [],
+    whitelistDataTables: "",
+    whitelistSearchTerm: "",
   },
   methods: {
     // Whitelist
@@ -114,6 +116,9 @@ var app = new Vue({
       this.showWhitelistPopup = true;
       this.resourceIdPlaceholder = "";
     },
+    searchWhitelist: function () {
+      this.whitelistDataTables.search(this.whitelistSearchTerm).draw();
+    },
     // Execution Log
     closeExecutionLogPopup: function () {
       this.executionLogDataTables.destroy();
@@ -123,11 +128,11 @@ var app = new Vue({
       this.executionLogServiceStats = {};
       this.showExecutionLogPopup = false;
     },
-    executionLogSearch: function () {
-      this.executionLogDataTables.search(this.executionLogSearchTerm).draw();
-    },
     openExecutionLog: function (keyURL) {
       getExecutionLog(keyURL);
+    },
+    searchExecutionLog: function () {
+      this.executionLogDataTables.search(this.executionLogSearchTerm).draw();
     },
     // Help
     closeHelpPopup: function () {
@@ -228,6 +233,7 @@ function getExecutionLogList() {
       });
       setTimeout(function () {
         $("#execution-log-list-table").DataTable({
+          dom: "rtp",
           columnDefs: [
             { orderable: false, targets: [2] },
             { className: "dt-center", targets: [2] },
@@ -305,7 +311,8 @@ function getWhitelist() {
       });
 
       setTimeout(function () {
-        $("#whitelist").DataTable({
+        app.whitelistDataTables = $("#whitelist").DataTable({
+          dom: "rtp",
           columnDefs: [
             { orderable: false, targets: [3, 4] },
             { className: "dt-center", targets: [4] },
