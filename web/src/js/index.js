@@ -235,7 +235,7 @@ function getExecutionLogList() {
         $("#execution-log-list-table").DataTable({
           dom: "rtp",
           columnDefs: [
-            { orderable: false, targets: [2] },
+            { orderable: false, targets: [0, 1, 2] },
             { className: "dt-center", targets: [2] },
           ],
           order: [[0, "desc"]],
