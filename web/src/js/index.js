@@ -312,11 +312,21 @@ function getWhitelist() {
 
       setTimeout(function () {
         app.whitelistDataTables = $("#whitelist").DataTable({
-          dom: "rtp",
           columnDefs: [
-            { orderable: false, targets: [3, 4] },
-            { className: "dt-center", targets: [4] },
+            { className: "dt-center", targets: [5] },
+            { orderable: false, targets: [0, 1, 2, 3, 4, 5] },
+            {
+              targets: [4],
+              visible: false,
+              searchable: false,
+            },
           ],
+          dom: "rtp",
+          order: [[4, "desc"]],
+          pageLength: 50,
+          rowGroup: {
+            dataSrc: 4,
+          },
         });
       }, 10);
 

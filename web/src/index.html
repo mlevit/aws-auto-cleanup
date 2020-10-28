@@ -162,6 +162,7 @@
               <th>Expiration</th>
               <th>Owner</th>
               <th>Comment</th>
+              <th>Type</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -169,24 +170,30 @@
             <tr v-for="item in whitelist" :key="item.id">
               <td style="white-space: nowrap">{{ item.resource_id }}</td>
               <td style="white-space: nowrap">
-                {{ item.expiration_readable }}
+                <span v-if="item.expiration < '4102444800'"
+                  >{{ item.expiration_readable }}</span
+                >
               </td>
               <td style="white-space: nowrap">{{ item.owner }}</td>
               <td>{{ item.comment }}</td>
+              <td>
+                <span v-if="item.expiration < '4102444800'">Temporary</span>
+                <span v-if="item.expiration >= '4102444800'">Permanent</span>
+              </td>
               <td style="white-space: nowrap">
                 <a
-                  v-if="item.expiration !== '99999999999'"
-                  v-on:click="extendWhitelistEntry( item.id )"
                   class="button is-warning"
+                  v-if="item.expiration < '4102444800'"
+                  v-on:click="extendWhitelistEntry( item.id )"
                 >
                   <span class="icon">
                     <i class="far fa-calendar-plus"></i>
                   </span>
                 </a>
                 <button
-                  v-if="item.expiration !== '99999999999'"
-                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
                   class="button is-danger"
+                  v-if="item.expiration < '4102444800'"
+                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
                 >
                   <span class="icon">
                     <i class="far fa-trash-alt"></i>
@@ -697,6 +704,11 @@
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"
       integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-rowgroup/1.1.2/dataTables.rowGroup.min.js"
+      integrity="sha512-ock7SbKoWBDD9MiniUi9p7WlkqpfRL1sM3CsWX7LxORuyLPRyzR484V8SVrTIWqhxtCVNnfcbOo+cRlHIhiwbg=="
       crossorigin="anonymous"
     ></script>
     <script
