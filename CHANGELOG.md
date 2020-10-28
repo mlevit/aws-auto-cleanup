@@ -1,5 +1,7 @@
 # AWS Auto Cleanup Changelog
 
+## 1.2.0
+
 ## 1.1.0
 
 - Added AWS Account ID to the navigation bar and webpage title.
