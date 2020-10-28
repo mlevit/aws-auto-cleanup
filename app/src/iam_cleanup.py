@@ -325,7 +325,6 @@ class IAMCleanup:
                             {
                                 "id": resource_id,
                                 "action": resource_action,
-                                "age": delta.days,
                                 "timestamp": datetime.datetime.now().strftime(
                                     "%Y-%m-%d %H:%M:%S"
                                 ),
