@@ -17,9 +17,15 @@ function convertJsonToGet(formJSON) {
 var app = new Vue({
   el: "#app",
   data: {
+    accountId: "",
+    executionLogActionStats: {},
+    executionLogDataTables: "",
     executionLogKey: "",
     executionLogList: [],
-    executionLogMode: false,
+    executionLogMode: "",
+    executionLogRegionStats: {},
+    executionLogSearchTerm: "",
+    executionLogServiceStats: {},
     executionLogTable: [],
     resourceIdPlaceholder: "",
     resourceList: [],
@@ -30,14 +36,18 @@ var app = new Vue({
     selectedResourceId: "",
     selectedService: "",
     serviceList: [],
-    settings: [],
-    showWhitelistDeletePopup: false,
+    serviceSettings: [],
+    serviceSettingsFlat: [],
     showExecutionLogListLoadingGif: false,
     showExecutionLogLoadingGif: false,
     showExecutionLogPopup: false,
+    showHelpPopup: false,
+    showWhitelistDeletePopup: false,
     showWhitelistLoadingGif: false,
     showWhitelistPopup: false,
     whitelist: [],
+    whitelistDataTables: "",
+    whitelistSearchTerm: "",
   },
   methods: {
     // Whitelist
@@ -89,10 +99,12 @@ var app = new Vue({
       sendApiRequest(convertJsonToGet(formData), "PUT");
     },
     updateResourceID: function (service, resource) {
-      this.resourceIdPlaceholder = this.settings[service][resource]["id"];
+      this.resourceIdPlaceholder = this.serviceSettings[service][resource][
+        "id"
+      ];
     },
     updateResourceList: function (service) {
-      this.resourceList = Object.keys(this.settings[service]);
+      this.resourceList = Object.keys(this.serviceSettings[service]);
       this.resourceIdPlaceholder = "";
     },
     openWhitelistDeletePopup: function (resourceId) {
@@ -104,13 +116,30 @@ var app = new Vue({
       this.showWhitelistPopup = true;
       this.resourceIdPlaceholder = "";
     },
+    searchWhitelist: function () {
+      this.whitelistDataTables.search(this.whitelistSearchTerm).draw();
+    },
     // Execution Log
+    closeExecutionLogPopup: function () {
+      this.executionLogDataTables.destroy();
+
+      this.executionLogActionStats = {};
+      this.executionLogRegionStats = {};
+      this.executionLogServiceStats = {};
+      this.showExecutionLogPopup = false;
+    },
     openExecutionLog: function (keyURL) {
       getExecutionLog(keyURL);
     },
-    closeExecutionLogPopup: function () {
-      $("#execution-log-table").DataTable().destroy();
-      this.showExecutionLogPopup = false;
+    searchExecutionLog: function () {
+      this.executionLogDataTables.search(this.executionLogSearchTerm).draw();
+    },
+    // Help
+    closeHelpPopup: function () {
+      this.showHelpPopup = false;
+    },
+    openHelpPopup: function () {
+      this.showHelpPopup = true;
     },
   },
 });
@@ -152,26 +181,35 @@ function getExecutionLog(executionLogURL) {
       app.executionLogTable = data["response"]["body"];
       app.executionLogKey = decodeURIComponent(executionLogURL);
 
+      setTimeout(function () {
+        app.executionLogDataTables = $("#execution-log-table").DataTable({
+          dom: "lrti",
+          autoWidth: true,
+          paging: false,
+        });
+        app.showExecutionLogLoadingGif = false;
+      }, 10);
+
+      // Get execution mode
       if (data["response"]["body"][0][7] == "True") {
         app.executionLogMode = "Dry Run";
       } else {
         app.executionLogMode = "Destroy";
       }
 
-      setTimeout(function () {
-        $("#execution-log-table").DataTable({
-          paging: false,
-          autoWidth: true,
-          columnDefs: [
-            {
-              className: "dt-body-nowrap",
-              targets: [1, 2, 3, 5],
-            },
-            { className: "dt-nowrap", targets: [1, 2, 3, 5] },
-          ],
-        });
-        app.showExecutionLogLoadingGif = false;
-      }, 10);
+      for (const log of data["response"]["body"]) {
+        // action taken
+        app.executionLogActionStats[log["5"]] =
+          ++app.executionLogActionStats[log["5"]] || 1;
+
+        // service and resource
+        app.executionLogServiceStats[log["2"] + " " + log["3"]] =
+          ++app.executionLogServiceStats[log["2"] + " " + log["3"]] || 1;
+
+        // region
+        app.executionLogRegionStats[log["1"]] =
+          ++app.executionLogRegionStats[log["1"]] || 1;
+      }
     })
     .catch((error) => {
       iziToast.error({
@@ -195,10 +233,12 @@ function getExecutionLogList() {
       });
       setTimeout(function () {
         $("#execution-log-list-table").DataTable({
+          dom: "rtp",
           columnDefs: [
             { orderable: false, targets: [2] },
             { className: "dt-center", targets: [2] },
           ],
+          order: [[0, "desc"]],
         });
       }, 10);
       app.showExecutionLogListLoadingGif = false;
@@ -213,19 +253,34 @@ function getExecutionLogList() {
     });
 }
 
-// Get settings
-function getSettings() {
+// Get supported services
+function getServices() {
   fetch(API_SERVICES)
     .then((response) => response.json())
     .then((data) => {
-      app.settings = data["response"];
+      app.serviceSettings = data["response"];
+
+      // get list of supported services
       app.serviceList = Object.keys(data["response"]);
+
+      // convert settings to flat table
+      for (const service in data["response"]) {
+        for (resource in data["response"][service]) {
+          app.serviceSettingsFlat.push({
+            service: service,
+            resource: resource,
+            ttl: data["response"][service][resource]["ttl"],
+            enabled: data["response"][service][resource]["clean"],
+          });
+        }
+      }
     })
     .catch((error) => {
       iziToast.error({
         title: "Something went wrong",
         message: error,
         color: "#EC2B55",
+        titleColor: "white",
         messageColor: "white",
       });
     });
@@ -256,14 +311,11 @@ function getWhitelist() {
       });
 
       setTimeout(function () {
-        $("#whitelist").DataTable({
+        app.whitelistDataTables = $("#whitelist").DataTable({
+          dom: "rtp",
           columnDefs: [
             { orderable: false, targets: [3, 4] },
             { className: "dt-center", targets: [4] },
-            {
-              className: "dt-body-nowrap",
-              targets: [0, 1, 2],
-            },
           ],
         });
       }, 10);
@@ -309,6 +361,20 @@ function refreshWhitelist() {
     });
 }
 
+function openTab(evt, tabName) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("content-tab");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tab");
+  for (i = 0; i < x.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" is-active", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " is-active";
+}
+
 // Get the API Gateway Base URL from manifest file
 fetch("serverless.manifest.json").then(function (response) {
   response.json().then(function (data) {
@@ -319,8 +385,16 @@ fetch("serverless.manifest.json").then(function (response) {
     API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
     API_EXECLOG = API_BASE + API_EXECLOG;
 
+    for (output of data["prod"]["outputs"]) {
+      if (output["OutputKey"] === "AccountID") {
+        app.accountId = output["OutputValue"];
+        document.title = "AWS Auto Cleanup - " + output["OutputValue"];
+        break;
+      }
+    }
+
     getWhitelist();
     getExecutionLogList();
-    getSettings();
+    getServices();
   });
 });

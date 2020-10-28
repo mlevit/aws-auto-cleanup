@@ -31,6 +31,8 @@ class ECSCleanup:
         Deletes ECS Clusters.
         """
 
+        self.logging.debug("Started cleanup of ECS Clusters.")
+
         clean = (
             self.settings.get("services", {})
             .get("ecs", {})
@@ -57,6 +59,7 @@ class ECSCleanup:
                         f"Could not get ECS Cluster's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
                     return False
 
                 resource_id = resource_details.get("clusterName")
@@ -70,22 +73,22 @@ class ECSCleanup:
                 if resource_id not in self.whitelist.get("ecs", {}).get("cluster", []):
                     if not self.settings.get("general", {}).get("dry_run", True):
                         if resource_status not in ("ACTIVE", "FAILED"):
-                            self.logging.error(
+                            self.logging.warn(
                                 f"ECS Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "skip - in use"
                             continue
                         elif resource_active_service_count > 0:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"ECS Cluster '{resource_id}' has {resource_active_service_count} active services running and cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "skip - in use"
                             continue
                         elif resource_running_task_count > 0:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"ECS Cluster '{resource_id}' has {resource_running_task_count} running tasks and cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "skip - in use"
                             continue
                         else:
                             try:
@@ -100,10 +103,8 @@ class ECSCleanup:
                                 resource_action = "error"
                                 continue
 
-                            self.logging.info(
-                                f"ECS Cluster '{resource_id}' has been deleted."
-                            )
-                            resource_action = "delete"
+                    self.logging.info(f"ECS Cluster '{resource_id}' has been deleted.")
+                    resource_action = "delete"
                 else:
                     self.logging.debug(
                         f"ECS Cluster '{resource_id}' has been whitelisted and has not been deleted."
@@ -111,8 +112,8 @@ class ECSCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "ecs", {}
-                ).setdefault("cluster", []).append(
+                    "ECS", {}
+                ).setdefault("Cluster", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -121,6 +122,8 @@ class ECSCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of ECS Clusters.")
             return True
         else:
             self.logging.info("Skipping cleanup of ECS Clusters.")
@@ -130,6 +133,8 @@ class ECSCleanup:
         """
         Deletes ECS Services.
         """
+
+        self.logging.debug("Started cleanup of ECS Services.")
 
         clean = (
             self.settings.get("services", {})
@@ -208,10 +213,11 @@ class ECSCleanup:
                                         resource_action = "error"
                                         continue
                                 else:
-                                    self.logging.error(
+                                    self.logging.warn(
                                         f"ECS Service '{resource_id}' in state '{resource_status}' cannot be deleted."
                                     )
-                                    resource_action = "error"
+                                    resource_action = "skip - in use"
+                                    continue
 
                             self.logging.info(
                                 f"ECS Service '{resource_id}' was created {delta.days} days ago "
@@ -232,7 +238,7 @@ class ECSCleanup:
 
                     self.execution_log.get("AWS").setdefault(
                         self.region, {}
-                    ).setdefault("ecs", {}).setdefault("service", []).append(
+                    ).setdefault("ECS", {}).setdefault("Service", []).append(
                         {
                             "id": resource_id,
                             "action": resource_action,
@@ -241,7 +247,9 @@ class ECSCleanup:
                             ),
                         }
                     )
-                return True
+
+            self.logging.debug("Finished cleanup of ECS Services.")
+            return True
         else:
             self.logging.info("Skipping cleanup of ECS Services.")
             return True

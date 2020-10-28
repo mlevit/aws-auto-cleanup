@@ -47,7 +47,7 @@ class Cleanup:
         else:
             self.logging.info(f"Auto Cleanup started in DESTROY mode.")
 
-        for region in self.settings.get("regions"):
+        for region in sorted(self.settings.get("regions")):
             if self.settings.get("regions").get(region).get("clean"):
                 self.logging.info(f"Switching to '{region}' region.")
 

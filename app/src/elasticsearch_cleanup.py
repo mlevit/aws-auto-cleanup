@@ -30,6 +30,8 @@ class ElasticsearchServiceCleanup:
         Deletes Elasticsearch Service Domains.
         """
 
+        self.logging.debug("Started cleanup of Elasticsearch Service Domains.")
+
         clean = (
             self.settings.get("services", {})
             .get("elasticsearch", {})
@@ -68,6 +70,7 @@ class ElasticsearchServiceCleanup:
                         f"Could not get Elasticsearch Service Domain '{resource_id}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
                     return False
 
                 resource_date = (
@@ -96,11 +99,11 @@ class ElasticsearchServiceCleanup:
                                 resource_action = "error"
                                 continue
 
-                            self.logging.info(
-                                f"Elasticsearch Service Domain '{resource_id}' was last modified {delta.days} days ago "
-                                "and has been deleted."
-                            )
-                            resource_action = "delete"
+                        self.logging.info(
+                            f"Elasticsearch Service Domain '{resource_id}' was last modified {delta.days} days ago "
+                            "and has been deleted."
+                        )
+                        resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"Elasticsearch Service Domain '{resource_id}' was created {delta.days} days ago "
@@ -114,8 +117,8 @@ class ElasticsearchServiceCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "elasticsearch", {}
-                ).setdefault("domain", []).append(
+                    "Elasticsearch Service", {}
+                ).setdefault("Domain", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -124,6 +127,8 @@ class ElasticsearchServiceCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Elasticsearch Service Domains.")
             return True
         else:
             self.logging.info("Skipping cleanup of Elasticsearch Service Domains.")

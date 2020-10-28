@@ -1,5 +1,6 @@
 import sys
 import datetime
+import threading
 
 import boto3
 
@@ -32,6 +33,8 @@ class CloudFormationCleanup:
         Deletes CloudFormation Stacks.
         """
 
+        self.logging.debug("Started cleanup of CloudFormation Stacks.")
+
         clean = (
             self.settings.get("services", {})
             .get("cloudformation", {})
@@ -53,90 +56,177 @@ class CloudFormationCleanup:
                 .get("ttl", 7)
             )
 
+            # threads list
+            threads = []
+
             for resource in resources:
-                resource_id = resource.get("StackName")
-                resource_date = (
-                    resource.get("LastUpdatedTime")
-                    if resource.get("LastUpdatedTime") is not None
-                    else resource.get("CreationTime")
+                thread = threading.Thread(
+                    target=self.delete_stack, args=(resource, ttl_days)
                 )
-                resource_action = "skip"
+                threads.append(thread)
 
-                if resource_id not in self.whitelist.get("cloudformation", {}).get(
-                    "stack", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-                    if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
-                                self.client_cloudformation.delete_stack(
-                                    StackName=resource_id
-                                )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete CloudFormation Stack '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
+            # start all threads
+            for thread in threads:
+                thread.start()
 
-                        self.logging.info(
-                            f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
-                    else:
-                        self.logging.debug(
-                            f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
-                            "(less than TTL setting) and has not been deleted."
-                        )
-                        resource_action = "skip - TTL"
-                else:
-                    self.logging.debug(
-                        f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
-                        "been deleted."
-                    )
-                    resource_action = "skip - whitelist"
+            # make sure that all threads have finished
+            for thread in threads:
+                thread.join()
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "CloudFormation", {}
-                ).setdefault("Stack", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
-                )
-
-                # For CloudFormation Stacks that are not deleted, add all physical
-                # resources into the Whitelist dictionary to prevent the need to whitelist
-                # each and every resource
-                if resource_action != "delete":
-                    try:
-                        resource_details = (
-                            self.client_cloudformation.describe_stack_resources(
-                                StackName=resource_id
-                            ).get("StackResources")
-                        )
-                    except:
-                        self.logging.error("Could not Describe Stack Resources.")
-                        self.logging.error(sys.exc_info()[1])
-                        return False
-
-                    for _ in resource_details:
-                        resource_child_id = _.get("PhysicalResourceId")
-                        platform, service, resource = _.get("ResourceType").split("::")
-
-                        self.whitelist.setdefault(service.lower(), {}).setdefault(
-                            resource.lower(), set()
-                        ).add(resource_child_id)
-
-                        self.logging.debug(
-                            f"{service} {resource} '{resource_child_id}' has been added to the whitelist."
-                        )
-            return True
+            self.logging.debug("Finished cleanup of CloudFormation Stacks.")
         else:
             self.logging.info("Skipping cleanup of CloudFormation Stacks.")
             return True
+
+    def delete_stack(self, resource, ttl_days):
+        resource_id = resource.get("StackName")
+        resource_date = (
+            resource.get("LastUpdatedTime")
+            if resource.get("LastUpdatedTime") is not None
+            else resource.get("CreationTime")
+        )
+        resource_status = resource.get("StackStatus")
+        resource_protection = True  # resource.get("EnableTerminationProtection")
+        resource_action = "skip"
+
+        if resource_id not in self.whitelist.get("cloudformation", {}).get("stack", []):
+            delta = Helper.get_day_delta(resource_date)
+            if delta.days > ttl_days:
+                if not self.settings.get("general", {}).get("dry_run", True):
+                    # form a list of resources that cannot be delete
+                    retain_resources = []
+                    if resource_status in ("DELETE_FAILED"):
+                        try:
+                            stack_resources = (
+                                self.client_cloudformation.list_stack_resources(
+                                    StackName=resource_id
+                                )
+                            ).get("StackResourceSummaries")
+                        except:
+                            self.logging.error(
+                                f"Could not retrieve a list of Stack Resources for CloudFormation Stack '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            self.log_execution(resource_id, "error")
+                            return False
+
+                        for stack_resource in stack_resources:
+                            if stack_resource.get("ResourceStatus") in (
+                                "DELETE_FAILED"
+                            ) and stack_resource.get("ResourceType") in (
+                                "AWS::S3::Bucket"
+                            ):
+                                retain_resources.append(
+                                    stack_resource.get("LogicalResourceId")
+                                )
+
+                    # remove termination protection
+                    if resource_protection:
+                        try:
+                            self.client_cloudformation.update_termination_protection(
+                                EnableTerminationProtection=False,
+                                StackName=resource_id,
+                            )
+                            self.logging.info(
+                                f"Termination Protection for CloudFormation Stack '{resource_id}' disabled."
+                            )
+                        except:
+                            self.logging.error(
+                                f"Could not disable Termination Protection for CloudFormation Stack '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            self.log_execution(resource_id, "error")
+                            return False
+
+                    try:
+                        self.client_cloudformation.delete_stack(
+                            StackName=resource_id,
+                            RetainResources=retain_resources,
+                        )
+
+                        waiter = self.client_cloudformation.get_waiter(
+                            "stack_delete_complete"
+                        )
+                        try:
+                            waiter.wait(
+                                StackName=resource_id,
+                                WaiterConfig={"Delay": 5, "MaxAttempts": 6},
+                            )
+                        except:
+                            self.logging.warn(
+                                f"Did not delete CloudFormation Stack '{resource_id}' within 30 seconds. "
+                                "Stopped waiting, check progress manually."
+                            )
+                            self.logging.warn(sys.exc_info()[1])
+                            self.log_execution(resource_id, "delete - timeout")
+                            return False
+                    except:
+                        self.logging.error(
+                            f"Could not delete CloudFormation Stack '{resource_id}'. "
+                            "Manual deletion by an administrator might be necessary."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        self.log_execution(resource_id, "error")
+                        return False
+
+                self.logging.info(
+                    f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
+                    "and has been deleted."
+                )
+                resource_action = "delete"
+            else:
+                self.logging.debug(
+                    f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
+                    "(less than TTL setting) and has not been deleted."
+                )
+                resource_action = "skip - TTL"
+        else:
+            self.logging.debug(
+                f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
+                "been deleted."
+            )
+            resource_action = "skip - whitelist"
+
+        self.log_execution(resource_id, resource_action)
+
+        # For CloudFormation Stacks that are not deleted, add all physical
+        # resources into the Whitelist dictionary to prevent the need to whitelist
+        # each and every resource
+        if resource_action != "delete":
+            try:
+                resource_details = self.client_cloudformation.describe_stack_resources(
+                    StackName=resource_id
+                ).get("StackResources")
+            except:
+                self.logging.error("Could not Describe Stack Resources.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for _ in resource_details:
+                resource_child_id = _.get("PhysicalResourceId")
+                platform, service, resource = _.get("ResourceType").split("::")
+
+                self.whitelist.setdefault(service.lower(), {}).setdefault(
+                    resource.lower(), set()
+                ).add(resource_child_id)
+
+                self.logging.debug(
+                    f"{service} {resource} '{resource_child_id}' has been added to the whitelist."
+                )
+
+        return True
+
+    def log_execution(self, resource_id, resource_action):
+        """
+        Record action taken to the execution log
+        """
+
+        self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
+            "CloudFormation", {}
+        ).setdefault("Stack", []).append(
+            {
+                "id": resource_id,
+                "action": resource_action,
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        )

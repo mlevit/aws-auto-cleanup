@@ -30,6 +30,8 @@ class KinesisCleanup:
         Deletes Kinesis Streams.
         """
 
+        self.logging.debug("Started cleanup of Kinesis Streams.")
+
         clean = (
             self.settings.get("services", {})
             .get("kinesis", {})
@@ -63,6 +65,7 @@ class KinesisCleanup:
                         f"Could not get Kinesis Stream's '{resource_id}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "error"
                     return False
 
                 resource_status = resource_details.get("StreamStatus")
@@ -90,10 +93,11 @@ class KinesisCleanup:
                                     resource_action = "error"
                                     continue
                             else:
-                                self.logging.error(
+                                self.logging.warn(
                                     f"Kinesis Stream '{resource_id}' in state '{resource_status}' cannot be deleted."
                                 )
-                                resource_action = "error"
+                                resource_action = "skip - in use"
+                                continue
 
                         self.logging.info(
                             f"Kinesis Stream '{resource_id}' was created {delta.days} days ago "
@@ -113,8 +117,8 @@ class KinesisCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "kinesis", {}
-                ).setdefault("stream", []).append(
+                    "Kinesis", {}
+                ).setdefault("Stream", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -123,6 +127,8 @@ class KinesisCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of Kinesis Streams.")
             return True
         else:
             self.logging.info("Skipping cleanup of Kinesis Streams.")

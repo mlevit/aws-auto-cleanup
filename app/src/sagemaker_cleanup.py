@@ -31,6 +31,8 @@ class SageMakerCleanup:
         Deletes SageMaker Endpoints.
         """
 
+        self.logging.debug("Started cleanup of SageMaker Endpoints.")
+
         clean = (
             self.settings.get("services", {})
             .get("sagemaker", {})
@@ -100,8 +102,8 @@ class SageMakerCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "sagemaker", {}
-                ).setdefault("endpoint", []).append(
+                    "SageMaker", {}
+                ).setdefault("Endpoint", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -110,6 +112,8 @@ class SageMakerCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of SageMaker Endpoints.")
             return True
         else:
             self.logging.info("Skipping cleanup of SageMaker Endpoints.")
@@ -119,6 +123,8 @@ class SageMakerCleanup:
         """
         Deletes SageMaker Notebook Instances.
         """
+
+        self.logging.debug("Started cleanup of SageMaker Notebook Instances.")
 
         clean = (
             self.settings.get("services", {})
@@ -155,8 +161,10 @@ class SageMakerCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            if resource_status == "InService":
+                        if resource_status == "InService":
+                            if not self.settings.get("general", {}).get(
+                                "dry_run", True
+                            ):
                                 try:
                                     self.client_sagemaker.stop_notebook_instance(
                                         NotebookInstanceName=resource_id,
@@ -168,13 +176,16 @@ class SageMakerCleanup:
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "error"
                                     continue
-                                else:
-                                    self.logging.info(
-                                        f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
-                                        "and has been stopped."
-                                    )
-                                    resource_action = "stop"
-                            elif resource_status in ("Stopped", "Failed"):
+
+                            self.logging.info(
+                                f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been stopped."
+                            )
+                            resource_action = "stop"
+                        elif resource_status in ("Stopped", "Failed"):
+                            if not self.settings.get("general", {}).get(
+                                "dry_run", True
+                            ):
                                 try:
                                     self.client_sagemaker.delete_notebook_instance(
                                         NotebookInstanceName=resource_id,
@@ -186,12 +197,12 @@ class SageMakerCleanup:
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "error"
                                     continue
-                                else:
-                                    self.logging.info(
-                                        f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
-                                        "and has been deleted."
-                                    )
-                                    resource_action = "delete"
+
+                            self.logging.info(
+                                f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "delete"
                     else:
                         self.logging.debug(
                             f"SageMaker Notebook Instance '{resource_id}' was created {delta.days} days ago "
@@ -205,8 +216,8 @@ class SageMakerCleanup:
                     resource_action = "skip - whitelist"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "sagemaker", {}
-                ).setdefault("notebook_instance", []).append(
+                    "SageMaker", {}
+                ).setdefault("Notebook Instance", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -215,6 +226,8 @@ class SageMakerCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of SageMaker Notebook Instances.")
             return True
         else:
             self.logging.info("Skipping cleanup of SageMaker Notebook Instances.")

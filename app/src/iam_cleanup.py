@@ -31,6 +31,8 @@ class IAMCleanup:
         Deletes IAM Roles.
         """
 
+        self.logging.debug("Started cleanup of IAM Roles.")
+
         clean = (
             self.settings.get("services", {})
             .get("iam", {})
@@ -312,6 +314,8 @@ class IAMCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of IAM Roles.")
             return True
         else:
             self.logging.info("Skipping cleanup of IAM Roles.")

@@ -2,30 +2,6 @@ html {
   background: #fafafa;
 }
 
-.navbar {
-  background: #232f3e;
-}
-
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.navbar h1 {
-  color: #d5dbdb;
-  font-family: "Amazon Ember", "Helvetica Neue", Roboto, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1;
-  font-weight: bold;
-}
-
-.navbar img {
-  padding-left: 28px;
-  margin-right: 6px;
-  height: 20px;
-}
-
 .body-container {
   margin: 50px auto;
 }
@@ -34,13 +10,9 @@ table.table {
   width: 100%;
 }
 
-.add-btn-wrap {
-  text-align: center;
-  margin: 50px 0;
-}
-
 .execution-log-modal {
   width: calc(100vw - 40px) !important;
+  height: calc(100vh - 40px) !important;
 }
 
 .execution-log-modal .table {

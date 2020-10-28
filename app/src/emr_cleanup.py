@@ -30,6 +30,8 @@ class EMRCleanup:
         Deletes EMR Clusters.
         """
 
+        self.logging.debug("Started cleanup of EMR Clusters.")
+
         clean = (
             self.settings.get("services", {})
             .get("emr", {})
@@ -85,10 +87,10 @@ class EMRCleanup:
                             )
                             resource_action = "delete"
                         else:
-                            self.logging.error(
+                            self.logging.warn(
                                 f"EMR Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "error"
+                            resource_action = "skip - in use"
                     else:
                         self.logging.debug(
                             f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
@@ -112,6 +114,8 @@ class EMRCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of EMR Clusters.")
             return True
         else:
             self.logging.info("Skipping cleanup of EMR Clusters.")

@@ -1,7 +1,7 @@
 ![](./static/banner.png)
 
 <p align="center">
-<a href="https://travis-ci.org/servian/aws-auto-cleanup"><img src="https://travis-ci.org/servian/aws-auto-cleanup.svg?branch=master"></a> <a href="https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/4f20fbbb03464b9aa6c558a4415d2288"></a> <a href="https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Coverage"><img src="https://api.codacy.com/project/badge/Coverage/4f20fbbb03464b9aa6c558a4415d2288"></a>
+<a href="https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/4f20fbbb03464b9aa6c558a4415d2288"></a>
 </p>
 
 <p align="center">

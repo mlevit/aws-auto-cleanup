@@ -71,11 +71,6 @@
     />
     <link
       rel="stylesheet"
-      href="//db.onlinewebfonts.com/c/157c6cc36dd65b1b2adc9e7f3329c761?family=Amazon+Ember"
-      type="text/css"
-    />
-    <link
-      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css"
       integrity="sha512-O03ntXoVqaGUTAeAmvQ2YSzkCvclZEcPQu1eqloPaHfJ5RuNGiS4l+3duaidD801P50J28EHyonCV06CUlTSag=="
       crossorigin="anonymous"
@@ -83,28 +78,83 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- Header -->
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="#">
-          <img src="img/logo.svg" alt="AWS Auto Cleanup" style="height: 18px" />
-        </a>
-        <h1>AWS Auto Cleanup</h1>
-      </div>
-    </nav>
+    <div id="app">
+      <!-- Header -->
+      <nav
+        class="navbar is-dark"
+        role="navigation"
+        aria-label="main navigation"
+      >
+        <div class="navbar-brand">
+          <a class="navbar-item" href="">
+            <img src="img/logo.svg" style="height: 18px" />
+          </a>
+        </div>
 
-    <!-- Body -->
-    <div class="container body-container">
-      <div id="app">
-        <h2 class="title">
-          Whitelist&nbsp;<button
-            class="button is-warning"
-            v-on:click="openWhitelistInsertPopup()"
-          >
-            <span class="icon"> <i class="fas fa-plus-square"></i> </span>
-            <span>New Entry</span>
-          </button>
-        </h2>
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            <a class="navbar-item"> AWS Auto Cleanup </a>
+          </div>
+        </div>
+
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <a
+                class="button is-light"
+                href="https://github.com/servian/aws-auto-cleanup/"
+              >
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>servian/aws-auto-cleanup</span>
+              </a>
+              <button class="button is-static">
+                <span class="icon">
+                  <i class="fab fa-aws"></i>
+                </span>
+                <span>{{accountId}}</span>
+              </button>
+              <button class="button is-info" v-on:click="openHelpPopup()">
+                <span class="icon">
+                  <i class="fas fa-question"></i>
+                </span>
+                <span>Help</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Body -->
+      <div class="container body-container">
+        <nav class="level">
+          <div class="level-left">
+            <h3 class="title is-3 mb-0 mr-2">Whitelist</h3>
+            <!-- <h2 class="title">Whitelist</h2> -->
+            <button
+              class="button is-warning"
+              v-on:click="openWhitelistInsertPopup()"
+            >
+              <span class="icon"> <i class="fas fa-plus"></i> </span>
+              <span>New Entry</span>
+            </button>
+          </div>
+          <div class="level-right">
+            <div class="control has-icons-left is-right">
+              <input
+                class="input"
+                placeholder="Search"
+                type="text"
+                v-model="whitelistSearchTerm"
+                v-on:keyup="searchWhitelist()"
+              />
+              <span class="icon is-left">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+          </div>
+        </nav>
         <table class="table" id="whitelist">
           <thead>
             <tr>
@@ -117,18 +167,20 @@
           </thead>
           <tbody>
             <tr v-for="item in whitelist" :key="item.id">
-              <td>{{ item.resource_id }}</td>
-              <td>{{ item.expiration_readable }}</td>
-              <td>{{ item.owner }}</td>
+              <td style="white-space: nowrap">{{ item.resource_id }}</td>
+              <td style="white-space: nowrap">
+                {{ item.expiration_readable }}
+              </td>
+              <td style="white-space: nowrap">{{ item.owner }}</td>
               <td>{{ item.comment }}</td>
-              <td>
+              <td style="white-space: nowrap">
                 <a
                   v-if="item.expiration !== '99999999999'"
                   v-on:click="extendWhitelistEntry( item.id )"
                   class="button is-warning"
                 >
                   <span class="icon">
-                    <i class="fas fa-calendar-plus"></i>
+                    <i class="far fa-calendar-plus"></i>
                   </span>
                 </a>
                 <button
@@ -137,7 +189,7 @@
                   class="button is-danger"
                 >
                   <span class="icon">
-                    <i class="fas fa-minus-square"></i>
+                    <i class="far fa-trash-alt"></i>
                   </span>
                 </button>
               </td>
@@ -154,11 +206,30 @@
         <br />
 
         <!-- Execution Log -->
-        <h2 class="title">Execution Logs</h2>
+        <!-- <h2 class="title"></h2> -->
+        <nav class="level">
+          <div class="level-left">
+            <h3 class="title is-3 mt-2 mb-0 mr-2">Execution Logs</h3>
+          </div>
+          <!-- <div class="level-right">
+            <div class="control has-icons-left is-right">
+              <input
+                class="input"
+                placeholder="Search"
+                type="text"
+                v-model="executionLogSearchTerm"
+                v-on:keyup="searchExecutionLog()"
+              />
+              <span class="icon is-left">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+          </div> -->
+        </nav>
 
         <table class="table" id="execution-log-list-table">
           <thead>
-            <th>Key</th>
+            <th>Log</th>
             <th>Date</th>
             <th>View</th>
           </thead>
@@ -171,7 +242,8 @@
                   v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
-                  ><span class="icon"> <i class="fas fa-list-alt"></i> </span
+                  ><span class="icon">
+                    <i class="fas fa-external-link-alt"></i> </span
                 ></a>
               </td>
             </tr>
@@ -204,53 +276,165 @@
                 style="line-height: unset !important"
               >
                 <button
-                  v-if="executionLogMode === 'Destroy'"
                   class="button is-danger"
+                  v-if="executionLogMode === 'Destroy'"
                 >
                   <span>{{executionLogMode}}</span>
                 </button>
                 <button
-                  v-if="executionLogMode === 'Dry Run'"
                   class="button is-success"
+                  v-if="executionLogMode === 'Dry Run'"
                 >
                   <span>{{executionLogMode}}</span>
                 </button>
                 <span>{{executionLogKey}}</span>
               </p>
               <button
-                class="delete"
                 aria-label="close"
+                class="delete"
                 v-on:click="closeExecutionLogPopup()"
               ></button>
             </header>
             <div class="box" style="border-radius: 0px !important">
-              <table class="table" id="execution-log-table">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>Region</th>
-                    <th>Service</th>
-                    <th>Resource</th>
-                    <th>ID</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in executionLogTable" :key="item.id">
-                    <td>{{ item[6] }}</td>
-                    <td>{{ item[1] }}</td>
-                    <td>{{ item[2] }}</td>
-                    <td>{{ item[3] }}</td>
-                    <td>{{ item[4] }}</td>
-                    <td>{{ item[5] }}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div
-                class="container has-text-centered"
-                v-show="showExecutionLogLoadingGif"
-              >
-                <button class="button is-warning is-loading">Loading</button>
+              <div class="content">
+                <nav class="level">
+                  <div class="level-left">
+                    <div class="tabs is-toggle">
+                      <ul class="m-0">
+                        <li
+                          class="tab is-active"
+                          onclick="openTab(event,'logs')"
+                        >
+                          <a>
+                            <span class="icon is-small"
+                              ><i class="fas fa-bars" aria-hidden="true"></i
+                            ></span>
+                            <span>Logs</span>
+                          </a>
+                        </li>
+                        <li class="tab" onclick="openTab(event,'statistics')">
+                          <a>
+                            <span class="icon is-small"
+                              ><i
+                                class="far fa-chart-bar"
+                                aria-hidden="true"
+                              ></i
+                            ></span>
+                            <span>Statistics</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="level-right">
+                    <div class="control has-icons-left is-right">
+                      <input
+                        class="input"
+                        placeholder="Search"
+                        type="text"
+                        v-model="executionLogSearchTerm"
+                        v-on:keyup="searchExecutionLog()"
+                      />
+                      <span class="icon is-left">
+                        <i class="fas fa-search"></i>
+                      </span>
+                    </div>
+                  </div>
+                </nav>
+                <div class="container is-fluid p-0">
+                  <div id="logs" class="content-tab">
+                    <table class="table" id="execution-log-table">
+                      <thead>
+                        <tr>
+                          <th>Timestamp</th>
+                          <th>Region</th>
+                          <th>Service</th>
+                          <th>Resource</th>
+                          <th>ID</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="item in executionLogTable" :key="item.id">
+                          <td style="white-space: nowrap">{{ item[6] }}</td>
+                          <td style="white-space: nowrap">{{ item[1] }}</td>
+                          <td style="white-space: nowrap">{{ item[2] }}</td>
+                          <td style="white-space: nowrap">{{ item[3] }}</td>
+                          <td>{{ item[4] }}</td>
+                          <td style="white-space: nowrap">{{ item[5] }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div
+                    id="statistics"
+                    class="content-tab"
+                    style="display: none"
+                  >
+                    <div class="columns">
+                      <div class="column">
+                        <table class="table" id="execution-log-table">
+                          <thead>
+                            <tr>
+                              <th>Resource</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="key in Object.keys(executionLogServiceStats).sort()"
+                            >
+                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{executionLogServiceStats[key]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="column">
+                        <table class="table" id="execution-log-table">
+                          <thead>
+                            <tr>
+                              <th>Action</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="key in Object.keys(executionLogActionStats).sort()"
+                            >
+                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{executionLogActionStats[key]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="column">
+                        <table class="table" id="execution-log-table">
+                          <thead>
+                            <tr>
+                              <th>Region</th>
+                              <th>Count</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="key in Object.keys(executionLogRegionStats).sort()"
+                            >
+                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{executionLogRegionStats[key]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="container has-text-centered"
+                  v-show="showExecutionLogLoadingGif"
+                >
+                  <button class="button is-warning is-loading">Loading</button>
+                </div>
               </div>
             </div>
             <!-- .box -->
@@ -386,8 +570,8 @@
         <!-- Popup: Delete Whitelist Rule -->
         <div
           class="modal"
-          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
           id="delete-whitelist"
+          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
         >
           <div
             class="modal-background"
@@ -422,19 +606,83 @@
           </div>
         </div>
       </div>
+
+      <div
+        class="modal"
+        id="help"
+        v-bind:class="{ 'is-active': showHelpPopup }"
+      >
+        <div class="modal-background" v-on:click="closeHelpPopup()"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">AWS Auto Cleanup Help</p>
+            <button
+              class="delete"
+              aria-label="close"
+              v-on:click="closeHelpPopup()"
+            ></button>
+          </header>
+          <section class="modal-card-body">
+            <div class="content">
+              <p>
+                AWS Auto Cleanup is an open-source application to
+                programmatically clean AWS resources based on a Whitelist and
+                time-to-live (TTL) settings.
+              </p>
+              <h2>Whitelist</h2>
+              <p>
+                The whitelist maintains a record of all AWS resources that have
+                been preserved. During the execution of Auto Cleanup, the
+                scanned resources will be checked against the whitelist. If the
+                resource exists within the whitelist table, it will not be
+                deleted.
+              </p>
+              <h2>Services</h2>
+              <p>
+                The table below details AWS services, resources, default TTLs,
+                and whether that particular resource is monitored and cleaned.
+              </p>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Resource</th>
+                    <th>TTL (days)</th>
+                    <th>Enabled</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in serviceSettingsFlat">
+                    <td>{{ item.service }}</td>
+                    <td>{{ item.resource }}</td>
+                    <td>{{ item.ttl }}</td>
+                    <td>{{ item.enabled }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <h2>Execution Log</h2>
+              <p>
+                Post every Auto Cleanup run, an execution log is generated and
+                stored as a flat CSV file within an S3 Bucket. The execution log
+                details the actions taken for each AWS service and resource that
+                was scanned and identified.
+              </p>
+            </div>
+          </section>
+          <footer class="modal-card-foot">
+            <button class="button is-success" v-on:click="closeHelpPopup()">
+              OK
+            </button>
+          </footer>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
+    <!-- <footer class="footer">
       <div class="content has-text-centered">
-        <a class="button" href="https://github.com/servian/aws-auto-cleanup/">
-          <span class="icon">
-            <i class="fab fa-github"></i>
-          </span>
-          <span>servian/aws-auto-cleanup</span>
-        </a>
       </div>
-    </footer>
+    </footer> -->
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"

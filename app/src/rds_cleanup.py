@@ -33,6 +33,8 @@ class RDSCleanup:
         and then the Instance will be terminated.
         """
 
+        self.logging.debug("Started cleanup of RDS Instances.")
+
         clean = (
             self.settings.get("services", {})
             .get("rds", {})
@@ -71,11 +73,6 @@ class RDSCleanup:
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False,
                                     )
-
-                                    self.logging.info(
-                                        f"RDS Instance '{resource_id}' had delete protection turned on "
-                                        "and now has been turned off."
-                                    )
                                 except:
                                     self.logging.error(
                                         f"Could not remove termination protection from RDS Instance '{resource_id}'."
@@ -83,6 +80,11 @@ class RDSCleanup:
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "error"
                                     continue
+                                else:
+                                    self.logging.info(
+                                        f"RDS Instance '{resource_id}' had delete protection turned on "
+                                        "and now has been turned off."
+                                    )
 
                             # delete instance
                             try:
@@ -126,6 +128,8 @@ class RDSCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of RDS Instances.")
             return True
         else:
             self.logging.info("Skipping cleanup of RDS Instances.")
@@ -136,6 +140,8 @@ class RDSCleanup:
         Deletes RDS Snapshots.
         """
 
+        self.logging.debug("Started cleanup of RDS Snapshots.")
+
         clean = (
             self.settings.get("services", {})
             .get("rds", {})
@@ -144,7 +150,9 @@ class RDSCleanup:
         )
         if clean:
             try:
-                resources = self.client_rds.describe_db_snapshots().get("DBSnapshots")
+                resources = self.client_rds.describe_db_snapshots(
+                    SnapshotType="manual"
+                ).get("DBSnapshots")
             except:
                 self.logging.error("Could not list all RDS Snapshots.")
                 self.logging.error(sys.exc_info()[1])
@@ -207,6 +215,8 @@ class RDSCleanup:
                         ),
                     }
                 )
+
+            self.logging.debug("Finished cleanup of RDS Snapshots.")
             return True
         else:
             self.logging.debug("Skipping cleanup of RDS Snapshots.")
