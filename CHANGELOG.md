@@ -4,6 +4,7 @@
 
 - Added AWS Account ID to the navigation bar and webpage title.
 - Added default sorting (by log name in descending order) within the execution log list table. This ensures the latest execution logs are always first.
+- Added EC2 Image (AMI) cleanup.
 - Added execution log statistics to the execution log popup. Statistics include a breakdown of counts by service, action taken, and region.
 - Added help section to the website introducing new users to Auto Cleanup as well as exposing AWS service settings from the Settings table.
 - Fixed an issue where Auto Cleanup was attempting to delete automated Redshift and RDS snapshots. Only manual snapshots can be deleted.
