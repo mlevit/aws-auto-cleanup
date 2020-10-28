@@ -197,7 +197,7 @@ function getExecutionLog(executionLogURL) {
         app.executionLogMode = "Destroy";
       }
 
-      for (log of data["response"]["body"]) {
+      for (const log of data["response"]["body"]) {
         // action taken
         app.executionLogActionStats[log["5"]] =
           ++app.executionLogActionStats[log["5"]] || 1;
@@ -264,7 +264,7 @@ function getServices() {
       app.serviceList = Object.keys(data["response"]);
 
       // convert settings to flat table
-      for (service in data["response"]) {
+      for (const service in data["response"]) {
         for (resource in data["response"][service]) {
           app.serviceSettingsFlat.push({
             service: service,
