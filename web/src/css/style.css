@@ -19,6 +19,10 @@ table.table {
   width: 100%;
 }
 
+.add-whitelist-modal {
+  width: 700px !important;
+}
+
 tr.dtrg-group {
   background-color: hsl(0, 0%, 98%);
   font-weight: bold;

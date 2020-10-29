@@ -213,25 +213,10 @@
         <br />
 
         <!-- Execution Log -->
-        <!-- <h2 class="title"></h2> -->
         <nav class="level">
           <div class="level-left">
             <h3 class="title is-3 mt-2 mb-0 mr-2">Execution Logs</h3>
           </div>
-          <!-- <div class="level-right">
-            <div class="control has-icons-left is-right">
-              <input
-                class="input"
-                placeholder="Search"
-                type="text"
-                v-model="executionLogSearchTerm"
-                v-on:keyup="searchExecutionLog()"
-              />
-              <span class="icon is-left">
-                <i class="fas fa-search"></i>
-              </span>
-            </div>
-          </div> -->
         </nav>
 
         <table class="table" id="execution-log-list-table">
@@ -459,7 +444,7 @@
             class="modal-background"
             v-on:click="closeWhitelistInsertPopup()"
           ></div>
-          <div class="modal-card">
+          <div class="modal-card add-whitelist-modal">
             <form action="#" v-on:submit.prevent="createWhitelistEntry()">
               <header class="modal-card-head">
                 <p class="modal-card-title">Add Whitelist Entry</p>
