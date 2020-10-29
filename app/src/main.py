@@ -21,6 +21,7 @@ from src.emr_cleanup import EMRCleanup
 from src.glue_cleanup import GlueCleanup
 from src.helper import Helper
 from src.iam_cleanup import IAMCleanup
+from src.kafka_cleanup import KafkaCleanup
 from src.kinesis_cleanup import KinesisCleanup
 from src.lambda_cleanup import LambdaCleanup
 from src.rds_cleanup import RDSCleanup
@@ -152,6 +153,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=glue_class.run, args=())
+                threads.append(thread)
+
+                # Kafka
+                kafka_class = KafkaCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=kafka_class.run, args=())
                 threads.append(thread)
 
                 # Kinesis

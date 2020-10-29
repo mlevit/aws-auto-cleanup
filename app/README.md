@@ -120,11 +120,14 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
 | ECS Services                   | Service Name           | `ecs:service:service_name`                           |
+| ElastiCache Clusters           | Cache Cluster ID       | `elasticache:cluster:cache_cluster_id`               |
+| ElastiCache Replication Groups | Replication Group ID   | `elasticache:replication_group:replication_group_id` |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | Elasticsearch Service          | Domain Name            | `elasticsearch:domain:domain_name`                   |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
+| Kafka Clusters                 | Cluster Name           | `kafka:cluster:cluster_name`                         |
 | Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name          | `lambda:function:function_name`                      |
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`               |
@@ -179,11 +182,14 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EC2                   | Volumes                  | True  | 7   |                                                                |
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
+| ElastCache            | Clusters :new:           | True  | 7   |                                                                |
+| ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
 | Elasticsearch Service | Domain Name :new:        | True  | 7   |                                                                |
 | EMR                   | Clusters                 | True  | 7   |                                                                |
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
+| Kafka                 | Clusters :new:           | True  | 7   |                                                                |
 | Kinesis               | Streams :new:            | True  | 7   |                                                                |
 | Lambda                | Functions                | True  | 30  |                                                                |
 | RDS                   | Instances                | True  | 7   |                                                                |

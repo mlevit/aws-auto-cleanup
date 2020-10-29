@@ -277,6 +277,23 @@
             }
           }
         },
+        "kafka": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cluster_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "kinesis": {
           "M": {
             "stream": {

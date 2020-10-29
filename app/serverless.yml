@@ -127,6 +127,11 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - kafka:DeleteCluster
+        - kafka:ListClusters
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - kinesis:DeleteStream
         - kinesis:DescribeStream
         - kinesis:ListStreams
