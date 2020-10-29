@@ -2,6 +2,11 @@
 
 ## 1.2.0
 
+- Added Boto3 pagination to IAM Role retrieval.
+- Added point-in-time recovery to the Whitelist and Settings DynamoDB tables.
+- Added Whitelist table groupings to separate the permanent and temporary entries. As a side note, any entry with an expiration epoch of `4102444800` or greater will be considered "permanent".
+- Fixed an issue where AWS managed roles, roles beginning with `AWSServiceRoleFor` were being incorrectly marked as `skip - whitelist`. These roles are now ignored during cleanup.
+
 ## 1.1.0
 
 - Added AWS Account ID to the navigation bar and webpage title.
