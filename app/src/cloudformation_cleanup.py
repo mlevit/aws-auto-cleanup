@@ -158,7 +158,7 @@ class CloudFormationCleanup:
                                 "Stopped waiting, check progress manually."
                             )
                             self.logging.warn(sys.exc_info()[1])
-                            self.log_execution(resource_id, "delete - timeout")
+                            self.log_execution(resource_id, "DELETE - TIMEOUT")
                             return False
                     except:
                         self.logging.error(
@@ -166,33 +166,33 @@ class CloudFormationCleanup:
                             "Manual deletion by an administrator might be necessary."
                         )
                         self.logging.error(sys.exc_info()[1])
-                        self.log_execution(resource_id, "error")
+                        self.log_execution(resource_id, "ERROR")
                         return False
 
                 self.logging.info(
                     f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
                     "and has been deleted."
                 )
-                resource_action = "delete"
+                resource_action = "DELETE"
             else:
                 self.logging.debug(
                     f"CloudFormation Stack '{resource_id}' was last modified {delta.days} days ago "
                     "(less than TTL setting) and has not been deleted."
                 )
-                resource_action = "skip - TTL"
+                resource_action = "SKIP - TTL"
         else:
             self.logging.debug(
                 f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
                 "been deleted."
             )
-            resource_action = "skip - whitelist"
+            resource_action = "SKIP - WHITELIST"
 
         self.log_execution(resource_id, resource_action)
 
         # For CloudFormation Stacks that are not deleted, add all physical
         # resources into the Whitelist dictionary to prevent the need to whitelist
         # each and every resource
-        if resource_action != "delete":
+        if resource_action != "DELETE":
             try:
                 resource_details = self.client_cloudformation.describe_stack_resources(
                     StackName=resource_id

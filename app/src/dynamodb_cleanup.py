@@ -15,6 +15,7 @@ class DynamoDBCleanup:
         self.region = region
 
         self._client_dynamodb = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_dynamodb(self):
@@ -63,43 +64,45 @@ class DynamoDBCleanup:
                         f"Could not get DynamoDB Table's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
-                    resource_action = "error"
-                    continue
+                    resource_action = "ERROR"
+                else:
+                    resource_date = resource_details.get("CreationDateTime")
+                    resource_action = "skip"
 
-                resource_date = resource_details.get("CreationDateTime")
-                resource_action = "skip"
-
-                if resource not in self.whitelist.get("dynamodb", {}).get("table", []):
-                    delta = Helper.get_day_delta(resource_date)
-                    if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
+                    if resource not in self.whitelist.get("dynamodb", {}).get(
+                        "table", []
+                    ):
+                        delta = Helper.get_day_delta(resource_date)
+                        if delta.days > ttl_days:
                             try:
-                                self.client_dynamodb.delete_table(TableName=resource)
+                                if not self._dry_run:
+                                    self.client_dynamodb.delete_table(
+                                        TableName=resource
+                                    )
                             except:
                                 self.logging.error(
                                     f"Could not delete DynamoDB Table '{resource}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"DynamoDB Table '{resource}' was created {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"DynamoDB Table '{resource}' was created {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"DynamoDB Table '{resource}' was created {delta.days} days ago "
+                                "(less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"DynamoDB Table '{resource}' was created {delta.days} days ago "
-                            "(less than TTL setting) and has not been deleted."
+                            f"DynamoDB Table '{resource}' has been whitelisted and has not "
+                            "been deleted."
                         )
-                        resource_action = "skip - TTL"
-                else:
-                    self.logging.debug(
-                        f"DynamoDB Table '{resource}' has been whitelisted and has not "
-                        "been deleted."
-                    )
-                    resource_action = "skip - whitelist"
+                        resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "DynamoDB", {}

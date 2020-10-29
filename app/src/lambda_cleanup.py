@@ -15,6 +15,7 @@ class LambdaCleanup:
         self.region = region
 
         self._client_lambda = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_lambda(self):
@@ -65,35 +66,34 @@ class LambdaCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
+                        try:
+                            if not self._dry_run:
                                 self.client_lambda.delete_function(
                                     FunctionName=resource_id
                                 )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete Lambda Function '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                        except:
+                            self.logging.error(
+                                f"Could not delete Lambda Function '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"Lambda Function '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "Lambda", {}

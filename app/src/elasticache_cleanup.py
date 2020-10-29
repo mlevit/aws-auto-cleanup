@@ -15,6 +15,7 @@ class ElastiCacheCleanup:
         self.region = region
 
         self._client_elasticache = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_elasticache(self):
@@ -69,35 +70,34 @@ class ElastiCacheCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
+                        try:
+                            if not self._dry_run:
                                 self.client_elasticache.delete_cache_cluster(
                                     CacheClusterId=resource_id
                                 )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete ElastiCache Cluster '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"ElastiCache Cluster '{resource_id}' was last modified {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                        except:
+                            self.logging.error(
+                                f"Could not delete ElastiCache Cluster '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"ElastiCache Cluster '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"ElastiCache Cluster '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"ElastiCache Cluster '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "ElastiCache", {}
@@ -162,49 +162,47 @@ class ElastiCacheCleanup:
                         f"Could not describe ElastiCache Cluster '{resource_primary_cluster_id}'."
                     )
                     self.logging.error(sys.exc_info()[1])
-                    resource_action = "error"
-                    continue
+                    resource_action = "ERROR"
+                else:
+                    resource_date = resource_primary_cluster_details.get(
+                        "CacheClusterCreateTime"
+                    )
+                    resource_action = "skip"
 
-                resource_date = resource_primary_cluster_details.get(
-                    "CacheClusterCreateTime"
-                )
-                resource_action = "skip"
+                    if resource_id not in self.whitelist.get("elasticache", {}).get(
+                        "replication_group", []
+                    ):
+                        delta = Helper.get_day_delta(resource_date)
 
-                if resource_id not in self.whitelist.get("elasticache", {}).get(
-                    "replication_group", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
+                        if delta.days > ttl_days:
                             try:
-                                self.client_elasticache.delete_replication_group(
-                                    ReplicationGroupId=resource_id
-                                )
+                                if not self._dry_run:
+                                    self.client_elasticache.delete_replication_group(
+                                        ReplicationGroupId=resource_id
+                                    )
                             except:
                                 self.logging.error(
                                     f"Could not delete ElastiCache Replication Group '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"ElastiCache Replication Group '{resource_id}' was last modified {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"ElastiCache Replication Group '{resource_id}' was last modified {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"ElastiCache Replication Group '{resource_id}' was last modified {delta.days} days ago "
+                                "(less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"ElastiCache Replication Group '{resource_id}' was last modified {delta.days} days ago "
-                            "(less than TTL setting) and has not been deleted."
+                            f"ElastiCache Replication Group '{resource_id}' has been whitelisted and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
-                else:
-                    self.logging.debug(
-                        f"ElastiCache Replication Group '{resource_id}' has been whitelisted and has not been deleted."
-                    )
-                    resource_action = "skip - whitelist"
+                        resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "ElastiCache", {}

@@ -15,6 +15,7 @@ class RDSCleanup:
         self.region = region
 
         self._client_rds = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_rds(self):
@@ -65,57 +66,55 @@ class RDSCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            # remove termination prodtection
-                            if resource.get("DeletionProtection"):
-                                try:
+                        if resource.get("DeletionProtection"):
+                            try:
+                                if not self._dry_run:
                                     self.client_rds.modify_db_instance(
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False,
                                     )
-                                except:
-                                    self.logging.error(
-                                        f"Could not remove termination protection from RDS Instance '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-                                else:
-                                    self.logging.info(
-                                        f"RDS Instance '{resource_id}' had delete protection turned on "
-                                        "and now has been turned off."
-                                    )
-
-                            # delete instance
-                            try:
-                                self.client_rds.delete_db_instance(
-                                    DBInstanceIdentifier=resource_id,
-                                    SkipFinalSnapshot=True,
+                            except:
+                                self.logging.error(
+                                    f"Could not remove termination protection from RDS Instance '{resource_id}'."
                                 )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"RDS Instance '{resource_id}' had delete protection turned on "
+                                    "and now has been turned off."
+                                )
+
+                        if resource_action != "ERROR":
+                            try:
+                                if not self._dry_run:
+                                    self.client_rds.delete_db_instance(
+                                        DBInstanceIdentifier=resource_id,
+                                        SkipFinalSnapshot=True,
+                                    )
                             except:
                                 self.logging.error(
                                     f"Could not delete RDS Instance '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"RDS Instance '{resource_id}' was created {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"RDS Instance '{resource_id}' was created {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"RDS Instance '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"RDS Instance '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}
@@ -176,33 +175,33 @@ class RDSCleanup:
                     if delta.days > ttl_days:
                         if not self.settings.get("general", {}).get("dry_run", True):
                             try:
-                                self.client_rds.delete_db_snapshot(
-                                    DBSnapshotIdentifier=resource_id
-                                )
+                                if not self._dry_run:
+                                    self.client_rds.delete_db_snapshot(
+                                        DBSnapshotIdentifier=resource_id
+                                    )
                             except:
                                 self.logging.error(
                                     f"Could not delete RDS Snapshot '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"RDS Snapshot '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "RDS", {}

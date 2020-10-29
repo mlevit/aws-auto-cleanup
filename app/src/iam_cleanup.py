@@ -16,6 +16,7 @@ class IAMCleanup:
         self.region = "global"
 
         self._client_iam = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_iam(self):
@@ -79,48 +80,50 @@ class IAMCleanup:
                                         f"Could not generate IAM Role last accessed details for '{resource_arn}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-
-                                try:
-                                    get_last_accessed = self.client_iam.get_service_last_accessed_details(
-                                        JobId=gen_last_accessed.get("JobId")
-                                    )
-                                except:
-                                    self.logging.error(
-                                        f"Could not get IAM Role last accessed details for '{resource_arn}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-
-                                backoff = 1
-                                while (
-                                    get_last_accessed.get("JobStatus") == "IN_PROGRESS"
-                                ):
-                                    if backoff <= 16:
-                                        time.sleep(backoff)
-
-                                        try:
-                                            get_last_accessed = self.client_iam.get_service_last_accessed_details(
-                                                JobId=gen_last_accessed.get("JobId")
-                                            )
-                                        except:
-                                            self.logging.error(
-                                                f"Could not get IAM Role last accessed details for '{resource_arn}'."
-                                            )
-                                            self.logging.error(sys.exc_info()[1])
-                                            resource_action = "error"
-                                            continue
-
-                                        backoff = 2 * backoff
-                                    else:
-                                        self.logging.error(
-                                            f"Could not retrieve IAM Role '{resource_id}' last accessed "
-                                            "details in a reasonable amount of time."
+                                    resource_action = "ERROR"
+                                else:
+                                    try:
+                                        get_last_accessed = self.client_iam.get_service_last_accessed_details(
+                                            JobId=gen_last_accessed.get("JobId")
                                         )
-                                        resource_action = "error"
-                                        return False
+                                    except:
+                                        self.logging.error(
+                                            f"Could not get IAM Role last accessed details for '{resource_arn}'."
+                                        )
+                                        self.logging.error(sys.exc_info()[1])
+                                        resource_action = "ERROR"
+                                    else:
+                                        backoff = 1
+                                        while (
+                                            get_last_accessed.get("JobStatus")
+                                            == "IN_PROGRESS"
+                                        ):
+                                            if backoff <= 16:
+                                                time.sleep(backoff)
+
+                                                try:
+                                                    get_last_accessed = self.client_iam.get_service_last_accessed_details(
+                                                        JobId=gen_last_accessed.get(
+                                                            "JobId"
+                                                        )
+                                                    )
+                                                except:
+                                                    self.logging.error(
+                                                        f"Could not get IAM Role last accessed details for '{resource_arn}'."
+                                                    )
+                                                    self.logging.error(
+                                                        sys.exc_info()[1]
+                                                    )
+                                                    resource_action = "ERROR"
+                                                    backoff = 99
+                                                else:
+                                                    backoff = 2 * backoff
+                                            else:
+                                                self.logging.error(
+                                                    f"Could not retrieve IAM Role '{resource_id}' last accessed "
+                                                    "details in a reasonable amount of time."
+                                                )
+                                                resource_action = "ERROR"
 
                                 if get_last_accessed.get("JobStatus") == "COMPLETED":
                                     last_accessed = (
@@ -143,72 +146,62 @@ class IAMCleanup:
                                     delta = Helper.get_day_delta(last_accessed)
 
                                     if delta.days > ttl_days:
-                                        if not self.settings.get("general", {}).get(
-                                            "dry_run", True
-                                        ):
-                                            # delete all inline policies
-                                            try:
-                                                policies = (
-                                                    self.client_iam.list_role_policies(
-                                                        RoleName=resource_id
-                                                    )
+                                        # delete all inline policies
+                                        try:
+                                            policies = (
+                                                self.client_iam.list_role_policies(
+                                                    RoleName=resource_id
                                                 )
-                                            except:
-                                                self.logging.error(
-                                                    f"Could not retrieve inline IAM Policies for IAM Role '{resource_id}'."
-                                                )
-                                                self.logging.error(sys.exc_info()[1])
-                                                resource_action = "error"
-                                                continue
+                                            )
+                                        except:
+                                            self.logging.error(
+                                                f"Could not retrieve inline IAM Policies for IAM Role '{resource_id}'."
+                                            )
+                                            self.logging.error(sys.exc_info()[1])
+                                            resource_action = "ERROR"
+                                            continue
 
-                                            for policy in policies.get("PolicyNames"):
-                                                try:
+                                        for policy in policies.get("PolicyNames"):
+                                            try:
+                                                if not self._dry_run:
                                                     self.client_iam.delete_role_policy(
                                                         RoleName=resource_id,
                                                         PolicyName=policy,
                                                     )
-
-                                                    self.logging.info(
-                                                        f"IAM Policy '{policy}' has been deleted from IAM Role '{resource_id}'."
-                                                    )
-                                                    resource_action = "delete"
-                                                except:
-                                                    self.logging.error(
-                                                        f"Could not delete an inline IAM Policy '{policy}' from IAM Role '{resource_id}'."
-                                                    )
-                                                    self.logging.error(
-                                                        sys.exc_info()[1]
-                                                    )
-                                                    resource_action = "error"
-                                                    continue
-
-                                            # detach all managed policies
-                                            try:
-                                                policies = self.client_iam.list_attached_role_policies(
-                                                    RoleName=resource_id
-                                                )
                                             except:
                                                 self.logging.error(
-                                                    f"Could not retrieve managed IAM Policies attached to IAM Role '{resource_id}'."
+                                                    f"Could not delete an inline IAM Policy '{policy}' from IAM Role '{resource_id}'."
                                                 )
                                                 self.logging.error(sys.exc_info()[1])
-                                                resource_action = "error"
-                                                continue
+                                                resource_action = "ERROR"
+                                            else:
+                                                self.logging.info(
+                                                    f"IAM Policy '{policy}' has been deleted from IAM Role '{resource_id}'."
+                                                )
 
+                                        # detach all managed policies
+                                        try:
+                                            policies = self.client_iam.list_attached_role_policies(
+                                                RoleName=resource_id
+                                            )
+                                        except:
+                                            self.logging.error(
+                                                f"Could not retrieve managed IAM Policies attached to IAM Role '{resource_id}'."
+                                            )
+                                            self.logging.error(sys.exc_info()[1])
+                                            resource_action = "ERROR"
+                                        else:
                                             for policy in policies.get(
                                                 "AttachedPolicies"
                                             ):
                                                 try:
-                                                    self.client_iam.detach_role_policy(
-                                                        RoleName=resource_id,
-                                                        PolicyArn=policy.get(
-                                                            "PolicyArn"
-                                                        ),
-                                                    )
-
-                                                    self.logging.info(
-                                                        f"IAM Policy '{policy.get('PolicyName')}' has been detached from IAM Role '{resource_id}'."
-                                                    )
+                                                    if not self._dry_run:
+                                                        self.client_iam.detach_role_policy(
+                                                            RoleName=resource_id,
+                                                            PolicyArn=policy.get(
+                                                                "PolicyArn"
+                                                            ),
+                                                        )
                                                 except:
                                                     self.logging.error(
                                                         f"Could not detach a managed IAM Policy '{policy.get('PolicyName')}' from IAM Role '{resource_id}'."
@@ -216,37 +209,36 @@ class IAMCleanup:
                                                     self.logging.error(
                                                         sys.exc_info()[1]
                                                     )
-                                                    resource_action = "error"
-                                                    continue
+                                                    resource_action = "ERROR"
+                                                else:
+                                                    self.logging.info(
+                                                        f"IAM Policy '{policy.get('PolicyName')}' has been detached from IAM Role '{resource_id}'."
+                                                    )
 
-                                            # delete all instance profiles
-                                            try:
-                                                profiles = self.client_iam.list_instance_profiles_for_role(
-                                                    RoleName=resource_id
-                                                )
-                                            except:
-                                                self.logging.error(
-                                                    f"Could not retrieve IAM Instance Profiles associated with IAM Role '{resource_id}'."
-                                                )
-                                                self.logging.error(sys.exc_info()[1])
-                                                resource_action = "error"
-                                                continue
-
+                                        # delete all instance profiles
+                                        try:
+                                            profiles = self.client_iam.list_instance_profiles_for_role(
+                                                RoleName=resource_id
+                                            )
+                                        except:
+                                            self.logging.error(
+                                                f"Could not retrieve IAM Instance Profiles associated with IAM Role '{resource_id}'."
+                                            )
+                                            self.logging.error(sys.exc_info()[1])
+                                            resource_action = "ERROR"
+                                        else:
                                             for profile in profiles.get(
                                                 "InstanceProfiles"
                                             ):
                                                 # remove role from instance profile
                                                 try:
-                                                    self.client_iam.remove_role_from_instance_profile(
-                                                        InstanceProfileName=profile.get(
-                                                            "InstanceProfileName"
-                                                        ),
-                                                        RoleName=resource_id,
-                                                    )
-
-                                                    self.logging.info(
-                                                        f"IAM Role '{resource_id}' has been removed from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
-                                                    )
+                                                    if not self._dry_run:
+                                                        self.client_iam.remove_role_from_instance_profile(
+                                                            InstanceProfileName=profile.get(
+                                                                "InstanceProfileName"
+                                                            ),
+                                                            RoleName=resource_id,
+                                                        )
                                                 except:
                                                     self.logging.error(
                                                         f"Could not remove IAM Role '{resource_id}' from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
@@ -254,20 +246,20 @@ class IAMCleanup:
                                                     self.logging.error(
                                                         sys.exc_info()[1]
                                                     )
-                                                    resource_action = "error"
-                                                    continue
+                                                    resource_action = "ERROR"
+                                                else:
+                                                    self.logging.info(
+                                                        f"IAM Role '{resource_id}' has been removed from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
+                                                    )
 
                                                 # delete instance profile
                                                 try:
-                                                    self.client_iam.delete_instance_profile(
-                                                        InstanceProfileName=profile.get(
-                                                            "InstanceProfileName"
+                                                    if not self._dry_run:
+                                                        self.client_iam.delete_instance_profile(
+                                                            InstanceProfileName=profile.get(
+                                                                "InstanceProfileName"
+                                                            )
                                                         )
-                                                    )
-
-                                                    self.logging.info(
-                                                        f"IAM Instance Profile '{profile.get('InstanceProfileName')}' has been delete."
-                                                    )
                                                 except:
                                                     self.logging.error(
                                                         f"Could not delete IAM Instance Profile '{profile.get('InstanceProfileName')}'."
@@ -275,49 +267,52 @@ class IAMCleanup:
                                                     self.logging.error(
                                                         sys.exc_info()[1]
                                                     )
-                                                    resource_action = "error"
-                                                    continue
+                                                    resource_action = "ERROR"
+                                                else:
+                                                    self.logging.info(
+                                                        f"IAM Instance Profile '{profile.get('InstanceProfileName')}' has been delete."
+                                                    )
 
-                                            # delete role
-                                            try:
+                                        # delete role
+                                        try:
+                                            if not self._dry_run:
                                                 self.client_iam.delete_role(
                                                     RoleName=resource_id
                                                 )
-                                            except:
-                                                self.logging.error(
-                                                    f"Could not delete IAM Role '{resource_id}'."
-                                                )
-                                                self.logging.error(sys.exc_info()[1])
-                                                resource_action = "error"
-                                                continue
-
-                                        self.logging.info(
-                                            f"IAM Role '{resource_id}' was last modified {delta.days} days ago "
-                                            "and has been deleted."
-                                        )
-                                        resource_action = "delete"
+                                        except:
+                                            self.logging.error(
+                                                f"Could not delete IAM Role '{resource_id}'."
+                                            )
+                                            self.logging.error(sys.exc_info()[1])
+                                            resource_action = "ERROR"
+                                        else:
+                                            self.logging.info(
+                                                f"IAM Role '{resource_id}' was last modified {delta.days} days ago "
+                                                "and has been deleted."
+                                            )
+                                            resource_action = "DELETE"
                                     else:
                                         self.logging.debug(
                                             f"IAM Role '{resource_id}' was last accessed {delta.days} days ago "
                                             "(less than TTL setting) and has not been deleted."
                                         )
-                                        resource_action = "skip - TTL"
+                                        resource_action = "SKIP - TTL"
                                 else:
                                     self.logging.error(
                                         f"Could not get IAM Role last accessed details for '{resource_id}'."
                                     )
-                                    return False
+                                    resource_action = "ERROR"
                             else:
                                 self.logging.debug(
                                     f"IAM Role '{resource_id}' was last modified {delta.days} days ago "
                                     "(less than TTL setting) and has not been deleted."
                                 )
-                                resource_action = "skip - TTL"
+                                resource_action = "SKIP - TTL"
                         else:
                             self.logging.debug(
                                 f"IAM Role '{resource_id}' has been whitelisted and has not been deleted."
                             )
-                            resource_action = "skip - whitelist"
+                            resource_action = "SKIP - WHITELIST"
 
                         self.execution_log.get("AWS").setdefault(
                             self.region, {}

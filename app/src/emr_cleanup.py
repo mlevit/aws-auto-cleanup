@@ -15,6 +15,7 @@ class EMRCleanup:
         self.region = region
 
         self._client_emr = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_emr(self):
@@ -66,42 +67,39 @@ class EMRCleanup:
 
                     if delta.days > ttl_days:
                         if resource_status in ("RUNNING", "WAITING"):
-                            if not self.settings.get("general", {}).get(
-                                "dry_run", True
-                            ):
-                                try:
+                            try:
+                                if not self._dry_run:
                                     self.client_emr.terminate_job_flows(
                                         JobFlowIds=[resource_id]
                                     )
-                                except:
-                                    self.logging.error(
-                                        f"Could not delete EMR Cluster '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-
-                            self.logging.info(
-                                f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
-                                "and has been deleted."
-                            )
-                            resource_action = "delete"
+                            except:
+                                self.logging.error(
+                                    f"Could not delete EMR Cluster '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                         else:
                             self.logging.warn(
                                 f"EMR Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
                             )
-                            resource_action = "skip - in use"
+                            resource_action = "SKIP - IN USE"
                     else:
                         self.logging.debug(
                             f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"EMR Cluster '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EMR", {}
