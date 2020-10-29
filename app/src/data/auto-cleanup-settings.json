@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "3"
+      "N": "4"
     }
   },
   {
@@ -171,6 +171,36 @@
                 },
                 "id": {
                   "S": "application_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "elasticache": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cache_cluster_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "replication_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "replication_group_id"
                 },
                 "ttl": {
                   "N": "7"

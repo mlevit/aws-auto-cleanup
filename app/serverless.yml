@@ -89,6 +89,13 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - elasticache:DeleteCacheCluster
+        - elasticache:DeleteReplicationGroup
+        - elasticache:DescribeCacheClusters
+        - elasticache:DescribeReplicationGroups
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - elasticmapreduce:ListClusters
         - elasticmapreduce:TerminateJobFlows
       Resource: "*"
