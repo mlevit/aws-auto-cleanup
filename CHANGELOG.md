@@ -6,7 +6,7 @@
 - Added Kafka Cluster cleanup.
 - Added paginated IAM Role retrieval.
 - Added point-in-time recovery to the Whitelist and Settings DynamoDB tables.
-- Added Whitelist table groupings to separate the permanent and temporary entries. As a side note, any entry with an expiration epoch of `4102444800` or greater will be considered "permanent".
+- Added Whitelist table groupings to separate the permanent and temporary entries. As a side note, any entry with an expiration epoch of `4102444800` (2100-01-01 00:00:00) or greater will be considered "permanent".
 - Fixed an issue where AWS managed roles, roles beginning with `AWSServiceRoleFor` were being incorrectly marked as `SKIP - WHITELIST`. These roles are now ignored during cleanup.
 - Improved accuracy of actions taken within execution logs.
 
