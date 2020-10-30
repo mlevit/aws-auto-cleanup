@@ -95,6 +95,7 @@ provider:
         - elasticache:DescribeReplicationGroups
       Resource: "*"
     - Effect: Allow
+      Action:
         - elasticfilesystem:DeleteFileSystem
         - elasticfilesystem:DeleteMountTarget
         - elasticfilesystem:DescribeFileSystems
