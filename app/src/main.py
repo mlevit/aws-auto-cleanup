@@ -14,6 +14,7 @@ from src.cloudformation_cleanup import CloudFormationCleanup
 from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
 from src.ecs_cleanup import ECSCleanup
+from src.efs_cleanup import EFSCleanup
 from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
 from src.elasticache_cleanup import ElastiCacheCleanup
 from src.elasticsearch_cleanup import ElasticsearchServiceCleanup
@@ -98,6 +99,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=ecs_class.run, args=())
+                threads.append(thread)
+
+                # EFS
+                efs_class = EFSCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=efs_class.run, args=())
                 threads.append(thread)
 
                 # Elastic Beanstalk
