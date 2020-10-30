@@ -120,6 +120,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
 | ECS Services                   | Service Name           | `ecs:service:service_name`                           |
+| EFS File Systems               | File System ID         | `efs:file_system:file_system_id`                     |
 | ElastiCache Clusters           | Cache Cluster ID       | `elasticache:cluster:cache_cluster_id`               |
 | ElastiCache Replication Groups | Replication Group ID   | `elasticache:replication_group:replication_group_id` |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
@@ -182,6 +183,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EC2                   | Volumes                  | True  | 7   |                                                                |
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
+| EFS                   | File Systems :new:       | True  | 7   |                                                                |
 | ElastCache            | Clusters :new:           | True  | 7   |                                                                |
 | ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
