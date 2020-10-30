@@ -25,7 +25,6 @@ class EFSCleanup:
 
     def run(self):
         self.file_systems()
-        self.layers()
 
     def file_systems(self):
         """
@@ -147,6 +146,3 @@ class EFSCleanup:
         else:
             self.logging.info("Skipping cleanup of EFS File Systems.")
             return True
-
-    def layers(self):
-        pass

@@ -2,6 +2,7 @@
 
 ## 1.2.0
 
+- Added EFS File System cleanup.
 - Added ElastiCache Cluster and Replication Group cleanup.
 - Added Kafka Cluster cleanup.
 - Added paginated IAM Role retrieval.
