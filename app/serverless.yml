@@ -95,6 +95,12 @@ provider:
         - elasticache:DescribeReplicationGroups
       Resource: "*"
     - Effect: Allow
+        - elasticfilesystem:DeleteFileSystem
+        - elasticfilesystem:DeleteMountTarget
+        - elasticfilesystem:DescribeFileSystems
+        - elasticfilesystem:DescribeMountTargets
+      Resource: "*"
+    - Effect: Allow
       Action:
         - elasticmapreduce:ListClusters
         - elasticmapreduce:TerminateJobFlows

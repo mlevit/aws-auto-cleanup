@@ -162,6 +162,20 @@
             }
           }
         },
+        "efs": {
+          "M": {
+            "file_system": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "file_system_id"
+                }
+              }
+            }
+          }
+        },
         "elasticbeanstalk": {
           "M": {
             "application": {
