@@ -59,7 +59,7 @@ class SageMakerCleanup:
                 resource_id = resource.get("EndpointName")
                 resource_status = resource.get("EndpointStatus")
                 resource_date = resource.get("LastModifiedTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("sagemaker", {}).get(
                     "endpoint", []
@@ -153,7 +153,7 @@ class SageMakerCleanup:
                 resource_id = resource.get("NotebookInstanceName")
                 resource_status = resource.get("NotebookInstanceStatus")
                 resource_date = resource.get("LastModifiedTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("sagemaker", {}).get(
                     "notebook_instance", []

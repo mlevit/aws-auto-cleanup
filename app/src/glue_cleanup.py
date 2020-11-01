@@ -57,7 +57,7 @@ class GlueCleanup:
             for resource in resources:
                 resource_id = resource.get("EndpointName")
                 resource_date = resource.get("LastModifiedTimestamp")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("glue", {}).get(
                     "dev_endpoint", []

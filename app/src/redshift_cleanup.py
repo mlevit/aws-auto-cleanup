@@ -59,7 +59,7 @@ class RedshiftCleanup:
                 resource_id = resource.get("ClusterIdentifier")
                 resource_date = resource.get("ClusterCreateTime")
                 resource_status = resource.get("ClusterStatus")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "cluster", []
@@ -155,7 +155,7 @@ class RedshiftCleanup:
                 resource_id = resource.get("SnapshotIdentifier")
                 resource_date = resource.get("SnapshotCreateTime")
                 resource_status = resource.get("Status")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
                     "snapshot", []

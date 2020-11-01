@@ -72,7 +72,7 @@ class EC2Cleanup:
 
             for resource in resources:
                 resource_id = resource.get("AllocationId")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("address", []):
                     if resource.get("AssociationId") is None:
@@ -159,7 +159,7 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("ImageId")
                 resource_date = resource.get("CreationDate")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("image", []):
                     delta = Helper.get_day_delta(resource_date)
@@ -246,7 +246,7 @@ class EC2Cleanup:
                     resource_id = resource.get("InstanceId")
                     resource_date = resource.get("LaunchTime")
                     resource_state = resource.get("State").get("Name")
-                    resource_action = "skip"
+                    resource_action = None
 
                     if resource_id not in self.whitelist.get("ec2", {}).get(
                         "instance", []
@@ -398,7 +398,7 @@ class EC2Cleanup:
                 return False
 
             for resource in resources:
-                resource_action = "skip"
+                resource_action = None
 
                 if resource not in self.whitelist.get("ec2", {}).get(
                     "security_group", []
@@ -479,7 +479,7 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("SnapshotId")
                 resource_date = resource.get("StartTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("snapshot", []):
                     snapshots_in_use = []
@@ -593,7 +593,7 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("VolumeId")
                 resource_date = resource.get("CreateTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
                     if resource.get("Attachments") == []:

@@ -68,7 +68,7 @@ class ECSCleanup:
                 resource_active_service_count = resource_details.get(
                     "activeServicesCount"
                 )
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ecs", {}).get("cluster", []):
                     if not self.settings.get("general", {}).get("dry_run", True):
@@ -186,7 +186,7 @@ class ECSCleanup:
                     resource_id = resource_details.get("serviceName")
                     resource_status = resource_details.get("status")
                     resource_date = resource_details.get("createdAt")
-                    resource_action = "skip"
+                    resource_action = None
 
                     if resource_id not in self.whitelist.get("ecs", {}).get(
                         "service", []

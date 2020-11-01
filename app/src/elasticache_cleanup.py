@@ -62,7 +62,7 @@ class ElastiCacheCleanup:
             for resource in resources:
                 resource_id = resource.get("CacheClusterId")
                 resource_date = resource.get("CacheClusterCreateTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("elasticache", {}).get(
                     "cluster", []
@@ -167,7 +167,7 @@ class ElastiCacheCleanup:
                     resource_date = resource_primary_cluster_details.get(
                         "CacheClusterCreateTime"
                     )
-                    resource_action = "skip"
+                    resource_action = None
 
                     if resource_id not in self.whitelist.get("elasticache", {}).get(
                         "replication_group", []

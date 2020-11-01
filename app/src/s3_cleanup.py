@@ -65,7 +65,7 @@ class S3Cleanup:
             for resource in resources.get("Buckets"):
                 resource_id = resource.get("Name")
                 resource_date = resource.get("CreationDate")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("s3", {}).get("bucket", []):
                     delta = Helper.get_day_delta(resource_date)

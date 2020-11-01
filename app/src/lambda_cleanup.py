@@ -58,7 +58,7 @@ class LambdaCleanup:
             for resource in resources:
                 resource_id = resource.get("FunctionName")
                 resource_date = resource.get("LastModified")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("lambda", {}).get(
                     "function", []

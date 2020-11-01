@@ -61,7 +61,7 @@ class IAMCleanup:
                     resource_id = resource.get("RoleName")
                     resource_arn = resource.get("Arn")
                     resource_date = resource.get("CreateDate")
-                    resource_action = "skip"
+                    resource_action = None
 
                     if "AWSServiceRoleFor" not in resource_id:
                         if resource_id not in self.whitelist.get("iam", {}).get(

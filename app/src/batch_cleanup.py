@@ -58,7 +58,7 @@ class BatchCleanup:
             for resource in resources:
                 resource_id = resource.get("computeEnvironmentName")
                 resource_date = resource.get("LastModified")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("batch", {}).get(
                     "compute_environment", []
@@ -145,7 +145,7 @@ class BatchCleanup:
                 resource_id = resource.get("jobQueueName")
                 resource_state = resource.get("state")
                 resource_environments = resource.get("computeEnvironmentOrder")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("batch", {}).get(
                     "job_queue", []

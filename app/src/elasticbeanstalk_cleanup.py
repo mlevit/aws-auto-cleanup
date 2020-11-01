@@ -61,7 +61,7 @@ class ElasticBeanstalkCleanup:
             for resource in resources:
                 resource_id = resource.get("ApplicationName")
                 resource_date = resource.get("DateUpdated")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("elasticbeanstalk", {}).get(
                     "application", []

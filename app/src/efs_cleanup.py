@@ -58,7 +58,7 @@ class EFSCleanup:
                 resource_id = resource.get("FileSystemId")
                 resource_date = resource.get("CreationTime")
                 resource_number_of_mount_targets = resource.get("NumberOfMountTargets")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("efs", {}).get(
                     "file_system", []

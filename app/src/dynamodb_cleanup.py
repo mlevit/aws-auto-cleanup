@@ -67,7 +67,7 @@ class DynamoDBCleanup:
                     resource_action = "ERROR"
                 else:
                     resource_date = resource_details.get("CreationDateTime")
-                    resource_action = "skip"
+                    resource_action = None
 
                     if resource not in self.whitelist.get("dynamodb", {}).get(
                         "table", []

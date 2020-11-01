@@ -58,7 +58,7 @@ class KafkaCleanup:
                 resource_id = resource.get("ClusterName")
                 resource_arn = resource.get("ClusterArn")
                 resource_date = resource.get("CreationTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("kafka", {}).get(
                     "cluster", []

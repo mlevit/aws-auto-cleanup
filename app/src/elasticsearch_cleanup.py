@@ -78,7 +78,7 @@ class ElasticsearchServiceCleanup:
                         .get("Status")
                         .get("UpdateDate")
                     )
-                    resource_action = "skip"
+                    resource_action = None
 
                     if resource_id not in self.whitelist.get("elasticsearch", {}).get(
                         "domain", []

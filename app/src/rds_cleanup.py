@@ -60,7 +60,7 @@ class RDSCleanup:
             for resource in resources:
                 resource_id = resource.get("DBInstanceIdentifier")
                 resource_date = resource.get("InstanceCreateTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("rds", {}).get("instance", []):
                     delta = Helper.get_day_delta(resource_date)
@@ -167,7 +167,7 @@ class RDSCleanup:
             for resource in resources:
                 resource_id = resource.get("DBSnapshotIdentifier")
                 resource_date = resource.get("SnapshotCreateTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("rds", {}).get("snapshot", []):
                     delta = Helper.get_day_delta(resource_date)

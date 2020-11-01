@@ -56,7 +56,7 @@ class KinesisCleanup:
 
             for resource in resources:
                 resource_id = resource
-                resource_action = "skip"
+                resource_action = None
 
                 try:
                     resource_details = self.client_kinesis.describe_stream(

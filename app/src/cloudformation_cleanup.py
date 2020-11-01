@@ -87,7 +87,7 @@ class CloudFormationCleanup:
         )
         resource_status = resource.get("StackStatus")
         resource_protection = True  # resource.get("EnableTerminationProtection")
-        resource_action = "skip"
+        resource_action = None
 
         if resource_id not in self.whitelist.get("cloudformation", {}).get("stack", []):
             delta = Helper.get_day_delta(resource_date)

@@ -60,7 +60,7 @@ class EMRCleanup:
                     resource.get("Status").get("Timeline").get("CreationDateTime")
                 )
                 resource_status = resource.get("Status").get("State")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("emr", {}).get("cluster", []):
                     delta = Helper.get_day_delta(resource_date)
