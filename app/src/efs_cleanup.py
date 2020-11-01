@@ -113,13 +113,13 @@ class EFSCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"EFS File System '{resource_id}' was last modified {delta.days} days ago "
+                                    f"EFS File System '{resource_id}' was created {delta.days} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"EFS File System '{resource_id}' was last modified {delta.days} days ago "
+                            f"EFS File System '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
