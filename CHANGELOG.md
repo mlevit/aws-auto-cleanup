@@ -4,6 +4,7 @@
 
 - Added EFS File System cleanup.
 - Added ElastiCache Cluster and Replication Group cleanup.
+- Added ELB Load Balancer cleanup.
 - Added Kafka Cluster cleanup.
 - Added paginated IAM Role retrieval.
 - Added point-in-time recovery to the Whitelist and Settings DynamoDB tables.
