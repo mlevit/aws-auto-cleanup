@@ -125,6 +125,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | ElastiCache Replication Groups | Replication Group ID   | `elasticache:replication_group:replication_group_id` |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | Elasticsearch Service          | Domain Name            | `elasticsearch:domain:domain_name`                   |
+| ELB Load Balancers             | Load Balancer Name     | `elb:load_balancer:load_balancer_name`               |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
@@ -188,6 +189,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
 | Elasticsearch Service | Domain Name :new:        | True  | 7   |                                                                |
+| ELB                   | Load Balancers :new:     | True  | 7   |                                                                |
 | EMR                   | Clusters                 | True  | 7   |                                                                |
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
