@@ -20,7 +20,7 @@ class ELBCleanup:
     @property
     def client_elb(self):
         if not self._client_elb:
-            self._client_elb = boto3.client("elb", region_name=self.region)
+            self._client_elb = boto3.client("elbv2", region_name=self.region)
         return self._client_elb
 
     def run(self):
@@ -42,7 +42,7 @@ class ELBCleanup:
         if clean:
             try:
                 resources = self.client_elb.describe_load_balancers().get(
-                    "LoadBalancerDescriptions"
+                    "LoadBalancers"
                 )
             except:
                 self.logging.error("Could not list all ELB Load Balancers.")
@@ -58,6 +58,7 @@ class ELBCleanup:
 
             for resource in resources:
                 resource_id = resource.get("LoadBalancerName")
+                resource_arn = resource.get("LoadBalancerArn")
                 resource_date = resource.get("CreatedTime")
                 resource_action = None
 
@@ -69,21 +70,39 @@ class ELBCleanup:
                     if delta.days > ttl_days:
                         try:
                             if not self._dry_run:
-                                self.client_elb.delete_load_balancer(
-                                    LoadBalancerName=resource_id
+                                self.client_elb.modify_load_balancer_attributes(
+                                    LoadBalancerArn=resource_arn,
+                                    Attributes=[
+                                        {
+                                            "Key": "deletion_protection.enabled",
+                                            "Value": "false",
+                                        },
+                                    ],
                                 )
                         except:
                             self.logging.error(
-                                f"Could not delete ELB Load Balancer '{resource_id}'."
+                                f"Could not disable Delete Protection for ELB Load Balancer '{resource_id}'."
                             )
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
-                            self.logging.info(
-                                f"ELB Load Balancer '{resource_id}' was created {delta.days} days ago "
-                                "and has been deleted."
-                            )
-                            resource_action = "DELETE"
+                            try:
+                                if not self._dry_run:
+                                    self.client_elb.delete_load_balancer(
+                                        LoadBalancerArn=resource_arn
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete ELB Load Balancer '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"ELB Load Balancer '{resource_id}' was created {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"ELB Load Balancer '{resource_id}' was created {delta.days} days ago "
