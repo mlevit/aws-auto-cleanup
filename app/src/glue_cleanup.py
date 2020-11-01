@@ -78,13 +78,13 @@ class GlueCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Glue Dev Endpoint '{resource_id}' was created {delta.days} days ago "
+                                f"Glue Dev Endpoint '{resource_id}' was last modified {delta.days} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Glue Dev Endpoint '{resource_id}' was created {delta.days} days ago "
+                            f"Glue Dev Endpoint '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
