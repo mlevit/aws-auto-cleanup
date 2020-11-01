@@ -15,9 +15,10 @@ from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
 from src.ecs_cleanup import ECSCleanup
 from src.efs_cleanup import EFSCleanup
-from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
 from src.elasticache_cleanup import ElastiCacheCleanup
+from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
 from src.elasticsearch_cleanup import ElasticsearchServiceCleanup
+from src.elb_cleanup import ELBCleanup
 from src.emr_cleanup import EMRCleanup
 from src.glue_cleanup import GlueCleanup
 from src.helper import Helper
@@ -143,6 +144,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=elasticsearch_class.run, args=())
+                threads.append(thread)
+
+                # ELB
+                elb_class = ELBCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=elb_class.run, args=())
                 threads.append(thread)
 
                 # EMR

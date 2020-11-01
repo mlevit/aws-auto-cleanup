@@ -103,6 +103,11 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - elasticloadbalancing:DeleteLoadBalancer
+        - elasticloadbalancing:DescribeLoadBalancers
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - elasticmapreduce:ListClusters
         - elasticmapreduce:TerminateJobFlows
       Resource: "*"

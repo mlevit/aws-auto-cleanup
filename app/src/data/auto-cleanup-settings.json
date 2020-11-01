@@ -243,6 +243,23 @@
             }
           }
         },
+        "elb": {
+          "M": {
+            "load_balancer": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "load_balancer_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "emr": {
           "M": {
             "cluster": {
