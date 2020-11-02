@@ -215,6 +215,4 @@ class BatchCleanup:
         else:
             self.logging.info("Skipping cleanup of Batch Job Queues.")
             return True
-
-    def layers(self):
-        pass
+            

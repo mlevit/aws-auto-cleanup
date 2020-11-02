@@ -112,6 +112,3 @@ class KafkaCleanup:
         else:
             self.logging.info("Skipping cleanup of Kafka Clusters.")
             return True
-
-    def layers(self):
-        pass

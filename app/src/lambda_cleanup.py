@@ -25,7 +25,6 @@ class LambdaCleanup:
 
     def run(self):
         self.functions()
-        self.layers()
 
     def functions(self):
         """
@@ -112,6 +111,3 @@ class LambdaCleanup:
         else:
             self.logging.info("Skipping cleanup of Lambda Functions.")
             return True
-
-    def layers(self):
-        pass
