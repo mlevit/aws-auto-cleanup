@@ -32,12 +32,6 @@ provider:
             - cloudformation.amazonaws.com
     - Effect: Allow
       Action:
-        - athena:GetQueryExecution
-        - athena:GetQueryResults
-        - athena:StartQueryExecution
-      Resource: "*"
-    - Effect: Allow
-      Action:
         - cloudformation:DeleteStack
         - cloudformation:DescribeStacks
         - cloudformation:DescribeStackResources
