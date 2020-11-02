@@ -295,13 +295,17 @@ function getWhitelist() {
     .then((data) => {
       let i = 1;
       let whitelist_raw = data["response"]["whitelist"];
-      // Add row ID for action reference
-      app.whitelist = whitelist_raw.map((item) => {
-        item["id"] = i++;
-        dayjs.extend(dayjs_plugin_utc);
-        dayjs.extend(dayjs_plugin_timezone);
 
+      dayjs.extend(dayjs_plugin_utc);
+      dayjs.extend(dayjs_plugin_timezone);
+
+      app.whitelist = whitelist_raw.map((item) => {
         let readable_date = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
+
+        item["row_id"] = i++;
+        item["service"] = item["resource_id"].split(":", 3)[0];
+        item["resource"] = item["resource_id"].split(":", 3)[1];
+        item["id"] = item["resource_id"].split(":", 3)[2];
 
         item["expiration_readable"] = readable_date.format(
           "ddd MMM DD HH:mm:ss YYYY"
@@ -314,18 +318,18 @@ function getWhitelist() {
         app.whitelistDataTables = $("#whitelist").DataTable({
           columnDefs: [
             { className: "dt-center", targets: [5] },
-            { orderable: false, targets: [0, 1, 2, 3, 4, 5] },
+            { orderable: false, targets: [0, 1, 2, 3, 4, 5, 6, 7] },
             {
-              targets: [4],
+              targets: [6],
               visible: false,
               searchable: false,
             },
           ],
           dom: "rtp",
-          order: [[4, "desc"]],
+          order: [[6, "desc"]],
           pageLength: 50,
           rowGroup: {
-            dataSrc: 4,
+            dataSrc: 6,
           },
         });
       }, 10);

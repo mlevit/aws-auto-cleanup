@@ -158,7 +158,9 @@
         <table class="table" id="whitelist">
           <thead>
             <tr>
-              <th>Resource ID</th>
+              <th>Service</th>
+              <th>Resource</th>
+              <th>ID</th>
               <th>Expiration</th>
               <th>Owner</th>
               <th>Comment</th>
@@ -167,8 +169,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in whitelist" :key="item.id">
-              <td style="white-space: nowrap">{{ item.resource_id }}</td>
+            <tr v-for="item in whitelist" :key="item.row_id">
+              <td style="white-space: nowrap">{{ item.service }}</td>
+              <td style="white-space: nowrap">{{ item.resource }}</td>
+              <td style="white-space: nowrap">{{ item.id }}</td>
               <td style="white-space: nowrap">
                 <span v-if="item.expiration < '4102444800'"
                   >{{ item.expiration_readable }}</span
@@ -184,7 +188,7 @@
                 <button
                   class="button is-warning"
                   v-if="item.expiration < '4102444800'"
-                  v-on:click="extendWhitelistEntry( item.id )"
+                  v-on:click="extendWhitelistEntry( item.row_id )"
                 >
                   <span class="icon">
                     <i class="far fa-calendar-plus"></i>
