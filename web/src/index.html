@@ -181,7 +181,7 @@
                 <span v-if="item.expiration >= '4102444800'">Permanent</span>
               </td>
               <td style="white-space: nowrap">
-                <a
+                <button
                   class="button is-warning"
                   v-if="item.expiration < '4102444800'"
                   v-on:click="extendWhitelistEntry( item.id )"
@@ -189,7 +189,7 @@
                   <span class="icon">
                     <i class="far fa-calendar-plus"></i>
                   </span>
-                </a>
+                </button>
                 <button
                   class="button is-danger"
                   v-if="item.expiration < '4102444800'"
@@ -230,13 +230,15 @@
               <td>{{ item.key }}</td>
               <td>{{ item.date }}</td>
               <td>
-                <a
+                <button
                   v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
-                  ><span class="icon">
-                    <i class="fas fa-external-link-alt"></i> </span
-                ></a>
+                >
+                  <span class="icon">
+                    <i class="fas fa-external-link-alt"></i>
+                  </span>
+                </button>
               </td>
             </tr>
           </tbody>
