@@ -242,17 +242,17 @@ _Note: Some regions are deactivated by default as they required special access f
 
 Post every Auto Cleanup run, an execution log is generated and stored as a flat CSV file within the `execution-log` S3 Bucket. The execution log files adhere to the following schema.
 
-| Column       | Format    | Description                                                                                         |
-| ------------ | --------- | --------------------------------------------------------------------------------------------------- |
-| platform     | string    | Always `AWS`                                                                                        |
-| region       | string    | Region (e.g. `ap-southeast-2`)                                                                      |
-| service      | string    | Service (e.g., `s3`)                                                                                |
-| resource     | string    | Resource (e.g., `bucket`)                                                                           |
-| resource_id  | string    | Resource ID (e.g., Instance ID)                                                                     |
-| action       | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
-| timestamp    | timestamp | Timestamp when action was performed                                                                 |
-| dry_run_flag | boolean   | Dry run activated                                                                                   |
-| execution_id | string    | Lambda execution ID                                                                                 |
+| Column       | Format    | Description                                                                                                  |
+| ------------ | --------- | ------------------------------------------------------------------------------------------------------------ |
+| platform     | string    | Always `AWS`                                                                                                 |
+| region       | string    | Region (e.g. `ap-southeast-2`)                                                                               |
+| service      | string    | Service (e.g., `s3`)                                                                                         |
+| resource     | string    | Resource (e.g., `bucket`)                                                                                    |
+| resource_id  | string    | Resource ID (e.g., Instance ID)                                                                              |
+| action       | string    | Action taken on the resource (e.g., `DELETE`, `SKIP - TTL`, `SKIP - WHITELIST`, `SKIP - IN USE`, OR `ERROR`) |
+| timestamp    | timestamp | Timestamp when action was performed                                                                          |
+| dry_run_flag | boolean   | Dry run activated                                                                                            |
+| execution_id | string    | Lambda execution ID                                                                                          |
 
 #### Athena
 
