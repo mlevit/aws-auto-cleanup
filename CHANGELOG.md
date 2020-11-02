@@ -2,6 +2,7 @@
 
 ## 1.2.0
 
+- Added Amplify Apps cleanup.
 - Added EFS File System cleanup.
 - Added ElastiCache Cluster and Replication Group cleanup.
 - Added ELB Load Balancer cleanup.

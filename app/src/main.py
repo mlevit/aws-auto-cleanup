@@ -10,6 +10,7 @@ import threading
 import boto3
 from dynamodb_json import json_util as dynamodb_json
 
+from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
 from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
@@ -79,6 +80,17 @@ class Cleanup:
                     region,
                 )
                 cloudformation_class.run()
+
+                # Amplify
+                amplify_class = AmplifyCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=amplify_class.run, args=())
+                threads.append(thread)
 
                 # DynamoDB
                 dynamodb_class = DynamoDBCleanup(

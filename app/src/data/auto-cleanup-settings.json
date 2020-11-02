@@ -25,6 +25,23 @@
     },
     "value": {
       "M": {
+        "amplify": {
+          "M": {
+            "app": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "app_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "cloudformation": {
           "M": {
             "stack": {

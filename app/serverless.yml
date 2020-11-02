@@ -32,6 +32,11 @@ provider:
             - cloudformation.amazonaws.com
     - Effect: Allow
       Action:
+        - amplify:DeleteApp
+        - amplify:ListApps
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - cloudformation:DeleteStack
         - cloudformation:DescribeStacks
         - cloudformation:DescribeStackResources
