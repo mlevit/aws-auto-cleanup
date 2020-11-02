@@ -271,7 +271,7 @@ class EC2Cleanup:
                                         f"EC2 Instance '{resource_id}' in a 'running' state was last "
                                         f"launched {delta.days} days ago and has been stopped."
                                     )
-                                    resource_action = "stop"
+                                    resource_action = "STOP"
                             elif resource_state == "stopped":
                                 # disable termination protection before terminating the instance
                                 try:

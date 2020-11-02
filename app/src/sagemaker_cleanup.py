@@ -178,7 +178,7 @@ class SageMakerCleanup:
                                     f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
                                     "and has been stopped."
                                 )
-                                resource_action = "stop"
+                                resource_action = "STOP"
                         elif resource_status in ("Stopped", "Failed"):
                             try:
                                 if not self._dry_run:
