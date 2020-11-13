@@ -88,8 +88,12 @@ def lambda_handler(event, context):
         settings.get("services", {}).get(service, {}).get(resource, {}).get("ttl", 7)
     )
 
-    try:
+    if parameters.get("permanent", False):
+        expiration = 4102444800
+    else:
         expiration = int(time.time()) + (resource_ttl * 86400)
+
+    try:
         boto3.client("dynamodb").put_item(
             TableName=os.environ.get("WHITELISTTABLE"),
             Item={
