@@ -10,16 +10,21 @@ import threading
 import boto3
 from dynamodb_json import json_util as dynamodb_json
 
+from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
 from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
 from src.ecs_cleanup import ECSCleanup
+from src.efs_cleanup import EFSCleanup
+from src.elasticache_cleanup import ElastiCacheCleanup
 from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
 from src.elasticsearch_cleanup import ElasticsearchServiceCleanup
+from src.elb_cleanup import ELBCleanup
 from src.emr_cleanup import EMRCleanup
 from src.glue_cleanup import GlueCleanup
 from src.helper import Helper
 from src.iam_cleanup import IAMCleanup
+from src.kafka_cleanup import KafkaCleanup
 from src.kinesis_cleanup import KinesisCleanup
 from src.lambda_cleanup import LambdaCleanup
 from src.rds_cleanup import RDSCleanup
@@ -76,6 +81,17 @@ class Cleanup:
                 )
                 cloudformation_class.run()
 
+                # Amplify
+                amplify_class = AmplifyCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=amplify_class.run, args=())
+                threads.append(thread)
+
                 # DynamoDB
                 dynamodb_class = DynamoDBCleanup(
                     self.logging,
@@ -98,6 +114,17 @@ class Cleanup:
                 thread = threading.Thread(target=ecs_class.run, args=())
                 threads.append(thread)
 
+                # EFS
+                efs_class = EFSCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=efs_class.run, args=())
+                threads.append(thread)
+
                 # Elastic Beanstalk
                 elasticbeanstalk_class = ElasticBeanstalkCleanup(
                     self.logging,
@@ -109,6 +136,17 @@ class Cleanup:
                 thread = threading.Thread(target=elasticbeanstalk_class.run, args=())
                 threads.append(thread)
 
+                # ElastiCache
+                elasticache_class = ElastiCacheCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=elasticache_class.run, args=())
+                threads.append(thread)
+
                 # Elasticsearch Service
                 elasticsearch_class = ElasticsearchServiceCleanup(
                     self.logging,
@@ -118,6 +156,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=elasticsearch_class.run, args=())
+                threads.append(thread)
+
+                # ELB
+                elb_class = ELBCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=elb_class.run, args=())
                 threads.append(thread)
 
                 # EMR
@@ -140,6 +189,17 @@ class Cleanup:
                     region,
                 )
                 thread = threading.Thread(target=glue_class.run, args=())
+                threads.append(thread)
+
+                # Kafka
+                kafka_class = KafkaCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                thread = threading.Thread(target=kafka_class.run, args=())
                 threads.append(thread)
 
                 # Kinesis

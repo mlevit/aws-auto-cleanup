@@ -17,6 +17,7 @@ class EC2Cleanup:
         self._client_ec2 = None
         self._client_sts = None
         self._resource_ec2 = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_sts(self):
@@ -71,40 +72,39 @@ class EC2Cleanup:
 
             for resource in resources:
                 resource_id = resource.get("AllocationId")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("address", []):
                     if resource.get("AssociationId") is None:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
+                        try:
+                            if not self._dry_run:
                                 self.client_ec2.release_address(
                                     AllocationId=resource_id
                                 )
-                            except:
-                                self.logging.error(
-                                    f"Could not release EC2 Address '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"EC2 Address '{resource.get('PublicIp')}' is not associated with an EC2 instance and has "
-                            "been released."
-                        )
-                        resource_action = "delete"
+                        except:
+                            self.logging.error(
+                                f"Could not release EC2 Address '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"EC2 Address '{resource.get('PublicIp')}' is not associated with an EC2 instance and has "
+                                "been released."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.warn(
                             f"EC2 Address '{resource_id}' is associated with an EC2 instance and has not "
                             "been deleted."
                         )
-                        resource_action = "skip - in use"
+                        resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
                         f"EC2 Address '{resource_id}' has been whitelisted and has not "
                         "been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
@@ -159,40 +159,39 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("ImageId")
                 resource_date = resource.get("CreationDate")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("image", []):
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
+                        try:
+                            if not self._dry_run:
                                 self.client_ec2.deregister_image(ImageId=resource_id)
-                            except:
-                                self.logging.error(
-                                    f"Could not deregister EC2 Image '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
-                            "and has been deregistered."
-                        )
-                        resource_action = "delete"
+                        except:
+                            self.logging.error(
+                                f"Could not deregister EC2 Image '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been deregistered."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deregistered."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"EC2 Image '{resource_id}' has been whitelisted and has not "
                         "been deregistered."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
@@ -247,7 +246,7 @@ class EC2Cleanup:
                     resource_id = resource.get("InstanceId")
                     resource_date = resource.get("LaunchTime")
                     resource_state = resource.get("State").get("Name")
-                    resource_action = "skip"
+                    resource_action = None
 
                     if resource_id not in self.whitelist.get("ec2", {}).get(
                         "instance", []
@@ -256,94 +255,90 @@ class EC2Cleanup:
 
                         if delta.days > ttl_days:
                             if resource_state == "running":
-                                if not self.settings.get("general", {}).get(
-                                    "dry_run", True
-                                ):
-                                    try:
+                                try:
+                                    if not self._dry_run:
                                         self.client_ec2.stop_instances(
                                             InstanceIds=[resource_id]
                                         )
-                                    except:
-                                        self.logging.error(
-                                            f"Could not stop EC2 Instance '{resource_id}'."
-                                        )
-                                        self.logging.error(sys.exc_info()[1])
-                                        resource_action = "error"
-                                        continue
-
-                                self.logging.info(
-                                    f"EC2 Instance '{resource_id}' in a 'running' state was last "
-                                    f"launched {delta.days} days ago and has been stopped."
-                                )
-                                resource_action = "stop"
+                                except:
+                                    self.logging.error(
+                                        f"Could not stop EC2 Instance '{resource_id}'."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.info(
+                                        f"EC2 Instance '{resource_id}' in a 'running' state was last "
+                                        f"launched {delta.days} days ago and has been stopped."
+                                    )
+                                    resource_action = "STOP"
                             elif resource_state == "stopped":
-                                if not self.settings.get("general", {}).get(
-                                    "dry_run", True
-                                ):
-                                    # disable termination protection before terminating the instance
-                                    try:
-                                        resource_protection = (
-                                            self.client_ec2.describe_instance_attribute(
-                                                Attribute="disableApiTermination",
-                                                InstanceId=resource_id,
-                                            )
-                                            .get("DisableApiTermination")
-                                            .get("Value")
+                                # disable termination protection before terminating the instance
+                                try:
+                                    resource_protection = (
+                                        self.client_ec2.describe_instance_attribute(
+                                            Attribute="disableApiTermination",
+                                            InstanceId=resource_id,
                                         )
-                                    except:
-                                        self.logging.error(
-                                            f"Could not get if protection for EC2 Instance '{resource_id}' is on."
-                                        )
-                                        self.logging.error(sys.exc_info()[1])
-                                        resource_action = "error"
-                                        continue
-
+                                        .get("DisableApiTermination")
+                                        .get("Value")
+                                    )
+                                except:
+                                    self.logging.error(
+                                        f"Could not get if protection for EC2 Instance '{resource_id}' is on."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
                                     if resource_protection:
                                         try:
-                                            self.client_ec2.modify_instance_attribute(
-                                                DisableApiTermination={"Value": False},
-                                                InstanceId=resource_id,
-                                            )
+                                            if not self._dry_run:
+                                                self.client_ec2.modify_instance_attribute(
+                                                    DisableApiTermination={
+                                                        "Value": False
+                                                    },
+                                                    InstanceId=resource_id,
+                                                )
                                         except:
                                             self.logging.error(
                                                 f"Could not remove termination protection from EC2 Instance '{resource_id}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
-                                            resource_action = "error"
-                                            continue
+                                            resource_action = "ERROR"
+                                        else:
+                                            self.logging.info(
+                                                f"EC2 Instance '{resource_id}' had termination protection "
+                                                "turned on and now has been turned off."
+                                            )
 
-                                        self.logging.info(
-                                            f"EC2 Instance '{resource_id}' had termination protection "
-                                            "turned on and now has been turned off."
-                                        )
-
-                                    try:
-                                        self.client_ec2.terminate_instances(
-                                            InstanceIds=[resource_id]
-                                        )
-                                    except:
-                                        self.logging.error(
-                                            f"Could not delete Instance EC2 '{resource_id}'."
-                                        )
-                                        self.logging.error(sys.exc_info()[1])
-                                        continue
-
-                                self.logging.info(
-                                    f"EC2 Instance '{resource_id}' in a 'stopped' state was last "
-                                    f"launched {delta.days} days ago and has been terminated."
-                                )
-                                resource_action = "delete"
+                                    if resource_action != "ERROR":
+                                        try:
+                                            if not self._dry_run:
+                                                self.client_ec2.terminate_instances(
+                                                    InstanceIds=[resource_id]
+                                                )
+                                        except:
+                                            self.logging.error(
+                                                f"Could not delete Instance EC2 '{resource_id}'."
+                                            )
+                                            self.logging.error(sys.exc_info()[1])
+                                        else:
+                                            self.logging.info(
+                                                f"EC2 Instance '{resource_id}' in a 'stopped' state was last "
+                                                f"launched {delta.days} days ago and has been terminated."
+                                            )
+                                            resource_action = "DELETE"
                         else:
                             self.logging.debug(
                                 f"EC2 Instance '{resource_id}' was created {delta.days} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
-                            resource_action = "skip - TTL"
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
                             f"EC2 Instance '{resource_id}' has been whitelisted and has not been deleted."
                         )
-                        resource_action = "skip - whitelist"
+                        resource_action = "SKIP - WHITELIST"
 
                     self.execution_log.get("AWS").setdefault(
                         self.region, {}
@@ -403,33 +398,33 @@ class EC2Cleanup:
                 return False
 
             for resource in resources:
-                resource_action = "skip"
+                resource_action = None
 
                 if resource not in self.whitelist.get("ec2", {}).get(
                     "security_group", []
                 ):
-                    if not self.settings.get("general", {}).get("dry_run", True):
-                        try:
+                    try:
+                        if not self._dry_run:
                             self.client_ec2.delete_security_group(GroupId=resource)
-                        except:
+                    except:
+                        if "DependencyViolation" in str(sys.exc_info()[1]):
+                            self.logging.warn(
+                                f"EC2 Security Group '{resource}' has a dependent object "
+                                "and cannot been deleted without deleting the dependent object first."
+                            )
+                            resource_action = "SKIP - IN USE"
+                        else:
                             self.logging.error(
                                 f"Could not delete EC2 Security Group '{resource}'."
                             )
                             self.logging.error(sys.exc_info()[1])
-                            resource_action = "error"
-                            continue
-
-                    self.logging.info(
-                        f"EC2 Security Group '{resource}' is not associated with an EC2 instance and has "
-                        "been deleted."
-                    )
-                    resource_action = "delete"
-                else:
-                    self.logging.debug(
-                        f"EC2 Security Group '{resource}' has been whitelisted and has not "
-                        "been deleted."
-                    )
-                    resource_action = "skip - whitelist"
+                            resource_action = "ERROR"
+                    else:
+                        self.logging.info(
+                            f"EC2 Security Group '{resource}' is not associated with an EC2 instance and has "
+                            "been deleted."
+                        )
+                        resource_action = "DELETE"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
@@ -484,7 +479,7 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("SnapshotId")
                 resource_date = resource.get("StartTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("snapshot", []):
                     snapshots_in_use = []
@@ -497,59 +492,57 @@ class EC2Cleanup:
                     except:
                         self.logging.error(f"Could not retrieve EC2 Images.")
                         self.logging.error(sys.exc_info()[1])
-                        resource_action = "error"
-                        continue
+                        resource_action = "ERROR"
+                    else:
+                        for image in images:
+                            block_device_mappings = image.get("BlockDeviceMappings")
 
-                    for image in images:
-                        block_device_mappings = image.get("BlockDeviceMappings")
-
-                        for block_device_mapping in block_device_mappings:
-                            if "Ebs" in block_device_mapping:
-                                snapshots_in_use.append(
-                                    block_device_mapping.get("Ebs").get("SnapshotId")
-                                )
-
-                    if resource_id not in snapshots_in_use:
-                        delta = Helper.get_day_delta(resource_date)
-
-                        if delta.days > ttl_days:
-                            if not self.settings.get("general", {}).get(
-                                "dry_run", True
-                            ):
-                                try:
-                                    self.client_ec2.delete_snapshot(
-                                        SnapshotId=resource_id
+                            for block_device_mapping in block_device_mappings:
+                                if "Ebs" in block_device_mapping:
+                                    snapshots_in_use.append(
+                                        block_device_mapping.get("Ebs").get(
+                                            "SnapshotId"
+                                        )
                                     )
+
+                        if resource_id not in snapshots_in_use:
+                            delta = Helper.get_day_delta(resource_date)
+
+                            if delta.days > ttl_days:
+                                try:
+                                    if not self._dry_run:
+                                        self.client_ec2.delete_snapshot(
+                                            SnapshotId=resource_id
+                                        )
                                 except:
                                     self.logging.error(
                                         f"Could not delete EC2 Snapshot '{resource_id}'."
                                     )
                                     self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-
-                            self.logging.info(
-                                f"EC2 Snapshot '{resource_id}' was created {delta.days} days ago "
-                                "and has been deleted."
-                            )
-                            resource_action = "delete"
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.info(
+                                        f"EC2 Snapshot '{resource_id}' was created {delta.days} days ago "
+                                        "and has been deleted."
+                                    )
+                                    resource_action = "DELETE"
+                            else:
+                                self.logging.debug(
+                                    f"EC2 Snapshot '{resource_id} was created {delta.days} days ago "
+                                    "(less than TTL setting) and has not been deleted."
+                                )
+                                resource_action = "SKIP - TTL"
                         else:
-                            self.logging.debug(
-                                f"EC2 Snapshot '{resource_id} was created {delta.days} days ago "
-                                "(less than TTL setting) and has not been deleted."
+                            self.logging.warn(
+                                f"EC2 Snapshot '{resource_id}' is currently used by an Image "
+                                "and cannot been deleted without deleting the Image first."
                             )
-                            resource_action = "skip - TTL"
-                    else:
-                        self.logging.warn(
-                            f"EC2 Snapshot '{resource_id}' is currently used by an Image "
-                            "and cannot been deleted without deleting the Image first."
-                        )
-                        resource_action = "skip - in use"
+                            resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
                         f"EC2 Snapshot '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}
@@ -600,48 +593,45 @@ class EC2Cleanup:
             for resource in resources:
                 resource_id = resource.get("VolumeId")
                 resource_date = resource.get("CreateTime")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
                     if resource.get("Attachments") == []:
                         delta = Helper.get_day_delta(resource_date)
 
                         if delta.days > ttl_days:
-                            if not self.settings.get("general", {}).get(
-                                "dry_run", True
-                            ):
-                                try:
+                            try:
+                                if not self._dry_run:
                                     self.client_ec2.delete_volume(VolumeId=resource_id)
-                                except:
-                                    self.logging.error(
-                                        f"Could not delete EC2 Volume '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "error"
-                                    continue
-
-                            self.logging.info(
-                                f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
-                                "and has been deleted."
-                            )
-                            resource_action = "delete"
+                            except:
+                                self.logging.error(
+                                    f"Could not delete EC2 Volume '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                         else:
                             self.logging.debug(
                                 f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
-                            resource_action = "skip - TTL"
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.warn(
                             f"EC2 Volume '{resource_id}' is attached to an EC2 instance "
                             "and has not been deleted."
                         )
-                        resource_action = "skip - in use"
+                        resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
                         f"EC2 Volume '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "EC2", {}

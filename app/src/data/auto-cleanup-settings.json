@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "3"
+      "N": "4"
     }
   },
   {
@@ -25,6 +25,23 @@
     },
     "value": {
       "M": {
+        "amplify": {
+          "M": {
+            "app": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "app_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "cloudformation": {
           "M": {
             "stack": {
@@ -162,6 +179,23 @@
             }
           }
         },
+        "efs": {
+          "M": {
+            "file_system": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "file_system_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "elasticbeanstalk": {
           "M": {
             "application": {
@@ -179,6 +213,36 @@
             }
           }
         },
+        "elasticache": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cache_cluster_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "replication_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "replication_group_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "elasticsearch": {
           "M": {
             "domain": {
@@ -188,6 +252,23 @@
                 },
                 "id": {
                   "S": "domain_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "elb": {
+          "M": {
+            "load_balancer": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "load_balancer_name"
                 },
                 "ttl": {
                   "N": "7"
@@ -242,6 +323,23 @@
                 },
                 "ttl": {
                   "N": "30"
+                }
+              }
+            }
+          }
+        },
+        "kafka": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cluster_name"
+                },
+                "ttl": {
+                  "N": "7"
                 }
               }
             }

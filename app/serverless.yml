@@ -32,9 +32,8 @@ provider:
             - cloudformation.amazonaws.com
     - Effect: Allow
       Action:
-        - athena:GetQueryExecution
-        - athena:GetQueryResults
-        - athena:StartQueryExecution
+        - amplify:DeleteApp
+        - amplify:ListApps
       Resource: "*"
     - Effect: Allow
       Action:
@@ -89,6 +88,26 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - elasticache:DeleteCacheCluster
+        - elasticache:DeleteReplicationGroup
+        - elasticache:DescribeCacheClusters
+        - elasticache:DescribeReplicationGroups
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - elasticfilesystem:DeleteFileSystem
+        - elasticfilesystem:DeleteMountTarget
+        - elasticfilesystem:DescribeFileSystems
+        - elasticfilesystem:DescribeMountTargets
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - elasticloadbalancing:DeleteLoadBalancer
+        - elasticloadbalancing:DescribeLoadBalancers
+        - elasticloadbalancing:ModifyLoadBalancerAttributes
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - elasticmapreduce:ListClusters
         - elasticmapreduce:TerminateJobFlows
       Resource: "*"
@@ -117,6 +136,11 @@ provider:
         - iam:ListRolePolicies
         - iam:ListRoles
         - iam:RemoveRoleFromInstanceProfile
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - kafka:DeleteCluster
+        - kafka:ListClusters
       Resource: "*"
     - Effect: Allow
       Action:
@@ -212,6 +236,8 @@ resources:
           - AttributeName: key
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
     WhitelistTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -226,6 +252,8 @@ resources:
           AttributeName: expiration
           Enabled: true
         BillingMode: PAY_PER_REQUEST
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
     ExecutionLogBucket:
       Type: AWS::S3::Bucket
       DeletionPolicy: Retain

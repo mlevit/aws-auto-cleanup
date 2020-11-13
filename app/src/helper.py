@@ -13,14 +13,15 @@ class Helper:
 
     @staticmethod
     def get_day_delta(resource_date):
+        from_datetime = Helper.convert_to_datetime(
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+
         if resource_date is not None:
-            from_datetime = Helper.convert_to_datetime(
-                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            )
             to_datetime = Helper.convert_to_datetime(resource_date)
             return from_datetime - to_datetime
         else:
-            return 0
+            return from_datetime - from_datetime
 
     @staticmethod
     def parse_resource_id(resource_id):

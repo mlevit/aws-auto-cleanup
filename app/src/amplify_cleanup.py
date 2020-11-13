@@ -6,7 +6,7 @@ import boto3
 from src.helper import Helper
 
 
-class LambdaCleanup:
+class AmplifyCleanup:
     def __init__(self, logging, whitelist, settings, execution_log, region):
         self.logging = logging
         self.whitelist = whitelist
@@ -14,89 +14,86 @@ class LambdaCleanup:
         self.execution_log = execution_log
         self.region = region
 
-        self._client_lambda = None
+        self._client_amplify = None
         self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
-    def client_lambda(self):
-        if not self._client_lambda:
-            self._client_lambda = boto3.client("lambda", region_name=self.region)
-        return self._client_lambda
+    def client_amplify(self):
+        if not self._client_amplify:
+            self._client_amplify = boto3.client("amplify", region_name=self.region)
+        return self._client_amplify
 
     def run(self):
-        self.functions()
+        self.apps()
 
-    def functions(self):
+    def apps(self):
         """
-        Deletes Lambda Functions.
+        Deletes Amplify Apps.
         """
 
-        self.logging.debug("Started cleanup of Lambda Functions.")
+        self.logging.debug("Started cleanup of Amplify Apps.")
 
         clean = (
             self.settings.get("services", {})
-            .get("lambda", {})
-            .get("function", {})
+            .get("amplify", {})
+            .get("app", {})
             .get("clean", False)
         )
         if clean:
             try:
-                resources = self.client_lambda.list_functions().get("Functions")
+                resources = self.client_amplify.list_apps().get("apps")
             except:
-                self.logging.error("Could not list all Lambda Functions.")
+                self.logging.error("Could not list all Amplify Apps.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             ttl_days = (
                 self.settings.get("services", {})
-                .get("lambda", {})
-                .get("function", {})
+                .get("amplify", {})
+                .get("app", {})
                 .get("ttl", 7)
             )
 
             for resource in resources:
-                resource_id = resource.get("FunctionName")
-                resource_date = resource.get("LastModified")
+                resource_id = resource.get("name")
+                resource_app_id = resource.get("appId")
+                resource_date = resource.get("updateTime")
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("lambda", {}).get(
-                    "function", []
-                ):
+                if resource_id not in self.whitelist.get("amplify", {}).get("app", []):
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         try:
                             if not self._dry_run:
-                                self.client_lambda.delete_function(
-                                    FunctionName=resource_id
-                                )
+                                self.client_amplify.delete_app(appId=resource_app_id)
                         except:
                             self.logging.error(
-                                f"Could not delete Lambda Function '{resource_id}'."
+                                f"Could not delete Amplify App '{resource_id}'."
                             )
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                                f"Amplify App '{resource_id}' was last modified {delta.days} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                            f"Amplify App '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"Lambda Function '{resource_id}' has been whitelisted and has not been deleted."
+                        f"Amplify App '{resource_id}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "Lambda", {}
-                ).setdefault("Function", []).append(
+                    "Amplify", {}
+                ).setdefault("App", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -106,8 +103,8 @@ class LambdaCleanup:
                     }
                 )
 
-            self.logging.debug("Finished cleanup of Lambda Functions.")
+            self.logging.debug("Finished cleanup of Amplify Apps.")
             return True
         else:
-            self.logging.info("Skipping cleanup of Lambda Functions.")
+            self.logging.info("Skipping cleanup of Amplify Apps.")
             return True

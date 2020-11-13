@@ -1,5 +1,19 @@
 # AWS Auto Cleanup Changelog
 
+## 1.2.0
+
+- Added Amplify Apps cleanup.
+- Added EFS File System cleanup.
+- Added ElastiCache Cluster and Replication Group cleanup.
+- Added ELB Load Balancer cleanup.
+- Added Kafka Cluster cleanup.
+- Added paginated IAM Role retrieval.
+- Added `permanent` field to the Create Whitelist API allowing the creation of permanent whitelist entries. This is however not exposed via the web UI.
+- Added point-in-time recovery to the Whitelist and Settings DynamoDB tables.
+- Added Whitelist table groupings to separate the permanent and temporary entries. As a side note, any entry with an expiration epoch of `4102444800` (2100-01-01 00:00:00) or greater will be considered "permanent".
+- Fixed an issue where AWS managed roles, roles beginning with `AWSServiceRoleFor` were being incorrectly marked as `SKIP - WHITELIST`. These roles are now ignored during cleanup.
+- Improved accuracy of actions taken within execution logs.
+
 ## 1.1.0
 
 - Added AWS Account ID to the navigation bar and webpage title.

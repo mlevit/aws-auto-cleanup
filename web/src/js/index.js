@@ -235,7 +235,7 @@ function getExecutionLogList() {
         $("#execution-log-list-table").DataTable({
           dom: "rtp",
           columnDefs: [
-            { orderable: false, targets: [2] },
+            { orderable: false, targets: [0, 1, 2] },
             { className: "dt-center", targets: [2] },
           ],
           order: [[0, "desc"]],
@@ -295,13 +295,17 @@ function getWhitelist() {
     .then((data) => {
       let i = 1;
       let whitelist_raw = data["response"]["whitelist"];
-      // Add row ID for action reference
-      app.whitelist = whitelist_raw.map((item) => {
-        item["id"] = i++;
-        dayjs.extend(dayjs_plugin_utc);
-        dayjs.extend(dayjs_plugin_timezone);
 
+      dayjs.extend(dayjs_plugin_utc);
+      dayjs.extend(dayjs_plugin_timezone);
+
+      app.whitelist = whitelist_raw.map((item) => {
         let readable_date = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
+
+        item["row_id"] = i++;
+        item["service"] = item["resource_id"].split(":", 3)[0];
+        item["resource"] = item["resource_id"].split(":", 3)[1];
+        item["id"] = item["resource_id"].split(":", 3)[2];
 
         item["expiration_readable"] = readable_date.format(
           "ddd MMM DD HH:mm:ss YYYY"
@@ -312,11 +316,21 @@ function getWhitelist() {
 
       setTimeout(function () {
         app.whitelistDataTables = $("#whitelist").DataTable({
-          dom: "rtp",
           columnDefs: [
-            { orderable: false, targets: [3, 4] },
-            { className: "dt-center", targets: [4] },
+            { className: "dt-center", targets: [5] },
+            { orderable: false, targets: [0, 1, 2, 3, 4, 5, 6, 7] },
+            {
+              targets: [6],
+              visible: false,
+              searchable: false,
+            },
           ],
+          dom: "rtp",
+          order: [[6, "desc"]],
+          pageLength: 50,
+          rowGroup: {
+            dataSrc: 6,
+          },
         });
       }, 10);
 
@@ -333,32 +347,8 @@ function getWhitelist() {
 }
 
 function refreshWhitelist() {
-  fetch(API_GET_WHITELIST)
-    .then((response) => response.json())
-    .then((data) => {
-      let i = 1;
-      let whitelist_raw = data["response"]["whitelist"];
-      app.whitelist = whitelist_raw.map((item) => {
-        item["id"] = i++;
-        dayjs.extend(dayjs_plugin_utc);
-        dayjs.extend(dayjs_plugin_timezone);
-
-        let readable_date = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
-
-        item["expiration_readable"] = readable_date.format(
-          "ddd MMM DD HH:mm:ss YYYY"
-        );
-        return item;
-      });
-    })
-    .catch((error) => {
-      iziToast.error({
-        title: "Something went wrong",
-        message: error,
-        color: "#EC2B55",
-        messageColor: "white",
-      });
-    });
+  app.whitelistDataTables.destroy();
+  getWhitelist();
 }
 
 function openTab(evt, tabName) {

@@ -15,6 +15,7 @@ class ElasticBeanstalkCleanup:
         self.region = region
 
         self._client_elasticbeanstalk = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_elasticbeanstalk(self):
@@ -60,7 +61,7 @@ class ElasticBeanstalkCleanup:
             for resource in resources:
                 resource_id = resource.get("ApplicationName")
                 resource_date = resource.get("DateUpdated")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("elasticbeanstalk", {}).get(
                     "application", []
@@ -68,36 +69,35 @@ class ElasticBeanstalkCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
+                        try:
+                            if not self._dry_run:
                                 self.client_elasticbeanstalk.delete_application(
                                     ApplicationName=resource_id,
                                     TerminateEnvByForce=True,
                                 )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete Elastic Beanstalk Application '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                        except:
+                            self.logging.error(
+                                f"Could not delete Elastic Beanstalk Application '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"Elastic Beanstalk Application '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "Elastic Beanstalk", {}

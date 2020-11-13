@@ -6,7 +6,7 @@ import boto3
 from src.helper import Helper
 
 
-class LambdaCleanup:
+class KafkaCleanup:
     def __init__(self, logging, whitelist, settings, execution_log, region):
         self.logging = logging
         self.whitelist = whitelist
@@ -14,89 +14,90 @@ class LambdaCleanup:
         self.execution_log = execution_log
         self.region = region
 
-        self._client_lambda = None
+        self._client_kafka = None
         self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
-    def client_lambda(self):
-        if not self._client_lambda:
-            self._client_lambda = boto3.client("lambda", region_name=self.region)
-        return self._client_lambda
+    def client_kafka(self):
+        if not self._client_kafka:
+            self._client_kafka = boto3.client("kafka", region_name=self.region)
+        return self._client_kafka
 
     def run(self):
-        self.functions()
+        self.clusters()
 
-    def functions(self):
+    def clusters(self):
         """
-        Deletes Lambda Functions.
+        Deletes Kafka Clusters.
         """
 
-        self.logging.debug("Started cleanup of Lambda Functions.")
+        self.logging.debug("Started cleanup of Kafka Clusters.")
 
         clean = (
             self.settings.get("services", {})
-            .get("lambda", {})
-            .get("function", {})
+            .get("kafka", {})
+            .get("cluster", {})
             .get("clean", False)
         )
         if clean:
             try:
-                resources = self.client_lambda.list_functions().get("Functions")
+                resources = self.client_kafka.list_clusters().get("ClusterInfoList")
             except:
-                self.logging.error("Could not list all Lambda Functions.")
+                self.logging.error("Could not list all Kafka Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             ttl_days = (
                 self.settings.get("services", {})
-                .get("lambda", {})
-                .get("function", {})
+                .get("kafka", {})
+                .get("cluster", {})
                 .get("ttl", 7)
             )
 
             for resource in resources:
-                resource_id = resource.get("FunctionName")
-                resource_date = resource.get("LastModified")
+                resource_id = resource.get("ClusterName")
+                resource_arn = resource.get("ClusterArn")
+                resource_date = resource.get("CreationTime")
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("lambda", {}).get(
-                    "function", []
+                if resource_id not in self.whitelist.get("kafka", {}).get(
+                    "cluster", []
                 ):
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
                         try:
                             if not self._dry_run:
-                                self.client_lambda.delete_function(
-                                    FunctionName=resource_id
+                                self.client_kafka.delete_cluster(
+                                    ClusterArn=resource_arn
                                 )
                         except:
                             self.logging.error(
-                                f"Could not delete Lambda Function '{resource_id}'."
+                                f"Could not delete Kafka Cluster '{resource_id}'."
                             )
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                                f"Kafka Cluster '{resource_id}' was created {delta.days} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                            f"Kafka Cluster '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"Lambda Function '{resource_id}' has been whitelisted and has not been deleted."
+                        f"Kafka Cluster '{resource_id}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "Lambda", {}
-                ).setdefault("Function", []).append(
+                    "Kafka", {}
+                ).setdefault("Cluster", []).append(
                     {
                         "id": resource_id,
                         "action": resource_action,
@@ -106,8 +107,8 @@ class LambdaCleanup:
                     }
                 )
 
-            self.logging.debug("Finished cleanup of Lambda Functions.")
+            self.logging.debug("Finished cleanup of Kafka Clusters.")
             return True
         else:
-            self.logging.info("Skipping cleanup of Lambda Functions.")
+            self.logging.info("Skipping cleanup of Kafka Clusters.")
             return True

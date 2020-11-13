@@ -110,6 +110,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 
 | Resource                       | ID Attribute           | Example Value                                        |
 | ------------------------------ | ---------------------- | ---------------------------------------------------- |
+| Amplify Apps                   | App Name               | `amplify:app:app_name`                               |
 | CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`                    |
 | DynamoDB Tables                | Table Name             | `dynamodb:table:table_name`                          |
 | EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                          |
@@ -120,11 +121,16 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
 | ECS Services                   | Service Name           | `ecs:service:service_name`                           |
+| EFS File Systems               | File System ID         | `efs:file_system:file_system_id`                     |
+| ElastiCache Clusters           | Cache Cluster ID       | `elasticache:cluster:cache_cluster_id`               |
+| ElastiCache Replication Groups | Replication Group ID   | `elasticache:replication_group:replication_group_id` |
 | Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | Elasticsearch Service          | Domain Name            | `elasticsearch:domain:domain_name`                   |
+| ELB Load Balancers             | Load Balancer Name     | `elb:load_balancer:load_balancer_name`               |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
+| Kafka Clusters                 | Cluster Name           | `kafka:cluster:cluster_name`                         |
 | Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name          | `lambda:function:function_name`                      |
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`               |
@@ -169,6 +175,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 
 | Service               | Resource Type            | Clean | TTL | Comment                                                        |
 | --------------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
+| Amplify               | Apps :new:               | True  | 7   |                                                                |
 | CloudFormation        | Stacks                   | True  | 7   |                                                                |
 | DynamoDB              | Tables                   | True  | 7   |                                                                |
 | EC2                   | Addresses                | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
@@ -179,11 +186,16 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EC2                   | Volumes                  | True  | 7   |                                                                |
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
+| EFS                   | File Systems :new:       | True  | 7   |                                                                |
+| ElastCache            | Clusters :new:           | True  | 7   |                                                                |
+| ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
 | Elasticsearch Service | Domain Name :new:        | True  | 7   |                                                                |
+| ELB                   | Load Balancers :new:     | True  | 7   |                                                                |
 | EMR                   | Clusters                 | True  | 7   |                                                                |
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
+| Kafka                 | Clusters :new:           | True  | 7   |                                                                |
 | Kinesis               | Streams :new:            | True  | 7   |                                                                |
 | Lambda                | Functions                | True  | 30  |                                                                |
 | RDS                   | Instances                | True  | 7   |                                                                |
@@ -230,17 +242,17 @@ _Note: Some regions are deactivated by default as they required special access f
 
 Post every Auto Cleanup run, an execution log is generated and stored as a flat CSV file within the `execution-log` S3 Bucket. The execution log files adhere to the following schema.
 
-| Column       | Format    | Description                                                                                         |
-| ------------ | --------- | --------------------------------------------------------------------------------------------------- |
-| platform     | string    | Always `AWS`                                                                                        |
-| region       | string    | Region (e.g. `ap-southeast-2`)                                                                      |
-| service      | string    | Service (e.g., `s3`)                                                                                |
-| resource     | string    | Resource (e.g., `bucket`)                                                                           |
-| resource_id  | string    | Resource ID (e.g., Instance ID)                                                                     |
-| action       | string    | Action taken on the resource (e.g., `delete`, `skip - TTL`, `skip - whitelist`, `skip`, or `error`) |
-| timestamp    | timestamp | Timestamp when action was performed                                                                 |
-| dry_run_flag | boolean   | Dry run activated                                                                                   |
-| execution_id | string    | Lambda execution ID                                                                                 |
+| Column       | Format    | Description                                                                                                  |
+| ------------ | --------- | ------------------------------------------------------------------------------------------------------------ |
+| platform     | string    | Always `AWS`                                                                                                 |
+| region       | string    | Region (e.g. `ap-southeast-2`)                                                                               |
+| service      | string    | Service (e.g., `s3`)                                                                                         |
+| resource     | string    | Resource (e.g., `bucket`)                                                                                    |
+| resource_id  | string    | Resource ID (e.g., Instance ID)                                                                              |
+| action       | string    | Action taken on the resource (e.g., `DELETE`, `SKIP - TTL`, `SKIP - WHITELIST`, `SKIP - IN USE`, OR `ERROR`) |
+| timestamp    | timestamp | Timestamp when action was performed                                                                          |
+| dry_run_flag | boolean   | Dry run activated                                                                                            |
+| execution_id | string    | Lambda execution ID                                                                                          |
 
 #### Athena
 

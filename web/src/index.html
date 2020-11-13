@@ -158,35 +158,46 @@
         <table class="table" id="whitelist">
           <thead>
             <tr>
-              <th>Resource ID</th>
+              <th>Service</th>
+              <th>Resource</th>
+              <th>ID</th>
               <th>Expiration</th>
               <th>Owner</th>
               <th>Comment</th>
+              <th>Type</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in whitelist" :key="item.id">
-              <td style="white-space: nowrap">{{ item.resource_id }}</td>
+            <tr v-for="item in whitelist" :key="item.row_id">
+              <td style="white-space: nowrap">{{ item.service }}</td>
+              <td style="white-space: nowrap">{{ item.resource }}</td>
+              <td style="white-space: nowrap">{{ item.id }}</td>
               <td style="white-space: nowrap">
-                {{ item.expiration_readable }}
+                <span v-if="item.expiration < '4102444800'"
+                  >{{ item.expiration_readable }}</span
+                >
               </td>
               <td style="white-space: nowrap">{{ item.owner }}</td>
               <td>{{ item.comment }}</td>
+              <td>
+                <span v-if="item.expiration < '4102444800'">Temporary</span>
+                <span v-if="item.expiration >= '4102444800'">Permanent</span>
+              </td>
               <td style="white-space: nowrap">
-                <a
-                  v-if="item.expiration !== '99999999999'"
-                  v-on:click="extendWhitelistEntry( item.id )"
+                <button
                   class="button is-warning"
+                  v-if="item.expiration < '4102444800'"
+                  v-on:click="extendWhitelistEntry( item.row_id )"
                 >
                   <span class="icon">
                     <i class="far fa-calendar-plus"></i>
                   </span>
-                </a>
+                </button>
                 <button
-                  v-if="item.expiration !== '99999999999'"
-                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
                   class="button is-danger"
+                  v-if="item.expiration < '4102444800'"
+                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
                 >
                   <span class="icon">
                     <i class="far fa-trash-alt"></i>
@@ -206,25 +217,10 @@
         <br />
 
         <!-- Execution Log -->
-        <!-- <h2 class="title"></h2> -->
         <nav class="level">
           <div class="level-left">
             <h3 class="title is-3 mt-2 mb-0 mr-2">Execution Logs</h3>
           </div>
-          <!-- <div class="level-right">
-            <div class="control has-icons-left is-right">
-              <input
-                class="input"
-                placeholder="Search"
-                type="text"
-                v-model="executionLogSearchTerm"
-                v-on:keyup="searchExecutionLog()"
-              />
-              <span class="icon is-left">
-                <i class="fas fa-search"></i>
-              </span>
-            </div>
-          </div> -->
         </nav>
 
         <table class="table" id="execution-log-list-table">
@@ -238,13 +234,15 @@
               <td>{{ item.key }}</td>
               <td>{{ item.date }}</td>
               <td>
-                <a
+                <button
                   v-on:click="openExecutionLog( item.key_escape )"
                   target="_blank"
                   class="button"
-                  ><span class="icon">
-                    <i class="fas fa-external-link-alt"></i> </span
-                ></a>
+                >
+                  <span class="icon">
+                    <i class="fas fa-external-link-alt"></i>
+                  </span>
+                </button>
               </td>
             </tr>
           </tbody>
@@ -452,7 +450,7 @@
             class="modal-background"
             v-on:click="closeWhitelistInsertPopup()"
           ></div>
-          <div class="modal-card">
+          <div class="modal-card add-whitelist-modal">
             <form action="#" v-on:submit.prevent="createWhitelistEntry()">
               <header class="modal-card-head">
                 <p class="modal-card-title">Add Whitelist Entry</p>
@@ -697,6 +695,11 @@
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"
       integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg=="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-rowgroup/1.1.2/dataTables.rowGroup.min.js"
+      integrity="sha512-ock7SbKoWBDD9MiniUi9p7WlkqpfRL1sM3CsWX7LxORuyLPRyzR484V8SVrTIWqhxtCVNnfcbOo+cRlHIhiwbg=="
       crossorigin="anonymous"
     ></script>
     <script

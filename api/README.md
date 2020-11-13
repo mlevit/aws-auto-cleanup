@@ -73,7 +73,8 @@ Inserts a new whitelist entry into DynamoDB.
 {
   "resource_id": "string",
   "owner": "string",
-  "comment": "string"
+  "comment": "string",
+  "permanent": "bool"
 }
 ```
 
@@ -83,9 +84,11 @@ Inserts a new whitelist entry into DynamoDB.
 
   - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
 
-  - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+  - **owner** (string) -- The email address belonging to the owner of the whitelist entry.
 
   - **comment** (string) -- Comment associated with the whitelist entry.
+
+  - **permanent** (bool) -- If the whitelist entry should be created as a permanent.
 
 ##### Return type
 

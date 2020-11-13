@@ -16,6 +16,7 @@ class S3Cleanup:
 
         self._client_s3 = None
         self._resource_s3 = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_s3(self):
@@ -64,84 +65,88 @@ class S3Cleanup:
             for resource in resources.get("Buckets"):
                 resource_id = resource.get("Name")
                 resource_date = resource.get("CreationDate")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("s3", {}).get("bucket", []):
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            # delete bucket policy
-                            try:
+                        # delete bucket policy
+                        try:
+                            if not self._dry_run:
                                 self.client_s3.delete_bucket_policy(Bucket=resource_id)
-                                self.logging.info(
-                                    f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
-                                )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete Bucket Policy for S3 Bucket '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
+                        except:
+                            self.logging.error(
+                                f"Could not delete Bucket Policy for S3 Bucket '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
+                            )
 
                             bucket_resource = self.resource_s3.Bucket(resource_id)
 
                             # delete all objects
                             try:
-                                bucket_resource.objects.delete()
-                                self.logging.info(
-                                    f"Deleted all Objects from S3 Bucket '{resource_id}'."
-                                )
+                                if not self._dry_run:
+                                    bucket_resource.objects.delete()
                             except:
                                 self.logging.error(
                                     f"Could not delete all Objects from S3 Bucket '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                            # delete all Versions and DeleteMarkers
-                            try:
-                                bucket_resource.object_versions.delete()
+                                resource_action = "ERROR"
+                            else:
                                 self.logging.info(
-                                    f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
+                                    f"Deleted all Objects from S3 Bucket '{resource_id}'."
                                 )
-                            except:
-                                self.logging.error(
-                                    f"Could not get all Versions and Delete Markers from S3 Bucket '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
 
-                            # delete bucket
-                            try:
-                                self.client_s3.delete_bucket(Bucket=resource_id)
-                            except:
-                                self.logging.error(
-                                    f"Could not delete S3 Bucket '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
+                                # delete all Versions and DeleteMarkers
+                                try:
+                                    if not self._dry_run:
+                                        bucket_resource.object_versions.delete()
+                                except:
+                                    self.logging.error(
+                                        f"Could not get all Versions and Delete Markers from S3 Bucket '{resource_id}'."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.info(
+                                        f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
+                                    )
 
-                        self.logging.info(
-                            f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                                    # delete bucket
+                                    try:
+                                        if not self._dry_run:
+                                            self.client_s3.delete_bucket(
+                                                Bucket=resource_id
+                                            )
+                                    except:
+                                        self.logging.error(
+                                            f"Could not delete S3 Bucket '{resource_id}'."
+                                        )
+                                        self.logging.error(sys.exc_info()[1])
+                                        resource_action = "ERROR"
+                                    else:
+                                        self.logging.info(
+                                            f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
+                                            "and has been deleted."
+                                        )
+                                        resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"S3 Bucket '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "S3", {}

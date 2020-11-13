@@ -15,6 +15,7 @@ class GlueCleanup:
         self.region = region
 
         self._client_glue = None
+        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_glue(self):
@@ -56,7 +57,7 @@ class GlueCleanup:
             for resource in resources:
                 resource_id = resource.get("EndpointName")
                 resource_date = resource.get("LastModifiedTimestamp")
-                resource_action = "skip"
+                resource_action = None
 
                 if resource_id not in self.whitelist.get("glue", {}).get(
                     "dev_endpoint", []
@@ -64,35 +65,34 @@ class GlueCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
+                        try:
+                            if not self._dry_run:
                                 self.client_glue.delete_dev_endpoint(
                                     EndpointName=resource_id
                                 )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete Glue Dev Endpoint '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "error"
-                                continue
-
-                        self.logging.info(
-                            f"Glue Dev Endpoint '{resource_id}' was created {delta.days} days ago "
-                            "and has been deleted."
-                        )
-                        resource_action = "delete"
+                        except:
+                            self.logging.error(
+                                f"Could not delete Glue Dev Endpoint '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"Glue Dev Endpoint '{resource_id}' was last modified {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Glue Dev Endpoint '{resource_id}' was created {delta.days} days ago "
+                            f"Glue Dev Endpoint '{resource_id}' was last modified {delta.days} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "skip - TTL"
+                        resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
                         f"Glue Dev Endpoint '{resource_id}' has been whitelisted and has not been deleted."
                     )
-                    resource_action = "skip - whitelist"
+                    resource_action = "SKIP - WHITELIST"
 
                 self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
                     "glue", {}
