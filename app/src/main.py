@@ -16,6 +16,7 @@ from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
 from src.ecs_cleanup import ECSCleanup
 from src.efs_cleanup import EFSCleanup
+from src.eks_cleanup import EKSCleanup
 from src.elasticache_cleanup import ElastiCacheCleanup
 from src.elasticbeanstalk_cleanup import ElasticBeanstalkCleanup
 from src.elasticsearch_cleanup import ElasticsearchServiceCleanup
@@ -89,8 +90,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=amplify_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=amplify_class.run, args=()))
 
                 # DynamoDB
                 dynamodb_class = DynamoDBCleanup(
@@ -100,8 +100,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=dynamodb_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=dynamodb_class.run, args=()))
 
                 # ECS
                 ecs_class = ECSCleanup(
@@ -111,8 +110,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=ecs_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=ecs_class.run, args=()))
 
                 # EFS
                 efs_class = EFSCleanup(
@@ -122,8 +120,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=efs_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=efs_class.run, args=()))
 
                 # Elastic Beanstalk
                 elasticbeanstalk_class = ElasticBeanstalkCleanup(
@@ -133,8 +130,9 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=elasticbeanstalk_class.run, args=())
-                threads.append(thread)
+                threads.append(
+                    threading.Thread(target=elasticbeanstalk_class.run, args=())
+                )
 
                 # ElastiCache
                 elasticache_class = ElastiCacheCleanup(
@@ -144,8 +142,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=elasticache_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=elasticache_class.run, args=()))
 
                 # Elasticsearch Service
                 elasticsearch_class = ElasticsearchServiceCleanup(
@@ -155,8 +152,9 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=elasticsearch_class.run, args=())
-                threads.append(thread)
+                threads.append(
+                    threading.Thread(target=elasticsearch_class.run, args=())
+                )
 
                 # ELB
                 elb_class = ELBCleanup(
@@ -166,8 +164,17 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=elb_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=elb_class.run, args=()))
+
+                # ELK
+                eks_class = EKSCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=eks_class.run, args=()))
 
                 # EMR
                 emr_class = EMRCleanup(
@@ -177,8 +184,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=emr_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=emr_class.run, args=()))
 
                 # Glue
                 glue_class = GlueCleanup(
@@ -188,8 +194,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=glue_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=glue_class.run, args=()))
 
                 # Kafka
                 kafka_class = KafkaCleanup(
@@ -199,8 +204,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=kafka_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=kafka_class.run, args=()))
 
                 # Kinesis
                 kinesis_class = KinesisCleanup(
@@ -210,8 +214,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=kinesis_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=kinesis_class.run, args=()))
 
                 # Lambda
                 lambda_class = LambdaCleanup(
@@ -221,8 +224,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=lambda_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=lambda_class.run, args=()))
 
                 # RDS
                 rds_class = RDSCleanup(
@@ -232,8 +234,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=rds_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=rds_class.run, args=()))
 
                 # Redshift
                 redshift_class = RedshiftCleanup(
@@ -243,8 +244,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=redshift_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=redshift_class.run, args=()))
 
                 # SageMaker
                 sagemaker_class = SageMakerCleanup(
@@ -254,8 +254,7 @@ class Cleanup:
                     self.execution_log,
                     region,
                 )
-                thread = threading.Thread(target=sagemaker_class.run, args=())
-                threads.append(thread)
+                threads.append(threading.Thread(target=sagemaker_class.run, args=()))
 
                 # start all threads
                 for thread in threads:

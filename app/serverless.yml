@@ -83,6 +83,18 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - eks:DeleteCluster
+        - eks:DeleteFargateProfile
+        - eks:DeleteNodegroup
+        - eks:DescribeCluster
+        - eks:DescribeFargateProfile
+        - eks:DescribeNodegroup
+        - eks:ListClusters
+        - eks:ListFargateProfiles
+        - eks:ListNodegroups
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - elasticbeanstalk:DeleteApplication
         - elasticbeanstalk:DescribeApplications
       Resource: "*"
