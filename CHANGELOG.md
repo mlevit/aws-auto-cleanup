@@ -1,5 +1,9 @@
 # AWS Auto Cleanup Changelog
 
+## 1.3.0
+
+- Added paginated Whitelist retrieval.
+
 ## 1.2.0
 
 - Added Amplify Apps cleanup.
