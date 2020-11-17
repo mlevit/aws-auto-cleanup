@@ -74,6 +74,14 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - ecr:BatchDeleteImage
+        - ecr:DeleteRepository
+        - ecr:DescribeImages
+        - ecr:DescribeRepositories
+        - ecr:ListImages
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - ecs:DeleteCluster
         - ecs:DeleteService
         - ecs:DescribeClusters

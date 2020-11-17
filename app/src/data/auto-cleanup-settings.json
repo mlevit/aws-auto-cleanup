@@ -152,6 +152,36 @@
             }
           }
         },
+        "ecr": {
+          "M": {
+            "image": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "image_digest"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "repository": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "repository_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "ecs": {
           "M": {
             "cluster": {

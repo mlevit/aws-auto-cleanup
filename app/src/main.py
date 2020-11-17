@@ -14,6 +14,7 @@ from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
 from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
+from src.ecr_cleanup import ECRCleanup
 from src.ecs_cleanup import ECSCleanup
 from src.efs_cleanup import EFSCleanup
 from src.eks_cleanup import EKSCleanup
@@ -101,6 +102,16 @@ class Cleanup:
                     region,
                 )
                 threads.append(threading.Thread(target=dynamodb_class.run, args=()))
+
+                # ECR
+                ecr_class = ECRCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=ecr_class.run, args=()))
 
                 # ECS
                 ecs_class = ECSCleanup(

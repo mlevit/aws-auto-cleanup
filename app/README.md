@@ -119,15 +119,17 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                        |
 | EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                           |
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
+| ECR Images                     | Image Digest           | `ecr:image:image_digest`                             |
+| ECR Repositories               | Repository Name        | `ecr:repository:repository_name`                     |
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
 | ECS Services                   | Service Name           | `ecs:service:service_name`                           |
+| EFS File Systems               | File System ID         | `efs:file_system:file_system_id`                     |
 | EKS Clusters                   | Cluster Name           | `eks:cluster:cluster_name`                           |
 | EKS Fargate Profiles           | Fargate Profile Name   | `eks:fargate_profile:fargate_profile_name`           |
 | EKS Node Groups                | Node Group Name        | `eks:node_group:node_group_name`                     |
-| EFS File Systems               | File System ID         | `efs:file_system:file_system_id`                     |
+| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | ElastiCache Clusters           | Cache Cluster ID       | `elasticache:cluster:cache_cluster_id`               |
 | ElastiCache Replication Groups | Replication Group ID   | `elasticache:replication_group:replication_group_id` |
-| Elastic Beanstalk Applications | Application Name       | `elasticbeanstalk:application:application_name`      |
 | Elasticsearch Service          | Domain Name            | `elasticsearch:domain:domain_name`                   |
 | ELB Load Balancers             | Load Balancer Name     | `elb:load_balancer:load_balancer_name`               |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
@@ -136,10 +138,10 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | Kafka Clusters                 | Cluster Name           | `kafka:cluster:cluster_name`                         |
 | Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name          | `lambda:function:function_name`                      |
-| Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`               |
-| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:snapshot_identifier`              |
 | RDS Instances                  | DB Instance Identifier | `rds:instance:db_instance_identifier`                |
 | RDS Snapshots                  | DB Snapshot Name       | `rds:snapshot:db_snapshot_name`                      |
+| Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`               |
+| Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:snapshot_identifier`              |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                              |
 | SageMaker Endpoints            | Endpoint Name          | `sagemaker:endpoint:endpoint_name`                   |
 | SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
@@ -187,11 +189,13 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EC2                   | Security Groups          | True  | N/A | Deletes Security Group if not associated with an EC2 instance. |
 | EC2                   | Snapshots                | True  | 7   |                                                                |
 | EC2                   | Volumes                  | True  | 7   |                                                                |
+| ECR                   | Images :new:             | True  | 7   |                                                                |
+| ECR                   | Repositories :new:       | True  | 7   |                                                                |
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
-| EFS                   | File Systems :new:       | True  | 7   |                                                                |
 | EFS                   | Clusters :new:           | True  | 7   |                                                                |
 | EFS                   | Fargate Profiles :new:   | True  | 7   |                                                                |
+| EFS                   | File Systems :new:       | True  | 7   |                                                                |
 | EFS                   | Node Groups :new:        | True  | 7   |                                                                |
 | ElastCache            | Clusters :new:           | True  | 7   |                                                                |
 | ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
