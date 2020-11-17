@@ -139,7 +139,9 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - glue:DeleteDatabase
         - glue:DeleteDevEndPoint
+        - glue:GetDatabases
         - glue:GetDevEndpoints
         - glue:GetTable
       Resource: "*"

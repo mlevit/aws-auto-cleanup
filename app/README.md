@@ -134,6 +134,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | Elasticsearch Service          | Domain Name            | `elasticsearch:domain:domain_name`                   |
 | ELB Load Balancers             | Load Balancer Name     | `elb:load_balancer:load_balancer_name`               |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
+| Glue Dev Databases             | Database Name          | `glue:database:database_name`                        |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
 | Kafka Clusters                 | Cluster Name           | `kafka:cluster:cluster_name`                         |
@@ -208,6 +209,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | Elasticsearch Service | Domain Name :new:        | True  | 7   |                                                                |
 | ELB                   | Load Balancers :new:     | True  | 7   |                                                                |
 | EMR                   | Clusters                 | True  | 7   |                                                                |
+| Glue                  | Databases :new:          | True  | 30  |                                                                |
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
 | Kafka                 | Clusters :new:           | True  | 7   |                                                                |

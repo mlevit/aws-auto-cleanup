@@ -386,6 +386,19 @@
         },
         "glue": {
           "M": {
+            "database": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "database_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            },
             "dev_endpoint": {
               "M": {
                 "clean": {

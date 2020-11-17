@@ -5,6 +5,7 @@
 - Added CloudWatch Log Group cleanup.
 - Added ECR Image and Repository cleanup.
 - Added EKS Cluster, Fargate Profile, and Node Group cleanup.
+- Added Glue Database cleanup.
 - Added paginated Whitelist retrieval.
 - Removed API caching.
 
