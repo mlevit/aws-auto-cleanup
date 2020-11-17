@@ -3,6 +3,7 @@
 ## 1.3.0
 
 - Added API caching, it was always there but not activated correctly (my bad).
+- Added EKS Cluster, Fargate Profile, and Node Group cleanup.
 - Added paginated Whitelist retrieval.
 
 ## 1.2.0
