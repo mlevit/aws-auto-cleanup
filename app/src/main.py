@@ -12,6 +12,7 @@ from dynamodb_json import json_util as dynamodb_json
 
 from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
+from src.cloudwatch_cleanup import CloudWatchCleanup
 from src.dynamodb_cleanup import DynamoDBCleanup
 from src.ec2_cleanup import EC2Cleanup
 from src.ecr_cleanup import ECRCleanup
@@ -92,6 +93,16 @@ class Cleanup:
                     region,
                 )
                 threads.append(threading.Thread(target=amplify_class.run, args=()))
+
+                # CloudWatch
+                cloudwatch_class = CloudWatchCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=cloudwatch_class.run, args=()))
 
                 # DynamoDB
                 dynamodb_class = DynamoDBCleanup(

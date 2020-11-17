@@ -112,6 +112,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | ------------------------------ | ---------------------- | ---------------------------------------------------- |
 | Amplify Apps                   | App Name               | `amplify:app:app_name`                               |
 | CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`                    |
+| CloudWatch Log Groups          | Log Group Name         | `cloudwatch:log_group:log_group_name`                |
 | DynamoDB Tables                | Table Name             | `dynamodb:table:table_name`                          |
 | EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                          |
 | EC2 Images                     | Image ID               | `ec2:image:image_id`                                 |
@@ -182,6 +183,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | --------------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
 | Amplify               | Apps :new:               | True  | 7   |                                                                |
 | CloudFormation        | Stacks                   | True  | 7   |                                                                |
+| CloudWatch            | Log Groups :new:         | True  | 30  |                                                                |
 | DynamoDB              | Tables                   | True  | 7   |                                                                |
 | EC2                   | Addresses                | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
 | EC2                   | Images :new:             | True  | 7   |                                                                |

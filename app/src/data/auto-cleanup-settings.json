@@ -59,6 +59,23 @@
             }
           }
         },
+        "cloudwatch": {
+          "M": {
+            "log_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "log_group_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            }
+          }
+        },
         "dynamodb": {
           "M": {
             "table": {
