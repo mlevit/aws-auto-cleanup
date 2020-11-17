@@ -121,6 +121,9 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
 | ECS Clusters                   | Cluster Name           | `ecs:cluster:cluster_name`                           |
 | ECS Services                   | Service Name           | `ecs:service:service_name`                           |
+| EKS Clusters                   | Cluster Name           | `eks:cluster:cluster_name`                           |
+| EKS Fargate Profiles           | Fargate Profile Name   | `eks:fargate_profile:fargate_profile_name`           |
+| EKS Node Groups                | Node Group Name        | `eks:node_group:node_group_name`                     |
 | EFS File Systems               | File System ID         | `efs:file_system:file_system_id`                     |
 | ElastiCache Clusters           | Cache Cluster ID       | `elasticache:cluster:cache_cluster_id`               |
 | ElastiCache Replication Groups | Replication Group ID   | `elasticache:replication_group:replication_group_id` |
@@ -187,6 +190,9 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
 | EFS                   | File Systems :new:       | True  | 7   |                                                                |
+| EFS                   | Clusters :new:           | True  | 7   |                                                                |
+| EFS                   | Fargate Profiles :new:   | True  | 7   |                                                                |
+| EFS                   | Node Groups :new:        | True  | 7   |                                                                |
 | ElastCache            | Clusters :new:           | True  | 7   |                                                                |
 | ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
