@@ -58,12 +58,12 @@ class EKSCleanup:
                 # for each cluster, we must first delete all the Node Groups
                 # and Fargate Profiles before deleting the Cluster itself
                 self.fargate_profiles(resource)
-                self.nodegroups(resource)
+                self.node_groups(resource)
 
                 try:
                     resource_details = self.client_eks.describe_cluster(
                         name=resource,
-                    ).get("clusters")
+                    ).get("cluster")
                 except:
                     self.logging.error(
                         f"Could not get EKS Cluster's '{resource}' details."
@@ -246,7 +246,7 @@ class EKSCleanup:
             )
             return True
 
-    def nodegroups(self, cluster):
+    def node_groups(self, cluster):
         """
         Deletes EKS Node Groups for a Cluster.
         """
@@ -258,7 +258,7 @@ class EKSCleanup:
         clean = (
             self.settings.get("services", {})
             .get("eks", {})
-            .get("nodegroup", {})
+            .get("node_group", {})
             .get("clean", False)
         )
         if clean:
@@ -276,7 +276,7 @@ class EKSCleanup:
             ttl_days = (
                 self.settings.get("services", {})
                 .get("eks", {})
-                .get("nodegroup", {})
+                .get("node_group", {})
                 .get("ttl", 7)
             )
 
