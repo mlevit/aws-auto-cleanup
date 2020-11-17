@@ -2,10 +2,11 @@
 
 ## 1.3.0
 
-- Added API caching, it was always there but not activated correctly (my bad).
+- Added CloudWatch Log Group cleanup.
 - Added ECR Image and Repository cleanup.
 - Added EKS Cluster, Fargate Profile, and Node Group cleanup.
 - Added paginated Whitelist retrieval.
+- Removed API caching.
 
 ## 1.2.0
 

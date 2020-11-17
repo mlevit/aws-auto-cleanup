@@ -175,6 +175,11 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - logs:DeleteLogGroup
+        - logs:DescribeLogGroups
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - redshift:DeleteCluster
         - redshift:DeleteClusterSnapshot
         - redshift:DescribeClusterSnapshots
