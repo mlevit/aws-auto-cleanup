@@ -190,13 +190,16 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EC2                   | Snapshots                | True  | 7   |                                                                |
 | EC2                   | Volumes                  | True  | 7   |                                                                |
 | ECR                   | Images :new:             | True  | 7   |                                                                |
-| ECR                   | Repositories :new:       | True  | 7   |                                                                |
+| ECR                   | Repositories :new:       | True  | 7   | Deletes Repository if no Images exist.                         |
 | ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
 | ECS                   | Services :new:           | True  | 7   |                                                                |
 | EFS                   | Clusters :new:           | True  | 7   |                                                                |
 | EFS                   | Fargate Profiles :new:   | True  | 7   |                                                                |
 | EFS                   | File Systems :new:       | True  | 7   |                                                                |
 | EFS                   | Node Groups :new:        | True  | 7   |                                                                |
+| EKS                   | Clusters :new:           | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist.   |
+| EKS                   | Fargate Profiles :new:   | True  | 7   |                                                                |
+| EKS                   | Node Groups :new:        | True  | 7   |                                                                |
 | ElastCache            | Clusters :new:           | True  | 7   |                                                                |
 | ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
 | Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
