@@ -42,7 +42,9 @@ class BatchCleanup:
         )
         if clean:
             try:
-                resources = self.client_batch.describe_compute_environments().get("computeEnvironments")
+                resources = self.client_batch.describe_compute_environments().get(
+                    "computeEnvironments"
+                )
             except:
                 self.logging.error("Could not list all Batch Compute Environments.")
                 self.logging.error(sys.exc_info()[1])
@@ -69,7 +71,7 @@ class BatchCleanup:
                         try:
                             if not self._dry_run:
                                 self.client_batch.delete_compute_environment(
-                                    Compute EnvironmentName=resource_id
+                                    computeEnvironment=resource_id
                                 )
                         except:
                             self.logging.error(
@@ -215,4 +217,3 @@ class BatchCleanup:
         else:
             self.logging.info("Skipping cleanup of Batch Job Queues.")
             return True
-            
