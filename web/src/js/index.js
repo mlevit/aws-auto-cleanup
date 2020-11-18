@@ -327,7 +327,7 @@ function getWhitelist() {
           ],
           dom: "rtp",
           order: [[6, "desc"]],
-          pageLength: 50,
+          pageLength: 20,
           rowGroup: {
             dataSrc: 6,
           },
