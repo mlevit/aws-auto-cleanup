@@ -416,6 +416,19 @@
         },
         "iam": {
           "M": {
+            "policy": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "policy_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            },
             "role": {
               "M": {
                 "clean": {

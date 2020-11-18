@@ -148,13 +148,20 @@ provider:
     - Effect: Allow
       Action:
         - iam:DeleteInstanceProfile
+        - iam:DeletePolicy
+        - iam:DeletePolicyVersion
         - iam:DeleteRole
         - iam:DeleteRolePolicy
+        - iam:DetachGroupPolicy
         - iam:DetachRolePolicy
+        - iam:DetachUserPolicy
         - iam:GenerateServiceLastAccessedDetails
         - iam:GetServiceLastAccessedDetails
         - iam:ListAttachedRolePolicies
+        - iam:ListEntitiesForPolicy
         - iam:ListInstanceProfilesForRole
+        - iam:ListPolicies
+        - iam:ListPolicyVersions
         - iam:ListRolePolicies
         - iam:ListRoles
         - iam:RemoveRoleFromInstanceProfile
@@ -229,6 +236,7 @@ functions:
     description: Removes unused AWS resources based on time of creation
     memorySize: 512
     timeout: 900
+    maximumRetryAttempts: 0
     package:
       include:
         - src/data/**

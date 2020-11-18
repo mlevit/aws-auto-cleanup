@@ -6,6 +6,7 @@
 - Added ECR Image and Repository cleanup.
 - Added EKS Cluster, Fargate Profile, and Node Group cleanup.
 - Added Glue Database cleanup.
+- Added IAM Policy cleanup.
 - Added paginated Whitelist retrieval.
 - Removed API caching.
 

@@ -25,7 +25,257 @@ class IAMCleanup:
         return self._client_iam
 
     def run(self):
+        self.policies()
         self.roles()
+
+    def policies(self):
+        """
+        Deletes IAM Policies.
+        """
+
+        self.logging.debug("Started cleanup of IAM Policies.")
+
+        clean = (
+            self.settings.get("services", {})
+            .get("iam", {})
+            .get("policy", {})
+            .get("clean", False)
+        )
+        if clean:
+            try:
+                paginator = self.client_iam.get_paginator("list_policies")
+                response_iterator = paginator.paginate(Scope="Local")
+            except:
+                self.logging.error("Could not list all IAM Policies.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            ttl_days = (
+                self.settings.get("services", {})
+                .get("iam", {})
+                .get("policy", {})
+                .get("ttl", 7)
+            )
+
+            for page in response_iterator:
+                for resource in page.get("Policies"):
+                    resource_id = resource.get("PolicyName")
+                    resource_arn = resource.get("Arn")
+                    resource_date = resource.get("UpdateDate")
+                    resource_action = None
+
+                    if resource_id not in self.whitelist.get("iam", {}).get(
+                        "policy", []
+                    ):
+                        delta = Helper.get_day_delta(resource_date)
+
+                        if delta.days > ttl_days:
+                            if resource.get("AttachmentCount") > 0:
+                                # - Detach the policy from all users, groups, and roles that the policy is attached to,
+                                #   using the DetachUserPolicy, DetachGroupPolicy, or DetachRolePolicy API operations.
+                                #   To list all the users, groups, and roles that a policy is attached to, use ListEntitiesForPolicy.
+                                entities_paginator = self.client_iam.get_paginator(
+                                    "list_entities_for_policy"
+                                )
+
+                                try:
+                                    user_response_iterator = (
+                                        entities_paginator.paginate(
+                                            PolicyArn=resource_arn, EntityFilter="User"
+                                        )
+                                    )
+                                except:
+                                    self.logging.error(
+                                        f"Could not list all IAM Users with IAM Policy '{resource_id}' attached."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    for user_page in user_response_iterator:
+                                        for user_resource in user_page.get(
+                                            "PolicyUsers"
+                                        ):
+                                            try:
+                                                if not self._dry_run:
+                                                    self.client_iam.detach_user_policy(
+                                                        UserName=user_resource.get(
+                                                            "UserName"
+                                                        ),
+                                                        PolicyArn=resource_arn,
+                                                    )
+                                            except:
+                                                self.logging.error(
+                                                    f"""Could not detatch IAM Policy '{resource_id}' from IAM User {user_resource.get("UserName")}."""
+                                                )
+                                                self.logging.error(sys.exc_info()[1])
+                                                resource_action = "ERROR"
+                                            else:
+                                                self.logging.info(
+                                                    f"""IAM Policy '{resource_id}' was detatched from IAM User {user_resource.get("UserName")}."""
+                                                )
+
+                                try:
+                                    role_response_iterator = (
+                                        entities_paginator.paginate(
+                                            PolicyArn=resource_arn, EntityFilter="Role"
+                                        )
+                                    )
+                                except:
+                                    self.logging.error(
+                                        f"Could not list all IAM Roles with IAM Policy '{resource_id}' attached."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    for role_page in role_response_iterator:
+                                        for role_resource in role_page.get(
+                                            "PolicyRoles"
+                                        ):
+                                            try:
+                                                if not self._dry_run:
+                                                    self.client_iam.detach_role_policy(
+                                                        RoleName=role_resource.get(
+                                                            "RoleName"
+                                                        ),
+                                                        PolicyArn=resource_arn,
+                                                    )
+                                            except:
+                                                self.logging.error(
+                                                    f"""Could not detatch IAM Policy '{resource_id}' from IAM Role {role_resource.get("RoleName")}."""
+                                                )
+                                                self.logging.error(sys.exc_info()[1])
+                                                resource_action = "ERROR"
+                                            else:
+                                                self.logging.info(
+                                                    f"""IAM Policy '{resource_id}' was detatched from IAM Role {role_resource.get("RoleName")}."""
+                                                )
+
+                                try:
+                                    group_response_iterator = (
+                                        entities_paginator.paginate(
+                                            PolicyArn=resource_arn, EntityFilter="Group"
+                                        )
+                                    )
+                                except:
+                                    self.logging.error(
+                                        f"Could not list all IAM Policies with IAM Group '{resource_id}' attached."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    for group_page in group_response_iterator:
+                                        for group_resource in group_page.get(
+                                            "PolicyGroups"
+                                        ):
+                                            try:
+                                                if not self._dry_run:
+                                                    self.client_iam.detach_group_policy(
+                                                        GroupName=group_resource.get(
+                                                            "GroupName"
+                                                        ),
+                                                        PolicyArn=resource_arn,
+                                                    )
+                                            except:
+                                                self.logging.error(
+                                                    f"""Could not detatch IAM Policy '{resource_id}' from IAM Group {group_resource.get("GroupName")}."""
+                                                )
+                                                self.logging.error(sys.exc_info()[1])
+                                                resource_action = "ERROR"
+                                            else:
+                                                self.logging.info(
+                                                    f"""IAM Policy '{resource_id}' was detatched from IAM Group {group_resource.get("GroupName")}."""
+                                                )
+
+                            # - Delete all versions of the policy using DeletePolicyVersion. To list the policy's versions, use ListPolicyVersions.
+                            #   You cannot use DeletePolicyVersion to delete the version that is marked as the default version.
+                            #   You delete the policy's default version in the next step of the process.
+                            try:
+                                versions_paginator = self.client_iam.get_paginator(
+                                    "list_policy_versions"
+                                )
+                                versions_response_iterator = (
+                                    versions_paginator.paginate(PolicyArn=resource_arn)
+                                )
+                            except:
+                                self.logging.error(
+                                    f"Could not list all IAM Policy's '{resource_id}' versions."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                for versions_page in versions_response_iterator:
+                                    for versions_resource in versions_page.get(
+                                        "Versions"
+                                    ):
+                                        if not versions_resource.get(
+                                            "IsDefaultVersion"
+                                        ):
+                                            try:
+                                                if not self._dry_run:
+                                                    self.client_iam.delete_policy_version(
+                                                        PolicyArn=resource_arn,
+                                                        VersionId=versions_resource.get(
+                                                            "VersionId"
+                                                        ),
+                                                    )
+                                            except:
+                                                self.logging.error(
+                                                    f"""Could not delete IAM Policy Version '{versions_resource.get("VersionId")}' for IAM Policy {resource_id}."""
+                                                )
+                                                self.logging.error(sys.exc_info()[1])
+                                                resource_action = "ERROR"
+                                            else:
+                                                self.logging.info(
+                                                    f"""IAM Policy Version '{versions_resource.get("VersionId")}' was deleted for IAM Policy {resource_id}."""
+                                                )
+
+                            # - Delete the policy (this automatically deletes the policy's default version) using this API.
+                            try:
+                                if not self._dry_run:
+                                    self.client_iam.delete_policy(
+                                        PolicyArn=resource_arn
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete IAM Policy '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"IAM Policy '{resource_id}' was last modified {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"IAM Policy '{resource_id}' was last modified {delta.days} days ago "
+                                "(less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
+                    else:
+                        self.logging.debug(
+                            f"IAM Policy '{resource_id}' has been whitelisted and has not been deleted."
+                        )
+                        resource_action = "SKIP - WHITELIST"
+
+                    self.execution_log.get("AWS").setdefault(
+                        self.region, {}
+                    ).setdefault("IAM", {}).setdefault("Policy", []).append(
+                        {
+                            "id": resource_id,
+                            "action": resource_action,
+                            "timestamp": datetime.datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),
+                        }
+                    )
+
+            self.logging.debug("Finished cleanup of IAM Policies.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of IAM Policies.")
+            return True
 
     def roles(self):
         """

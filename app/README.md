@@ -136,6 +136,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Dev Databases             | Database Name          | `glue:database:database_name`                        |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
+| IAM Policies                   | Policy Name            | `iam:policy:policy_name`                             |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
 | Kafka Clusters                 | Cluster Name           | `kafka:cluster:cluster_name`                         |
 | Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                         |
@@ -211,6 +212,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EMR                   | Clusters                 | True  | 7   |                                                                |
 | Glue                  | Databases :new:          | True  | 30  |                                                                |
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
+| IAM                   | Policies :new:           | True  | 30  |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
 | Kafka                 | Clusters :new:           | True  | 7   |                                                                |
 | Kinesis               | Streams :new:            | True  | 7   |                                                                |
