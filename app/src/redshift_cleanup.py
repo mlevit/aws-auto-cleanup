@@ -58,7 +58,6 @@ class RedshiftCleanup:
             for resource in resources:
                 resource_id = resource.get("ClusterIdentifier")
                 resource_date = resource.get("ClusterCreateTime")
-                resource_status = resource.get("ClusterStatus")
                 resource_action = None
 
                 if resource_id not in self.whitelist.get("redshift", {}).get(
@@ -67,30 +66,24 @@ class RedshiftCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if resource_status == "available":
-                            try:
-                                if not self._dry_run:
-                                    self.client_redshift.delete_cluster(
-                                        ClusterIdentifier=resource_id,
-                                        SkipFinalClusterSnapshot=True,
-                                    )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete Redshift Cluster '{resource_id}'."
+                        try:
+                            if not self._dry_run:
+                                self.client_redshift.delete_cluster(
+                                    ClusterIdentifier=resource_id,
+                                    SkipFinalClusterSnapshot=True,
                                 )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.info(
-                                    f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
-                                    "and has been deleted."
-                                )
-                                resource_action = "DELETE"
-                        else:
-                            self.logging.warn(
-                                f"Redshift Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
+                        except:
+                            self.logging.error(
+                                f"Could not delete Redshift Cluster '{resource_id}'."
                             )
-                            resource_action = "SKIP - IN USE"
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
