@@ -43,7 +43,8 @@ class CloudFormationCleanup:
         )
         if clean:
             try:
-                resources = self.client_cloudformation.describe_stacks().get("Stacks")
+                paginator = self.client_cloudformation.get_paginator("describe_stacks")
+                response_iterator = paginator.paginate().build_full_result()
             except:
                 self.logging.error("Could not list all CloudFormation Stacks.")
                 self.logging.error(sys.exc_info()[1])
@@ -59,11 +60,12 @@ class CloudFormationCleanup:
             # threads list
             threads = []
 
-            for resource in resources:
-                thread = threading.Thread(
-                    target=self.delete_stack, args=(resource, ttl_days)
+            for resource in response_iterator.get("Stacks"):
+                threads.append(
+                    threading.Thread(
+                        target=self.delete_stack, args=(resource, ttl_days)
+                    )
                 )
-                threads.append(thread)
 
             # start all threads
             for thread in threads:
