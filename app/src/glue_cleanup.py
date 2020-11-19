@@ -24,8 +24,99 @@ class GlueCleanup:
         return self._client_glue
 
     def run(self):
+        self.crawlers()
         self.databases()
         self.dev_endpoints()
+
+    def crawlers(self):
+        """
+        Deletes Glue Crawlers.
+        """
+
+        self.logging.debug("Started cleanup of Glue Crawlers.")
+
+        clean = (
+            self.settings.get("services", {})
+            .get("glue", {})
+            .get("crawler", {})
+            .get("clean", False)
+        )
+        if clean:
+            try:
+                paginator = self.client_glue.get_paginator("get_crawlers")
+                response_iterator = paginator.paginate().build_full_result()
+            except:
+                self.logging.error("Could not list all Glue Crawlers.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            ttl_days = (
+                self.settings.get("services", {})
+                .get("glue", {})
+                .get("crawler", {})
+                .get("ttl", 7)
+            )
+
+            for resource in response_iterator.get("Crawlers"):
+                resource_id = resource.get("Name")
+                resource_date = resource.get("LastUpdated")
+                resource_status = resource.get("State")
+                resource_action = None
+
+                if resource_id not in self.whitelist.get("glue", {}).get("crawler", []):
+                    delta = Helper.get_day_delta(resource_date)
+
+                    if delta.days > ttl_days:
+                        if resource_status != "RUNNING":
+                            try:
+                                if not self._dry_run:
+                                    self.client_glue.delete_crawler(Name=resource_id)
+                            except:
+                                self.logging.error(
+                                    f"Could not delete Glue Crawler '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"Glue Crawler '{resource_id}' was last modified {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.warn(
+                                f"Glue Crawler '{resource_id}' in state '{resource_status}' cannot be deleted."
+                            )
+                            resource_action = "SKIP - IN USE"
+                    else:
+                        self.logging.debug(
+                            f"Glue Crawler '{resource_id}' was last modified {delta.days} days ago "
+                            "(less than TTL setting) and has not been deleted."
+                        )
+                        resource_action = "SKIP - TTL"
+                else:
+                    self.logging.debug(
+                        f"Glue Crawler '{resource_id}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
+                    "Glue", {}
+                ).setdefault("Crawler", []).append(
+                    {
+                        "id": resource_id,
+                        "action": resource_action,
+                        "timestamp": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    }
+                )
+
+            self.logging.debug("Finished cleanup of Glue Crawlers.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of Glue Crawlers.")
+            return True
 
     def databases(self):
         """

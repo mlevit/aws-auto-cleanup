@@ -139,8 +139,10 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - glue:DeleteCrawler
         - glue:DeleteDatabase
         - glue:DeleteDevEndPoint
+        - glue:GetCrawlers
         - glue:GetDatabases
         - glue:GetDevEndpoints
         - glue:GetTable
