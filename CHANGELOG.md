@@ -8,6 +8,7 @@
 - Added Glue Database cleanup.
 - Added IAM Policy cleanup.
 - Added paginated Whitelist retrieval.
+- Fixed broken pagination for IAM, Glue, and CloudWatch.
 - Removed API caching.
 
 ## 1.2.0
