@@ -173,24 +173,23 @@ class RDSCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
-                                if not self._dry_run:
-                                    self.client_rds.delete_db_snapshot(
-                                        DBSnapshotIdentifier=resource_id
-                                    )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete RDS Snapshot '{resource_id}'."
+                        try:
+                            if not self._dry_run:
+                                self.client_rds.delete_db_snapshot(
+                                    DBSnapshotIdentifier=resource_id
                                 )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.info(
-                                    f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
-                                    "and has been deleted."
-                                )
-                                resource_action = "DELETE"
+                        except:
+                            self.logging.error(
+                                f"Could not delete RDS Snapshot '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
