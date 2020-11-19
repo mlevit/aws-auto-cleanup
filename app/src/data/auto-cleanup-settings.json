@@ -386,6 +386,19 @@
         },
         "glue": {
           "M": {
+            "crawler": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "crawler_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
             "database": {
               "M": {
                 "clean": {
