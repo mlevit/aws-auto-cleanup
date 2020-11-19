@@ -5,10 +5,12 @@
 - Added CloudWatch Log Group cleanup.
 - Added ECR Image and Repository cleanup.
 - Added EKS Cluster, Fargate Profile, and Node Group cleanup.
+- Added Glue Crawler cleanup.
 - Added Glue Database cleanup.
 - Added IAM Policy cleanup.
 - Added paginated Whitelist retrieval.
 - Fixed broken pagination for IAM, Glue, and CloudWatch.
+- Fixed Redshift Cluster deletion. Redshift Clusters would not be deleted unless their status was `available`.
 - Removed API caching.
 
 ## 1.2.0
