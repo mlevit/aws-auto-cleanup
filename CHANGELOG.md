@@ -9,6 +9,7 @@
 - Added Glue Database cleanup.
 - Added IAM Policy cleanup.
 - Added paginated Whitelist retrieval.
+- Added parallel cleanup of global services (e.g., S3, IAM).
 - Fixed broken pagination for IAM, Glue, and CloudWatch.
 - Fixed Redshift Cluster deletion. Redshift Clusters would not be deleted unless their status was `available`.
 - Removed API caching.

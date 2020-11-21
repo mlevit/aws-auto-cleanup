@@ -303,11 +303,14 @@ class Cleanup:
         # global services
         self.logging.info("Switching region to 'global'.")
 
+        # threads list
+        threads = []
+
         # S3
         s3_class = S3Cleanup(
             self.logging, self.whitelist, self.settings, self.execution_log
         )
-        s3_class.run()
+        threads.append(threading.Thread(target=s3_class.run, args=()))
 
         # IAM
         # IAM will run after all other cleanup operations as there is a potential
@@ -315,7 +318,15 @@ class Cleanup:
         iam_class = IAMCleanup(
             self.logging, self.whitelist, self.settings, self.execution_log
         )
-        iam_class.run()
+        threads.append(threading.Thread(target=iam_class.run, args=()))
+
+        # start all threads
+        for thread in threads:
+            thread.start()
+
+        # make sure that all threads have finished
+        for thread in threads:
+            thread.join()
 
         self.logging.info("Auto Cleanup completed.")
         return True
