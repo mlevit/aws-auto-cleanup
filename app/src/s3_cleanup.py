@@ -82,7 +82,7 @@ class S3Cleanup:
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
-                            self.logging.info(
+                            self.logging.debug(
                                 f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
                             )
 
@@ -99,7 +99,7 @@ class S3Cleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                self.logging.info(
+                                self.logging.debug(
                                     f"Deleted all Objects from S3 Bucket '{resource_id}'."
                                 )
 
@@ -114,7 +114,7 @@ class S3Cleanup:
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "ERROR"
                                 else:
-                                    self.logging.info(
+                                    self.logging.debug(
                                         f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
                                     )
 
