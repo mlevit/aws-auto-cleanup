@@ -11,7 +11,7 @@
 - Added paginated Whitelist retrieval.
 - Added parallel cleanup of global services (e.g., S3, IAM).
 - Fixed broken pagination for IAM, Glue, and CloudWatch.
-- Fixed Redshift Cluster deletion. Redshift Clusters would not be deleted unless their status was `available`.
+- Fixed Redshift Cluster deletion. Redshift Clusters were not deleted unless their status was `available`.
 - Removed API caching.
 
 ## 1.2.0
