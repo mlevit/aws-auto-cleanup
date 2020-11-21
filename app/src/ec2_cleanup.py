@@ -94,7 +94,7 @@ class EC2Cleanup:
                             )
                             resource_action = "DELETE"
                     else:
-                        self.logging.warn(
+                        self.logging.debug(
                             f"EC2 Address '{resource_id}' is associated with an EC2 instance and has not "
                             "been deleted."
                         )
@@ -306,7 +306,7 @@ class EC2Cleanup:
                                             self.logging.error(sys.exc_info()[1])
                                             resource_action = "ERROR"
                                         else:
-                                            self.logging.info(
+                                            self.logging.debug(
                                                 f"EC2 Instance '{resource_id}' had termination protection "
                                                 "turned on and now has been turned off."
                                             )
@@ -533,7 +533,7 @@ class EC2Cleanup:
                                 )
                                 resource_action = "SKIP - TTL"
                         else:
-                            self.logging.warn(
+                            self.logging.debug(
                                 f"EC2 Snapshot '{resource_id}' is currently used by an Image "
                                 "and cannot been deleted without deleting the Image first."
                             )
@@ -622,7 +622,7 @@ class EC2Cleanup:
                             )
                             resource_action = "SKIP - TTL"
                     else:
-                        self.logging.warn(
+                        self.logging.debug(
                             f"EC2 Volume '{resource_id}' is attached to an EC2 instance "
                             "and has not been deleted."
                         )

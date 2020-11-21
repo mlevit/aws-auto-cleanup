@@ -110,7 +110,7 @@ class EKSCleanup:
                             )
                             resource_action = "SKIP - TTL"
                     else:
-                        self.logging.warn(
+                        self.logging.debug(
                             f"EKS Cluster '{resource_id}' is associated with EKS Fargate Profiles or EKS Node Groups and has not been deleted."
                         )
                         resource_action = "SKIP - IN USE"

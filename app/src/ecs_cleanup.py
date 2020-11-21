@@ -77,12 +77,12 @@ class ECSCleanup:
                         )
                         resource_action = "SKIP - IN USE"
                     elif resource_active_service_count > 0:
-                        self.logging.warn(
+                        self.logging.debug(
                             f"ECS Cluster '{resource_id}' has {resource_active_service_count} active services running and cannot be deleted."
                         )
                         resource_action = "SKIP - IN USE"
                     elif resource_running_task_count > 0:
-                        self.logging.warn(
+                        self.logging.debug(
                             f"ECS Cluster '{resource_id}' has {resource_running_task_count} running tasks and cannot be deleted."
                         )
                         resource_action = "SKIP - IN USE"

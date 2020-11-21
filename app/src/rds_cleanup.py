@@ -80,7 +80,7 @@ class RDSCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                self.logging.info(
+                                self.logging.debug(
                                     f"RDS Instance '{resource_id}' had delete protection turned on "
                                     "and now has been turned off."
                                 )

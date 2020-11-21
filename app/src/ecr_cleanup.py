@@ -98,7 +98,7 @@ class ECRCleanup:
                             )
                             resource_action = "SKIP - TTL"
                     else:
-                        self.logging.warn(
+                        self.logging.debug(
                             f"ECR Repository '{resource_id}' contains ECR Images and has not been deleted."
                         )
                         resource_action = "SKIP - IN USE"
