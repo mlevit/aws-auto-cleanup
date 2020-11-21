@@ -119,7 +119,7 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for role_response_iterator in role_page.get(
+                                for role_resource in role_response_iterator.get(
                                     "PolicyRoles"
                                 ):
                                     try:
