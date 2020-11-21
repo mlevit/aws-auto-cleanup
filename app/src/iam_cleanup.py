@@ -104,7 +104,7 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        self.logging.info(
+                                        self.logging.debug(
                                             f"""IAM Policy '{resource_id}' was detatched from IAM User {user_resource.get("UserName")}."""
                                         )
 
@@ -135,7 +135,7 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        self.logging.info(
+                                        self.logging.debug(
                                             f"""IAM Policy '{resource_id}' was detatched from IAM Role {role_resource.get("RoleName")}."""
                                         )
 
@@ -168,7 +168,7 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        self.logging.info(
+                                        self.logging.debug(
                                             f"""IAM Policy '{resource_id}' was detatched from IAM Group {group_resource.get("GroupName")}."""
                                         )
 
@@ -208,7 +208,7 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        self.logging.info(
+                                        self.logging.debug(
                                             f"""IAM Policy Version '{versions_resource.get("VersionId")}' was deleted for IAM Policy {resource_id}."""
                                         )
 
@@ -406,7 +406,7 @@ class IAMCleanup:
                                                 self.logging.error(sys.exc_info()[1])
                                                 resource_action = "ERROR"
                                             else:
-                                                self.logging.info(
+                                                self.logging.debug(
                                                     f"IAM Policy '{policy}' has been deleted from IAM Role '{resource_id}'."
                                                 )
 
@@ -442,7 +442,7 @@ class IAMCleanup:
                                                     )
                                                     resource_action = "ERROR"
                                                 else:
-                                                    self.logging.info(
+                                                    self.logging.debug(
                                                         f"IAM Policy '{policy.get('PolicyName')}' has been detached from IAM Role '{resource_id}'."
                                                     )
 
@@ -479,7 +479,7 @@ class IAMCleanup:
                                                     )
                                                     resource_action = "ERROR"
                                                 else:
-                                                    self.logging.info(
+                                                    self.logging.debug(
                                                         f"IAM Role '{resource_id}' has been removed from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
                                                     )
 
@@ -500,7 +500,7 @@ class IAMCleanup:
                                                     )
                                                     resource_action = "ERROR"
                                                 else:
-                                                    self.logging.info(
+                                                    self.logging.debug(
                                                         f"IAM Instance Profile '{profile.get('InstanceProfileName')}' has been delete."
                                                     )
 
