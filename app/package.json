@@ -17,7 +17,7 @@
   "scripts": {
     "deploy": "serverless deploy",
     "invoke": "serverless invoke --function AutoCleanup --type Event",
-    "logs": "serverless logs --function AutoCleanup --type Event",
+    "logs": "serverless logs --function AutoCleanup",
     "remove": "serverless remove"
   }
 }
