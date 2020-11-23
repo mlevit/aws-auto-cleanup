@@ -188,7 +188,7 @@ class Cleanup:
                 )
                 threads.append(threading.Thread(target=elb_class.run, args=()))
 
-                # ELK
+                # EKS
                 eks_class = EKSCleanup(
                     self.logging,
                     self.whitelist,
