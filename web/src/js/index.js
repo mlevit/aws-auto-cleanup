@@ -294,20 +294,20 @@ function getWhitelist() {
     .then((response) => response.json())
     .then((data) => {
       let i = 1;
-      let whitelist_raw = data["response"]["whitelist"];
+      let whitelistRaw = data["response"]["whitelist"];
 
       dayjs.extend(dayjs_plugin_utc);
       dayjs.extend(dayjs_plugin_timezone);
 
-      app.whitelist = whitelist_raw.map((item) => {
-        let readable_date = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
+      app.whitelist = whitelistRaw.map((item) => {
+        let readableDate = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
 
         item["row_id"] = i++;
         item["service"] = item["resource_id"].split(":", 3)[0];
         item["resource"] = item["resource_id"].split(":", 3)[1];
         item["id"] = item["resource_id"].split(":", 3)[2];
 
-        item["expiration_readable"] = readable_date.format(
+        item["expiration_readable"] = readableDate.format(
           "ddd MMM DD HH:mm:ss YYYY"
         );
 
