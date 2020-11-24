@@ -100,16 +100,13 @@ class GlueCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "Glue", {}
-                ).setdefault("Crawler", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "Glue",
+                    "Crawler",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of Glue Crawlers.")
@@ -185,16 +182,13 @@ class GlueCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "Glue", {}
-                ).setdefault("Database", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "Glue",
+                    "Database",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of Glue Databases.")
@@ -271,16 +265,13 @@ class GlueCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "Glue", {}
-                ).setdefault("Dev Endpoint", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "Glue",
+                    "Dev Endpoint",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of Glue Dev Endpoints.")

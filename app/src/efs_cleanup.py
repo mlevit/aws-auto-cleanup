@@ -129,16 +129,13 @@ class EFSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "EFS", {}
-                ).setdefault("File System", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "EFS",
+                    "File System",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of EFS File Systems.")

@@ -120,16 +120,13 @@ class EKSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "EKS", {}
-                ).setdefault("Cluster", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "EKS",
+                    "Cluster",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of EKS Clusters.")
@@ -224,16 +221,13 @@ class EKSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "EKS", {}
-                ).setdefault("Fargate Profile", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "EKS",
+                    "Fargate Profile",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug(
@@ -332,16 +326,13 @@ class EKSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "EKS", {}
-                ).setdefault("Node Group", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "EKS",
+                    "Node Group",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug(

@@ -109,16 +109,13 @@ class ECSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "ECS", {}
-                ).setdefault("Cluster", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "ECS",
+                    "Cluster",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of ECS Clusters.")
@@ -230,16 +227,13 @@ class ECSCleanup:
                         )
                         resource_action = "SKIP - WHITELIST"
 
-                    self.execution_log.get("AWS").setdefault(
-                        self.region, {}
-                    ).setdefault("ECS", {}).setdefault("Service", []).append(
-                        {
-                            "id": resource_id,
-                            "action": resource_action,
-                            "timestamp": datetime.datetime.now().strftime(
-                                "%Y-%m-%d %H:%M:%S"
-                            ),
-                        }
+                    Helper.record_execution_log_action(
+                        self.execution_log,
+                        self.region,
+                        "ECS",
+                        "Service",
+                        resource_id,
+                        resource_action,
                     )
 
             self.logging.debug("Finished cleanup of ECS Services.")
