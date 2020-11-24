@@ -224,6 +224,7 @@ provider:
         - sts:GetCallerIdentity
       Resource: "*"
   tracing:
+    apiGateway: true
     lambda: true
 
 package:
