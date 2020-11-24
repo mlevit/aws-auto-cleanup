@@ -210,9 +210,9 @@ class CloudFormationCleanup:
                 resource_child_id = stack_resource.get("PhysicalResourceId")
 
                 try:
-                    platform, service, resource = stack_resource.get(
-                        "ResourceType"
-                    ).split("::")
+                    _, service, resource = stack_resource.get("ResourceType").split(
+                        "::"
+                    )
                 except:
                     self.logging.warn(
                         f"""CloudFormation Stack '{resource_id}' resource '{stack_resource.get("ResourceType")}' """
