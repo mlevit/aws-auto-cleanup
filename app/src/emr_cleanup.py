@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
