@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "4"
+      "N": "5"
     }
   },
   {
@@ -54,6 +54,23 @@
                 },
                 "ttl": {
                   "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "cloudwatch": {
+          "M": {
+            "log_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "log_group_name"
+                },
+                "ttl": {
+                  "N": "30"
                 }
               }
             }
@@ -152,6 +169,36 @@
             }
           }
         },
+        "ecr": {
+          "M": {
+            "image": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "image_digest"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "repository": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "repository_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "ecs": {
           "M": {
             "cluster": {
@@ -188,6 +235,49 @@
                 },
                 "id": {
                   "S": "file_system_id"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "eks": {
+          "M": {
+            "cluster": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "cluster_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "fargate_profile": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "fargate_profile_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "node_group": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "node_group_name"
                 },
                 "ttl": {
                   "N": "7"
@@ -296,6 +386,32 @@
         },
         "glue": {
           "M": {
+            "crawler": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "crawler_name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "database": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "database_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            },
             "dev_endpoint": {
               "M": {
                 "clean": {
@@ -313,6 +429,19 @@
         },
         "iam": {
           "M": {
+            "policy": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "policy_name"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            },
             "role": {
               "M": {
                 "clean": {

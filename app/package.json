@@ -1,7 +1,7 @@
 {
   "name": "auto-cleanup-app",
   "description": "Auto Cleanup App",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "dependencies": {},
   "devDependencies": {
@@ -17,7 +17,7 @@
   "scripts": {
     "deploy": "serverless deploy",
     "invoke": "serverless invoke --function AutoCleanup --type Event",
-    "logs": "serverless logs --function AutoCleanup --type Event",
+    "logs": "serverless logs --function AutoCleanup",
     "remove": "serverless remove"
   }
 }

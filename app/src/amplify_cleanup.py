@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
@@ -91,16 +90,13 @@ class AmplifyCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "Amplify", {}
-                ).setdefault("App", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "Amplify",
+                    "App",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of Amplify Apps.")

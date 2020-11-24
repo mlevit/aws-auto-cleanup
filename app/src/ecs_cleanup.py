@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
@@ -71,55 +70,51 @@ class ECSCleanup:
                 resource_action = None
 
                 if resource_id not in self.whitelist.get("ecs", {}).get("cluster", []):
-                    if not self.settings.get("general", {}).get("dry_run", True):
-                        if resource_status not in ("ACTIVE", "FAILED"):
-                            self.logging.warn(
-                                f"ECS Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
+                    if resource_status not in ("ACTIVE", "FAILED"):
+                        self.logging.warn(
+                            f"ECS Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
+                        )
+                        resource_action = "SKIP - IN USE"
+                    elif resource_active_service_count > 0:
+                        self.logging.debug(
+                            f"ECS Cluster '{resource_id}' has {resource_active_service_count} active services running and cannot be deleted."
+                        )
+                        resource_action = "SKIP - IN USE"
+                    elif resource_running_task_count > 0:
+                        self.logging.debug(
+                            f"ECS Cluster '{resource_id}' has {resource_running_task_count} running tasks and cannot be deleted."
+                        )
+                        resource_action = "SKIP - IN USE"
+                    else:
+                        try:
+                            if not self._dry_run:
+                                self.client_ecs.delete_cluster(
+                                    cluster=resource_id,
+                                )
+                        except:
+                            self.logging.error(
+                                f"Could not delete ECS Cluster '{resource_id}'."
                             )
-                            resource_action = "SKIP - IN USE"
-                        elif resource_active_service_count > 0:
-                            self.logging.warn(
-                                f"ECS Cluster '{resource_id}' has {resource_active_service_count} active services running and cannot be deleted."
-                            )
-                            resource_action = "SKIP - IN USE"
-                        elif resource_running_task_count > 0:
-                            self.logging.warn(
-                                f"ECS Cluster '{resource_id}' has {resource_running_task_count} running tasks and cannot be deleted."
-                            )
-                            resource_action = "SKIP - IN USE"
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
                         else:
-                            try:
-                                if not self._dry_run:
-                                    self.client_ecs.delete_cluster(
-                                        cluster=resource_id,
-                                    )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete ECS Cluster '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.info(
-                                    f"ECS Cluster '{resource_id}' has been deleted."
-                                )
-                                resource_action = "DELETE"
+                            self.logging.info(
+                                f"ECS Cluster '{resource_id}' has been deleted."
+                            )
+                            resource_action = "DELETE"
                 else:
                     self.logging.debug(
                         f"ECS Cluster '{resource_id}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "ECS", {}
-                ).setdefault("Cluster", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "ECS",
+                    "Cluster",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of ECS Clusters.")
@@ -231,16 +226,13 @@ class ECSCleanup:
                         )
                         resource_action = "SKIP - WHITELIST"
 
-                    self.execution_log.get("AWS").setdefault(
-                        self.region, {}
-                    ).setdefault("ECS", {}).setdefault("Service", []).append(
-                        {
-                            "id": resource_id,
-                            "action": resource_action,
-                            "timestamp": datetime.datetime.now().strftime(
-                                "%Y-%m-%d %H:%M:%S"
-                            ),
-                        }
+                    Helper.record_execution_log_action(
+                        self.execution_log,
+                        self.region,
+                        "ECS",
+                        "Service",
+                        resource_id,
+                        resource_action,
                     )
 
             self.logging.debug("Finished cleanup of ECS Services.")

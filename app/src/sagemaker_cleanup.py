@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
@@ -101,16 +100,13 @@ class SageMakerCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "SageMaker", {}
-                ).setdefault("Endpoint", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "SageMaker",
+                    "Endpoint",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of SageMaker Endpoints.")
@@ -209,16 +205,13 @@ class SageMakerCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "SageMaker", {}
-                ).setdefault("Notebook Instance", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "SageMaker",
+                    "Notebook Instance",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of SageMaker Notebook Instances.")

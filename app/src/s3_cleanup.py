@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
@@ -82,7 +81,7 @@ class S3Cleanup:
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
-                            self.logging.info(
+                            self.logging.debug(
                                 f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
                             )
 
@@ -99,7 +98,7 @@ class S3Cleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                self.logging.info(
+                                self.logging.debug(
                                     f"Deleted all Objects from S3 Bucket '{resource_id}'."
                                 )
 
@@ -114,7 +113,7 @@ class S3Cleanup:
                                     self.logging.error(sys.exc_info()[1])
                                     resource_action = "ERROR"
                                 else:
-                                    self.logging.info(
+                                    self.logging.debug(
                                         f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
                                     )
 
@@ -148,16 +147,13 @@ class S3Cleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "S3", {}
-                ).setdefault("Bucket", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "S3",
+                    "Bucket",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of S3 Buckets.")

@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
@@ -99,16 +98,13 @@ class ElastiCacheCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "ElastiCache", {}
-                ).setdefault("Cluster", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "ElastiCache",
+                    "Cluster",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of ElastiCache Clusters.")
@@ -204,16 +200,13 @@ class ElastiCacheCleanup:
                         )
                         resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "ElastiCache", {}
-                ).setdefault("Replication Group", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "ElastiCache",
+                    "Replication Group",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of ElastiCache Replication Groups.")

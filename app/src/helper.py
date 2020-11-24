@@ -34,3 +34,17 @@ class Helper:
         }
 
         return result
+
+    @staticmethod
+    def record_execution_log_action(
+        execution_log, region, service, resource, resource_id, resource_action
+    ):
+        execution_log.get("AWS").setdefault(region, {}).setdefault(
+            service, {}
+        ).setdefault(resource, []).append(
+            {
+                "id": resource_id,
+                "action": resource_action,
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        )

@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 import boto3
 
@@ -80,7 +79,7 @@ class RDSCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                self.logging.info(
+                                self.logging.debug(
                                     f"RDS Instance '{resource_id}' had delete protection turned on "
                                     "and now has been turned off."
                                 )
@@ -116,16 +115,13 @@ class RDSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "RDS", {}
-                ).setdefault("Instance", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "RDS",
+                    "Instance",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of RDS Instances.")
@@ -173,24 +169,23 @@ class RDSCleanup:
                     delta = Helper.get_day_delta(resource_date)
 
                     if delta.days > ttl_days:
-                        if not self.settings.get("general", {}).get("dry_run", True):
-                            try:
-                                if not self._dry_run:
-                                    self.client_rds.delete_db_snapshot(
-                                        DBSnapshotIdentifier=resource_id
-                                    )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete RDS Snapshot '{resource_id}'."
+                        try:
+                            if not self._dry_run:
+                                self.client_rds.delete_db_snapshot(
+                                    DBSnapshotIdentifier=resource_id
                                 )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.info(
-                                    f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
-                                    "and has been deleted."
-                                )
-                                resource_action = "DELETE"
+                        except:
+                            self.logging.error(
+                                f"Could not delete RDS Snapshot '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
                             f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
@@ -203,16 +198,13 @@ class RDSCleanup:
                     )
                     resource_action = "SKIP - WHITELIST"
 
-                self.execution_log.get("AWS").setdefault(self.region, {}).setdefault(
-                    "RDS", {}
-                ).setdefault("Snapshot", []).append(
-                    {
-                        "id": resource_id,
-                        "action": resource_action,
-                        "timestamp": datetime.datetime.now().strftime(
-                            "%Y-%m-%d %H:%M:%S"
-                        ),
-                    }
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "RDS",
+                    "Snapshot",
+                    resource_id,
+                    resource_action,
                 )
 
             self.logging.debug("Finished cleanup of RDS Snapshots.")

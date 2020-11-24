@@ -150,8 +150,6 @@ functions:
           method: GET
           path: /settings/service
           cors: true
-          caching:
-            enabled: true
   ExecutionLogList:
     handler: src/execution_log/list.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-list
@@ -171,8 +169,6 @@ functions:
           method: GET
           path: /execution
           cors: true
-          caching:
-            enabled: true
   ExecutionLogRead:
     handler: src/execution_log/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-read
@@ -192,8 +188,6 @@ functions:
           method: GET
           path: /execution/{key}
           cors: true
-          caching:
-            enabled: true
 
 resources:
   Outputs:
@@ -201,7 +195,6 @@ resources:
       Value: !Ref AWS::AccountId
 
 plugins:
-  - serverless-api-gateway-caching
   - serverless-manifest-plugin
   - serverless-pseudo-parameters
   - serverless-python-requirements

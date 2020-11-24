@@ -1,5 +1,19 @@
 # AWS Auto Cleanup Changelog
 
+## 1.3.0
+
+- Added CloudWatch Log Group cleanup.
+- Added ECR Image and Repository cleanup.
+- Added EKS Cluster, Fargate Profile, and Node Group cleanup.
+- Added Glue Crawler cleanup.
+- Added Glue Database cleanup.
+- Added IAM Policy cleanup.
+- Added paginated Whitelist retrieval.
+- Added parallel cleanup of global services (e.g., S3, IAM).
+- Fixed broken pagination for IAM, Glue, and CloudWatch.
+- Fixed Redshift Cluster deletion. Redshift Clusters were not deleted unless their status was `available`.
+- Removed API caching.
+
 ## 1.2.0
 
 - Added Amplify Apps cleanup.

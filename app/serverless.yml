@@ -74,12 +74,32 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - ecr:BatchDeleteImage
+        - ecr:DeleteRepository
+        - ecr:DescribeImages
+        - ecr:DescribeRepositories
+        - ecr:ListImages
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - ecs:DeleteCluster
         - ecs:DeleteService
         - ecs:DescribeClusters
         - ecs:DescribeServices
         - ecs:ListClusters
         - ecs:ListServices
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - eks:DeleteCluster
+        - eks:DeleteFargateProfile
+        - eks:DeleteNodegroup
+        - eks:DescribeCluster
+        - eks:DescribeFargateProfile
+        - eks:DescribeNodegroup
+        - eks:ListClusters
+        - eks:ListFargateProfiles
+        - eks:ListNodegroups
       Resource: "*"
     - Effect: Allow
       Action:
@@ -119,20 +139,31 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - glue:DeleteCrawler
+        - glue:DeleteDatabase
         - glue:DeleteDevEndPoint
+        - glue:GetCrawlers
+        - glue:GetDatabases
         - glue:GetDevEndpoints
         - glue:GetTable
       Resource: "*"
     - Effect: Allow
       Action:
         - iam:DeleteInstanceProfile
+        - iam:DeletePolicy
+        - iam:DeletePolicyVersion
         - iam:DeleteRole
         - iam:DeleteRolePolicy
+        - iam:DetachGroupPolicy
         - iam:DetachRolePolicy
+        - iam:DetachUserPolicy
         - iam:GenerateServiceLastAccessedDetails
         - iam:GetServiceLastAccessedDetails
         - iam:ListAttachedRolePolicies
+        - iam:ListEntitiesForPolicy
         - iam:ListInstanceProfilesForRole
+        - iam:ListPolicies
+        - iam:ListPolicyVersions
         - iam:ListRolePolicies
         - iam:ListRoles
         - iam:RemoveRoleFromInstanceProfile
@@ -152,6 +183,11 @@ provider:
       Action:
         - lambda:DeleteFunction
         - lambda:ListFunctions
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - logs:DeleteLogGroup
+        - logs:DescribeLogGroups
       Resource: "*"
     - Effect: Allow
       Action:
@@ -202,6 +238,7 @@ functions:
     description: Removes unused AWS resources based on time of creation
     memorySize: 512
     timeout: 900
+    maximumRetryAttempts: 0
     package:
       include:
         - src/data/**

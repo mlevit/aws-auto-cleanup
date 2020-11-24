@@ -43,7 +43,8 @@ class CloudFormationCleanup:
         )
         if clean:
             try:
-                resources = self.client_cloudformation.describe_stacks().get("Stacks")
+                paginator = self.client_cloudformation.get_paginator("describe_stacks")
+                response_iterator = paginator.paginate().build_full_result()
             except:
                 self.logging.error("Could not list all CloudFormation Stacks.")
                 self.logging.error(sys.exc_info()[1])
@@ -59,11 +60,12 @@ class CloudFormationCleanup:
             # threads list
             threads = []
 
-            for resource in resources:
-                thread = threading.Thread(
-                    target=self.delete_stack, args=(resource, ttl_days)
+            for resource in response_iterator.get("Stacks"):
+                threads.append(
+                    threading.Thread(
+                        target=self.delete_stack, args=(resource, ttl_days)
+                    )
                 )
-                threads.append(thread)
 
             # start all threads
             for thread in threads:
@@ -198,21 +200,32 @@ class CloudFormationCleanup:
                     StackName=resource_id
                 ).get("StackResources")
             except:
-                self.logging.error("Could not Describe Stack Resources.")
+                self.logging.error(
+                    f"Could not Describe Stack Resources for CloudFormation Stack '{resource_id}'."
+                )
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            for _ in resource_details:
-                resource_child_id = _.get("PhysicalResourceId")
-                platform, service, resource = _.get("ResourceType").split("::")
+            for stack_resource in resource_details:
+                resource_child_id = stack_resource.get("PhysicalResourceId")
 
-                self.whitelist.setdefault(service.lower(), {}).setdefault(
-                    resource.lower(), set()
-                ).add(resource_child_id)
+                try:
+                    _, service, resource = stack_resource.get("ResourceType").split(
+                        "::"
+                    )
+                except:
+                    self.logging.warn(
+                        f"""CloudFormation Stack '{resource_id}' resource '{stack_resource.get("ResourceType")}' """
+                        """does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."""
+                    )
+                else:
+                    self.whitelist.setdefault(service.lower(), {}).setdefault(
+                        resource.lower(), set()
+                    ).add(resource_child_id)
 
-                self.logging.debug(
-                    f"{service} {resource} '{resource_child_id}' has been added to the whitelist."
-                )
+                    self.logging.debug(
+                        f"{service} {resource} '{resource_child_id}' has been added to the whitelist."
+                    )
 
         return True
 

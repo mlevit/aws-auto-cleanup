@@ -21,21 +21,23 @@ def get_return(code, message, request, response):
 
 
 def lambda_handler(event, context):
+    client = boto3.client("dynamodb")
+    paginator = client.get_paginator("scan")
     deserializer = TypeDeserializer()
 
     try:
         body = []
-        resources = (
-            boto3.client("dynamodb")
-            .scan(TableName=os.environ.get("WHITELISTTABLE"))
-            .get("Items")
+        page_iterator = paginator.paginate(
+            TableName=os.environ.get("WHITELISTTABLE"),
         )
-        for resource in resources:
-            item = {}
-            for key, value in resource.items():
-                item[key] = str(deserializer.deserialize(value))
 
-            body.append(item)
+        for page in page_iterator:
+            for item in page["Items"]:
+                record = {}
+                for key, value in item.items():
+                    record[key] = str(deserializer.deserialize(value))
+
+                body.append(record)
 
         return get_return(
             200,
