@@ -1,1 +1,2 @@
 dynamodb_json==1.3
+func-timeout==4.3.5

@@ -9,6 +9,7 @@ import threading
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
+from func_timeout import func_set_timeout
 
 from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
@@ -49,6 +50,7 @@ class Cleanup:
         self.whitelist = self.get_whitelist()
         self.dry_run = self.settings.get("general", {}).get("dry_run", True)
 
+    @func_set_timeout(840)
     def run_cleanup(self):
         if self.dry_run:
             self.logging.info(f"Auto Cleanup started in DRY RUN mode.")
@@ -542,8 +544,9 @@ def lambda_handler(event, context):
     # create instance of class
     cleanup = Cleanup(logging)
 
-    # run cleanup
-    cleanup.run_cleanup()
-
-    # export execution log
-    cleanup.export_execution_log(cleanup.execution_log, context.aws_request_id)
+    try:
+        cleanup.run_cleanup()
+    except:
+        logging.warning("Auto Cleanup timedout due to running overtime.")
+    finally:
+        cleanup.export_execution_log(cleanup.execution_log, context.aws_request_id)
