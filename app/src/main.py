@@ -547,6 +547,8 @@ def lambda_handler(event, context):
     try:
         cleanup.run_cleanup()
     except:
-        logging.warning("Auto Cleanup timedout due to running overtime.")
-    finally:
-        cleanup.export_execution_log(cleanup.execution_log, context.aws_request_id)
+        logging.warning(
+            "Auto Cleanup execution has exceeded 14 minutes and has been stopped."
+        )
+
+    cleanup.export_execution_log(cleanup.execution_log, context.aws_request_id)
