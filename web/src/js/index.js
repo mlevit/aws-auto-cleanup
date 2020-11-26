@@ -117,7 +117,14 @@ var app = new Vue({
     },
     updateResourceList: function (service) {
       this.resourceList = Object.keys(this.serviceSettings[service]);
-      this.resourceIdPlaceholder = "";
+
+      // auto select if only 1 option exists
+      if (this.resourceList.length == 1) {
+        this.selectedResource = this.resourceList[0];
+        this.updateResourceId(service, this.resourceList[0]);
+      } else {
+        this.resourceIdPlaceholder = "";
+      }
     },
     openWhitelistDeletePopup: function (resourceId) {
       this.selectedResourceId = resourceId;
