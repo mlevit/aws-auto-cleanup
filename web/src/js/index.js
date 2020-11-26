@@ -86,12 +86,9 @@ var app = new Vue({
       resourceId
     ) {
       this.selectedService = service.toLowerCase().replace(/ /g, "_");
-      this.updateResourceList(this.selectedService);
-
       this.selectedResource = resource.toLowerCase().replace(/ /g, "_");
-
       this.selectedResourceId = resourceId;
-
+      this.updateResourceList(this.selectedService);
       this.closeExecutionLogPopup();
       this.openWhitelistInsertPopup();
     },
@@ -170,17 +167,17 @@ function sendApiRequest(formURL, requestMethod) {
       app.closeWhitelistDeletePopup();
 
       iziToast.success({
-        message: data.message,
         color: "#3FBF61",
+        message: data.message,
         messageColor: "white",
       });
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -232,10 +229,10 @@ function getExecutionLog(executionLogUrl) {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -264,10 +261,10 @@ function getExecutionLogList() {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -296,11 +293,11 @@ function getServices() {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
-        titleColor: "white",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
+        titleColor: "white",
       });
     });
 }
@@ -357,10 +354,10 @@ function getWhitelist() {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -372,14 +369,17 @@ function refreshWhitelist() {
 
 function openTab(evt, tabName) {
   var i, x, tablinks;
+
   x = document.getElementsByClassName("content-tab");
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
   }
+
   tablinks = document.getElementsByClassName("tab");
   for (i = 0; i < x.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" is-active", "");
   }
+
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " is-active";
 }
