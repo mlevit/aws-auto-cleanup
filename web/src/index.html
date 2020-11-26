@@ -503,7 +503,7 @@
                             required
                             tabindex="2"
                             v-model="selectedResource"
-                            v-on:change="updateResourceID(selectedService, selectedResource)"
+                            v-on:change="updateResourceId(selectedService, selectedResource)"
                           >
                             <option v-for="item of resourceList">
                               {{ item }}
@@ -513,24 +513,22 @@
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div class="column">
-                    <div class="field">
-                      <label class="label">ID</label>
-                      <div class="control has-icons-left">
-                        <input
-                          :placeholder="[[ resourceIdPlaceholder ]]"
-                          class="input"
-                          required
-                          tabindex="3"
-                          type="text"
-                          v-model="selectedResourceId"
-                        />
-                        <span class="icon is-small is-left"
-                          ><i class="fas fa-id-card"></i
-                        ></span>
-                      </div>
-                    </div>
+                <div class="field">
+                  <label class="label">ID</label>
+                  <div class="control has-icons-left">
+                    <input
+                      :placeholder="[[ resourceIdPlaceholder ]]"
+                      class="input"
+                      required
+                      tabindex="3"
+                      type="text"
+                      v-model="selectedResourceId"
+                    />
+                    <span class="icon is-small is-left"
+                      ><i class="fas fa-id-card"></i
+                    ></span>
                   </div>
                 </div>
 
