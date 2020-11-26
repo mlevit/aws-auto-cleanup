@@ -364,7 +364,7 @@
                           <td style="white-space: nowrap">
                             <button
                               class="button is-warning"
-                              v-if="item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL'"
+                              v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - WHITELIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"
                               v-on:click="createWhitelistEntryFromExecutionLog( item[2], item[3], item[4] )"
                             >
                               <span class="icon">

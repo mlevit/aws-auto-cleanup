@@ -198,8 +198,12 @@ function getExecutionLog(executionLogURL) {
 
       setTimeout(function () {
         app.executionLogDataTables = $("#execution-log-table").DataTable({
-          dom: "lrti",
           autoWidth: true,
+          columnDefs: [
+            { orderable: false, targets: [6] },
+            { className: "dt-center", targets: [6] },
+          ],
+          dom: "lrti",
           paging: false,
         });
         app.showExecutionLogLoadingGif = false;
