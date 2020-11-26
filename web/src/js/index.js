@@ -95,15 +95,15 @@ var app = new Vue({
       this.closeExecutionLogPopup();
       this.openWhitelistInsertPopup();
     },
-    deleteWhitelistEntry: function (resourceID) {
+    deleteWhitelistEntry: function (resourceId) {
       let formData = {
-        resource_id: resourceID,
+        resource_id: resourceId,
       };
 
       sendApiRequest(convertJsonToGet(formData), "DELETE");
     },
-    extendWhitelistEntry: function (rowID) {
-      let row = this.whitelist[rowID - 1];
+    extendWhitelistEntry: function (rowId) {
+      let row = this.whitelist[rowId - 1];
       let formData = {
         resource_id: row.resource_id,
         expiration: row.expiration,
@@ -113,7 +113,7 @@ var app = new Vue({
 
       sendApiRequest(convertJsonToGet(formData), "PUT");
     },
-    updateResourceID: function (service, resource) {
+    updateResourceId: function (service, resource) {
       this.resourceIdPlaceholder = this.serviceSettings[service][resource][
         "id"
       ];
@@ -186,15 +186,15 @@ function sendApiRequest(formURL, requestMethod) {
 }
 
 // Get execution log for a single instance
-function getExecutionLog(executionLogURL) {
+function getExecutionLog(executionLogUrl) {
   app.showExecutionLogPopup = true;
   app.showExecutionLogLoadingGif = true;
 
-  fetch(API_EXECLOG + executionLogURL)
+  fetch(API_EXECLOG + executionLogUrl)
     .then((response) => response.json())
     .then((data) => {
       app.executionLogTable = data["response"]["body"];
-      app.executionLogKey = decodeURIComponent(executionLogURL);
+      app.executionLogKey = decodeURIComponent(executionLogUrl);
 
       setTimeout(function () {
         app.executionLogDataTables = $("#execution-log-table").DataTable({
