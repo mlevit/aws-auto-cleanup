@@ -80,6 +80,21 @@ var app = new Vue({
 
       sendApiRequest(convertJsonToGet(formData), "POST");
     },
+    createWhitelistEntryFromExecutionLog: function (
+      service,
+      resource,
+      resourceId
+    ) {
+      this.selectedService = service.toLowerCase().replace(/ /g, "_");
+      this.updateResourceList(this.selectedService);
+
+      this.selectedResource = resource.toLowerCase().replace(/ /g, "_");
+
+      this.selectedResourceId = resourceId;
+
+      this.closeExecutionLogPopup();
+      this.openWhitelistInsertPopup();
+    },
     deleteWhitelistEntry: function (resourceID) {
       let formData = {
         resource_id: resourceID,

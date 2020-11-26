@@ -350,6 +350,7 @@
                           <th>Resource</th>
                           <th>ID</th>
                           <th>Action</th>
+                          <th>Whitelist</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -360,6 +361,17 @@
                           <td style="white-space: nowrap">{{ item[3] }}</td>
                           <td>{{ item[4] }}</td>
                           <td style="white-space: nowrap">{{ item[5] }}</td>
+                          <td style="white-space: nowrap">
+                            <button
+                              class="button is-warning"
+                              v-if="item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL'"
+                              v-on:click="createWhitelistEntryFromExecutionLog( item[2], item[3], item[4] )"
+                            >
+                              <span class="icon">
+                                <i class="fas fa-plus"></i>
+                              </span>
+                            </button>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
