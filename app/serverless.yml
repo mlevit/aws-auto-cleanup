@@ -8,10 +8,6 @@ custom:
       name: ${self:service}-${self:provider.stage}-requirements
       compatibleRuntimes:
         - python3.8
-    noDeploy:
-      - boto
-      - boto3
-      - botocore
     slim: true
 
 provider:
@@ -30,6 +26,12 @@ provider:
         ForAnyValue:StringEquals:
           aws:CalledVia:
             - cloudformation.amazonaws.com
+    - Effect: Allow
+      Action:
+        - airflow:DeleteEnvironment
+        - airflow:GetEnvironment
+        - airflow:ListEnvironments
+      Resource: "*"
     - Effect: Allow
       Action:
         - amplify:DeleteApp

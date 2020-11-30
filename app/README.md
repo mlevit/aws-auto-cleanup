@@ -110,6 +110,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 
 | Resource                       | ID Attribute           | Example Value                                        |
 | ------------------------------ | ---------------------- | ---------------------------------------------------- |
+| Airflow Environments           | Environment Name       | `airflow:environment:environmet_name`                |
 | Amplify Apps                   | App Name               | `amplify:app:app_name`                               |
 | CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`                    |
 | CloudWatch Log Groups          | Log Group Name         | `cloudwatch:log_group:log_group_name`                |

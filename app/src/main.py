@@ -11,6 +11,7 @@ import boto3
 from dynamodb_json import json_util as dynamodb_json
 from func_timeout import func_set_timeout
 
+from src.airflow_cleanup import AirflowCleanup
 from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
 from src.cloudwatch_cleanup import CloudWatchCleanup
@@ -85,6 +86,16 @@ class Cleanup:
                     region,
                 )
                 cloudformation_class.run()
+
+                # Amazon Managed Workflows for Apache Airflow (MWAA)
+                airflow_class = AirflowCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=airflow_class.run, args=()))
 
                 # Amplify
                 amplify_class = AmplifyCleanup(

@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "5"
+      "N": "6"
     }
   },
   {
@@ -25,6 +25,23 @@
     },
     "value": {
       "M": {
+        "airflow": {
+          "M": {
+            "environment": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "Environment Name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
         "amplify": {
           "M": {
             "app": {
@@ -33,7 +50,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "app_name"
+                  "S": "App Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -50,7 +67,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "stack_name"
+                  "S": "Stack Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -67,7 +84,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "log_group_name"
+                  "S": "Log Group Name"
                 },
                 "ttl": {
                   "N": "30"
@@ -84,7 +101,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "table_name"
+                  "S": "Table Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -101,7 +118,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "allocation_id"
+                  "S": "Allocation ID"
                 }
               }
             },
@@ -111,7 +128,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "image_id"
+                  "S": "Imagine ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -124,7 +141,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "instance_id"
+                  "S": "Instance ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -137,7 +154,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "group_id"
+                  "S": "Group ID"
                 }
               }
             },
@@ -147,7 +164,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "snapshot_id"
+                  "S": "Snapshot ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -160,7 +177,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "volume_id"
+                  "S": "Volume ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -177,7 +194,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "image_digest"
+                  "S": "Imagine Digest"
                 },
                 "ttl": {
                   "N": "7"
@@ -190,7 +207,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "repository_name"
+                  "S": "Repository Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -207,7 +224,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "cluster_name"
+                  "S": "Cluster Name"
                 }
               }
             },
@@ -217,7 +234,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "service_name"
+                  "S": "Service Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -234,7 +251,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "file_system_id"
+                  "S": "File System ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -251,7 +268,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "cluster_name"
+                  "S": "Cluster Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -264,7 +281,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "fargate_profile_name"
+                  "S": "Fargate Profile Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -277,7 +294,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "node_group_name"
+                  "S": "Node Group Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -294,7 +311,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "application_name"
+                  "S": "Application Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -311,7 +328,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "cache_cluster_id"
+                  "S": "Cache Cluster ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -324,7 +341,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "replication_group_id"
+                  "S": "Replication Group ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -341,7 +358,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "domain_name"
+                  "S": "Domain Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -358,7 +375,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "load_balancer_name"
+                  "S": "Load Balancer Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -392,7 +409,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "crawler_name"
+                  "S": "Crawler Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -405,7 +422,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "database_name"
+                  "S": "Database Name"
                 },
                 "ttl": {
                   "N": "30"
@@ -418,7 +435,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "endpoint_name"
+                  "S": "Endpoint Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -435,7 +452,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "policy_name"
+                  "S": "Policy Name"
                 },
                 "ttl": {
                   "N": "30"
@@ -448,7 +465,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "role_name"
+                  "S": "Role Name"
                 },
                 "ttl": {
                   "N": "30"
@@ -465,7 +482,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "cluster_name"
+                  "S": "Cluster Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -482,7 +499,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "stream_name"
+                  "S": "Stream Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -499,7 +516,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "function_name"
+                  "S": "Function Name"
                 },
                 "ttl": {
                   "N": "30"
@@ -516,7 +533,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "db_instance_identifier"
+                  "S": "DB Instance Identifier"
                 },
                 "ttl": {
                   "N": "7"
@@ -529,7 +546,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "db_snapshot_name"
+                  "S": "DB Snapshot Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -546,7 +563,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "cluster_identifier"
+                  "S": "Cluster Identifier"
                 },
                 "ttl": {
                   "N": "7"
@@ -559,7 +576,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "snapshot_identifier"
+                  "S": "Snapshot Identifier"
                 },
                 "ttl": {
                   "N": "7"
@@ -576,7 +593,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "bucket_name"
+                  "S": "Bucket Name"
                 },
                 "ttl": {
                   "N": "30"
@@ -593,7 +610,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "endpoint_name"
+                  "S": "Endpoint Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -606,7 +623,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "notebook_instance_name"
+                  "S": "Notebook Instance Name"
                 },
                 "ttl": {
                   "N": "7"
