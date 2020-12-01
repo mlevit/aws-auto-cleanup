@@ -23,8 +23,99 @@ class SageMakerCleanup:
         return self._client_sagemaker
 
     def run(self):
+        self.apps()
         self.endpoints()
         self.notebook_instances()
+
+    def apps(self):
+        """
+        Deletes SageMaker Apps.
+        """
+
+        self.logging.debug("Started cleanup of SageMaker Apps.")
+
+        clean = (
+            self.settings.get("services", {})
+            .get("sagemaker", {})
+            .get("app", {})
+            .get("clean", False)
+        )
+        if clean:
+            try:
+                resources = self.client_sagemaker.list_apps().get("Apps")
+            except:
+                self.logging.error("Could not list all SageMaker Apps.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            ttl_days = (
+                self.settings.get("services", {})
+                .get("sagemaker", {})
+                .get("app", {})
+                .get("ttl", 7)
+            )
+
+            for resource in resources:
+                resource_id = resource.get("AppName")
+                resource_date = resource.get("CreationTime")
+                resource_app_type = resource.get("AppType")
+                resource_domain_id = resource.get("DomainId")
+                resource_status = resource.get("Status")
+                resource_user_profile = resource.get("UserProfileName")
+                resource_action = None
+
+                if resource_id not in self.whitelist.get("sagemaker", {}).get(
+                    "app", []
+                ):
+                    delta = Helper.get_day_delta(resource_date)
+                    if delta.days > ttl_days:
+                        if resource_status in ("Failed", "InService"):
+                            try:
+                                if not self._dry_run:
+                                    self.client_sagemaker.delete_app(
+                                        DomainId=resource_domain_id,
+                                        UserProfileName=resource_user_profile,
+                                        AppType=resource_app_type,
+                                        AppName=resource_id,
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete SageMaker App '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"SageMaker App '{resource_id}' was last modified {delta.days} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                    else:
+                        self.logging.debug(
+                            f"SageMaker App '{resource_id}' was created {delta.days} days ago "
+                            "(less than TTL setting) and has not been deleted."
+                        )
+                        resource_action = "SKIP - TTL"
+                else:
+                    self.logging.debug(
+                        f"SageMaker App '{resource_id}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "SageMaker",
+                    "App",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug("Finished cleanup of SageMaker Apps.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of SageMaker Apps.")
+            return True
 
     def endpoints(self):
         """

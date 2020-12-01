@@ -604,6 +604,19 @@
         },
         "sagemaker": {
           "M": {
+            "app": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "App Name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
             "endpoint": {
               "M": {
                 "clean": {

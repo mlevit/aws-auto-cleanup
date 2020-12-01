@@ -3,7 +3,8 @@
 ## 1.4.0
 
 - Added ability to whitelist entries directly from the execution log.
-- Added Amazon Managed Workflows for Apache Airflow (:kissing_closed_eyes:) cleanup.
+- Added Amazon Managed Workflows for Apache Airflow cleanup.
+- Added SageMaker App cleanup.
 
 ## 1.3.0
 
