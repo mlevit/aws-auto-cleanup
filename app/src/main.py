@@ -87,7 +87,7 @@ class Cleanup:
                 )
                 cloudformation_class.run()
 
-                # Amazon Managed Workflows for Apache Airflow (MWAA)
+                # Managed Workflows for Apache Airflow (MWAA)
                 airflow_class = AirflowCleanup(
                     self.logging,
                     self.whitelist,
