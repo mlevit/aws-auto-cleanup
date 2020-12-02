@@ -110,7 +110,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 
 | Resource                       | ID Attribute           | Example Value                                        |
 | ------------------------------ | ---------------------- | ---------------------------------------------------- |
-| Airflow Environments           | Environment Name       | `airflow:environment:environmet_name`                |
+| Airflow Environments           | Environment Name       | `airflow:environment:environment_name`               |
 | Amplify Apps                   | App Name               | `amplify:app:app_name`                               |
 | CloudFormation Stacks          | Stack Name             | `cloudformation:stack:stack_name`                    |
 | CloudWatch Log Groups          | Log Group Name         | `cloudwatch:log_group:log_group_name`                |
@@ -148,6 +148,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | Redshift Instances             | Cluster Identifier     | `redshift:instance:cluster_identifier`               |
 | Redshift Snapshots             | Snapshot Identifier    | `redshift:snapshot:snapshot_identifier`              |
 | S3 Buckets                     | Bucket Name            | `s3:bucket:bucket_name`                              |
+| SageMaker Apps                 | App Name               | `sagemaker:app:app_name`                             |
 | SageMaker Endpoints            | Endpoint Name          | `sagemaker:endpoint:endpoint_name`                   |
 | SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
 
@@ -226,6 +227,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | Redshift              | Clusters                 | True  | 7   |                                                                |
 | Redshift              | Snapshots                | True  | 7   |                                                                |
 | S3                    | Buckets                  | True  | 30  |                                                                |
+| SageMaker             | Apps :new:               | True  | 7   |                                                                |
 | SageMaker             | Endpoints :new:          | True  | 7   |                                                                |
 | SageMaker             | Notebook Instances :new: | True  | 7   |                                                                |
 
