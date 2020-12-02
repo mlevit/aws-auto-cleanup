@@ -73,10 +73,10 @@ class SageMakerCleanup:
                             try:
                                 if not self._dry_run:
                                     self.client_sagemaker.delete_app(
+                                        AppName=resource_id,
+                                        AppType=resource_app_type,
                                         DomainId=resource_domain_id,
                                         UserProfileName=resource_user_profile,
-                                        AppType=resource_app_type,
-                                        AppName=resource_id,
                                     )
                             except:
                                 self.logging.error(
