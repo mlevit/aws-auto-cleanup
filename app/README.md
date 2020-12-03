@@ -186,7 +186,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 
 | Service               | Resource Type            | Clean | TTL | Comment                                                        |
 | --------------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
-| Airflow               | Environment :new:        | True  | 7   |                                                                |
+| Airflow               | Environments :new:       | True  | 7   |                                                                |
 | Amplify               | Apps :new:               | True  | 7   |                                                                |
 | CloudFormation        | Stacks                   | True  | 7   |                                                                |
 | CloudWatch            | Log Groups :new:         | True  | 30  |                                                                |
