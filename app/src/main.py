@@ -393,11 +393,12 @@ class Cleanup:
 
         try:
             client = boto3.client("dynamodb")
-            settings_data = open("./src/data/auto-cleanup-settings.json")
-            whitelist_data = open("./src/data/auto-cleanup-whitelist.json")
 
-            settings_json = json.loads(settings_data.read())
-            whitelist_json = json.loads(whitelist_data.read())
+            with open("./src/data/auto-cleanup-settings.json") as settings_data:
+                settings_json = json.loads(settings_data.read())
+
+            with open("./src/data/auto-cleanup-whitelist.json") as whitelist_data:
+                whitelist_json = json.loads(whitelist_data.read())
 
             update_settings = False
 
@@ -450,9 +451,6 @@ class Cleanup:
                 except:
                     self.logging.error(sys.exc_info()[1])
                     continue
-
-            settings_data.close()
-            whitelist_data.close()
         except:
             self.logging.error(sys.exc_info()[1])
 

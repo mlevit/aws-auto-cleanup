@@ -9,18 +9,15 @@ from dynamodb_json import json_util as dynamodb_json
 def get_settings():
     settings = {}
 
-    try:
-        items = boto3.client("dynamodb").scan(
-            TableName=os.environ.get("SETTINGSTABLE")
-        )["Items"]
-    except Exception as error:
-        raise error
-    else:
-        for item in items:
-            item_json = dynamodb_json.loads(item, True)
-            settings[item_json.get("key")] = item_json.get("value")
+    items = boto3.client("dynamodb").scan(TableName=os.environ.get("SETTINGSTABLE"))[
+        "Items"
+    ]
 
-        return settings
+    for item in items:
+        item_json = dynamodb_json.loads(item, True)
+        settings[item_json.get("key")] = item_json.get("value")
+
+    return settings
 
 
 def get_return(code, message, request, response):
