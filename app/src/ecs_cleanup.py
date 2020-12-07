@@ -14,7 +14,7 @@ class ECSCleanup:
         self.region = region
 
         self._client_ecs = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_ecs(self):
@@ -88,7 +88,7 @@ class ECSCleanup:
                         resource_action = "SKIP - IN USE"
                     else:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ecs.delete_cluster(
                                     cluster=resource_id,
                                 )
@@ -196,7 +196,7 @@ class ECSCleanup:
                         if delta.days > ttl_days:
                             if resource_status in ("ACTIVE", "INACTIVE"):
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         self.client_ecs.delete_service(
                                             cluster=cluster,
                                             service=resource_id,

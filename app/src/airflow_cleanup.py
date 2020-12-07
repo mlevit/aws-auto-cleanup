@@ -14,7 +14,7 @@ class AirflowCleanup:
         self.region = region
 
         self._client_airflow = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_airflow(self):
@@ -74,7 +74,7 @@ class AirflowCleanup:
                         delta = Helper.get_day_delta(resource_date)
                         if delta.days > ttl_days:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_airflow.delete_environment(
                                         Name=resource
                                     )

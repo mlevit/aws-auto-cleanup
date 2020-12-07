@@ -14,7 +14,7 @@ class EMRCleanup:
         self.region = region
 
         self._client_emr = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_emr(self):
@@ -68,7 +68,7 @@ class EMRCleanup:
                     if delta.days > ttl_days:
                         if resource_status in ("RUNNING", "WAITING"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_emr.terminate_job_flows(
                                         JobFlowIds=[resource_id]
                                     )

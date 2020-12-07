@@ -15,7 +15,7 @@ class CloudWatchCleanup:
         self.region = region
 
         self._client_logs = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_logs(self):
@@ -69,7 +69,7 @@ class CloudWatchCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_logs.delete_log_group(
                                     logGroupName=resource_id
                                 )

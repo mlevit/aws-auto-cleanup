@@ -14,7 +14,7 @@ class RDSCleanup:
         self.region = region
 
         self._client_rds = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_rds(self):
@@ -68,7 +68,7 @@ class RDSCleanup:
                     if delta.days > ttl_days:
                         if resource.get("DeletionProtection"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_rds.modify_db_instance(
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False,
@@ -87,7 +87,7 @@ class RDSCleanup:
 
                         if resource_action != "ERROR":
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_rds.delete_db_instance(
                                         DBInstanceIdentifier=resource_id,
                                         SkipFinalSnapshot=True,
@@ -174,7 +174,7 @@ class RDSCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_rds.delete_db_snapshot(
                                     DBSnapshotIdentifier=resource_id
                                 )

@@ -14,7 +14,7 @@ class LambdaCleanup:
         self.region = region
 
         self._client_lambda = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_lambda(self):
@@ -66,7 +66,7 @@ class LambdaCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_lambda.delete_function(
                                     FunctionName=resource_id
                                 )

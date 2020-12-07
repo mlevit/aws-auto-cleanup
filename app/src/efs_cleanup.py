@@ -14,7 +14,7 @@ class EFSCleanup:
         self.region = region
 
         self._client_efs = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_efs(self):
@@ -84,7 +84,7 @@ class EFSCleanup:
                                     mount_target_id = mount_target.get("MountTargetId")
 
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_efs.delete_mount_target(
                                                 MountTargetId=mount_target_id
                                             )
@@ -101,7 +101,7 @@ class EFSCleanup:
 
                         if resource_action != "ERROR":
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_efs.delete_file_system(
                                         FileSystemId=resource_id
                                     )

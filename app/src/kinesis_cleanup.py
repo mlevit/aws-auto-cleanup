@@ -14,7 +14,7 @@ class KinesisCleanup:
         self.region = region
 
         self._client_kinesis = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_kinesis(self):
@@ -80,7 +80,7 @@ class KinesisCleanup:
                         if delta.days > ttl_days:
                             if resource_status == "ACTIVE":
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         self.client_kinesis.delete_stream(
                                             StreamName=resource_id,
                                             EnforceConsumerDeletion=True,

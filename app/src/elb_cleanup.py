@@ -14,7 +14,7 @@ class ELBCleanup:
         self.region = region
 
         self._client_elb = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_elb(self):
@@ -69,7 +69,7 @@ class ELBCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_elb.modify_load_balancer_attributes(
                                     LoadBalancerArn=resource_arn,
                                     Attributes=[
@@ -87,7 +87,7 @@ class ELBCleanup:
                             resource_action = "ERROR"
                         else:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_elb.delete_load_balancer(
                                         LoadBalancerArn=resource_arn
                                     )

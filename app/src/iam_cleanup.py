@@ -16,7 +16,7 @@ class IAMCleanup:
         self.region = "global"
 
         self._client_iam = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_iam(self):
@@ -92,7 +92,7 @@ class IAMCleanup:
                             else:
                                 for user_resource in user_resources.get("PolicyUsers"):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.detach_user_policy(
                                                 UserName=user_resource.get("UserName"),
                                                 PolicyArn=resource_arn,
@@ -121,7 +121,7 @@ class IAMCleanup:
                             else:
                                 for role_resource in role_resources.get("PolicyRoles"):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.detach_role_policy(
                                                 RoleName=role_resource.get("RoleName"),
                                                 PolicyArn=resource_arn,
@@ -152,7 +152,7 @@ class IAMCleanup:
                                     "PolicyGroups"
                                 ):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.detach_group_policy(
                                                 GroupName=group_resource.get(
                                                     "GroupName"
@@ -190,7 +190,7 @@ class IAMCleanup:
                             for versions_resource in versions_resources.get("Versions"):
                                 if not versions_resource.get("IsDefaultVersion"):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.delete_policy_version(
                                                 PolicyArn=resource_arn,
                                                 VersionId=versions_resource.get(
@@ -210,7 +210,7 @@ class IAMCleanup:
 
                         # - Delete the policy (this automatically deletes the policy's default version) using this API.
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_iam.delete_policy(PolicyArn=resource_arn)
                         except:
                             self.logging.error(
@@ -383,7 +383,7 @@ class IAMCleanup:
 
                                     for policy in policies:
                                         try:
-                                            if not self._dry_run:
+                                            if not self.is_dry_run:
                                                 self.client_iam.delete_role_policy(
                                                     RoleName=resource_id,
                                                     PolicyName=policy,
@@ -418,7 +418,7 @@ class IAMCleanup:
                                     else:
                                         for policy in policies:
                                             try:
-                                                if not self._dry_run:
+                                                if not self.is_dry_run:
                                                     self.client_iam.detach_role_policy(
                                                         RoleName=resource_id,
                                                         PolicyArn=policy.get(
@@ -456,7 +456,7 @@ class IAMCleanup:
                                         for profile in profiles:
                                             # remove role from instance profile
                                             try:
-                                                if not self._dry_run:
+                                                if not self.is_dry_run:
                                                     self.client_iam.remove_role_from_instance_profile(
                                                         InstanceProfileName=profile.get(
                                                             "InstanceProfileName"
@@ -476,7 +476,7 @@ class IAMCleanup:
 
                                             # delete instance profile
                                             try:
-                                                if not self._dry_run:
+                                                if not self.is_dry_run:
                                                     self.client_iam.delete_instance_profile(
                                                         InstanceProfileName=profile.get(
                                                             "InstanceProfileName"
@@ -495,7 +495,7 @@ class IAMCleanup:
 
                                     # delete role
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.delete_role(
                                                 RoleName=resource_id
                                             )

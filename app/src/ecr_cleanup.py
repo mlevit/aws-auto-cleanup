@@ -14,7 +14,7 @@ class ECRCleanup:
         self.region = region
 
         self._client_ecr = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_ecr(self):
@@ -78,7 +78,7 @@ class ECRCleanup:
                     if len(list_images) == 0:
                         if delta.days > ttl_days:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_ecr.delete_repository(
                                         repositoryName=resource_id
                                     )
@@ -169,7 +169,7 @@ class ECRCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ecr.batch_delete_image(
                                     repositoryName=repository,
                                     imageIds=[{"imageDigest": resource_id}],

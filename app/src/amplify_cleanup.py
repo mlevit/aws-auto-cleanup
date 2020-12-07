@@ -14,7 +14,7 @@ class AmplifyCleanup:
         self.region = region
 
         self._client_amplify = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_amplify(self):
@@ -65,7 +65,7 @@ class AmplifyCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_amplify.delete_app(appId=resource_app_id)
                         except:
                             self.logging.error(

@@ -14,7 +14,7 @@ class RedshiftCleanup:
         self.region = region
 
         self._client_redshift = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_redshift(self):
@@ -67,7 +67,7 @@ class RedshiftCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_redshift.delete_cluster(
                                     ClusterIdentifier=resource_id,
                                     SkipFinalClusterSnapshot=True,
@@ -159,7 +159,7 @@ class RedshiftCleanup:
                     if delta.days > ttl_days:
                         if resource_status in ("available", "final snapshot"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_redshift.delete_cluster_snapshot(
                                         SnapshotIdentifier=resource_id
                                     )

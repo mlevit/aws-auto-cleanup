@@ -15,7 +15,7 @@ class S3Cleanup:
 
         self._client_s3 = None
         self._resource_s3 = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_s3(self):
@@ -72,7 +72,7 @@ class S3Cleanup:
                     if delta.days > ttl_days:
                         # delete bucket policy
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_s3.delete_bucket_policy(Bucket=resource_id)
                         except:
                             self.logging.error(
@@ -89,7 +89,7 @@ class S3Cleanup:
 
                             # delete all objects
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     bucket_resource.objects.delete()
                             except:
                                 self.logging.error(
@@ -104,7 +104,7 @@ class S3Cleanup:
 
                                 # delete all Versions and DeleteMarkers
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         bucket_resource.object_versions.delete()
                                 except:
                                     self.logging.error(
@@ -119,7 +119,7 @@ class S3Cleanup:
 
                                     # delete bucket
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_s3.delete_bucket(
                                                 Bucket=resource_id
                                             )

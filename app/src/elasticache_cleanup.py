@@ -14,7 +14,7 @@ class ElastiCacheCleanup:
         self.region = region
 
         self._client_elasticache = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_elasticache(self):
@@ -75,7 +75,7 @@ class ElastiCacheCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_elasticache.delete_cache_cluster(
                                     CacheClusterId=resource_id
                                 )
@@ -177,7 +177,7 @@ class ElastiCacheCleanup:
 
                         if delta.days > ttl_days:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_elasticache.delete_replication_group(
                                         ReplicationGroupId=resource_id
                                     )

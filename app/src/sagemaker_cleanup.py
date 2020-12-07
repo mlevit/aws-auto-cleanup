@@ -14,7 +14,7 @@ class SageMakerCleanup:
         self.region = region
 
         self._client_sagemaker = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_sagemaker(self):
@@ -72,7 +72,7 @@ class SageMakerCleanup:
                     if delta.days > ttl_days:
                         if resource_status in ("Failed", "InService"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_sagemaker.delete_app(
                                         AppName=resource_id,
                                         AppType=resource_app_type,
@@ -165,7 +165,7 @@ class SageMakerCleanup:
                             "Failed",
                         ):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_sagemaker.delete_endpoint(
                                         EndpointName=resource_id,
                                     )
@@ -255,7 +255,7 @@ class SageMakerCleanup:
                     if delta.days > ttl_days:
                         if resource_status == "InService":
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_sagemaker.stop_notebook_instance(
                                         NotebookInstanceName=resource_id,
                                     )
@@ -273,7 +273,7 @@ class SageMakerCleanup:
                                 resource_action = "STOP"
                         elif resource_status in ("Stopped", "Failed"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_sagemaker.delete_notebook_instance(
                                         NotebookInstanceName=resource_id,
                                     )

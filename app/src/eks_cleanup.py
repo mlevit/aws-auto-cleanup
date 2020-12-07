@@ -14,7 +14,7 @@ class EKSCleanup:
         self.region = region
 
         self._client_eks = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_eks(self):
@@ -95,7 +95,7 @@ class EKSCleanup:
                     if len(list_fargate_profiles) == 0 and len(list_nodegroups) == 0:
                         if delta.days > ttl_days:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_eks.delete_cluster(name=resource_id)
                             except:
                                 self.logging.error(
@@ -202,7 +202,7 @@ class EKSCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_eks.delete_fargate_profile(
                                     clusterName=cluster, fargateProfileName=resource_id
                                 )
@@ -310,7 +310,7 @@ class EKSCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_eks.delete_nodegroup(
                                     clusterName=cluster, nodegroupName=resource_id
                                 )

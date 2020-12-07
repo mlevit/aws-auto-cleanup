@@ -14,7 +14,7 @@ class GlueCleanup:
         self.region = region
 
         self._client_glue = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_glue(self):
@@ -68,7 +68,7 @@ class GlueCleanup:
                     if delta.days > ttl_days:
                         if resource_status != "RUNNING":
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_glue.delete_crawler(Name=resource_id)
                             except:
                                 self.logging.error(
@@ -155,7 +155,7 @@ class GlueCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_glue.delete_database(Name=resource_id)
                         except:
                             self.logging.error(
@@ -237,7 +237,7 @@ class GlueCleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_glue.delete_dev_endpoint(
                                     EndpointName=resource_id
                                 )

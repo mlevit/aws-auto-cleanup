@@ -16,7 +16,7 @@ class EC2Cleanup:
         self._client_ec2 = None
         self._client_sts = None
         self._resource_ec2 = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
 
     @property
     def client_sts(self):
@@ -76,7 +76,7 @@ class EC2Cleanup:
                 if resource_id not in self.whitelist.get("ec2", {}).get("address", []):
                     if resource.get("AssociationId") is None:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ec2.release_address(
                                     AllocationId=resource_id
                                 )
@@ -162,7 +162,7 @@ class EC2Cleanup:
 
                     if delta.days > ttl_days:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ec2.deregister_image(ImageId=resource_id)
                         except:
                             self.logging.error(
@@ -252,7 +252,7 @@ class EC2Cleanup:
                         if delta.days > ttl_days:
                             if resource_state == "running":
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         self.client_ec2.stop_instances(
                                             InstanceIds=[resource_id]
                                         )
@@ -288,7 +288,7 @@ class EC2Cleanup:
                                 else:
                                     if resource_protection:
                                         try:
-                                            if not self._dry_run:
+                                            if not self.is_dry_run:
                                                 self.client_ec2.modify_instance_attribute(
                                                     DisableApiTermination={
                                                         "Value": False
@@ -309,7 +309,7 @@ class EC2Cleanup:
 
                                     if resource_action != "ERROR":
                                         try:
-                                            if not self._dry_run:
+                                            if not self.is_dry_run:
                                                 self.client_ec2.terminate_instances(
                                                     InstanceIds=[resource_id]
                                                 )
@@ -402,7 +402,7 @@ class EC2Cleanup:
                     "security_group", []
                 ):
                     try:
-                        if not self._dry_run:
+                        if not self.is_dry_run:
                             self.client_ec2.delete_security_group(GroupId=resource)
                     except:
                         if "DependencyViolation" in str(sys.exc_info()[1]):
@@ -510,7 +510,7 @@ class EC2Cleanup:
 
                             if delta.days > ttl_days:
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         self.client_ec2.delete_snapshot(
                                             SnapshotId=resource_id
                                         )
@@ -599,7 +599,7 @@ class EC2Cleanup:
 
                         if delta.days > ttl_days:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_ec2.delete_volume(VolumeId=resource_id)
                             except:
                                 self.logging.error(
