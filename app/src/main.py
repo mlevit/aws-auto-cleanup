@@ -350,13 +350,13 @@ class Cleanup:
         try:
             paginator = boto3.client("dynamodb").get_paginator("scan")
             items = (
-                paginator.paginate(TableName=os.environ.get("SETTINGSTABLE"))
+                paginator.paginate(TableName=os.environ.get("SETTINGS_TABLE"))
                 .build_full_result()
                 .get("Items")
             )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ.get("SETTINGSTABLE")}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("SETTINGS_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         else:
@@ -372,13 +372,13 @@ class Cleanup:
         try:
             paginator = boto3.client("dynamodb").get_paginator("scan")
             items = (
-                paginator.paginate(TableName=os.environ.get("WHITELISTTABLE"))
+                paginator.paginate(TableName=os.environ.get("WHITELIST_TABLE"))
                 .build_full_result()
                 .get("Items")
             )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ.get("WHITELISTTABLE")}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("WHITELIST_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         else:
@@ -413,7 +413,7 @@ class Cleanup:
 
             # get current settings version
             current_version = client.get_item(
-                TableName=os.environ.get("SETTINGSTABLE"),
+                TableName=os.environ.get("SETTINGS_TABLE"),
                 Key={"key": {"S": "version"}},
             )
 
@@ -429,24 +429,24 @@ class Cleanup:
                     update_settings = True
                     self.logging.info(
                         f"Existing settings with version {current_version} are being updated "
-                        f"""to version {new_version} in DynamoDB Table '{os.environ.get("SETTINGSTABLE")}'."""
+                        f"""to version {new_version} in DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}'."""
                     )
                 else:
                     self.logging.debug(
                         f"Existing settings are at the lastest version {current_version} in "
-                        f"""DynamoDB Table '{os.environ.get("SETTINGSTABLE")}'."""
+                        f"""DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}'."""
                     )
             else:
                 update_settings = True
                 self.logging.info(
-                    f"""Settings are being inserted into DynamoDB Table '{os.environ.get("SETTINGSTABLE")}' for the first time."""
+                    f"""Settings are being inserted into DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}' for the first time."""
                 )
 
             if update_settings:
                 for setting in settings_json:
                     try:
                         client.put_item(
-                            TableName=os.environ.get("SETTINGSTABLE"), Item=setting
+                            TableName=os.environ.get("SETTINGS_TABLE"), Item=setting
                         )
                     except:
                         self.logging.error(sys.exc_info()[1])
@@ -455,7 +455,7 @@ class Cleanup:
             for whitelist in whitelist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ.get("WHITELISTTABLE"), Item=whitelist
+                        TableName=os.environ.get("WHITELIST_TABLE"), Item=whitelist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
@@ -519,7 +519,7 @@ class Cleanup:
 
                 now = datetime.datetime.now()
                 client = boto3.client("s3")
-                bucket = os.environ.get("EXECUTIONLOGBUCKET")
+                bucket = os.environ.get("EXECUTION_LOG_BUCKET")
                 key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.csv"""
 
                 try:
@@ -556,7 +556,7 @@ def lambda_handler(event, context):
 
     logging.basicConfig(
         format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)",
-        level=os.environ.get("LOGLEVEL", "WARNING").upper(),
+        level=os.environ.get("LOG_LEVEL", "WARNING").upper(),
     )
 
     # create instance of class

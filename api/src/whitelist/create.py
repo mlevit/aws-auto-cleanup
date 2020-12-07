@@ -11,7 +11,7 @@ def get_settings():
 
     paginator = boto3.client("dynamodb").get_paginator("scan")
     items = (
-        paginator.paginate(TableName=os.environ.get("SETTINGSTABLE"))
+        paginator.paginate(TableName=os.environ.get("SETTINGS_TABLE"))
         .build_full_result()
         .get("Items")
     )
@@ -95,7 +95,7 @@ def lambda_handler(event, context):
 
     try:
         boto3.client("dynamodb").put_item(
-            TableName=os.environ.get("WHITELISTTABLE"),
+            TableName=os.environ.get("WHITELIST_TABLE"),
             Item={
                 "resource_id": {"S": parameters.get("resource_id")},
                 "expiration": {"N": str(expiration)},

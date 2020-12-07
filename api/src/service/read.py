@@ -20,7 +20,7 @@ def get_settings():
 
     paginator = boto3.client("dynamodb").get_paginator("scan")
     items = (
-        paginator.paginate(TableName=os.environ.get("SETTINGSTABLE"))
+        paginator.paginate(TableName=os.environ.get("SETTINGS_TABLE"))
         .build_full_result()
         .get("Items")
     )

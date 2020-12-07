@@ -36,7 +36,7 @@ def lambda_handler(event, context):
     try:
         file_contents = (
             client.get_object(
-                Bucket=os.environ.get("EXECUTIONLOGBUCKET"),
+                Bucket=os.environ.get("EXECUTION_LOG_BUCKET"),
                 Key=key,
             )
             .get("Body")

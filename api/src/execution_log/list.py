@@ -27,7 +27,7 @@ def lambda_handler(event, context):
 
     try:
         page_iterator = paginator.paginate(
-            Bucket=os.environ.get("EXECUTIONLOGBUCKET"),
+            Bucket=os.environ.get("EXECUTION_LOG_BUCKET"),
         )
 
         for page in page_iterator:
@@ -40,7 +40,7 @@ def lambda_handler(event, context):
         print(f"[ERROR] {error}")
         return get_return(
             400,
-            f"""Could not list files in S3 Bucket '{os.environ.get("EXECUTIONLOGBUCKET")}'""",
+            f"""Could not list files in S3 Bucket '{os.environ.get("EXECUTION_LOG_BUCKET")}'""",
             None,
             None,
         )

@@ -253,12 +253,12 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      EXECUTIONLOGBUCKET:
+      LOG_LEVEL: ${self:custom.log_level}
+      EXECUTION_LOG_BUCKET:
         Ref: ExecutionLogBucket
-      SETTINGSTABLE:
+      SETTINGS_TABLE:
         Ref: SettingsTable
-      WHITELISTTABLE:
+      WHITELIST_TABLE:
         Ref: WhitelistTable
     events:
       - schedule:
