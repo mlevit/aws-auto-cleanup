@@ -40,7 +40,8 @@ class AirflowCleanup:
         )
         if clean:
             try:
-                resources = self.client_airflow.list_environments().get("Environments")
+                paginator = self.client_airflow.get_paginator("list_environments")
+                resources = paginator.paginate().build_full_result().get("Environments")
             except:
                 self.logging.error("Could not list all Airflow Environments.")
                 self.logging.error(sys.exc_info()[1])

@@ -40,7 +40,8 @@ class DynamoDBCleanup:
         )
         if clean:
             try:
-                resources = self.client_dynamodb.list_tables().get("TableNames")
+                paginator = self.client_dynamodb.get_paginator("list_tables")
+                resources = paginator.paginate().build_full_result().get("TableNames")
             except:
                 self.logging.error("Could not list all DynamoDB Tables.")
                 self.logging.error(sys.exc_info()[1])

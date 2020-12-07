@@ -41,7 +41,8 @@ class RedshiftCleanup:
         )
         if clean:
             try:
-                resources = self.client_redshift.describe_clusters().get("Clusters")
+                paginator = self.client_redshift.get_paginator("describe_clusters")
+                resources = paginator.paginate().build_full_result().get("Clusters")
             except:
                 self.logging.error("Could not list all Redshift Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -125,9 +126,14 @@ class RedshiftCleanup:
         )
         if clean:
             try:
-                resources = self.client_redshift.describe_cluster_snapshots(
-                    SnapshotType="manual",
-                ).get("Snapshots")
+                paginator = self.client_redshift.get_paginator(
+                    "describe_cluster_snapshots"
+                )
+                resources = (
+                    paginator.paginate(SnapshotType="manual")
+                    .build_full_result()
+                    .get("Snapshots")
+                )
             except:
                 self.logging.error("Could not list all Redshift Snapshots.")
                 self.logging.error(sys.exc_info()[1])

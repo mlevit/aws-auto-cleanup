@@ -43,9 +43,14 @@ class ElastiCacheCleanup:
         )
         if clean:
             try:
-                resources = self.client_elasticache.describe_cache_clusters(
-                    ShowCacheClustersNotInReplicationGroups=True
-                ).get("CacheClusters")
+                paginator = self.client_elasticache.get_paginator(
+                    "describe_cache_clusters"
+                )
+                resources = (
+                    paginator.paginate(ShowCacheClustersNotInReplicationGroups=True)
+                    .build_full_result()
+                    .get("CacheClusters")
+                )
             except:
                 self.logging.error("Could not list all ElastiCache Clusters.")
                 self.logging.error(sys.exc_info()[1])

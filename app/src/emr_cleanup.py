@@ -40,7 +40,8 @@ class EMRCleanup:
         )
         if clean:
             try:
-                resources = self.client_emr.list_clusters().get("Clusters")
+                paginator = self.client_emr.get_paginator("list_clusters")
+                resources = paginator.paginate().build_full_result().get("Clusters")
             except:
                 self.logging.error("Could not list all EMR Clusters.")
                 self.logging.error(sys.exc_info()[1])

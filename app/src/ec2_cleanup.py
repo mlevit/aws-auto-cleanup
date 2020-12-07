@@ -221,7 +221,10 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                reservations = self.client_ec2.describe_instances().get("Reservations")
+                paginator = self.client_ec2.get_paginator("describe_instances")
+                reservations = (
+                    paginator.paginate().build_full_result().get("Reservations")
+                )
             except:
                 self.logging.error("Could not list all EC2 Instances.")
                 self.logging.error(sys.exc_info()[1])
@@ -364,20 +367,25 @@ class EC2Cleanup:
         if clean:
             try:
                 # help from https://stackoverflow.com/a/41150217
-                instances = self.client_ec2.describe_instances()
-                security_groups = self.client_ec2.describe_security_groups()
+                paginator = self.client_ec2.get_paginator("describe_instances")
+                instances = paginator.paginate().build_full_result().get("Reservations")
+
+                paginator = self.client_ec2.get_paginator("describe_security_groups")
+                security_groups = (
+                    paginator.paginate().build_full_result().get("SecurityGroups")
+                )
 
                 instance_security_group_set = set()
                 security_group_set = set()
 
-                for reservation in instances.get("Reservations"):
+                for reservation in instances:
                     for instance in reservation.get("Instances"):
                         for security_group in instance.get("SecurityGroups"):
                             instance_security_group_set.add(
                                 security_group.get("GroupId")
                             )
 
-                for security_group in security_groups.get("SecurityGroups"):
+                for security_group in security_groups:
                     if security_group.get("GroupName") != "default":
                         security_group_set.add(security_group.get("GroupId"))
 
@@ -446,11 +454,16 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                resources = self.client_ec2.describe_snapshots(
-                    OwnerIds=[
-                        "self",
-                    ]
-                ).get("Snapshots")
+                paginator = self.client_ec2.get_paginator("describe_snapshots")
+                resources = (
+                    paginator.paginate(
+                        OwnerIds=[
+                            "self",
+                        ]
+                    )
+                    .build_full_result()
+                    .get("Snapshots")
+                )
             except:
                 self.logging.error("Could not list all EC2 Snapshots.")
                 self.logging.error(sys.exc_info()[1])
@@ -561,7 +574,8 @@ class EC2Cleanup:
         )
         if clean:
             try:
-                resources = self.client_ec2.describe_volumes().get("Volumes")
+                paginator = self.client_ec2.get_paginator("describe_volumes")
+                resources = paginator.paginate().build_full_result().get("Volumes")
             except:
                 self.logging.error("Could not list all EC2 Volumes.")
                 self.logging.error(sys.exc_info()[1])

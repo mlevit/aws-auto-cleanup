@@ -40,7 +40,8 @@ class LambdaCleanup:
         )
         if clean:
             try:
-                resources = self.client_lambda.list_functions().get("Functions")
+                paginator = self.client_lambda.get_paginator("list_functions")
+                resources = paginator.paginate().build_full_result().get("Functions")
             except:
                 self.logging.error("Could not list all Lambda Functions.")
                 self.logging.error(sys.exc_info()[1])

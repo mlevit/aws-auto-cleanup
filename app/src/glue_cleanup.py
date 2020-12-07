@@ -43,7 +43,7 @@ class GlueCleanup:
         if clean:
             try:
                 paginator = self.client_glue.get_paginator("get_crawlers")
-                response_iterator = paginator.paginate().build_full_result()
+                resources = paginator.paginate().build_full_result().get("Crawlers")
             except:
                 self.logging.error("Could not list all Glue Crawlers.")
                 self.logging.error(sys.exc_info()[1])
@@ -56,7 +56,7 @@ class GlueCleanup:
                 .get("ttl", 7)
             )
 
-            for resource in response_iterator.get("Crawlers"):
+            for resource in resources:
                 resource_id = resource.get("Name")
                 resource_date = resource.get("LastUpdated")
                 resource_status = resource.get("State")
@@ -130,7 +130,7 @@ class GlueCleanup:
         if clean:
             try:
                 paginator = self.client_glue.get_paginator("get_databases")
-                response_iterator = paginator.paginate().build_full_result()
+                resources = paginator.paginate().build_full_result().get("DatabaseList")
             except:
                 self.logging.error("Could not list all Glue Databases.")
                 self.logging.error(sys.exc_info()[1])
@@ -143,7 +143,7 @@ class GlueCleanup:
                 .get("ttl", 7)
             )
 
-            for resource in response_iterator.get("DatabaseList"):
+            for resource in resources:
                 resource_id = resource.get("Name")
                 resource_date = resource.get("CreateTime")
                 resource_action = None
@@ -211,7 +211,8 @@ class GlueCleanup:
         )
         if clean:
             try:
-                resources = self.client_glue.get_dev_endpoints().get("DevEndpoints")
+                paginator = self.client_glue.get_paginator("get_dev_endpoints")
+                resources = paginator.paginate().build_full_result().get("DevEndpoints")
             except:
                 self.logging.error("Could not list all Glue Dev Endpoints.")
                 self.logging.error(sys.exc_info()[1])

@@ -40,7 +40,8 @@ class AmplifyCleanup:
         )
         if clean:
             try:
-                resources = self.client_amplify.list_apps().get("apps")
+                paginator = self.client_amplify.get_paginator("list_apps")
+                resources = paginator.paginate().build_full_result().get("apps")
             except:
                 self.logging.error("Could not list all Amplify Apps.")
                 self.logging.error(sys.exc_info()[1])

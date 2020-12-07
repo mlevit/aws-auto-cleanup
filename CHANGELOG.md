@@ -4,6 +4,7 @@
 
 - Added ability to whitelist entries directly from the execution log.
 - Added Managed Workflows for Apache Airflow cleanup.
+- Added paginated resource retrieval where possible.
 - Added SageMaker App cleanup.
 
 ## 1.3.0

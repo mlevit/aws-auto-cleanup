@@ -40,8 +40,9 @@ class ELBCleanup:
         )
         if clean:
             try:
-                resources = self.client_elb.describe_load_balancers().get(
-                    "LoadBalancers"
+                paginator = self.client_elb.get_paginator("describe_load_balancers")
+                resources = (
+                    paginator.paginate().build_full_result().get("LoadBalancers")
                 )
             except:
                 self.logging.error("Could not list all ELB Load Balancers.")

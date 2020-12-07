@@ -40,7 +40,8 @@ class ECRCleanup:
         )
         if clean:
             try:
-                resources = self.client_ecr.describe_repositories().get("repositories")
+                paginator = self.client_ecr.get_paginator("describe_repositories")
+                resources = paginator.paginate().build_full_result().get("repositories")
             except:
                 self.logging.error("Could not list all ECR Repositories.")
                 self.logging.error(sys.exc_info()[1])

@@ -41,7 +41,8 @@ class ECSCleanup:
         )
         if clean:
             try:
-                resources = self.client_ecs.list_clusters().get("clusterArns")
+                paginator = self.client_ecs.get_paginator("list_clusters")
+                resources = paginator.paginate().build_full_result().get("clusterArns")
             except:
                 self.logging.error("Could not list all ECS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -138,7 +139,8 @@ class ECSCleanup:
         )
         if clean:
             try:
-                clusters = self.client_ecs.list_clusters().get("clusterArns")
+                paginator = self.client_ecs.get_paginator("list_clusters")
+                clusters = paginator.paginate().build_full_result().get("clusterArns")
             except:
                 self.logging.error("Could not list all ECS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -146,9 +148,12 @@ class ECSCleanup:
 
             for cluster in clusters:
                 try:
-                    resources = self.client_ecs.list_services(
-                        cluster=cluster,
-                    ).get("serviceArns")
+                    paginator = self.client_ecs.get_paginator("list_services")
+                    resources = (
+                        paginator.paginate(cluster=cluster)
+                        .build_full_result()
+                        .get("serviceArns")
+                    )
                 except:
                     self.logging.error(
                         f"Could not list all ECS Services for Cluster '{cluster}'."

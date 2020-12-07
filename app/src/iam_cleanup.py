@@ -44,9 +44,11 @@ class IAMCleanup:
         if clean:
             try:
                 paginator = self.client_iam.get_paginator("list_policies")
-                response_iterator = paginator.paginate(
-                    Scope="Local"
-                ).build_full_result()
+                resources = (
+                    paginator.paginate(Scope="Local")
+                    .build_full_result()
+                    .get("Policies")
+                )
             except:
                 self.logging.error("Could not list all IAM Policies.")
                 self.logging.error(sys.exc_info()[1])
@@ -59,7 +61,7 @@ class IAMCleanup:
                 .get("ttl", 7)
             )
 
-            for resource in response_iterator.get("Policies"):
+            for resource in resources:
                 resource_id = resource.get("PolicyName")
                 resource_arn = resource.get("Arn")
                 resource_date = resource.get("UpdateDate")
@@ -78,7 +80,7 @@ class IAMCleanup:
                             )
 
                             try:
-                                user_response_iterator = entities_paginator.paginate(
+                                user_resources = entities_paginator.paginate(
                                     PolicyArn=resource_arn, EntityFilter="User"
                                 ).build_full_result()
                             except:
@@ -88,9 +90,7 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for user_resource in user_response_iterator.get(
-                                    "PolicyUsers"
-                                ):
+                                for user_resource in user_resources.get("PolicyUsers"):
                                     try:
                                         if not self._dry_run:
                                             self.client_iam.detach_user_policy(
@@ -109,7 +109,7 @@ class IAMCleanup:
                                         )
 
                             try:
-                                role_response_iterator = entities_paginator.paginate(
+                                role_resources = entities_paginator.paginate(
                                     PolicyArn=resource_arn, EntityFilter="Role"
                                 ).build_full_result()
                             except:
@@ -119,9 +119,7 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for role_resource in role_response_iterator.get(
-                                    "PolicyRoles"
-                                ):
+                                for role_resource in role_resources.get("PolicyRoles"):
                                     try:
                                         if not self._dry_run:
                                             self.client_iam.detach_role_policy(
@@ -140,7 +138,7 @@ class IAMCleanup:
                                         )
 
                             try:
-                                group_response_iterator = entities_paginator.paginate(
+                                group_resources = entities_paginator.paginate(
                                     PolicyArn=resource_arn, EntityFilter="Group"
                                 ).build_full_result()
                             except:
@@ -150,7 +148,7 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for group_resource in group_response_iterator.get(
+                                for group_resource in group_resources.get(
                                     "PolicyGroups"
                                 ):
                                     try:
@@ -179,7 +177,7 @@ class IAMCleanup:
                             versions_paginator = self.client_iam.get_paginator(
                                 "list_policy_versions"
                             )
-                            versions_response_iterator = versions_paginator.paginate(
+                            versions_resources = versions_paginator.paginate(
                                 PolicyArn=resource_arn
                             ).build_full_result()
                         except:
@@ -189,9 +187,7 @@ class IAMCleanup:
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
-                            for versions_resource in versions_response_iterator.get(
-                                "Versions"
-                            ):
+                            for versions_resource in versions_resources.get("Versions"):
                                 if not versions_resource.get("IsDefaultVersion"):
                                     try:
                                         if not self._dry_run:
@@ -271,7 +267,7 @@ class IAMCleanup:
         if clean:
             try:
                 paginator = self.client_iam.get_paginator("list_roles")
-                response_iterator = paginator.paginate().build_full_result()
+                resources = paginator.paginate().build_full_result().get("Roles")
             except:
                 self.logging.error("Could not list all IAM Roles.")
                 self.logging.error(sys.exc_info()[1])
@@ -284,7 +280,7 @@ class IAMCleanup:
                 .get("ttl", 7)
             )
 
-            for resource in response_iterator.get("Roles"):
+            for resource in resources:
                 resource_id = resource.get("RoleName")
                 resource_arn = resource.get("Arn")
                 resource_date = resource.get("CreateDate")

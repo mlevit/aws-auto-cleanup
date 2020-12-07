@@ -40,7 +40,10 @@ class KafkaCleanup:
         )
         if clean:
             try:
-                resources = self.client_kafka.list_clusters().get("ClusterInfoList")
+                paginator = self.client_kafka.get_paginator("list_clusters")
+                resources = (
+                    paginator.paginate().build_full_result().get("ClusterInfoList")
+                )
             except:
                 self.logging.error("Could not list all Kafka Clusters.")
                 self.logging.error(sys.exc_info()[1])

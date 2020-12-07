@@ -40,7 +40,8 @@ class EKSCleanup:
         )
         if clean:
             try:
-                resources = self.client_eks.list_clusters().get("clusters")
+                paginator = self.client_eks.get_paginator("list_clusters")
+                resources = paginator.paginate().build_full_result().get("clusters")
             except:
                 self.logging.error("Could not list all EKS Clusters.")
                 self.logging.error(sys.exc_info()[1])

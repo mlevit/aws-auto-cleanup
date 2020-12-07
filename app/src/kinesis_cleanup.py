@@ -40,7 +40,8 @@ class KinesisCleanup:
         )
         if clean:
             try:
-                resources = self.client_kinesis.list_streams().get("StreamNames")
+                paginator = self.client_kinesis.get_paginator("list_streams")
+                resources = paginator.paginate().build_full_result().get("StreamNames")
             except:
                 self.logging.error("Could not list all Kinesis Streams.")
                 self.logging.error(sys.exc_info()[1])

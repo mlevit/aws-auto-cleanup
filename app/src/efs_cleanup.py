@@ -40,7 +40,8 @@ class EFSCleanup:
         )
         if clean:
             try:
-                resources = self.client_efs.describe_file_systems().get("FileSystems")
+                paginator = self.client_efs.get_paginator("describe_file_systems")
+                resources = paginator.paginate().build_full_result().get("FileSystems")
             except:
                 self.logging.error("Could not list all EFS File Systems.")
                 self.logging.error(sys.exc_info()[1])

@@ -43,7 +43,8 @@ class RDSCleanup:
         )
         if clean:
             try:
-                resources = self.client_rds.describe_db_instances().get("DBInstances")
+                paginator = self.client_rds.get_paginator("describe_db_instances")
+                resources = paginator.paginate().build_full_result().get("DBInstances")
             except:
                 self.logging.error("Could not list all RDS Instances.")
                 self.logging.error(sys.exc_info()[1])
@@ -145,9 +146,12 @@ class RDSCleanup:
         )
         if clean:
             try:
-                resources = self.client_rds.describe_db_snapshots(
-                    SnapshotType="manual"
-                ).get("DBSnapshots")
+                paginator = self.client_rds.get_paginator("describe_db_snapshots")
+                resources = (
+                    paginator.paginate(SnapshotType="manual")
+                    .build_full_result()
+                    .get("DBSnapshots")
+                )
             except:
                 self.logging.error("Could not list all RDS Snapshots.")
                 self.logging.error(sys.exc_info()[1])

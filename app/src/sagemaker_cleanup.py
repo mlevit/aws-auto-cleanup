@@ -42,7 +42,8 @@ class SageMakerCleanup:
         )
         if clean:
             try:
-                resources = self.client_sagemaker.list_apps().get("Apps")
+                paginator = self.client_sagemaker.get_paginator("list_apps")
+                resources = paginator.paginate().build_full_result().get("Apps")
             except:
                 self.logging.error("Could not list all SageMaker Apps.")
                 self.logging.error(sys.exc_info()[1])
@@ -132,7 +133,8 @@ class SageMakerCleanup:
         )
         if clean:
             try:
-                resources = self.client_sagemaker.list_endpoints().get("Endpoints")
+                paginator = self.client_sagemaker.get_paginator("list_endpoints")
+                resources = paginator.paginate().build_full_result().get("Endpoints")
             except:
                 self.logging.error("Could not list all SageMaker Endpoints.")
                 self.logging.error(sys.exc_info()[1])
