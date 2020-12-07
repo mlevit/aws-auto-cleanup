@@ -76,13 +76,19 @@ class EKSCleanup:
                 resource_action = None
 
                 if resource_id not in self.whitelist.get("eks", {}).get("cluster", []):
-                    list_fargate_profiles = self.client_eks.list_fargate_profiles(
-                        clusterName=resource_id,
-                    ).get("fargateProfileNames")
+                    paginator = self.client_eks.get_paginator("list_fargate_profiles")
+                    list_fargate_profiles = (
+                        paginator.paginate(clusterName=resource_id)
+                        .build_full_result()
+                        .get("fargateProfileNames")
+                    )
 
-                    list_nodegroups = self.client_eks.list_nodegroups(
-                        clusterName=resource_id,
-                    ).get("nodegroups")
+                    paginator = self.client_eks.get_paginator("list_nodegroups")
+                    list_nodegroups = (
+                        paginator.paginate(clusterName=resource_id)
+                        .build_full_result()
+                        .get("nodegroups")
+                    )
 
                     delta = Helper.get_day_delta(resource_date)
 
@@ -152,9 +158,12 @@ class EKSCleanup:
         )
         if clean:
             try:
-                resources = self.client_eks.list_fargate_profiles(
-                    clusterName=cluster
-                ).get("fargateProfileNames")
+                paginator = self.client_eks.get_paginator("list_fargate_profiles")
+                resources = (
+                    paginator.paginate(clusterName=cluster)
+                    .build_full_result()
+                    .get("fargateProfileNames")
+                )
             except:
                 self.logging.error(
                     f"Could not list all EKS Fargate Profiles for EKS Cluster {cluster}."
@@ -257,8 +266,11 @@ class EKSCleanup:
         )
         if clean:
             try:
-                resources = self.client_eks.list_nodegroups(clusterName=cluster).get(
-                    "nodegroups"
+                paginator = self.client_eks.get_paginator("list_nodegroups")
+                resources = (
+                    paginator.paginate(clusterName=cluster)
+                    .build_full_result()
+                    .get("nodegroups")
                 )
             except:
                 self.logging.error(

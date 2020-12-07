@@ -66,11 +66,14 @@ class ECRCleanup:
                 if resource_id not in self.whitelist.get("ecr", {}).get(
                     "repository", []
                 ):
-                    list_images = self.client_ecr.list_images(
-                        repositoryName=resource_id,
-                    ).get("imageIds")
-
                     delta = Helper.get_day_delta(resource_date)
+
+                    paginator = self.client_ecr.get_paginator("list_images")
+                    list_images = (
+                        paginator.paginate(repositoryName=resource_id)
+                        .build_full_result()
+                        .get("imageIds")
+                    )
 
                     if len(list_images) == 0:
                         if delta.days > ttl_days:
@@ -140,9 +143,8 @@ class ECRCleanup:
         )
         if clean:
             try:
-                resources = self.client_ecr.describe_images(
-                    repositoryName=repository
-                ).get("imageDetails")
+                paginator = self.client_ecr.get_paginator("describe_images")
+                resources = paginator.paginate().build_full_result().get("imageDetails")
             except:
                 self.logging.error(
                     f"Could not list all ECR Images for ECR Repository {repository}."

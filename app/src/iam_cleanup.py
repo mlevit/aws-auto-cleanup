@@ -365,8 +365,13 @@ class IAMCleanup:
                                 if delta.days > ttl_days:
                                     # delete all inline policies
                                     try:
-                                        policies = self.client_iam.list_role_policies(
-                                            RoleName=resource_id
+                                        paginator = self.client_iam.get_paginator(
+                                            "list_role_policies"
+                                        )
+                                        policies = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("PolicyNames")
                                         )
                                     except:
                                         self.logging.error(
@@ -376,7 +381,7 @@ class IAMCleanup:
                                         resource_action = "ERROR"
                                         continue
 
-                                    for policy in policies.get("PolicyNames"):
+                                    for policy in policies:
                                         try:
                                             if not self._dry_run:
                                                 self.client_iam.delete_role_policy(
@@ -396,10 +401,13 @@ class IAMCleanup:
 
                                     # detach all managed policies
                                     try:
+                                        paginator = self.client_iam.get_paginator(
+                                            "list_attached_role_policies"
+                                        )
                                         policies = (
-                                            self.client_iam.list_attached_role_policies(
-                                                RoleName=resource_id
-                                            )
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("AttachedPolicies")
                                         )
                                     except:
                                         self.logging.error(
@@ -408,7 +416,7 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        for policy in policies.get("AttachedPolicies"):
+                                        for policy in policies:
                                             try:
                                                 if not self._dry_run:
                                                     self.client_iam.detach_role_policy(
@@ -430,8 +438,13 @@ class IAMCleanup:
 
                                     # delete all instance profiles
                                     try:
-                                        profiles = self.client_iam.list_instance_profiles_for_role(
-                                            RoleName=resource_id
+                                        paginator = self.client_iam.get_paginator(
+                                            "list_instance_profiles_for_role"
+                                        )
+                                        profiles = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("InstanceProfiles")
                                         )
                                     except:
                                         self.logging.error(
@@ -440,7 +453,7 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        for profile in profiles.get("InstanceProfiles"):
+                                        for profile in profiles:
                                             # remove role from instance profile
                                             try:
                                                 if not self._dry_run:

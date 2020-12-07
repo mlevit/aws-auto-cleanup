@@ -9,9 +9,12 @@ from dynamodb_json import json_util as dynamodb_json
 def get_settings():
     settings = {}
 
-    items = boto3.client("dynamodb").scan(TableName=os.environ.get("SETTINGSTABLE"))[
-        "Items"
-    ]
+    paginator = boto3.client("dynamodb").get_paginator("scan")
+    items = (
+        paginator.paginate(TableName=os.environ.get("SETTINGSTABLE"))
+        .build_full_result()
+        .get("Items")
+    )
 
     for item in items:
         item_json = dynamodb_json.loads(item, True)

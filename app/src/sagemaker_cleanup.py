@@ -223,8 +223,11 @@ class SageMakerCleanup:
         )
         if clean:
             try:
-                resources = self.client_sagemaker.list_notebook_instances().get(
-                    "NotebookInstances"
+                paginator = self.client_sagemaker.get_paginator(
+                    "list_notebook_instances"
+                )
+                resources = (
+                    paginator.paginate().build_full_result().get("NotebookInstances")
                 )
             except:
                 self.logging.error("Could not list all SageMaker Notebook Instances.")

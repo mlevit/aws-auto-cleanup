@@ -348,9 +348,12 @@ class Cleanup:
         settings = {}
 
         try:
-            items = boto3.client("dynamodb").scan(
-                TableName=os.environ.get("SETTINGSTABLE")
-            )["Items"]
+            paginator = boto3.client("dynamodb").get_paginator("scan")
+            items = (
+                paginator.paginate(TableName=os.environ.get("SETTINGSTABLE"))
+                .build_full_result()
+                .get("Items")
+            )
         except:
             self.logging.error(
                 f"""Could not read DynamoDB table '{os.environ.get("SETTINGSTABLE")}'."""
@@ -365,23 +368,29 @@ class Cleanup:
 
     def get_whitelist(self):
         whitelist = {}
-        try:
-            for record in boto3.client("dynamodb").scan(
-                TableName=os.environ.get("WHITELISTTABLE")
-            )["Items"]:
-                record_json = dynamodb_json.loads(record, True)
-                parsed_resource_id = Helper.parse_resource_id(
-                    record_json.get("resource_id")
-                )
 
-                whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
-                    parsed_resource_id.get("resource_type"), set()
-                ).add(parsed_resource_id.get("resource"))
+        try:
+            paginator = boto3.client("dynamodb").get_paginator("scan")
+            items = (
+                paginator.paginate(TableName=os.environ.get("WHITELISTTABLE"))
+                .build_full_result()
+                .get("Items")
+            )
         except:
             self.logging.error(
                 f"""Could not read DynamoDB table '{os.environ.get("WHITELISTTABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
+        else:
+            for item in items:
+                item_json = dynamodb_json.loads(item, True)
+                parsed_resource_id = Helper.parse_resource_id(
+                    item_json.get("resource_id")
+                )
+
+                whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
+                    parsed_resource_id.get("resource_type"), set()
+                ).add(parsed_resource_id.get("resource"))
         return whitelist
 
     def setup_dynamodb(self):

@@ -99,11 +99,14 @@ class CloudFormationCleanup:
                     retain_resources = []
                     if resource_status in ("DELETE_FAILED"):
                         try:
+                            paginator = self.client_cloudformation.get_paginator(
+                                "list_stack_resources"
+                            )
                             stack_resources = (
-                                self.client_cloudformation.list_stack_resources(
-                                    StackName=resource_id
-                                )
-                            ).get("StackResourceSummaries")
+                                paginator.paginate(StackName=resource_id)
+                                .build_full_result()
+                                .get("StackResourceSummaries")
+                            )
                         except:
                             self.logging.error(
                                 f"Could not retrieve a list of Stack Resources for CloudFormation Stack '{resource_id}'."
