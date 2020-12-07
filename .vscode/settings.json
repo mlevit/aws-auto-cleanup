@@ -1,5 +1,5 @@
 {
   "editor.formatOnSave": true,
   "python.formatting.provider": "black",
-  "python.pythonPath": "/usr/local/opt/python@3.8/bin/python3.8"
+  "python.pythonPath": "/usr/local/bin/python3",
 }

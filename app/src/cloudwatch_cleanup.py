@@ -87,8 +87,7 @@ class CloudWatchCleanup:
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"CloudWatch Log Group '{resource_id}' was created {delta.days} days ago "
-                            "(less than TTL setting) and has not been deleted."
+                            f"CloudWatch Log Group '{resource_id}' was created {delta.days} days ago (less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
                 else:
