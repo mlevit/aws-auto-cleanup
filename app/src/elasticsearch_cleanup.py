@@ -53,13 +53,13 @@ class ElasticsearchServiceCleanup:
                 return False
 
             for resource in resources:
-                resource_id = resource["DomainName"]
+                resource_id = resource.get("DomainName")
 
                 try:
                     resource_details = (
                         self.client_elasticsearch.describe_elasticsearch_domain_config(
                             DomainName=resource_id
-                        )["DomainConfig"]
+                        ).get("DomainConfig")
                     )
                 except:
                     self.logging.error(
@@ -68,9 +68,9 @@ class ElasticsearchServiceCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_date = resource_details["ElasticsearchVersion"]["Status"][
-                        "UpdateDate"
-                    ]
+                    resource_date = resource_details.get("ElasticsearchVersion").get(
+                        "Status"
+                    )["UpdateDate"]
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 

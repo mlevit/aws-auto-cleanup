@@ -43,16 +43,18 @@ class EMRCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_emr.get_paginator("list_clusters")
-                resources = paginator.paginate().build_full_result()["Clusters"]
+                resources = paginator.paginate().build_full_result().get("Clusters")
             except:
                 self.logging.error("Could not list all EMR Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["Id"]
-                resource_date = resource["Status"]["Timeline"]["CreationDateTime"]
-                resource_status = resource["Status"]["State"]
+                resource_id = resource.get("Id")
+                resource_date = (
+                    resource.get("Status").get("Timeline").get("CreationDateTime")
+                )
+                resource_status = resource.get("Status").get("State")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

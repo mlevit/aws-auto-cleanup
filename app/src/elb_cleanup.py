@@ -43,16 +43,18 @@ class ELBCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_elb.get_paginator("describe_load_balancers")
-                resources = paginator.paginate().build_full_result()["LoadBalancers"]
+                resources = (
+                    paginator.paginate().build_full_result().get("LoadBalancers")
+                )
             except:
                 self.logging.error("Could not list all ELB Load Balancers.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["LoadBalancerName"]
-                resource_arn = resource["LoadBalancerArn"]
-                resource_date = resource["CreatedTime"]
+                resource_id = resource.get("LoadBalancerName")
+                resource_arn = resource.get("LoadBalancerArn")
+                resource_date = resource.get("CreatedTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

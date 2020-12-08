@@ -55,15 +55,15 @@ class IAMCleanup:
                 return False
 
             for resource in resources:
-                resource_id = resource["PolicyName"]
-                resource_arn = resource["Arn"]
-                resource_date = resource["UpdateDate"]
+                resource_id = resource.get("PolicyName")
+                resource_arn = resource.get("Arn")
+                resource_date = resource.get("UpdateDate")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
                     if resource_age > maximum_resource_age:
-                        if resource["AttachmentCount"] > 0:
+                        if resource.get("AttachmentCount") > 0:
                             # - Detach the policy from all users, groups, and roles that the policy is attached to,
                             #   using the DetachUserPolicy, DetachGroupPolicy, or DetachRolePolicy API operations.
                             #   To list all the users, groups, and roles that a policy is attached to, use ListEntitiesForPolicy.
@@ -82,22 +82,22 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for user_resource in user_resources["PolicyUsers"]:
+                                for user_resource in user_resources.get("PolicyUsers"):
                                     try:
                                         if not self.is_dry_run:
                                             self.client_iam.detach_user_policy(
-                                                UserName=user_resource["UserName"],
+                                                UserName=user_resource.get("UserName"),
                                                 PolicyArn=resource_arn,
                                             )
                                     except:
                                         self.logging.error(
-                                            f"""Could not detatch IAM Policy '{resource_id}' from IAM User {user_resource["UserName"]}."""
+                                            f"""Could not detatch IAM Policy '{resource_id}' from IAM User {user_resource.get("UserName")}."""
                                         )
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.debug(
-                                            f"""IAM Policy '{resource_id}' was detatched from IAM User {user_resource["UserName"]}."""
+                                            f"""IAM Policy '{resource_id}' was detatched from IAM User {user_resource.get("UserName")}."""
                                         )
 
                             try:
@@ -111,22 +111,22 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for role_resource in role_resources["PolicyRoles"]:
+                                for role_resource in role_resources.get("PolicyRoles"):
                                     try:
                                         if not self.is_dry_run:
                                             self.client_iam.detach_role_policy(
-                                                RoleName=role_resource["RoleName"],
+                                                RoleName=role_resource.get("RoleName"),
                                                 PolicyArn=resource_arn,
                                             )
                                     except:
                                         self.logging.error(
-                                            f"""Could not detatch IAM Policy '{resource_id}' from IAM Role {role_resource["RoleName"]}."""
+                                            f"""Could not detatch IAM Policy '{resource_id}' from IAM Role {role_resource.get("RoleName")}."""
                                         )
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.debug(
-                                            f"""IAM Policy '{resource_id}' was detatched from IAM Role {role_resource["RoleName"]}."""
+                                            f"""IAM Policy '{resource_id}' was detatched from IAM Role {role_resource.get("RoleName")}."""
                                         )
 
                             try:
@@ -153,13 +153,13 @@ class IAMCleanup:
                                             )
                                     except:
                                         self.logging.error(
-                                            f"""Could not detatch IAM Policy '{resource_id}' from IAM Group {group_resource["GroupName"]}."""
+                                            f"""Could not detatch IAM Policy '{resource_id}' from IAM Group {group_resource.get("GroupName")}."""
                                         )
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.debug(
-                                            f"""IAM Policy '{resource_id}' was detatched from IAM Group {group_resource["GroupName"]}."""
+                                            f"""IAM Policy '{resource_id}' was detatched from IAM Group {group_resource.get("GroupName")}."""
                                         )
 
                         # - Delete all versions of the policy using DeletePolicyVersion. To list the policy's versions, use ListPolicyVersions.
@@ -179,8 +179,8 @@ class IAMCleanup:
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
-                            for versions_resource in versions_resources["Versions"]:
-                                if not versions_resource["IsDefaultVersion"]:
+                            for versions_resource in versions_resources.get("Versions"):
+                                if not versions_resource.get("IsDefaultVersion"):
                                     try:
                                         if not self.is_dry_run:
                                             self.client_iam.delete_policy_version(
@@ -191,13 +191,13 @@ class IAMCleanup:
                                             )
                                     except:
                                         self.logging.error(
-                                            f"""Could not delete IAM Policy Version '{versions_resource["VersionId"]}' for IAM Policy {resource_id}."""
+                                            f"""Could not delete IAM Policy Version '{versions_resource.get("VersionId")}' for IAM Policy {resource_id}."""
                                         )
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.debug(
-                                            f"""IAM Policy Version '{versions_resource["VersionId"]}' was deleted for IAM Policy {resource_id}."""
+                                            f"""IAM Policy Version '{versions_resource.get("VersionId")}' was deleted for IAM Policy {resource_id}."""
                                         )
 
                         # - Delete the policy (this automatically deletes the policy's default version) using this API.
@@ -261,16 +261,16 @@ class IAMCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_iam.get_paginator("list_roles")
-                resources = paginator.paginate().build_full_result()["Roles"]
+                resources = paginator.paginate().build_full_result().get("Roles")
             except:
                 self.logging.error("Could not list all IAM Roles.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["RoleName"]
-                resource_arn = resource["Arn"]
-                resource_date = resource["CreateDate"]
+                resource_id = resource.get("RoleName")
+                resource_arn = resource.get("Arn")
+                resource_date = resource.get("CreateDate")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -291,7 +291,7 @@ class IAMCleanup:
                             else:
                                 try:
                                     get_last_accessed = self.client_iam.get_service_last_accessed_details(
-                                        JobId=gen_last_accessed["JobId"]
+                                        JobId=gen_last_accessed.get("JobId")
                                     )
                                 except:
                                     self.logging.error(
@@ -302,14 +302,15 @@ class IAMCleanup:
                                 else:
                                     backoff = 1
                                     while (
-                                        get_last_accessed["JobStatus"] == "IN_PROGRESS"
+                                        get_last_accessed.get("JobStatus")
+                                        == "IN_PROGRESS"
                                     ):
                                         if backoff <= 16:
                                             time.sleep(backoff)
 
                                             try:
                                                 get_last_accessed = self.client_iam.get_service_last_accessed_details(
-                                                    JobId=gen_last_accessed["JobId"]
+                                                    JobId=gen_last_accessed.get("JobId")
                                                 )
                                             except:
                                                 self.logging.error(
@@ -327,7 +328,7 @@ class IAMCleanup:
                                             )
                                             resource_action = "ERROR"
 
-                            if get_last_accessed["JobStatus"] == "COMPLETED":
+                            if get_last_accessed.get("JobStatus") == "COMPLETED":
                                 last_accessed = (
                                     datetime.datetime.now()
                                     - datetime.timedelta(days=365)
@@ -353,9 +354,11 @@ class IAMCleanup:
                                         paginator = self.client_iam.get_paginator(
                                             "list_role_policies"
                                         )
-                                        policies = paginator.paginate(
-                                            RoleName=resource_id
-                                        ).build_full_result()["PolicyNames"]
+                                        policies = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("PolicyNames")
+                                        )
                                     except:
                                         self.logging.error(
                                             f"Could not retrieve inline IAM Policies for IAM Role '{resource_id}'."
@@ -387,9 +390,11 @@ class IAMCleanup:
                                         paginator = self.client_iam.get_paginator(
                                             "list_attached_role_policies"
                                         )
-                                        policies = paginator.paginate(
-                                            RoleName=resource_id
-                                        ).build_full_result()["AttachedPolicies"]
+                                        policies = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("AttachedPolicies")
+                                        )
                                     except:
                                         self.logging.error(
                                             f"Could not retrieve managed IAM Policies attached to IAM Role '{resource_id}'."
@@ -408,13 +413,13 @@ class IAMCleanup:
                                                     )
                                             except:
                                                 self.logging.error(
-                                                    f"Could not detach a managed IAM Policy '{policy['PolicyName']}' from IAM Role '{resource_id}'."
+                                                    f"Could not detach a managed IAM Policy '{policy.get('PolicyName')}' from IAM Role '{resource_id}'."
                                                 )
                                                 self.logging.error(sys.exc_info()[1])
                                                 resource_action = "ERROR"
                                             else:
                                                 self.logging.debug(
-                                                    f"IAM Policy '{policy['PolicyName']}' has been detached from IAM Role '{resource_id}'."
+                                                    f"IAM Policy '{policy.get('PolicyName')}' has been detached from IAM Role '{resource_id}'."
                                                 )
 
                                     # delete all instance profiles
@@ -422,9 +427,11 @@ class IAMCleanup:
                                         paginator = self.client_iam.get_paginator(
                                             "list_instance_profiles_for_role"
                                         )
-                                        profiles = paginator.paginate(
-                                            RoleName=resource_id
-                                        ).build_full_result()["InstanceProfiles"]
+                                        profiles = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("InstanceProfiles")
+                                        )
                                     except:
                                         self.logging.error(
                                             f"Could not retrieve IAM Instance Profiles associated with IAM Role '{resource_id}'."
@@ -444,13 +451,13 @@ class IAMCleanup:
                                                     )
                                             except:
                                                 self.logging.error(
-                                                    f"Could not remove IAM Role '{resource_id}' from IAM Instance Profile '{profile['InstanceProfileName']}'."
+                                                    f"Could not remove IAM Role '{resource_id}' from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
                                                 )
                                                 self.logging.error(sys.exc_info()[1])
                                                 resource_action = "ERROR"
                                             else:
                                                 self.logging.debug(
-                                                    f"IAM Role '{resource_id}' has been removed from IAM Instance Profile '{profile['InstanceProfileName']}'."
+                                                    f"IAM Role '{resource_id}' has been removed from IAM Instance Profile '{profile.get('InstanceProfileName')}'."
                                                 )
 
                                             # delete instance profile
@@ -463,13 +470,13 @@ class IAMCleanup:
                                                     )
                                             except:
                                                 self.logging.error(
-                                                    f"Could not delete IAM Instance Profile '{profile['InstanceProfileName']}'."
+                                                    f"Could not delete IAM Instance Profile '{profile.get('InstanceProfileName')}'."
                                                 )
                                                 self.logging.error(sys.exc_info()[1])
                                                 resource_action = "ERROR"
                                             else:
                                                 self.logging.debug(
-                                                    f"IAM Instance Profile '{profile['InstanceProfileName']}' has been delete."
+                                                    f"IAM Instance Profile '{profile.get('InstanceProfileName')}' has been delete."
                                                 )
 
                                     # delete role

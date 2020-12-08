@@ -43,7 +43,7 @@ class DynamoDBCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_dynamodb.get_paginator("list_tables")
-                resources = paginator.paginate().build_full_result()["TableNames"]
+                resources = paginator.paginate().build_full_result().get("TableNames")
             except:
                 self.logging.error("Could not list all DynamoDB Tables.")
                 self.logging.error(sys.exc_info()[1])
@@ -53,14 +53,14 @@ class DynamoDBCleanup:
                 try:
                     resource_details = self.client_dynamodb.describe_table(
                         TableName=resource
-                    )["Table"]
+                    ).get("Table")
                 except:
                     self.logging.error(
                         f"Could not get DynamoDB Table's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
                 else:
-                    resource_date = resource_details["CreationDateTime"]
+                    resource_date = resource_details.get("CreationDateTime")
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 

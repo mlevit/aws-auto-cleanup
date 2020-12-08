@@ -43,16 +43,16 @@ class EFSCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_efs.get_paginator("describe_file_systems")
-                resources = paginator.paginate().build_full_result()["FileSystems"]
+                resources = paginator.paginate().build_full_result().get("FileSystems")
             except:
                 self.logging.error("Could not list all EFS File Systems.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["FileSystemId"]
-                resource_date = resource["CreationTime"]
-                resource_number_of_mount_targets = resource["NumberOfMountTargets"]
+                resource_id = resource.get("FileSystemId")
+                resource_date = resource.get("CreationTime")
+                resource_number_of_mount_targets = resource.get("NumberOfMountTargets")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -63,7 +63,7 @@ class EFSCleanup:
                                 resource_mount_targets = (
                                     self.client_efs.describe_mount_targets(
                                         FileSystemId=resource_id
-                                    )["MountTargets"]
+                                    ).get("MountTargets")
                                 )
                             except:
                                 self.logging.error(
@@ -73,7 +73,7 @@ class EFSCleanup:
                                 resource_action = "ERROR"
                             else:
                                 for mount_target in resource_mount_targets:
-                                    mount_target_id = mount_target["MountTargetId"]
+                                    mount_target_id = mount_target.get("MountTargetId")
 
                                     try:
                                         if not self.is_dry_run:
@@ -88,7 +88,7 @@ class EFSCleanup:
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.info(
-                                            f"EFS Mount Target '{mount_target_id}' was deleted for EFS File System {resource_id}."
+                                            f"EFS Mount Target '{mount_target_id}' was deleted for EFS File System '{resource_id}'."
                                         )
 
                         if resource_action != "ERROR":

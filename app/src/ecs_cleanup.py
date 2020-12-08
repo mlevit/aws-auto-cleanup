@@ -44,7 +44,7 @@ class ECSCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_ecs.get_paginator("list_clusters")
-                resources = paginator.paginate().build_full_result()["clusterArns"]
+                resources = paginator.paginate().build_full_result().get("clusterArns")
             except:
                 self.logging.error("Could not list all ECS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -56,7 +56,7 @@ class ECSCleanup:
                         clusters=[
                             resource,
                         ]
-                    )["clusters"][0]
+                    ).get("clusters")[0]
                 except:
                     self.logging.error(
                         f"Could not get ECS Cluster's '{resource}' details."
@@ -64,9 +64,11 @@ class ECSCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_id = resource_details["clusterName"]
-                    resource_status = resource_details["status"]
-                    resource_running_task_count = resource_details["runningTasksCount"]
+                    resource_id = resource_details.get("clusterName")
+                    resource_status = resource_details.get("status")
+                    resource_running_task_count = resource_details.get(
+                        "runningTasksCount"
+                    )
                     resource_active_service_count = resource_details.get(
                         "activeServicesCount"
                     )
@@ -144,7 +146,7 @@ class ECSCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_ecs.get_paginator("list_clusters")
-                clusters = paginator.paginate().build_full_result()["clusterArns"]
+                clusters = paginator.paginate().build_full_result().get("clusterArns")
             except:
                 self.logging.error("Could not list all ECS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -170,7 +172,7 @@ class ECSCleanup:
                             services=[
                                 resource,
                             ],
-                        )["services"][0]
+                        ).get("services")[0]
                     except:
                         self.logging.error(
                             f"Could not get ECS Service's '{resource}' details."
@@ -178,9 +180,9 @@ class ECSCleanup:
                         self.logging.error(sys.exc_info()[1])
                         resource_action = "ERROR"
                     else:
-                        resource_id = resource_details["serviceName"]
-                        resource_status = resource_details["status"]
-                        resource_date = resource_details["createdAt"]
+                        resource_id = resource_details.get("serviceName")
+                        resource_status = resource_details.get("status")
+                        resource_date = resource_details.get("createdAt")
                         resource_age = Helper.get_day_delta(resource_date).days
                         resource_action = None
 

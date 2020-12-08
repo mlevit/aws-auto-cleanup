@@ -43,7 +43,7 @@ class EKSCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_eks.get_paginator("list_clusters")
-                resources = paginator.paginate().build_full_result()["clusters"]
+                resources = paginator.paginate().build_full_result().get("clusters")
             except:
                 self.logging.error("Could not list all EKS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -58,7 +58,7 @@ class EKSCleanup:
                 try:
                     resource_details = self.client_eks.describe_cluster(
                         name=resource,
-                    )["cluster"]
+                    ).get("cluster")
                 except:
                     self.logging.error(
                         f"Could not get EKS Cluster's '{resource}' details."
@@ -66,8 +66,8 @@ class EKSCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_id = resource_details["name"]
-                    resource_date = resource_details["createdAt"]
+                    resource_id = resource_details.get("name")
+                    resource_date = resource_details.get("createdAt")
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
@@ -75,14 +75,18 @@ class EKSCleanup:
                         paginator = self.client_eks.get_paginator(
                             "list_fargate_profiles"
                         )
-                        list_fargate_profiles = paginator.paginate(
-                            clusterName=resource_id
-                        ).build_full_result()["fargateProfileNames"]
+                        list_fargate_profiles = (
+                            paginator.paginate(clusterName=resource_id)
+                            .build_full_result()
+                            .get("fargateProfileNames")
+                        )
 
                         paginator = self.client_eks.get_paginator("list_nodegroups")
-                        list_nodegroups = paginator.paginate(
-                            clusterName=resource_id
-                        ).build_full_result()["nodegroups"]
+                        list_nodegroups = (
+                            paginator.paginate(clusterName=resource_id)
+                            .build_full_result()
+                            .get("nodegroups")
+                        )
 
                         if (
                             len(list_fargate_profiles) == 0
@@ -171,7 +175,7 @@ class EKSCleanup:
                     resource_details = self.client_eks.describe_fargate_profile(
                         clusterName=cluster,
                         fargateProfileName=resource,
-                    )["fargateProfile"]
+                    ).get("fargateProfile")
                 except:
                     self.logging.error(
                         f"Could not get EKS Fargate Profile's '{resource}' details."
@@ -179,8 +183,8 @@ class EKSCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_id = resource_details["fargateProfileName"]
-                    resource_date = resource_details["createdAt"]
+                    resource_id = resource_details.get("fargateProfileName")
+                    resource_date = resource_details.get("createdAt")
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
@@ -270,7 +274,7 @@ class EKSCleanup:
                     resource_details = self.client_eks.describe_nodegroup(
                         clusterName=cluster,
                         nodegroupName=resource,
-                    )["nodegroup"]
+                    ).get("nodegroup")
                 except:
                     self.logging.error(
                         f"Could not get EKS Node Group's '{resource}' details."
@@ -278,8 +282,8 @@ class EKSCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_id = resource_details["nodegroupName"]
-                    resource_date = resource_details["createdAt"]
+                    resource_id = resource_details.get("nodegroupName")
+                    resource_date = resource_details.get("createdAt")
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 

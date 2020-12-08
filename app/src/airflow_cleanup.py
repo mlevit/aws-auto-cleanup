@@ -44,7 +44,7 @@ class AirflowCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_airflow.get_paginator("list_environments")
-                resources = paginator.paginate().build_full_result()["Environments"]
+                resources = paginator.paginate().build_full_result().get("Environments")
             except botocore.exceptions.EndpointConnectionError:
                 self.logging.debug(f"Airflow is not enabled in region '{self.region}'.")
                 return False
@@ -57,14 +57,14 @@ class AirflowCleanup:
                 try:
                     resource_details = self.client_airflow.get_environment(
                         Name=resource
-                    )["Environment"]
+                    ).get("Environment")
                 except:
                     self.logging.error(
                         f"Could not get Airflow Environment's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
                 else:
-                    resource_date = resource_details["CreatedAt"]
+                    resource_date = resource_details.get("CreatedAt")
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 

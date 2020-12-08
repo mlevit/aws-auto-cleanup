@@ -44,15 +44,15 @@ class RedshiftCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_redshift.get_paginator("describe_clusters")
-                resources = paginator.paginate().build_full_result()["Clusters"]
+                resources = paginator.paginate().build_full_result().get("Clusters")
             except:
                 self.logging.error("Could not list all Redshift Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["ClusterIdentifier"]
-                resource_date = resource["ClusterCreateTime"]
+                resource_id = resource.get("ClusterIdentifier")
+                resource_date = resource.get("ClusterCreateTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -123,18 +123,20 @@ class RedshiftCleanup:
                 paginator = self.client_redshift.get_paginator(
                     "describe_cluster_snapshots"
                 )
-                resources = paginator.paginate(
-                    SnapshotType="manual"
-                ).build_full_result()["Snapshots"]
+                resources = (
+                    paginator.paginate(SnapshotType="manual")
+                    .build_full_result()
+                    .get("Snapshots")
+                )
             except:
                 self.logging.error("Could not list all Redshift Snapshots.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["SnapshotIdentifier"]
-                resource_date = resource["SnapshotCreateTime"]
-                resource_status = resource["Status"]
+                resource_id = resource.get("SnapshotIdentifier")
+                resource_date = resource.get("SnapshotCreateTime")
+                resource_status = resource.get("Status")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

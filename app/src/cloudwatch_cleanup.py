@@ -46,16 +46,16 @@ class CloudWatchCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_logs.get_paginator("describe_log_groups")
-                resources = paginator.paginate().build_full_result()["logGroups"]
+                resources = paginator.paginate().build_full_result().get("logGroups")
             except:
                 self.logging.error("Could not list all CloudWatch Log Groups.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["logGroupName"]
+                resource_id = resource.get("logGroupName")
                 resource_date = datetime.datetime.fromtimestamp(
-                    resource["creationTime"] / 1000.0
+                    resource.get("creationTime") / 1000.0
                 ).strftime("%Y-%m-%d %H:%M:%S")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None

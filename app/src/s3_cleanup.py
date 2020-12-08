@@ -56,9 +56,9 @@ class S3Cleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            for resource in resources["Buckets"]:
-                resource_id = resource["Name"]
-                resource_date = resource["CreationDate"]
+            for resource in resources.get("Buckets"):
+                resource_id = resource.get("Name")
+                resource_date = resource.get("CreationDate")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

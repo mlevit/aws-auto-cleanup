@@ -45,16 +45,16 @@ class GlueCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_glue.get_paginator("get_crawlers")
-                resources = paginator.paginate().build_full_result()["Crawlers"]
+                resources = paginator.paginate().build_full_result().get("Crawlers")
             except:
                 self.logging.error("Could not list all Glue Crawlers.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["Name"]
-                resource_date = resource["LastUpdated"]
-                resource_status = resource["State"]
+                resource_id = resource.get("Name")
+                resource_date = resource.get("LastUpdated")
+                resource_status = resource.get("State")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -126,14 +126,14 @@ class GlueCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_glue.get_paginator("get_databases")
-                resources = paginator.paginate().build_full_result()["DatabaseList"]
+                resources = paginator.paginate().build_full_result().get("DatabaseList")
             except:
                 self.logging.error("Could not list all Glue Databases.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["Name"]
+                resource_id = resource.get("Name")
                 resource_date = resource.get("CreateTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
@@ -200,15 +200,15 @@ class GlueCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_glue.get_paginator("get_dev_endpoints")
-                resources = paginator.paginate().build_full_result()["DevEndpoints"]
+                resources = paginator.paginate().build_full_result().get("DevEndpoints")
             except:
                 self.logging.error("Could not list all Glue Dev Endpoints.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["EndpointName"]
-                resource_date = resource["LastModifiedTimestamp"]
+                resource_id = resource.get("EndpointName")
+                resource_date = resource.get("LastModifiedTimestamp")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

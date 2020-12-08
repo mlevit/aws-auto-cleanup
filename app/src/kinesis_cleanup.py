@@ -43,7 +43,7 @@ class KinesisCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_kinesis.get_paginator("list_streams")
-                resources = paginator.paginate().build_full_result()["StreamNames"]
+                resources = paginator.paginate().build_full_result().get("StreamNames")
             except:
                 self.logging.error("Could not list all Kinesis Streams.")
                 self.logging.error(sys.exc_info()[1])
@@ -56,7 +56,7 @@ class KinesisCleanup:
                 try:
                     resource_details = self.client_kinesis.describe_stream(
                         StreamName=resource_id
-                    )["StreamDescription"]
+                    ).get("StreamDescription")
                 except:
                     self.logging.error(
                         f"Could not get Kinesis Stream's '{resource_id}' details."
@@ -64,8 +64,8 @@ class KinesisCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_status = resource_details["StreamStatus"]
-                    resource_date = resource_details["StreamCreationTimestamp"]
+                    resource_status = resource_details.get("StreamStatus")
+                    resource_date = resource_details.get("StreamCreationTimestamp")
                     resource_age = Helper.get_day_delta(resource_date).days
 
                     if resource_id not in resource_whitelist:

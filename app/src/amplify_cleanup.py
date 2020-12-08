@@ -43,16 +43,16 @@ class AmplifyCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_amplify.get_paginator("list_apps")
-                resources = paginator.paginate().build_full_result()["apps"]
+                resources = paginator.paginate().build_full_result().get("apps")
             except:
                 self.logging.error("Could not list all Amplify Apps.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["name"]
-                resource_app_id = resource["appId"]
-                resource_date = resource["updateTime"]
+                resource_id = resource.get("name")
+                resource_app_id = resource.get("appId")
+                resource_date = resource.get("updateTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

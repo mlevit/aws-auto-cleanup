@@ -46,21 +46,21 @@ class RDSCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_rds.get_paginator("describe_db_instances")
-                resources = paginator.paginate().build_full_result()["DBInstances"]
+                resources = paginator.paginate().build_full_result().get("DBInstances")
             except:
                 self.logging.error("Could not list all RDS Instances.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["DBInstanceIdentifier"]
-                resource_date = resource["InstanceCreateTime"]
+                resource_id = resource.get("DBInstanceIdentifier")
+                resource_date = resource.get("InstanceCreateTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
                     if resource_age > maximum_resource_age:
-                        if resource["DeletionProtection"]:
+                        if resource.get("DeletionProtection"):
                             try:
                                 if not self.is_dry_run:
                                     self.client_rds.modify_db_instance(
@@ -143,17 +143,19 @@ class RDSCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_rds.get_paginator("describe_db_snapshots")
-                resources = paginator.paginate(
-                    SnapshotType="manual"
-                ).build_full_result()["DBSnapshots"]
+                resources = (
+                    paginator.paginate(SnapshotType="manual")
+                    .build_full_result()
+                    .get("DBSnapshots")
+                )
             except:
                 self.logging.error("Could not list all RDS Snapshots.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["DBSnapshotIdentifier"]
-                resource_date = resource["SnapshotCreateTime"]
+                resource_id = resource.get("DBSnapshotIdentifier")
+                resource_date = resource.get("SnapshotCreateTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

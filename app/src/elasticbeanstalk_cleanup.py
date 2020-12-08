@@ -55,8 +55,8 @@ class ElasticBeanstalkCleanup:
                 return False
 
             for resource in resources:
-                resource_id = resource["ApplicationName"]
-                resource_date = resource["DateUpdated"]
+                resource_id = resource.get("ApplicationName")
+                resource_date = resource.get("DateUpdated")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

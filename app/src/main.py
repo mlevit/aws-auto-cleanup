@@ -10,7 +10,7 @@ from collections import defaultdict
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
-from func_timeout import func_set_timeout
+from func_timeout import func_set_timeout, FunctionTimedOut
 
 from src.airflow_cleanup import AirflowCleanup
 from src.amplify_cleanup import AmplifyCleanup
@@ -61,8 +61,8 @@ class Cleanup:
         else:
             self.logging.info(f"Auto Cleanup started in DESTROY mode.")
 
-        for region in sorted(self.settings["regions"]):
-            if self.settings["regions"][region]["clean"]:
+        for region in sorted(self.settings.get("regions")):
+            if self.settings.get("regions").get(region).get("clean"):
                 self.logging.info(f"Switching to '{region}' region.")
 
                 # check if the region is enabled within the account
@@ -352,18 +352,20 @@ class Cleanup:
 
         try:
             paginator = boto3.client("dynamodb").get_paginator("scan")
-            items = paginator.paginate(
-                TableName=os.environ["SETTINGS_TABLE"]
-            ).build_full_result()["Items"]
+            items = (
+                paginator.paginate(TableName=os.environ.get("SETTINGS_TABLE"))
+                .build_full_result()
+                .get("Items")
+            )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ["SETTINGS_TABLE"]}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("SETTINGS_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         else:
             for item in items:
                 item_json = dynamodb_json.loads(item, True)
-                settings[item_json["key"]] = item_json["value"]
+                settings[item_json.get("key")] = item_json.get("value")
 
         return settings
 
@@ -372,18 +374,22 @@ class Cleanup:
 
         try:
             paginator = boto3.client("dynamodb").get_paginator("scan")
-            items = paginator.paginate(
-                TableName=os.environ["WHITELIST_TABLE"]
-            ).build_full_result()["Items"]
+            items = (
+                paginator.paginate(TableName=os.environ.get("WHITELIST_TABLE"))
+                .build_full_result()
+                .get("Items")
+            )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ["WHITELIST_TABLE"]}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("WHITELIST_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         else:
             for item in items:
                 item_json = dynamodb_json.loads(item, True)
-                parsed_resource_id = Helper.parse_resource_id(item_json["resource_id"])
+                parsed_resource_id = Helper.parse_resource_id(
+                    item_json.get("resource_id")
+                )
 
                 whitelist[parsed_resource_id["service"]][
                     parsed_resource_id["resource_type"]
@@ -411,7 +417,7 @@ class Cleanup:
 
             # get current settings version
             current_version = client.get_item(
-                TableName=os.environ["SETTINGS_TABLE"],
+                TableName=os.environ.get("SETTINGS_TABLE"),
                 Key={"key": {"S": "version"}},
             )
 
@@ -420,29 +426,31 @@ class Cleanup:
 
             # check if settings exist and if they're older than current settings
             if "Item" in current_version:
-                current_version = float(current_version["Item"]["value"]["N"])
+                current_version = float(
+                    current_version.get("Item").get("value").get("N")
+                )
                 if current_version < new_version:
                     update_settings = True
                     self.logging.info(
                         f"Existing settings with version {current_version} are being updated "
-                        f"""to version {new_version} in DynamoDB Table '{os.environ["SETTINGS_TABLE"]}'."""
+                        f"""to version {new_version} in DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}'."""
                     )
                 else:
                     self.logging.debug(
                         f"Existing settings are at the lastest version {current_version} in "
-                        f"""DynamoDB Table '{os.environ["SETTINGS_TABLE"]}'."""
+                        f"""DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}'."""
                     )
             else:
                 update_settings = True
                 self.logging.info(
-                    f"""Settings are being inserted into DynamoDB Table '{os.environ["SETTINGS_TABLE"]}' for the first time."""
+                    f"""Settings are being inserted into DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}' for the first time."""
                 )
 
             if update_settings:
                 for setting in settings_json:
                     try:
                         client.put_item(
-                            TableName=os.environ["SETTINGS_TABLE"], Item=setting
+                            TableName=os.environ.get("SETTINGS_TABLE"), Item=setting
                         )
                     except:
                         self.logging.error(sys.exc_info()[1])
@@ -451,7 +459,7 @@ class Cleanup:
             for whitelist in whitelist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ["WHITELIST_TABLE"], Item=whitelist
+                        TableName=os.environ.get("WHITELIST_TABLE"), Item=whitelist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
@@ -493,16 +501,16 @@ class Cleanup:
                             for region, region_dict in platform_dict.items():
                                 for service, service_dict in region_dict.items():
                                     for resource in service_dict:
-                                        for action in service_dict[resource]:
+                                        for action in service_dict.get(resource):
                                             wr.writerow(
                                                 [
                                                     platform,
                                                     region,
                                                     service,
                                                     resource,
-                                                    action["id"],
-                                                    action["action"],
-                                                    action["timestamp"],
+                                                    action.get("id"),
+                                                    action.get("action"),
+                                                    action.get("timestamp"),
                                                     self.dry_run,
                                                     aws_request_id,
                                                 ]
@@ -515,7 +523,7 @@ class Cleanup:
 
                 now = datetime.datetime.now()
                 client = boto3.client("s3")
-                bucket = os.environ["EXECUTION_LOG_BUCKET"]
+                bucket = os.environ.get("EXECUTION_LOG_BUCKET")
                 key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.csv"""
 
                 try:
@@ -525,10 +533,10 @@ class Cleanup:
                         f"Could not upload the execution log to S3 's3://{bucket}/{key}."
                     )
                     return False
-
-                self.logging.info(
-                    f"Execution log has been uploaded to S3 's3://{bucket}/{key}."
-                )
+                else:
+                    self.logging.info(
+                        f"Execution log has been uploaded to S3 's3://{bucket}/{key}."
+                    )
             finally:
                 os.remove(temp_file)
             return True
@@ -560,7 +568,7 @@ def lambda_handler(event, context):
 
     try:
         cleanup.run_cleanup()
-    except:
+    except FunctionTimedOut:
         logging.warning(
             "Auto Cleanup execution has exceeded 14 minutes and has been stopped."
         )

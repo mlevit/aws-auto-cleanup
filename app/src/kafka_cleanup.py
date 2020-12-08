@@ -43,16 +43,18 @@ class KafkaCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_kafka.get_paginator("list_clusters")
-                resources = paginator.paginate().build_full_result()["ClusterInfoList"]
+                resources = (
+                    paginator.paginate().build_full_result().get("ClusterInfoList")
+                )
             except:
                 self.logging.error("Could not list all Kafka Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["ClusterName"]
-                resource_arn = resource["ClusterArn"]
-                resource_date = resource["CreationTime"]
+                resource_id = resource.get("ClusterName")
+                resource_arn = resource.get("ClusterArn")
+                resource_date = resource.get("CreationTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

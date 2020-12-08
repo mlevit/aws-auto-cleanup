@@ -45,19 +45,19 @@ class SageMakerCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_sagemaker.get_paginator("list_apps")
-                resources = paginator.paginate().build_full_result()["Apps"]
+                resources = paginator.paginate().build_full_result().get("Apps")
             except:
                 self.logging.error("Could not list all SageMaker Apps.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["AppName"]
-                resource_date = resource["CreationTime"]
-                resource_app_type = resource["AppType"]
-                resource_domain_id = resource["DomainId"]
-                resource_status = resource["Status"]
-                resource_user_profile = resource["UserProfileName"]
+                resource_id = resource.get("AppName")
+                resource_date = resource.get("CreationTime")
+                resource_app_type = resource.get("AppType")
+                resource_domain_id = resource.get("DomainId")
+                resource_status = resource.get("Status")
+                resource_user_profile = resource.get("UserProfileName")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -129,16 +129,16 @@ class SageMakerCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_sagemaker.get_paginator("list_endpoints")
-                resources = paginator.paginate().build_full_result()["Endpoints"]
+                resources = paginator.paginate().build_full_result().get("Endpoints")
             except:
                 self.logging.error("Could not list all SageMaker Endpoints.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["EndpointName"]
-                resource_status = resource["EndpointStatus"]
-                resource_date = resource["LastModifiedTime"]
+                resource_id = resource.get("EndpointName")
+                resource_status = resource.get("EndpointStatus")
+                resource_date = resource.get("LastModifiedTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -224,9 +224,9 @@ class SageMakerCleanup:
                 return False
 
             for resource in resources:
-                resource_id = resource["NotebookInstanceName"]
-                resource_status = resource["NotebookInstanceStatus"]
-                resource_date = resource["LastModifiedTime"]
+                resource_id = resource.get("NotebookInstanceName")
+                resource_status = resource.get("NotebookInstanceStatus")
+                resource_date = resource.get("LastModifiedTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

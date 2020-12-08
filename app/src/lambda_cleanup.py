@@ -43,15 +43,15 @@ class LambdaCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_lambda.get_paginator("list_functions")
-                resources = paginator.paginate().build_full_result()["Functions"]
+                resources = paginator.paginate().build_full_result().get("Functions")
             except:
                 self.logging.error("Could not list all Lambda Functions.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["FunctionName"]
-                resource_date = resource["LastModified"]
+                resource_id = resource.get("FunctionName")
+                resource_date = resource.get("LastModified")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 

@@ -48,17 +48,19 @@ class ElastiCacheCleanup:
                 paginator = self.client_elasticache.get_paginator(
                     "describe_cache_clusters"
                 )
-                resources = paginator.paginate(
-                    ShowCacheClustersNotInReplicationGroups=True
-                ).build_full_result()["CacheClusters"]
+                resources = (
+                    paginator.paginate(ShowCacheClustersNotInReplicationGroups=True)
+                    .build_full_result()
+                    .get("CacheClusters")
+                )
             except:
                 self.logging.error("Could not list all ElastiCache Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["CacheClusterId"]
-                resource_date = resource["CacheClusterCreateTime"]
+                resource_id = resource.get("CacheClusterId")
+                resource_date = resource.get("CacheClusterCreateTime")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -136,14 +138,14 @@ class ElastiCacheCleanup:
                 return False
 
             for resource in resources:
-                resource_id = resource["ReplicationGroupId"]
-                resource_primary_cluster_id = resource["MemberClusters"][0]
+                resource_id = resource.get("ReplicationGroupId")
+                resource_primary_cluster_id = resource.get("MemberClusters")[0]
 
                 try:
                     resource_primary_cluster_details = (
                         self.client_elasticache.describe_cache_clusters(
                             CacheClusterId=resource_primary_cluster_id
-                        )["CacheClusters"][0]
+                        ).get("CacheClusters")[0]
                     )
                 except:
                     self.logging.error(
