@@ -365,7 +365,7 @@ class Cleanup:
                 item_json = dynamodb_json.loads(item, True)
                 settings[item_json["key"]] = item_json["value"]
 
-            return settings
+        return settings
 
     def get_whitelist(self):
         whitelist = defaultdict(lambda: defaultdict(set))
@@ -385,9 +385,10 @@ class Cleanup:
                 item_json = dynamodb_json.loads(item, True)
                 parsed_resource_id = Helper.parse_resource_id(item_json["resource_id"])
 
-                whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
-                    parsed_resource_id.get("resource_type"), set()
-                ).add(parsed_resource_id.get("resource"))
+                whitelist[parsed_resource_id["service"]][
+                    parsed_resource_id["resource_type"]
+                ].add(parsed_resource_id["resource"])
+
         return whitelist
 
     def setup_dynamodb(self):
