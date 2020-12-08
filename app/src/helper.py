@@ -58,9 +58,7 @@ class Helper:
     def record_execution_log_action(
         execution_log, region, service, resource, resource_id, resource_action
     ):
-        execution_log["AWS"].setdefault(region, {}).setdefault(service, {}).setdefault(
-            resource, []
-        ).append(
+        execution_log["AWS"][region][service][resource].append(
             {
                 "id": resource_id,
                 "action": resource_action,

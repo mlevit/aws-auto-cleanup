@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import threading
+from collections import defaultdict
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
@@ -46,7 +47,9 @@ class Cleanup:
         self.setup_dynamodb()
 
         # create dictionaries and variables
-        self.execution_log = {"AWS": {}}
+        self.execution_log = defaultdict(
+            lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+        )
         self.settings = self.get_settings()
         self.whitelist = self.get_whitelist()
         self.dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
@@ -365,7 +368,7 @@ class Cleanup:
             return settings
 
     def get_whitelist(self):
-        whitelist = {}
+        whitelist = defaultdict(lambda: defaultdict(set))
 
         try:
             paginator = boto3.client("dynamodb").get_paginator("scan")
