@@ -43,15 +43,15 @@ class ECRCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_ecr.get_paginator("describe_repositories")
-                resources = paginator.paginate().build_full_result()["repositories"]
+                resources = paginator.paginate().build_full_result().get("repositories")
             except:
                 self.logging.error("Could not list all ECR Repositories.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["repositoryName"]
-                resource_date = resource["createdAt"]
+                resource_id = resource.get("repositoryName")
+                resource_date = resource.get("createdAt")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -62,9 +62,11 @@ class ECRCleanup:
                 if resource_id not in whitelisted_resources:
                     try:
                         paginator = self.client_ecr.get_paginator("list_images")
-                        list_images = paginator.paginate(
-                            repositoryName=resource_id
-                        ).build_full_result()["imageIds"]
+                        list_images = (
+                            paginator.paginate(repositoryName=resource_id)
+                            .build_full_result()
+                            .get("imageIds")
+                        )
                     except:
                         self.logging.error(
                             f"Could not list all ECR Images for ECR Repository '{resource_id}'."
@@ -129,7 +131,7 @@ class ECRCleanup:
         """
 
         self.logging.debug(
-            f"Started cleanup of ECR Images for ECR Repository {repository}."
+            f"Started cleanup of ECR Images for ECR Repository '{repository}'."
         )
 
         is_cleaning_enabled = Helper.get_setting(
@@ -143,17 +145,21 @@ class ECRCleanup:
         if is_cleaning_enabled:
             try:
                 paginator = self.client_ecr.get_paginator("describe_images")
-                resources = paginator.paginate().build_full_result()["imageDetails"]
+                resources = (
+                    paginator.paginate(repositoryName=repository)
+                    .build_full_result()
+                    .get("imageDetails")
+                )
             except:
                 self.logging.error(
-                    f"Could not list all ECR Images for ECR Repository {repository}."
+                    f"Could not list all ECR Images for ECR Repository '{repository}'."
                 )
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
-                resource_id = resource["imageDigest"]
-                resource_date = resource["imagePushedAt"]
+                resource_id = resource.get("imageDigest")
+                resource_date = resource.get("imagePushedAt")
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
@@ -199,11 +205,11 @@ class ECRCleanup:
                 )
 
             self.logging.debug(
-                f"Finished cleanup of ECR Images for ECR Repository {repository}."
+                f"Finished cleanup of ECR Images for ECR Repository '{repository}'."
             )
             return True
         else:
             self.logging.info(
-                f"Skipping cleanup of ECR Images for ECR Repository {repository}."
+                f"Skipping cleanup of ECR Images for ECR Repository '{repository}'."
             )
             return True
