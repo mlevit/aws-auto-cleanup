@@ -1,5 +1,6 @@
 import sys
 
+import botocore
 import boto3
 
 from src.helper import Helper
@@ -44,6 +45,9 @@ class AirflowCleanup:
             try:
                 paginator = self.client_airflow.get_paginator("list_environments")
                 resources = paginator.paginate().build_full_result()["Environments"]
+            except botocore.exceptions.EndpointConnectionError:
+                self.logging.debug(f"Airflow is not enabled in region '{self.region}'.")
+                return False
             except:
                 self.logging.error("Could not list all Airflow Environments.")
                 self.logging.error(sys.exc_info()[1])
