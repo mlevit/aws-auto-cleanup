@@ -141,22 +141,6 @@ class CloudFormationCleanup:
                             StackName=resource_id,
                             RetainResources=retain_resources,
                         )
-
-                        waiter = self.client_cloudformation.get_waiter(
-                            "stack_delete_complete"
-                        )
-                        try:
-                            waiter.wait(
-                                StackName=resource_id,
-                                WaiterConfig={"Delay": 5, "MaxAttempts": 6},
-                            )
-                        except:
-                            self.logging.warn(
-                                f"Did not delete CloudFormation Stack '{resource_id}' within 30 seconds. "
-                                "Stopped waiting, check progress manually."
-                            )
-                            self.logging.warn(sys.exc_info()[1])
-                            resource_action = "ERROR"
                 except:
                     self.logging.error(
                         f"Could not delete CloudFormation Stack '{resource_id}'. "
@@ -165,11 +149,27 @@ class CloudFormationCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    self.logging.info(
-                        f"CloudFormation Stack '{resource_id}' was last modified {resource_age} days ago "
-                        "and has been deleted."
-                    )
-                    resource_action = "DELETE"
+                    try:
+                        waiter = self.client_cloudformation.get_waiter(
+                            "stack_delete_complete"
+                        )
+                        waiter.wait(
+                            StackName=resource_id,
+                            WaiterConfig={"Delay": 5, "MaxAttempts": 6},
+                        )
+                    except:
+                        self.logging.warn(
+                            f"Did not delete CloudFormation Stack '{resource_id}' within 30 seconds. "
+                            "Stopped waiting, check progress manually."
+                        )
+                        self.logging.warn(sys.exc_info()[1])
+                        resource_action = "DELETE - NOT CONFIRMED"
+                    else:
+                        self.logging.info(
+                            f"CloudFormation Stack '{resource_id}' was last modified {resource_age} days ago "
+                            "and has been deleted."
+                        )
+                        resource_action = "DELETE"
             else:
                 self.logging.debug(
                     f"CloudFormation Stack '{resource_id}' was last modified {resource_age} days ago "
