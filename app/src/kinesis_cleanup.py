@@ -14,7 +14,7 @@ class KinesisCleanup:
         self.region = region
 
         self._client_kinesis = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_kinesis(self):
@@ -32,27 +32,22 @@ class KinesisCleanup:
 
         self.logging.debug("Started cleanup of Kinesis Streams.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("kinesis", {})
-            .get("stream", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.kinesis.stream.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.kinesis.stream.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "kinesis.stream")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_kinesis.get_paginator("list_streams")
-                resources = paginator.paginate().build_full_result().get("StreamNames")
+                resources = paginator.paginate().build_full_result()["StreamNames"]
             except:
                 self.logging.error("Could not list all Kinesis Streams.")
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("kinesis", {})
-                .get("stream", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 resource_id = resource
@@ -61,7 +56,7 @@ class KinesisCleanup:
                 try:
                     resource_details = self.client_kinesis.describe_stream(
                         StreamName=resource_id
-                    ).get("StreamDescription")
+                    )["StreamDescription"]
                 except:
                     self.logging.error(
                         f"Could not get Kinesis Stream's '{resource_id}' details."
@@ -69,15 +64,13 @@ class KinesisCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_status = resource_details.get("StreamStatus")
-                    resource_date = resource_details.get("StreamCreationTimestamp")
+                    resource_status = resource_details["StreamStatus"]
+                    resource_date = resource_details["StreamCreationTimestamp"]
+                    resource_age = Helper.get_day_delta(resource_date).days
 
-                    if resource_id not in self.whitelist.get("kinesis", {}).get(
-                        "stream", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
+                    if resource_id not in resource_whitelist:
 
-                        if delta.days > ttl_days:
+                        if resource_age > maximum_resource_age:
                             if resource_status == "ACTIVE":
                                 try:
                                     if not self.is_dry_run:
@@ -93,7 +86,7 @@ class KinesisCleanup:
                                     resource_action = "ERROR"
                                 else:
                                     self.logging.info(
-                                        f"Kinesis Stream '{resource_id}' was created {delta.days} days ago "
+                                        f"Kinesis Stream '{resource_id}' was created {resource_age} days ago "
                                         "and has been deleted."
                                     )
                                     resource_action = "DELETE"
@@ -104,7 +97,7 @@ class KinesisCleanup:
                                 resource_action = "SKIP - IN USE"
                         else:
                             self.logging.debug(
-                                f"Kinesis Stream '{resource_id}' was created {delta.days} days ago "
+                                f"Kinesis Stream '{resource_id}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"

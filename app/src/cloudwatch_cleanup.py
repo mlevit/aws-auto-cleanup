@@ -15,7 +15,7 @@ class CloudWatchCleanup:
         self.region = region
 
         self._client_logs = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_logs(self):
@@ -33,41 +33,35 @@ class CloudWatchCleanup:
 
         self.logging.debug("Started cleanup of CloudWatch Log Groups.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("cloudwatch", {})
-            .get("log_group", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.cloudwatch.log_group.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.cloudwatch.log_group.ttl", 30
+        )
+        resource_whitelist = Helper.get_whitelist(
+            self.whitelist, "cloudwatch.log_group"
+        )
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_logs.get_paginator("describe_log_groups")
-                resources = paginator.paginate().build_full_result().get("logGroups")
+                resources = paginator.paginate().build_full_result()["logGroups"]
             except:
                 self.logging.error("Could not list all CloudWatch Log Groups.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("cloudwatch", {})
-                .get("log_group", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("logGroupName")
+                resource_id = resource["logGroupName"]
                 resource_date = datetime.datetime.fromtimestamp(
-                    resource.get("creationTime") / 1000.0
+                    resource["creationTime"] / 1000.0
                 ).strftime("%Y-%m-%d %H:%M:%S")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("cloudwatch", {}).get(
-                    "log_group", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_logs.delete_log_group(
@@ -81,13 +75,13 @@ class CloudWatchCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"CloudWatch Log Group '{resource_id}' was created {delta.days} days ago "
+                                f"CloudWatch Log Group '{resource_id}' was created {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"CloudWatch Log Group '{resource_id}' was created {delta.days} days ago (less than TTL setting) and has not been deleted."
+                            f"CloudWatch Log Group '{resource_id}' was created {resource_age} days ago (less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
                 else:

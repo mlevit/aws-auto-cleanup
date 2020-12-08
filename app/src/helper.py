@@ -23,6 +23,25 @@ class Helper:
         else:
             return from_datetime - from_datetime
 
+    # https://codereview.stackexchange.com/a/253174/234246
+    @staticmethod
+    def get_setting(settings, path, default=None):
+        result = settings
+        for key in path.split("."):
+            result = result.get(key)
+            if result is None:
+                return default
+        return result
+
+    @staticmethod
+    def get_whitelist(whitelist, path, default=[]):
+        result = whitelist
+        for key in path.split("."):
+            result = result.get(key)
+            if result is None:
+                return default
+        return result
+
     @staticmethod
     def parse_resource_id(resource_id):
         elements = resource_id.split(":", 2)
@@ -39,9 +58,9 @@ class Helper:
     def record_execution_log_action(
         execution_log, region, service, resource, resource_id, resource_action
     ):
-        execution_log.get("AWS").setdefault(region, {}).setdefault(
-            service, {}
-        ).setdefault(resource, []).append(
+        execution_log["AWS"].setdefault(region, {}).setdefault(service, {}).setdefault(
+            resource, []
+        ).append(
             {
                 "id": resource_id,
                 "action": resource_action,

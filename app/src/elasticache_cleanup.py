@@ -14,7 +14,7 @@ class ElastiCacheCleanup:
         self.region = region
 
         self._client_elasticache = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_elasticache(self):
@@ -35,45 +35,35 @@ class ElastiCacheCleanup:
 
         self.logging.debug("Started cleanup of ElastiCache Clusters.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("elasticache", {})
-            .get("cluster", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.elasticache.cluster.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.elasticache.cluster.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "elasticache.cluster")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_elasticache.get_paginator(
                     "describe_cache_clusters"
                 )
-                resources = (
-                    paginator.paginate(ShowCacheClustersNotInReplicationGroups=True)
-                    .build_full_result()
-                    .get("CacheClusters")
-                )
+                resources = paginator.paginate(
+                    ShowCacheClustersNotInReplicationGroups=True
+                ).build_full_result()["CacheClusters"]
             except:
                 self.logging.error("Could not list all ElastiCache Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("elasticache", {})
-                .get("cluster", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("CacheClusterId")
-                resource_date = resource.get("CacheClusterCreateTime")
+                resource_id = resource["CacheClusterId"]
+                resource_date = resource["CacheClusterCreateTime"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("elasticache", {}).get(
-                    "cluster", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_elasticache.delete_cache_cluster(
@@ -87,13 +77,13 @@ class ElastiCacheCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"ElastiCache Cluster '{resource_id}' was created {delta.days} days ago "
+                                f"ElastiCache Cluster '{resource_id}' was created {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"ElastiCache Cluster '{resource_id}' was created {delta.days} days ago "
+                            f"ElastiCache Cluster '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -125,13 +115,17 @@ class ElastiCacheCleanup:
 
         self.logging.debug("Started cleanup of ElastiCache Replication Groups.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("elasticache", {})
-            .get("replication_group", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.elasticache.replication_group.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.elasticache.replication_group.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(
+            self.whitelist, "elasticache.replication_group"
+        )
+
+        if is_cleaning_enabled:
             try:
                 resources = self.client_elasticache.describe_replication_groups().get(
                     "ReplicationGroups"
@@ -141,22 +135,15 @@ class ElastiCacheCleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("elasticache", {})
-                .get("replication_group", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("ReplicationGroupId")
-                resource_primary_cluster_id = resource.get("MemberClusters")[0]
+                resource_id = resource["ReplicationGroupId"]
+                resource_primary_cluster_id = resource["MemberClusters"][0]
 
                 try:
                     resource_primary_cluster_details = (
                         self.client_elasticache.describe_cache_clusters(
                             CacheClusterId=resource_primary_cluster_id
-                        ).get("CacheClusters")[0]
+                        )["CacheClusters"][0]
                     )
                 except:
                     self.logging.error(
@@ -168,14 +155,11 @@ class ElastiCacheCleanup:
                     resource_date = resource_primary_cluster_details.get(
                         "CacheClusterCreateTime"
                     )
+                    resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in self.whitelist.get("elasticache", {}).get(
-                        "replication_group", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
-
-                        if delta.days > ttl_days:
+                    if resource_id not in resource_whitelist:
+                        if resource_age > maximum_resource_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_elasticache.delete_replication_group(
@@ -189,13 +173,13 @@ class ElastiCacheCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"ElastiCache Replication Group '{resource_id}' was last modified {delta.days} days ago "
+                                    f"ElastiCache Replication Group '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"ElastiCache Replication Group '{resource_id}' was last modified {delta.days} days ago "
+                                f"ElastiCache Replication Group '{resource_id}' was last modified {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"

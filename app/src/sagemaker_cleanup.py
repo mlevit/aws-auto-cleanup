@@ -14,7 +14,7 @@ class SageMakerCleanup:
         self.region = region
 
         self._client_sagemaker = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_sagemaker(self):
@@ -34,42 +34,35 @@ class SageMakerCleanup:
 
         self.logging.debug("Started cleanup of SageMaker Apps.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("sagemaker", {})
-            .get("app", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.sagemaker.app.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.sagemaker.app.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "sagemaker.app")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_sagemaker.get_paginator("list_apps")
-                resources = paginator.paginate().build_full_result().get("Apps")
+                resources = paginator.paginate().build_full_result()["Apps"]
             except:
                 self.logging.error("Could not list all SageMaker Apps.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("sagemaker", {})
-                .get("app", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("AppName")
-                resource_date = resource.get("CreationTime")
-                resource_app_type = resource.get("AppType")
-                resource_domain_id = resource.get("DomainId")
-                resource_status = resource.get("Status")
-                resource_user_profile = resource.get("UserProfileName")
+                resource_id = resource["AppName"]
+                resource_date = resource["CreationTime"]
+                resource_app_type = resource["AppType"]
+                resource_domain_id = resource["DomainId"]
+                resource_status = resource["Status"]
+                resource_user_profile = resource["UserProfileName"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("sagemaker", {}).get(
-                    "app", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         if resource_status in ("Failed", "InService"):
                             try:
                                 if not self.is_dry_run:
@@ -87,13 +80,13 @@ class SageMakerCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"SageMaker App '{resource_id}' was last modified {delta.days} days ago "
+                                    f"SageMaker App '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"SageMaker App '{resource_id}' was created {delta.days} days ago "
+                            f"SageMaker App '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -125,40 +118,32 @@ class SageMakerCleanup:
 
         self.logging.debug("Started cleanup of SageMaker Endpoints.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("sagemaker", {})
-            .get("endpoint", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.sagemaker.endpoint.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.sagemaker.endpoint.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "sagemaker.endpoint")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_sagemaker.get_paginator("list_endpoints")
-                resources = paginator.paginate().build_full_result().get("Endpoints")
+                resources = paginator.paginate().build_full_result()["Endpoints"]
             except:
                 self.logging.error("Could not list all SageMaker Endpoints.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("sagemaker", {})
-                .get("endpoint", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("EndpointName")
-                resource_status = resource.get("EndpointStatus")
-                resource_date = resource.get("LastModifiedTime")
+                resource_id = resource["EndpointName"]
+                resource_status = resource["EndpointStatus"]
+                resource_date = resource["LastModifiedTime"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("sagemaker", {}).get(
-                    "endpoint", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         if resource_status in (
                             "OutOfService",
                             "InService",
@@ -177,13 +162,13 @@ class SageMakerCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"SageMaker Endpoint '{resource_id}' was last modified {delta.days} days ago "
+                                    f"SageMaker Endpoint '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"SageMaker Endpoint '{resource_id}' was created {delta.days} days ago "
+                            f"SageMaker Endpoint '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -215,44 +200,38 @@ class SageMakerCleanup:
 
         self.logging.debug("Started cleanup of SageMaker Notebook Instances.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("sagemaker", {})
-            .get("notebook_instance", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.sagemaker.notebook_instance.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.sagemaker.notebook_instance.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(
+            self.whitelist, "sagemaker.notebook_instance"
+        )
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_sagemaker.get_paginator(
                     "list_notebook_instances"
                 )
-                resources = (
-                    paginator.paginate().build_full_result().get("NotebookInstances")
-                )
+                resources = paginator.paginate().build_full_result()[
+                    "NotebookInstances"
+                ]
             except:
                 self.logging.error("Could not list all SageMaker Notebook Instances.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("sagemaker", {})
-                .get("notebook_instance", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("NotebookInstanceName")
-                resource_status = resource.get("NotebookInstanceStatus")
-                resource_date = resource.get("LastModifiedTime")
+                resource_id = resource["NotebookInstanceName"]
+                resource_status = resource["NotebookInstanceStatus"]
+                resource_date = resource["LastModifiedTime"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("sagemaker", {}).get(
-                    "notebook_instance", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         if resource_status == "InService":
                             try:
                                 if not self.is_dry_run:
@@ -267,7 +246,7 @@ class SageMakerCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
+                                    f"SageMaker Notebook Instance '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been stopped."
                                 )
                                 resource_action = "STOP"
@@ -285,13 +264,13 @@ class SageMakerCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"SageMaker Notebook Instance '{resource_id}' was last modified {delta.days} days ago "
+                                    f"SageMaker Notebook Instance '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"SageMaker Notebook Instance '{resource_id}' was created {delta.days} days ago "
+                            f"SageMaker Notebook Instance '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

@@ -14,7 +14,7 @@ class ECSCleanup:
         self.region = region
 
         self._client_ecs = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_ecs(self):
@@ -33,16 +33,18 @@ class ECSCleanup:
 
         self.logging.debug("Started cleanup of ECS Clusters.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ecs", {})
-            .get("cluster", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ecs.cluster.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.ecs.cluster.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ecs.cluster")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_ecs.get_paginator("list_clusters")
-                resources = paginator.paginate().build_full_result().get("clusterArns")
+                resources = paginator.paginate().build_full_result()["clusterArns"]
             except:
                 self.logging.error("Could not list all ECS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -54,60 +56,60 @@ class ECSCleanup:
                         clusters=[
                             resource,
                         ]
-                    ).get("clusters")[0]
+                    )["clusters"][0]
                 except:
                     self.logging.error(
                         f"Could not get ECS Cluster's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
-                    return False
-
-                resource_id = resource_details.get("clusterName")
-                resource_status = resource_details.get("status")
-                resource_running_task_count = resource_details.get("runningTasksCount")
-                resource_active_service_count = resource_details.get(
-                    "activeServicesCount"
-                )
-                resource_action = None
-
-                if resource_id not in self.whitelist.get("ecs", {}).get("cluster", []):
-                    if resource_status not in ("ACTIVE", "FAILED"):
-                        self.logging.warn(
-                            f"ECS Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
-                        )
-                        resource_action = "SKIP - IN USE"
-                    elif resource_active_service_count > 0:
-                        self.logging.debug(
-                            f"ECS Cluster '{resource_id}' has {resource_active_service_count} active services running and cannot be deleted."
-                        )
-                        resource_action = "SKIP - IN USE"
-                    elif resource_running_task_count > 0:
-                        self.logging.debug(
-                            f"ECS Cluster '{resource_id}' has {resource_running_task_count} running tasks and cannot be deleted."
-                        )
-                        resource_action = "SKIP - IN USE"
-                    else:
-                        try:
-                            if not self.is_dry_run:
-                                self.client_ecs.delete_cluster(
-                                    cluster=resource_id,
-                                )
-                        except:
-                            self.logging.error(
-                                f"Could not delete ECS Cluster '{resource_id}'."
-                            )
-                            self.logging.error(sys.exc_info()[1])
-                            resource_action = "ERROR"
-                        else:
-                            self.logging.info(
-                                f"ECS Cluster '{resource_id}' has been deleted."
-                            )
-                            resource_action = "DELETE"
+                    resource_action = "ERROR"
                 else:
-                    self.logging.debug(
-                        f"ECS Cluster '{resource_id}' has been whitelisted and has not been deleted."
+                    resource_id = resource_details["clusterName"]
+                    resource_status = resource_details["status"]
+                    resource_running_task_count = resource_details["runningTasksCount"]
+                    resource_active_service_count = resource_details.get(
+                        "activeServicesCount"
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = None
+
+                    if resource_id not in resource_whitelist:
+                        if resource_status not in ("ACTIVE", "FAILED"):
+                            self.logging.warn(
+                                f"ECS Cluster '{resource_id}' in state '{resource_status}' cannot be deleted."
+                            )
+                            resource_action = "SKIP - IN USE"
+                        elif resource_active_service_count > 0:
+                            self.logging.debug(
+                                f"ECS Cluster '{resource_id}' has {resource_active_service_count} active services running and cannot be deleted."
+                            )
+                            resource_action = "SKIP - IN USE"
+                        elif resource_running_task_count > 0:
+                            self.logging.debug(
+                                f"ECS Cluster '{resource_id}' has {resource_running_task_count} running tasks and cannot be deleted."
+                            )
+                            resource_action = "SKIP - IN USE"
+                        else:
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_ecs.delete_cluster(
+                                        cluster=resource_id,
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete ECS Cluster '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"ECS Cluster '{resource_id}' has been deleted."
+                                )
+                                resource_action = "DELETE"
+                    else:
+                        self.logging.debug(
+                            f"ECS Cluster '{resource_id}' has been whitelisted and has not been deleted."
+                        )
+                        resource_action = "SKIP - WHITELIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -131,16 +133,18 @@ class ECSCleanup:
 
         self.logging.debug("Started cleanup of ECS Services.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ecs", {})
-            .get("service", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ecs.service.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.ecs.service.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ecs.service")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_ecs.get_paginator("list_clusters")
-                clusters = paginator.paginate().build_full_result().get("clusterArns")
+                clusters = paginator.paginate().build_full_result()["clusterArns"]
             except:
                 self.logging.error("Could not list all ECS Clusters.")
                 self.logging.error(sys.exc_info()[1])
@@ -149,24 +153,15 @@ class ECSCleanup:
             for cluster in clusters:
                 try:
                     paginator = self.client_ecs.get_paginator("list_services")
-                    resources = (
-                        paginator.paginate(cluster=cluster)
-                        .build_full_result()
-                        .get("serviceArns")
-                    )
+                    resources = paginator.paginate(cluster=cluster).build_full_result()[
+                        "serviceArns"
+                    ]
                 except:
                     self.logging.error(
                         f"Could not list all ECS Services for Cluster '{cluster}'."
                     )
                     self.logging.error(sys.exc_info()[1])
                     return False
-
-                ttl_days = (
-                    self.settings.get("services", {})
-                    .get("ecs", {})
-                    .get("service", {})
-                    .get("ttl", 7)
-                )
 
                 for resource in resources:
                     try:
@@ -175,61 +170,58 @@ class ECSCleanup:
                             services=[
                                 resource,
                             ],
-                        ).get("services")[0]
+                        )["services"][0]
                     except:
                         self.logging.error(
                             f"Could not get ECS Service's '{resource}' details."
                         )
                         self.logging.error(sys.exc_info()[1])
-                        return False
+                        resource_action = "ERROR"
+                    else:
+                        resource_id = resource_details["serviceName"]
+                        resource_status = resource_details["status"]
+                        resource_date = resource_details["createdAt"]
+                        resource_age = Helper.get_day_delta(resource_date).days
+                        resource_action = None
 
-                    resource_id = resource_details.get("serviceName")
-                    resource_status = resource_details.get("status")
-                    resource_date = resource_details.get("createdAt")
-                    resource_action = None
-
-                    if resource_id not in self.whitelist.get("ecs", {}).get(
-                        "service", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
-
-                        if delta.days > ttl_days:
-                            if resource_status in ("ACTIVE", "INACTIVE"):
-                                try:
-                                    if not self.is_dry_run:
-                                        self.client_ecs.delete_service(
-                                            cluster=cluster,
-                                            service=resource_id,
-                                            force=True,
+                        if resource_id not in resource_whitelist:
+                            if resource_age > maximum_resource_age:
+                                if resource_status in ("ACTIVE", "INACTIVE"):
+                                    try:
+                                        if not self.is_dry_run:
+                                            self.client_ecs.delete_service(
+                                                cluster=cluster,
+                                                service=resource_id,
+                                                force=True,
+                                            )
+                                    except:
+                                        self.logging.error(
+                                            f"Could not delete ECS Service '{resource_id}'."
                                         )
-                                except:
-                                    self.logging.error(
-                                        f"Could not delete ECS Service '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "ERROR"
+                                        self.logging.error(sys.exc_info()[1])
+                                        resource_action = "ERROR"
+                                    else:
+                                        self.logging.info(
+                                            f"ECS Service '{resource_id}' was created {resource_age} days ago "
+                                            "and has been deleted."
+                                        )
+                                        resource_action = "DELETE"
                                 else:
-                                    self.logging.info(
-                                        f"ECS Service '{resource_id}' was created {delta.days} days ago "
-                                        "and has been deleted."
+                                    self.logging.warn(
+                                        f"ECS Service '{resource_id}' in state '{resource_status}' cannot be deleted."
                                     )
-                                    resource_action = "DELETE"
+                                    resource_action = "SKIP - IN USE"
                             else:
-                                self.logging.warn(
-                                    f"ECS Service '{resource_id}' in state '{resource_status}' cannot be deleted."
+                                self.logging.debug(
+                                    f"ECS Service '{resource_id}' was created {resource_age} days ago "
+                                    "(less than TTL setting) and has not been deleted."
                                 )
-                                resource_action = "SKIP - IN USE"
+                                resource_action = "SKIP - TTL"
                         else:
                             self.logging.debug(
-                                f"ECS Service '{resource_id}' was created {delta.days} days ago "
-                                "(less than TTL setting) and has not been deleted."
+                                f"ECS Service '{resource_id}' has been whitelisted and has not been deleted."
                             )
-                            resource_action = "SKIP - TTL"
-                    else:
-                        self.logging.debug(
-                            f"ECS Service '{resource_id}' has been whitelisted and has not been deleted."
-                        )
-                        resource_action = "SKIP - WHITELIST"
+                            resource_action = "SKIP - WHITELIST"
 
                     Helper.record_execution_log_action(
                         self.execution_log,

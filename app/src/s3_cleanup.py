@@ -15,7 +15,7 @@ class S3Cleanup:
 
         self._client_s3 = None
         self._resource_s3 = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_s3(self):
@@ -40,13 +40,15 @@ class S3Cleanup:
 
         self.logging.debug("Started cleanup of S3 Buckets.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("s3", {})
-            .get("bucket", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.s3.bucket.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.s3.bucket.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "s3.bucket")
+
+        if is_cleaning_enabled:
             try:
                 resources = self.client_s3.list_buckets()
             except:
@@ -54,22 +56,14 @@ class S3Cleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("s3", {})
-                .get("bucket", {})
-                .get("ttl", 7)
-            )
-
-            for resource in resources.get("Buckets"):
-                resource_id = resource.get("Name")
-                resource_date = resource.get("CreationDate")
+            for resource in resources["Buckets"]:
+                resource_id = resource["Name"]
+                resource_date = resource["CreationDate"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("s3", {}).get("bucket", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         # delete bucket policy
                         try:
                             if not self.is_dry_run:
@@ -131,13 +125,13 @@ class S3Cleanup:
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.info(
-                                            f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
+                                            f"S3 Bucket '{resource_id}' was created {resource_age} days ago "
                                             "and has been deleted."
                                         )
                                         resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"S3 Bucket '{resource_id}' was created {delta.days} days ago "
+                            f"S3 Bucket '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

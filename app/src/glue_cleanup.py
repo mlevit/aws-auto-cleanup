@@ -14,7 +14,7 @@ class GlueCleanup:
         self.region = region
 
         self._client_glue = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_glue(self):
@@ -34,38 +34,32 @@ class GlueCleanup:
 
         self.logging.debug("Started cleanup of Glue Crawlers.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("glue", {})
-            .get("crawler", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.glue.crawler.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.glue.crawler.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.crawler")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_glue.get_paginator("get_crawlers")
-                resources = paginator.paginate().build_full_result().get("Crawlers")
+                resources = paginator.paginate().build_full_result()["Crawlers"]
             except:
                 self.logging.error("Could not list all Glue Crawlers.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("glue", {})
-                .get("crawler", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("Name")
-                resource_date = resource.get("LastUpdated")
-                resource_status = resource.get("State")
+                resource_id = resource["Name"]
+                resource_date = resource["LastUpdated"]
+                resource_status = resource["State"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("glue", {}).get("crawler", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         if resource_status != "RUNNING":
                             try:
                                 if not self.is_dry_run:
@@ -78,7 +72,7 @@ class GlueCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"Glue Crawler '{resource_id}' was last modified {delta.days} days ago "
+                                    f"Glue Crawler '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
@@ -89,7 +83,7 @@ class GlueCleanup:
                             resource_action = "SKIP - IN USE"
                     else:
                         self.logging.debug(
-                            f"Glue Crawler '{resource_id}' was last modified {delta.days} days ago "
+                            f"Glue Crawler '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -121,39 +115,31 @@ class GlueCleanup:
 
         self.logging.debug("Started cleanup of Glue Databases.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("glue", {})
-            .get("database", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.glue.database.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.glue.database.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.database")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_glue.get_paginator("get_databases")
-                resources = paginator.paginate().build_full_result().get("DatabaseList")
+                resources = paginator.paginate().build_full_result()["DatabaseList"]
             except:
                 self.logging.error("Could not list all Glue Databases.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("glue", {})
-                .get("database", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("Name")
+                resource_id = resource["Name"]
                 resource_date = resource.get("CreateTime")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("glue", {}).get(
-                    "database", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_glue.delete_database(Name=resource_id)
@@ -165,13 +151,13 @@ class GlueCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Glue Database '{resource_id}' was created {delta.days} days ago "
+                                f"Glue Database '{resource_id}' was created {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Glue Database '{resource_id}' was created {delta.days} days ago "
+                            f"Glue Database '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -203,39 +189,31 @@ class GlueCleanup:
 
         self.logging.debug("Started cleanup of Glue Dev Endpoints.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("glue", {})
-            .get("dev_endpoint", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.glue.dev_endpoint.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.glue.dev_endpoint.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.dev_endpoint")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_glue.get_paginator("get_dev_endpoints")
-                resources = paginator.paginate().build_full_result().get("DevEndpoints")
+                resources = paginator.paginate().build_full_result()["DevEndpoints"]
             except:
                 self.logging.error("Could not list all Glue Dev Endpoints.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("glue", {})
-                .get("dev_endpoint", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("EndpointName")
-                resource_date = resource.get("LastModifiedTimestamp")
+                resource_id = resource["EndpointName"]
+                resource_date = resource["LastModifiedTimestamp"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("glue", {}).get(
-                    "dev_endpoint", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_glue.delete_dev_endpoint(
@@ -249,13 +227,13 @@ class GlueCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Glue Dev Endpoint '{resource_id}' was last modified {delta.days} days ago "
+                                f"Glue Dev Endpoint '{resource_id}' was last modified {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Glue Dev Endpoint '{resource_id}' was last modified {delta.days} days ago "
+                            f"Glue Dev Endpoint '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

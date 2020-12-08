@@ -14,7 +14,7 @@ class ElasticsearchServiceCleanup:
         self.region = region
 
         self._client_elasticsearch = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_elasticsearch(self):
@@ -32,14 +32,17 @@ class ElasticsearchServiceCleanup:
 
         self.logging.debug("Started cleanup of Elasticsearch Service Domains.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("elasticsearch", {})
-            .get("domain", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.elasticsearch.domain.clean", False
+        )
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.elasticsearch.domain.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(
+            self.whitelist, "elasticsearch.domain"
         )
 
-        if clean:
+        if is_cleaning_enabled:
             try:
                 resources = self.client_elasticsearch.list_domain_names().get(
                     "DomainNames"
@@ -49,21 +52,14 @@ class ElasticsearchServiceCleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("elasticsearch", {})
-                .get("domain", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("DomainName")
+                resource_id = resource["DomainName"]
 
                 try:
                     resource_details = (
                         self.client_elasticsearch.describe_elasticsearch_domain_config(
                             DomainName=resource_id
-                        ).get("DomainConfig")
+                        )["DomainConfig"]
                     )
                 except:
                     self.logging.error(
@@ -72,19 +68,14 @@ class ElasticsearchServiceCleanup:
                     self.logging.error(sys.exc_info()[1])
                     resource_action = "ERROR"
                 else:
-                    resource_date = (
-                        resource_details.get("ElasticsearchVersion")
-                        .get("Status")
-                        .get("UpdateDate")
-                    )
+                    resource_date = resource_details["ElasticsearchVersion"]["Status"][
+                        "UpdateDate"
+                    ]
+                    resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in self.whitelist.get("elasticsearch", {}).get(
-                        "domain", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
-
-                        if delta.days > ttl_days:
+                    if resource_id not in resource_whitelist:
+                        if resource_age > maximum_resource_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_elasticsearch.delete_elasticsearch_domain(
@@ -98,13 +89,13 @@ class ElasticsearchServiceCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"Elasticsearch Service Domain '{resource_id}' was last modified {delta.days} days ago "
+                                    f"Elasticsearch Service Domain '{resource_id}' was last modified {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"Elasticsearch Service Domain '{resource_id}' was created {delta.days} days ago "
+                                f"Elasticsearch Service Domain '{resource_id}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"

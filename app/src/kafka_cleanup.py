@@ -14,7 +14,7 @@ class KafkaCleanup:
         self.region = region
 
         self._client_kafka = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_kafka(self):
@@ -32,42 +32,32 @@ class KafkaCleanup:
 
         self.logging.debug("Started cleanup of Kafka Clusters.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("kafka", {})
-            .get("cluster", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.kafka.cluster.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.kafka.cluster.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "kafka.cluster")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_kafka.get_paginator("list_clusters")
-                resources = (
-                    paginator.paginate().build_full_result().get("ClusterInfoList")
-                )
+                resources = paginator.paginate().build_full_result()["ClusterInfoList"]
             except:
                 self.logging.error("Could not list all Kafka Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("kafka", {})
-                .get("cluster", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("ClusterName")
-                resource_arn = resource.get("ClusterArn")
-                resource_date = resource.get("CreationTime")
+                resource_id = resource["ClusterName"]
+                resource_arn = resource["ClusterArn"]
+                resource_date = resource["CreationTime"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("kafka", {}).get(
-                    "cluster", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_kafka.delete_cluster(
@@ -81,13 +71,13 @@ class KafkaCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Kafka Cluster '{resource_id}' was created {delta.days} days ago "
+                                f"Kafka Cluster '{resource_id}' was created {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Kafka Cluster '{resource_id}' was created {delta.days} days ago "
+                            f"Kafka Cluster '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

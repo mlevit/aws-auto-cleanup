@@ -14,7 +14,7 @@ class LambdaCleanup:
         self.region = region
 
         self._client_lambda = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_lambda(self):
@@ -32,39 +32,31 @@ class LambdaCleanup:
 
         self.logging.debug("Started cleanup of Lambda Functions.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("lambda", {})
-            .get("function", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.lambda.function.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.lambda.function.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "lambda.function")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_lambda.get_paginator("list_functions")
-                resources = paginator.paginate().build_full_result().get("Functions")
+                resources = paginator.paginate().build_full_result()["Functions"]
             except:
                 self.logging.error("Could not list all Lambda Functions.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("lambda", {})
-                .get("function", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
-                resource_id = resource.get("FunctionName")
-                resource_date = resource.get("LastModified")
+                resource_id = resource["FunctionName"]
+                resource_date = resource["LastModified"]
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("lambda", {}).get(
-                    "function", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_lambda.delete_function(
@@ -78,13 +70,13 @@ class LambdaCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                                f"Lambda Function '{resource_id}' was last modified {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Lambda Function '{resource_id}' was last modified {delta.days} days ago "
+                            f"Lambda Function '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

@@ -14,7 +14,7 @@ class DynamoDBCleanup:
         self.region = region
 
         self._client_dynamodb = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_dynamodb(self):
@@ -32,47 +32,40 @@ class DynamoDBCleanup:
 
         self.logging.debug("Started cleanup of DynamoDB Tables.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("dynamodb", {})
-            .get("table", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.dynamodb.table.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.dynamodb.table.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "dynamodb.table")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_dynamodb.get_paginator("list_tables")
-                resources = paginator.paginate().build_full_result().get("TableNames")
+                resources = paginator.paginate().build_full_result()["TableNames"]
             except:
                 self.logging.error("Could not list all DynamoDB Tables.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("dynamodb", {})
-                .get("table", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 try:
                     resource_details = self.client_dynamodb.describe_table(
                         TableName=resource
-                    ).get("Table")
+                    )["Table"]
                 except:
                     self.logging.error(
                         f"Could not get DynamoDB Table's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
                 else:
-                    resource_date = resource_details.get("CreationDateTime")
+                    resource_date = resource_details["CreationDateTime"]
+                    resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource not in self.whitelist.get("dynamodb", {}).get(
-                        "table", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
-                        if delta.days > ttl_days:
+                    if resource not in resource_whitelist:
+                        if resource_age > maximum_resource_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_dynamodb.delete_table(
@@ -86,13 +79,13 @@ class DynamoDBCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"DynamoDB Table '{resource}' was created {delta.days} days ago "
+                                    f"DynamoDB Table '{resource}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"DynamoDB Table '{resource}' was created {delta.days} days ago "
+                                f"DynamoDB Table '{resource}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"

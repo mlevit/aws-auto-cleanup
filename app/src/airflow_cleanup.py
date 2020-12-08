@@ -14,7 +14,7 @@ class AirflowCleanup:
         self.region = region
 
         self._client_airflow = None
-        self.is_dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_airflow(self):
@@ -32,47 +32,40 @@ class AirflowCleanup:
 
         self.logging.debug("Started cleanup of Airflow Environments.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("airflow", {})
-            .get("environment", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.airflow.environment.clean", False
         )
-        if clean:
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.airflow.environment.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "airflow.environment")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_airflow.get_paginator("list_environments")
-                resources = paginator.paginate().build_full_result().get("Environments")
+                resources = paginator.paginate().build_full_result()["Environments"]
             except:
                 self.logging.error("Could not list all Airflow Environments.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("airflow", {})
-                .get("environment", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 try:
                     resource_details = self.client_airflow.get_environment(
                         Name=resource
-                    ).get("Environment")
+                    )["Environment"]
                 except:
                     self.logging.error(
                         f"Could not get Airflow Environment's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
                 else:
-                    resource_date = resource_details.get("CreatedAt")
+                    resource_date = resource_details["CreatedAt"]
+                    resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource not in self.whitelist.get("airflow", {}).get(
-                        "environment", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
-                        if delta.days > ttl_days:
+                    if resource not in resource_whitelist:
+                        if resource_age > maximum_resource_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_airflow.delete_environment(
@@ -86,13 +79,13 @@ class AirflowCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"Airflow Environment '{resource}' was created {delta.days} days ago "
+                                    f"Airflow Environment '{resource}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"Airflow Environment '{resource}' was created {delta.days} days ago "
+                                f"Airflow Environment '{resource}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"
