@@ -446,6 +446,19 @@
         },
         "iam": {
           "M": {
+            "access_key": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "Access Key ID"
+                },
+                "ttl": {
+                  "N": "30"
+                }
+              }
+            },
             "policy": {
               "M": {
                 "clean": {
