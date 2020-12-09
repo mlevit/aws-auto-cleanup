@@ -234,11 +234,10 @@ class EC2Cleanup:
                     resource_id = resource.get("InstanceId")
                     resource_date = resource.get("LaunchTime")
                     resource_state = resource.get("State").get("Name")
+                    resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
                     if resource_id not in resource_whitelist:
-                        resource_age = Helper.get_day_delta(resource_date).days
-
                         if resource_age > maximum_resource_age:
                             if resource_state == "running":
                                 try:
@@ -308,6 +307,7 @@ class EC2Cleanup:
                                                 f"Could not delete Instance EC2 '{resource_id}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "ERROR"
                                         else:
                                             self.logging.info(
                                                 f"EC2 Instance '{resource_id}' in a 'stopped' state was last "
