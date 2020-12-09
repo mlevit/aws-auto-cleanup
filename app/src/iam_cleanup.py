@@ -318,7 +318,7 @@ class IAMCleanup:
                                                 )
                                                 self.logging.error(sys.exc_info()[1])
                                                 resource_action = "ERROR"
-                                                backoff = 99
+                                                continue
                                             else:
                                                 backoff = 2 * backoff
                                         else:
@@ -327,6 +327,7 @@ class IAMCleanup:
                                                 "details in a reasonable amount of time."
                                             )
                                             resource_action = "ERROR"
+                                            continue
 
                             if get_last_accessed.get("JobStatus") == "COMPLETED":
                                 last_accessed = (
