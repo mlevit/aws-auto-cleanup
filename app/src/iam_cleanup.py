@@ -25,8 +25,119 @@ class IAMCleanup:
         return self._client_iam
 
     def run(self):
+        self.access_keys()
         self.policies()
         self.roles()
+
+    def access_keys(self):
+        """
+        Deletes IAM Access Keys.
+        """
+
+        self.logging.debug("Started cleanup of IAM Access Keys.")
+
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.access_key.clean", False
+        )
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.iam.access_key.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.access_key")
+
+        if is_cleaning_enabled:
+            try:
+                paginator = self.client_iam.get_paginator("list_access_keys")
+                resources = (
+                    paginator.paginate().build_full_result().get("AccessKeyMetadata")
+                )
+            except:
+                self.logging.error("Could not list all IAM Access Keys.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for resource in resources:
+                resource_id = resource.get("AccessKeyId")
+                resource_status = resource.get("Status")
+
+                if resource_id not in resource_whitelist:
+                    try:
+                        resource_details = self.client_iam.get_access_key_last_used(
+                            AccessKeyId=resource_id
+                        ).get("AccessKeyLastUsed")
+                    except:
+                        self.logging.error(
+                            f"Could not get IAM Access Key's '{resource_id}' details."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        resource_action = "ERROR"
+                    else:
+                        resource_date = resource_details.get(
+                            "resource_details", resource.get("CreateDate")
+                        )
+                        resource_age = Helper.get_day_delta(resource_date).days
+                        resource_action = None
+
+                        if resource_status == "Inactive":
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_iam.delete_access_key(
+                                        AccessKeyId=resource_id
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete IAM Access Key '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"IAM Access Key '{resource_id}' in state '{resource_status}' has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        elif resource_age > maximum_resource_age:
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_iam.delete_access_key(
+                                        AccessKeyId=resource_id
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete IAM Access Key '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"IAM Access Key '{resource_id}' was last used {resource_age} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"IAM Access Key '{resource_id}' was last used {resource_age} days ago "
+                                "(less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
+                else:
+                    self.logging.debug(
+                        f"IAM Access Key '{resource_id}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "IAM",
+                    "Access Key",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug("Finished cleanup of IAM Access Keys.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of IAM Access Keys.")
+            return True
 
     def policies(self):
         """
