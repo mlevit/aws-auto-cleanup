@@ -222,7 +222,16 @@ class EC2Cleanup:
             try:
                 paginator = self.client_ec2.get_paginator("describe_instances")
                 reservations = (
-                    paginator.paginate().build_full_result().get("Reservations")
+                    paginator.paginate(
+                        Filters=[
+                            {
+                                "Name": "state-reason-message",
+                                "Values": ["running", "stopped"],
+                            },
+                        ]
+                    )
+                    .build_full_result()
+                    .get("Reservations")
                 )
             except:
                 self.logging.error("Could not list all EC2 Instances.")
