@@ -25,16 +25,15 @@ class IAMCleanup:
         return self._client_iam
 
     def run(self):
-        self.access_keys()
         self.policies()
         self.roles()
 
-    def access_keys(self):
+    def access_keys(self, user):
         """
-        Deletes IAM Access Keys.
+        Deletes IAM Access Keys for a User.
         """
 
-        self.logging.debug("Started cleanup of IAM Access Keys.")
+        self.logging.debug(f"Started cleanup of IAM Access Keys for IAM User '{user}'.")
 
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.access_key.clean", False
@@ -48,10 +47,14 @@ class IAMCleanup:
             try:
                 paginator = self.client_iam.get_paginator("list_access_keys")
                 resources = (
-                    paginator.paginate().build_full_result().get("AccessKeyMetadata")
+                    paginator.paginate(UserName=user)
+                    .build_full_result()
+                    .get("AccessKeyMetadata")
                 )
             except:
-                self.logging.error("Could not list all IAM Access Keys.")
+                self.logging.error(
+                    f"Could not list all IAM Access Keys for IAM User '{user}'."
+                )
                 self.logging.error(sys.exc_info()[1])
                 return False
 
@@ -81,7 +84,7 @@ class IAMCleanup:
                             try:
                                 if not self.is_dry_run:
                                     self.client_iam.delete_access_key(
-                                        AccessKeyId=resource_id
+                                        UserName=user, AccessKeyId=resource_id
                                     )
                             except:
                                 self.logging.error(
@@ -98,7 +101,7 @@ class IAMCleanup:
                             try:
                                 if not self.is_dry_run:
                                     self.client_iam.delete_access_key(
-                                        AccessKeyId=resource_id
+                                        UserName=user, AccessKeyId=resource_id
                                     )
                             except:
                                 self.logging.error(
@@ -133,10 +136,14 @@ class IAMCleanup:
                     resource_action,
                 )
 
-            self.logging.debug("Finished cleanup of IAM Access Keys.")
+            self.logging.debug(
+                f"Finished cleanup of IAM Access Keys for IAM User '{user}'."
+            )
             return True
         else:
-            self.logging.info("Skipping cleanup of IAM Access Keys.")
+            self.logging.info(
+                f"Skipping cleanup of IAM Access Keys for IAM User '{user}'."
+            )
             return True
 
     def policies(self):
