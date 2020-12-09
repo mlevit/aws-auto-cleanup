@@ -1,4 +1,5 @@
 import sys
+import threading
 
 import boto3
 
@@ -50,108 +51,125 @@ class S3Cleanup:
 
         if is_cleaning_enabled:
             try:
-                resources = self.client_s3.list_buckets()
+                resources = self.client_s3.list_buckets().get("Buckets")
             except:
                 self.logging.error("Could not list all S3 Buckets.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            for resource in resources.get("Buckets"):
-                resource_id = resource.get("Name")
-                resource_date = resource.get("CreationDate")
-                resource_age = Helper.get_day_delta(resource_date).days
-                resource_action = None
+            # threads list
+            threads = []
 
-                if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
-                        # delete bucket policy
-                        try:
-                            if not self.is_dry_run:
-                                self.client_s3.delete_bucket_policy(Bucket=resource_id)
-                        except:
-                            self.logging.error(
-                                f"Could not delete Bucket Policy for S3 Bucket '{resource_id}'."
-                            )
-                            self.logging.error(sys.exc_info()[1])
-                            resource_action = "ERROR"
-                        else:
-                            self.logging.debug(
-                                f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
-                            )
-
-                            bucket_resource = self.resource_s3.Bucket(resource_id)
-
-                            # delete all objects
-                            try:
-                                if not self.is_dry_run:
-                                    bucket_resource.objects.delete()
-                            except:
-                                self.logging.error(
-                                    f"Could not delete all Objects from S3 Bucket '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.debug(
-                                    f"Deleted all Objects from S3 Bucket '{resource_id}'."
-                                )
-
-                                # delete all Versions and DeleteMarkers
-                                try:
-                                    if not self.is_dry_run:
-                                        bucket_resource.object_versions.delete()
-                                except:
-                                    self.logging.error(
-                                        f"Could not get all Versions and Delete Markers from S3 Bucket '{resource_id}'."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "ERROR"
-                                else:
-                                    self.logging.debug(
-                                        f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
-                                    )
-
-                                    # delete bucket
-                                    try:
-                                        if not self.is_dry_run:
-                                            self.client_s3.delete_bucket(
-                                                Bucket=resource_id
-                                            )
-                                    except:
-                                        self.logging.error(
-                                            f"Could not delete S3 Bucket '{resource_id}'."
-                                        )
-                                        self.logging.error(sys.exc_info()[1])
-                                        resource_action = "ERROR"
-                                    else:
-                                        self.logging.info(
-                                            f"S3 Bucket '{resource_id}' was created {resource_age} days ago "
-                                            "and has been deleted."
-                                        )
-                                        resource_action = "DELETE"
-                    else:
-                        self.logging.debug(
-                            f"S3 Bucket '{resource_id}' was created {resource_age} days ago "
-                            "(less than TTL setting) and has not been deleted."
-                        )
-                        resource_action = "SKIP - TTL"
-                else:
-                    self.logging.debug(
-                        f"S3 Bucket '{resource_id}' has been whitelisted and has not been deleted."
+            for resource in resources:
+                threads.append(
+                    threading.Thread(
+                        target=self.delete_bucket,
+                        args=(resource, resource_whitelist, maximum_resource_age),
                     )
-                    resource_action = "SKIP - WHITELIST"
-
-                Helper.record_execution_log_action(
-                    self.execution_log,
-                    self.region,
-                    "S3",
-                    "Bucket",
-                    resource_id,
-                    resource_action,
                 )
+
+            # start all threads
+            for thread in threads:
+                thread.start()
+
+            # make sure that all threads have finished
+            for thread in threads:
+                thread.join()
 
             self.logging.debug("Finished cleanup of S3 Buckets.")
             return True
         else:
             self.logging.info("Skipping cleanup of S3 Buckets.")
             return True
+
+    def delete_bucket(self, resource, resource_whitelist, maximum_resource_age):
+        resource_id = resource.get("Name")
+        resource_date = resource.get("CreationDate")
+        resource_age = Helper.get_day_delta(resource_date).days
+        resource_action = None
+
+        if resource_id not in resource_whitelist:
+            if resource_age > maximum_resource_age:
+                # delete bucket policy
+                try:
+                    if not self.is_dry_run:
+                        self.client_s3.delete_bucket_policy(Bucket=resource_id)
+                except:
+                    self.logging.error(
+                        f"Could not delete Bucket Policy for S3 Bucket '{resource_id}'."
+                    )
+                    self.logging.error(sys.exc_info()[1])
+                    resource_action = "ERROR"
+                else:
+                    self.logging.debug(
+                        f"Deleted Bucket Policy for S3 Bucket '{resource_id}'."
+                    )
+
+                    bucket_resource = self.resource_s3.Bucket(resource_id)
+
+                    # delete all objects
+                    try:
+                        if not self.is_dry_run:
+                            bucket_resource.objects.delete()
+                    except:
+                        self.logging.error(
+                            f"Could not delete all Objects from S3 Bucket '{resource_id}'."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        resource_action = "ERROR"
+                    else:
+                        self.logging.debug(
+                            f"Deleted all Objects from S3 Bucket '{resource_id}'."
+                        )
+
+                        # delete all Versions and DeleteMarkers
+                        try:
+                            if not self.is_dry_run:
+                                bucket_resource.object_versions.delete()
+                        except:
+                            self.logging.error(
+                                f"Could not get all Versions and Delete Markers from S3 Bucket '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.debug(
+                                f"Deleted all Versions and Delete Markers from S3 Bucket '{resource_id}'."
+                            )
+
+                            # delete bucket
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_s3.delete_bucket(Bucket=resource_id)
+                            except:
+                                self.logging.error(
+                                    f"Could not delete S3 Bucket '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"S3 Bucket '{resource_id}' was created {resource_age} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+            else:
+                self.logging.debug(
+                    f"S3 Bucket '{resource_id}' was created {resource_age} days ago "
+                    "(less than TTL setting) and has not been deleted."
+                )
+                resource_action = "SKIP - TTL"
+        else:
+            self.logging.debug(
+                f"S3 Bucket '{resource_id}' has been whitelisted and has not been deleted."
+            )
+            resource_action = "SKIP - WHITELIST"
+
+        Helper.record_execution_log_action(
+            self.execution_log,
+            self.region,
+            "S3",
+            "Bucket",
+            resource_id,
+            resource_action,
+        )
