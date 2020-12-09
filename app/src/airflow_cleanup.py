@@ -63,6 +63,7 @@ class AirflowCleanup:
                         f"Could not get Airflow Environment's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "ERROR"
                 else:
                     resource_date = resource_details.get("CreatedAt")
                     resource_age = Helper.get_day_delta(resource_date).days

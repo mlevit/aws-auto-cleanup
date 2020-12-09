@@ -59,6 +59,7 @@ class DynamoDBCleanup:
                         f"Could not get DynamoDB Table's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
+                    resource_action = "ERROR"
                 else:
                     resource_date = resource_details.get("CreationDateTime")
                     resource_age = Helper.get_day_delta(resource_date).days

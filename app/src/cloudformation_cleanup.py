@@ -199,6 +199,7 @@ class CloudFormationCleanup:
                     f"Could not Describe Stack Resources for CloudFormation Stack '{resource_id}'."
                 )
                 self.logging.error(sys.exc_info()[1])
+                resource_action = "ERROR"
             else:
                 for stack_resource in resource_details:
                     resource_child_id = stack_resource.get("PhysicalResourceId")
