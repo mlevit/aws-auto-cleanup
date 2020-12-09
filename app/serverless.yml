@@ -151,6 +151,7 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - iam:DeleteAccessKey
         - iam:DeleteInstanceProfile
         - iam:DeletePolicy
         - iam:DeletePolicyVersion
@@ -160,7 +161,9 @@ provider:
         - iam:DetachRolePolicy
         - iam:DetachUserPolicy
         - iam:GenerateServiceLastAccessedDetails
+        - iam:GetAccessKeyLastUsed
         - iam:GetServiceLastAccessedDetails
+        - iam:ListAccessKeys
         - iam:ListAttachedRolePolicies
         - iam:ListEntitiesForPolicy
         - iam:ListInstanceProfilesForRole
