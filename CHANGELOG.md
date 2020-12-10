@@ -3,6 +3,7 @@
 ## 1.4.0
 
 - Added ability to whitelist entries directly from the execution log.
+- Added IAM Access Key and User cleanup.
 - Added Managed Workflows for Apache Airflow cleanup.
 - Added paginated resource retrieval where possible.
 - Added parallel cleanup of S3 Buckets.

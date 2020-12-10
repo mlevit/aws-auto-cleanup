@@ -153,6 +153,7 @@ provider:
       Action:
         - iam:DeleteAccessKey
         - iam:DeleteInstanceProfile
+        - iam:DeleteLoginProfile
         - iam:DeletePolicy
         - iam:DeletePolicyVersion
         - iam:DeleteRole
