@@ -741,6 +741,9 @@ class IAMCleanup:
         try:
             if not self.is_dry_run:
                 self.client_iam.delete_login_profile(UserName=user)
+        except self.client_iam.exceptions.NoSuchEntityException:
+            self.logging.debug(f"No Login Profile to delete for IAM User '{user}'.")
+            return True
         except:
             self.logging.error(f"Could not delete IAM User '{user}' Login Profile.")
             self.logging.error(sys.exc_info()[1])
@@ -837,6 +840,11 @@ class IAMCleanup:
                         try:
                             if not self.is_dry_run:
                                 self.client_iam.delete_user(UserName=resource_id)
+                        except self.client_iam.exceptions.DeleteConflictException:
+                            self.logging.debug(
+                                f"IAM User '{resource_id}' has dependent objects and has not been deleted."
+                            )
+                            resource_action = "SKIP - IN USE"
                         except:
                             self.logging.error(
                                 f"Could not delete IAM User '{resource_id}'."
