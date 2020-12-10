@@ -39,12 +39,13 @@ class CloudFormationCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.cloudformation.stack.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.cloudformation.stack.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(
             self.whitelist, "cloudformation.stack"
         )
+        semaphore = threading.Semaphore(value=1)
 
         if is_cleaning_enabled:
             try:
@@ -62,7 +63,12 @@ class CloudFormationCleanup:
                 threads.append(
                     threading.Thread(
                         target=self.delete_stack,
-                        args=(resource, resource_whitelist, maximum_resource_age),
+                        args=(
+                            semaphore,
+                            resource,
+                            resource_whitelist,
+                            resource_maximum_age,
+                        ),
                     )
                 )
 
@@ -79,7 +85,11 @@ class CloudFormationCleanup:
             self.logging.info("Skipping cleanup of CloudFormation Stacks.")
             return True
 
-    def delete_stack(self, resource, resource_whitelist, maximum_resource_age):
+    def delete_stack(
+        self, semaphore, resource, resource_whitelist, resource_maximum_age
+    ):
+        semaphore.acquire()
+
         resource_id = resource.get("StackName")
         resource_date = resource.get("LastUpdatedTime", resource.get("CreationTime"))
         resource_status = resource.get("StackStatus")
@@ -88,91 +98,79 @@ class CloudFormationCleanup:
         resource_action = None
 
         if resource_id not in resource_whitelist:
-            if resource_age > maximum_resource_age:
-                # form a list of resources that cannot be delete
-                retain_resources = []
-                if resource_status in ("DELETE_FAILED"):
-                    try:
-                        paginator = self.client_cloudformation.get_paginator(
-                            "list_stack_resources"
-                        )
-                        stack_resources = (
-                            paginator.paginate(StackName=resource_id)
-                            .build_full_result()
-                            .get("StackResourceSummaries")
-                        )
-                    except:
-                        self.logging.error(
-                            f"Could not retrieve a list of Stack Resources for CloudFormation Stack '{resource_id}'."
-                        )
-                        self.logging.error(sys.exc_info()[1])
-                        resource_action = "ERROR"
-                    else:
-                        for stack_resource in stack_resources:
-                            if stack_resource.get("ResourceStatus") in (
-                                "DELETE_FAILED"
-                            ) and stack_resource.get("ResourceType") in (
-                                "AWS::S3::Bucket"
-                            ):
-                                retain_resources.append(
-                                    stack_resource.get("LogicalResourceId")
+            if resource_age > resource_maximum_age:
+                if resource_status not in (
+                    "DELETE_PENDING",
+                    "DELETE_IN_PROGRESS",
+                    "DELETE_COMPLETE",
+                ):
+                    # form a list of resources that cannot be delete
+                    retain_resources = []
+                    if resource_status in ("DELETE_FAILED"):
+                        try:
+                            paginator = self.client_cloudformation.get_paginator(
+                                "list_stack_resources"
+                            )
+                            stack_resources = (
+                                paginator.paginate(StackName=resource_id)
+                                .build_full_result()
+                                .get("StackResourceSummaries")
+                            )
+                        except:
+                            self.logging.error(
+                                f"Could not retrieve a list of Stack Resources for CloudFormation Stack '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            for stack_resource in stack_resources:
+                                if stack_resource.get("ResourceStatus") in (
+                                    "DELETE_FAILED"
+                                ) and stack_resource.get("ResourceType") in (
+                                    "AWS::S3::Bucket"
+                                ):
+                                    retain_resources.append(
+                                        stack_resource.get("LogicalResourceId")
+                                    )
+
+                    # remove termination protection
+                    if resource_protection:
+                        try:
+                            if not self.is_dry_run:
+                                self.client_cloudformation.update_termination_protection(
+                                    EnableTerminationProtection=False,
+                                    StackName=resource_id,
                                 )
+                        except:
+                            self.logging.error(
+                                f"Could not disable Termination Protection for CloudFormation Stack '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.debug(
+                                f"Termination Protection for CloudFormation Stack '{resource_id}' disabled."
+                            )
 
-                # remove termination protection
-                if resource_protection:
                     try:
                         if not self.is_dry_run:
-                            self.client_cloudformation.update_termination_protection(
-                                EnableTerminationProtection=False,
+                            self.client_cloudformation.delete_stack(
                                 StackName=resource_id,
+                                RetainResources=retain_resources,
                             )
                     except:
                         self.logging.error(
-                            f"Could not disable Termination Protection for CloudFormation Stack '{resource_id}'."
+                            f"Could not delete CloudFormation Stack '{resource_id}'. "
+                            "Manual deletion by an administrator might be necessary."
                         )
                         self.logging.error(sys.exc_info()[1])
                         resource_action = "ERROR"
-                    else:
-                        self.logging.debug(
-                            f"Termination Protection for CloudFormation Stack '{resource_id}' disabled."
-                        )
-
-                try:
-                    if not self.is_dry_run:
-                        self.client_cloudformation.delete_stack(
-                            StackName=resource_id,
-                            RetainResources=retain_resources,
-                        )
-                except:
-                    self.logging.error(
-                        f"Could not delete CloudFormation Stack '{resource_id}'. "
-                        "Manual deletion by an administrator might be necessary."
-                    )
-                    self.logging.error(sys.exc_info()[1])
-                    resource_action = "ERROR"
-                else:
-                    try:
-                        if not self.is_dry_run:
-                            waiter = self.client_cloudformation.get_waiter(
-                                "stack_delete_complete"
-                            )
-                            waiter.wait(
-                                StackName=resource_id,
-                                WaiterConfig={"Delay": 5, "MaxAttempts": 6},
-                            )
-                    except:
-                        self.logging.warn(
-                            f"Did not delete CloudFormation Stack '{resource_id}' within 30 seconds. "
-                            "Stopped waiting, check progress manually."
-                        )
-                        self.logging.warn(sys.exc_info()[1])
-                        resource_action = "DELETE - NOT CONFIRMED"
                     else:
                         self.logging.info(
                             f"CloudFormation Stack '{resource_id}' was last modified {resource_age} days ago "
-                            "and has been deleted."
+                            "and has started being deleted. Check progress manually."
                         )
-                        resource_action = "DELETE"
+                        resource_action = "DELETE - NOT CONFIRMED"
             else:
                 self.logging.debug(
                     f"CloudFormation Stack '{resource_id}' was last modified {resource_age} days ago "
@@ -203,15 +201,14 @@ class CloudFormationCleanup:
             else:
                 for stack_resource in resource_details:
                     resource_child_id = stack_resource.get("PhysicalResourceId")
+                    resource_type = stack_resource.get("ResourceType")
 
                     try:
-                        _, service, resource = stack_resource.get("ResourceType").split(
-                            "::"
-                        )
+                        _, service, resource = resource_type.split("::")
                     except:
-                        self.logging.warn(
-                            f"""CloudFormation Stack '{resource_id}' resource '{stack_resource.get("ResourceType")}' """
-                            """does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."""
+                        self.logging.debug(
+                            f"CloudFormation Stack '{resource_id}' resource '{resource_type}' "
+                            "does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."
                         )
                     else:
                         self.whitelist[service.lower()][resource.lower()].add(
@@ -230,5 +227,7 @@ class CloudFormationCleanup:
             resource_id,
             resource_action,
         )
+
+        semaphore.release()
 
         return True
