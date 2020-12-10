@@ -140,6 +140,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Policies                   | Policy Name            | `iam:policy:policy_name`                             |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
+| IAM Users                      | User Name              | `iam:user:user_name`                                 |
 | Kafka Clusters                 | Cluster Name           | `kafka:cluster:cluster_name`                         |
 | Kinesis Streams                | Stream Name            | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name          | `lambda:function:function_name`                      |
@@ -219,6 +220,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | Glue                  | Dev Endpoints            | True  | 7   |                                                                |
 | IAM                   | Policies :new:           | True  | 30  |                                                                |
 | IAM                   | Roles                    | True  | 30  |                                                                |
+| IAM                   | Users :new:              | True  | 30  |                                                                |
 | Kafka                 | Clusters :new:           | True  | 7   |                                                                |
 | Kinesis               | Streams :new:            | True  | 7   |                                                                |
 | Lambda                | Functions                | True  | 30  |                                                                |
