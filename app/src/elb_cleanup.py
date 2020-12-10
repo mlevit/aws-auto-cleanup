@@ -35,7 +35,7 @@ class ELBCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.elb.load_balancer.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.elb.load_balancer.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "elb.load_balancer")
@@ -59,7 +59,7 @@ class ELBCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_elb.modify_load_balancer_attributes(

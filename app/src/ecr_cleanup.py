@@ -35,7 +35,7 @@ class ECRCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ecr.repository.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ecr.repository.ttl", 7
         )
         whitelisted_resources = Helper.get_whitelist(self.whitelist, "ecr.repository")
@@ -75,7 +75,7 @@ class ECRCleanup:
                         resource_action = "ERROR"
                     else:
                         if len(list_images) == 0:
-                            if resource_age > maximum_resource_age:
+                            if resource_age > resource_maximum_age:
                                 try:
                                     if not self.is_dry_run:
                                         self.client_ecr.delete_repository(
@@ -137,7 +137,7 @@ class ECRCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ecr.image.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ecr.image.ttl", 7
         )
         whitelisted_resources = Helper.get_whitelist(self.whitelist, "ecr.image")
@@ -164,7 +164,7 @@ class ECRCleanup:
                 resource_action = None
 
                 if resource_id not in whitelisted_resources:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_ecr.batch_delete_image(

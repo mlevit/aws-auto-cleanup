@@ -37,7 +37,7 @@ class SageMakerCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.sagemaker.app.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.sagemaker.app.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "sagemaker.app")
@@ -62,7 +62,7 @@ class SageMakerCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource_status in ("Failed", "InService"):
                             try:
                                 if not self.is_dry_run:
@@ -121,7 +121,7 @@ class SageMakerCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.sagemaker.endpoint.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.sagemaker.endpoint.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "sagemaker.endpoint")
@@ -143,7 +143,7 @@ class SageMakerCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource_status in (
                             "OutOfService",
                             "InService",
@@ -203,7 +203,7 @@ class SageMakerCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.sagemaker.notebook_instance.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.sagemaker.notebook_instance.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(
@@ -231,7 +231,7 @@ class SageMakerCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource_status == "InService":
                             try:
                                 if not self.is_dry_run:

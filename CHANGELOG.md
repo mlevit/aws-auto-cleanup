@@ -8,6 +8,7 @@
 - Added paginated resource retrieval where possible.
 - Added parallel cleanup of S3 Buckets.
 - Added SageMaker App cleanup.
+- Removed CloudFormation Stack deletion waiting as it was raising API throttling errors.
 
 ## 1.3.0
 

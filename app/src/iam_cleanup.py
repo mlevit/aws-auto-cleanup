@@ -39,7 +39,7 @@ class IAMCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.access_key.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.access_key.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.access_key")
@@ -98,7 +98,7 @@ class IAMCleanup:
                                     f"IAM Access Key '{resource_id}' for IAM User '{user}' in state '{resource_status}' has been deleted."
                                 )
                                 resource_action = "DELETE"
-                        elif resource_age > maximum_resource_age:
+                        elif resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_iam.delete_access_key(
@@ -157,7 +157,7 @@ class IAMCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.policy.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.policy.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.policy")
@@ -181,7 +181,7 @@ class IAMCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource.get("AttachmentCount") > 0:
                             # - Detach the policy from all users, groups, and roles that the policy is attached to,
                             #   using the DetachUserPolicy, DetachGroupPolicy, or DetachRolePolicy API operations.
@@ -372,7 +372,7 @@ class IAMCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.role.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.role.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.role")
@@ -395,7 +395,7 @@ class IAMCleanup:
 
                 if "AWSServiceRoleFor" not in resource_id:
                     if resource_id not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             # check when the role was last accessed
                             try:
                                 gen_last_accessed = self.client_iam.generate_service_last_accessed_details(
@@ -468,7 +468,7 @@ class IAMCleanup:
 
                                 delta = Helper.get_day_delta(last_accessed)
 
-                                if resource_age > maximum_resource_age:
+                                if resource_age > resource_maximum_age:
                                     # delete all inline policies
                                     try:
                                         paginator = self.client_iam.get_paginator(
@@ -667,7 +667,7 @@ class IAMCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.user_policy.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.user_policy.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user_policy")
@@ -808,7 +808,7 @@ class IAMCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.user.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.user.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user")
@@ -831,7 +831,7 @@ class IAMCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         self.access_keys(resource_id)
                         self.user_policies(resource_id)
                         self.delete_login_profile(resource_id)

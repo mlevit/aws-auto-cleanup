@@ -38,7 +38,7 @@ class RDSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.rds.instance.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.rds.instance.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "rds.instance")
@@ -59,7 +59,7 @@ class RDSCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource.get("DeletionProtection"):
                             try:
                                 if not self.is_dry_run:
@@ -135,7 +135,7 @@ class RDSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.rds.snapshot.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.rds.snapshot.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "rds.snapshot")
@@ -160,7 +160,7 @@ class RDSCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_rds.delete_db_snapshot(

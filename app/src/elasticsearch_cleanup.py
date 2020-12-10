@@ -35,7 +35,7 @@ class ElasticsearchServiceCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.elasticsearch.domain.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.elasticsearch.domain.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(
@@ -75,7 +75,7 @@ class ElasticsearchServiceCleanup:
                     resource_action = None
 
                     if resource_id not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_elasticsearch.delete_elasticsearch_domain(

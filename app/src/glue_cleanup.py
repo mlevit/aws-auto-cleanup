@@ -37,7 +37,7 @@ class GlueCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.glue.crawler.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.glue.crawler.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.crawler")
@@ -59,7 +59,7 @@ class GlueCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource_status != "RUNNING":
                             try:
                                 if not self.is_dry_run:
@@ -118,7 +118,7 @@ class GlueCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.glue.database.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.glue.database.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.database")
@@ -139,7 +139,7 @@ class GlueCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_glue.delete_database(Name=resource_id)
@@ -192,7 +192,7 @@ class GlueCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.glue.dev_endpoint.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.glue.dev_endpoint.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.dev_endpoint")
@@ -213,7 +213,7 @@ class GlueCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_glue.delete_dev_endpoint(

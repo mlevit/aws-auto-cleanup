@@ -35,7 +35,7 @@ class EKSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.eks.cluster.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.eks.cluster.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "eks.cluster")
@@ -92,7 +92,7 @@ class EKSCleanup:
                             len(list_fargate_profiles) == 0
                             and len(list_nodegroups) == 0
                         ):
-                            if resource_age > maximum_resource_age:
+                            if resource_age > resource_maximum_age:
                                 try:
                                     if not self.is_dry_run:
                                         self.client_eks.delete_cluster(name=resource_id)
@@ -152,7 +152,7 @@ class EKSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.eks.fargate_profile.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.eks.fargate_profile.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "eks.fargate_profile")
@@ -189,7 +189,7 @@ class EKSCleanup:
                     resource_action = None
 
                     if resource_id not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_eks.delete_fargate_profile(
@@ -251,7 +251,7 @@ class EKSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.eks.node_group.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.eks.node_group.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "eks.node_group")
@@ -288,7 +288,7 @@ class EKSCleanup:
                     resource_action = None
 
                     if resource_id not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_eks.delete_nodegroup(

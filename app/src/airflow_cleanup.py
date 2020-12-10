@@ -36,7 +36,7 @@ class AirflowCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.airflow.environment.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.airflow.environment.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "airflow.environment")
@@ -70,7 +70,7 @@ class AirflowCleanup:
                     resource_action = None
 
                     if resource not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_airflow.delete_environment(

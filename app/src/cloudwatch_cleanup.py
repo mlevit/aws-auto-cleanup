@@ -36,7 +36,7 @@ class CloudWatchCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.cloudwatch.log_group.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.cloudwatch.log_group.ttl", 30
         )
         resource_whitelist = Helper.get_whitelist(
@@ -61,7 +61,7 @@ class CloudWatchCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_logs.delete_log_group(

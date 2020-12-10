@@ -35,7 +35,7 @@ class EFSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.efs.file_system.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.efs.file_system.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "efs.file_system")
@@ -57,7 +57,7 @@ class EFSCleanup:
                 resource_action = None
 
                 if resource_id not in resource_whitelist:
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         if resource_number_of_mount_targets > 0:
                             try:
                                 resource_mount_targets = (

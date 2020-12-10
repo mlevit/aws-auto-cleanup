@@ -58,7 +58,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.address.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.address.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.address")
@@ -132,7 +132,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.image.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.image.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.image")
@@ -157,7 +157,7 @@ class EC2Cleanup:
                 if resource_id not in resource_whitelist:
                     resource_age = Helper.get_day_delta(resource_date).days
 
-                    if resource_age > maximum_resource_age:
+                    if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
                                 self.client_ec2.deregister_image(ImageId=resource_id)
@@ -213,7 +213,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.instance.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.instance.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.instance")
@@ -247,7 +247,7 @@ class EC2Cleanup:
                     resource_action = None
 
                     if resource_id not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             if resource_state == "running":
                                 try:
                                     if not self.is_dry_run:
@@ -360,7 +360,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.security_group.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.security_group.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.security_group")
@@ -405,7 +405,7 @@ class EC2Cleanup:
                             self.client_ec2.delete_security_group(GroupId=resource)
                     except:
                         if "DependencyViolation" in str(sys.exc_info()[1]):
-                            self.logging.warn(
+                            self.logging.debug(
                                 f"EC2 Security Group '{resource}' has a dependent object "
                                 "and cannot been deleted without deleting the dependent object first."
                             )
@@ -448,7 +448,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.snapshot.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.snapshot.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.snapshot")
@@ -502,7 +502,7 @@ class EC2Cleanup:
                         if resource_id not in snapshots_in_use:
                             resource_age = Helper.get_day_delta(resource_date).days
 
-                            if resource_age > maximum_resource_age:
+                            if resource_age > resource_maximum_age:
                                 try:
                                     if not self.is_dry_run:
                                         self.client_ec2.delete_snapshot(
@@ -563,7 +563,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.volume.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.volume.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.volume")
@@ -586,7 +586,7 @@ class EC2Cleanup:
                     if resource.get("Attachments") == []:
                         resource_age = Helper.get_day_delta(resource_date).days
 
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_ec2.delete_volume(VolumeId=resource_id)

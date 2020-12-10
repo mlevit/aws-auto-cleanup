@@ -35,7 +35,7 @@ class DynamoDBCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.dynamodb.table.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.dynamodb.table.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "dynamodb.table")
@@ -66,7 +66,7 @@ class DynamoDBCleanup:
                     resource_action = None
 
                     if resource not in resource_whitelist:
-                        if resource_age > maximum_resource_age:
+                        if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
                                     self.client_dynamodb.delete_table(

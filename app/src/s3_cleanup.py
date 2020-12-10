@@ -44,10 +44,11 @@ class S3Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.s3.bucket.clean", False
         )
-        maximum_resource_age = Helper.get_setting(
+        resource_maximum_age = Helper.get_setting(
             self.settings, "services.s3.bucket.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "s3.bucket")
+        semaphore = threading.Semaphore(value=5)
 
         if is_cleaning_enabled:
             try:
@@ -64,7 +65,12 @@ class S3Cleanup:
                 threads.append(
                     threading.Thread(
                         target=self.delete_bucket,
-                        args=(resource, resource_whitelist, maximum_resource_age),
+                        args=(
+                            semaphore,
+                            resource,
+                            resource_whitelist,
+                            resource_maximum_age,
+                        ),
                     )
                 )
 
@@ -82,14 +88,18 @@ class S3Cleanup:
             self.logging.info("Skipping cleanup of S3 Buckets.")
             return True
 
-    def delete_bucket(self, resource, resource_whitelist, maximum_resource_age):
+    def delete_bucket(
+        self, semaphore, resource, resource_whitelist, resource_maximum_age
+    ):
+        semaphore.acquire()
+
         resource_id = resource.get("Name")
         resource_date = resource.get("CreationDate")
         resource_age = Helper.get_day_delta(resource_date).days
         resource_action = None
 
         if resource_id not in resource_whitelist:
-            if resource_age > maximum_resource_age:
+            if resource_age > resource_maximum_age:
                 # delete bucket policy
                 try:
                     if not self.is_dry_run:
@@ -173,3 +183,7 @@ class S3Cleanup:
             resource_id,
             resource_action,
         )
+
+        semaphore.release()
+
+        return True
