@@ -89,13 +89,13 @@ class IAMCleanup:
                                     )
                             except:
                                 self.logging.error(
-                                    f"Could not delete IAM Access Key '{resource_id}'."
+                                    f"Could not delete IAM Access Key '{resource_id}' for IAM User '{user}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"IAM Access Key '{resource_id}' in state '{resource_status}' has been deleted."
+                                    f"IAM Access Key '{resource_id}' for IAM User '{user}' in state '{resource_status}' has been deleted."
                                 )
                                 resource_action = "DELETE"
                         elif resource_age > maximum_resource_age:
@@ -106,25 +106,25 @@ class IAMCleanup:
                                     )
                             except:
                                 self.logging.error(
-                                    f"Could not delete IAM Access Key '{resource_id}'."
+                                    f"Could not delete IAM Access Key '{resource_id}' for IAM User '{user}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"IAM Access Key '{resource_id}' was last used {resource_age} days ago "
-                                    "and has been deleted."
+                                    f"IAM Access Key '{resource_id}' for IAM User '{user}' was "
+                                    f"last used {resource_age} days ago and has been deleted."
                                 )
                                 resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"IAM Access Key '{resource_id}' was last used {resource_age} days ago "
-                                "(less than TTL setting) and has not been deleted."
+                                f"IAM Access Key '{resource_id}' for IAM User '{user}' was last "
+                                f"used {resource_age} days ago (less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"IAM Access Key '{resource_id}' has been whitelisted and has not been deleted."
+                        f"IAM Access Key '{resource_id}' for IAM User '{user}' has been whitelisted and has not been deleted."
                     )
                     resource_action = "SKIP - WHITELIST"
 
@@ -655,21 +655,149 @@ class IAMCleanup:
             self.logging.info("Skipping cleanup of IAM Roles.")
             return True
 
+    def user_policies(self, user):
+        """
+        Deletes IAM User Policies.
+        """
+
+        self.logging.debug(
+            f"Started cleanup of IAM User Policies for IAM User '{user}'."
+        )
+
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.user_policy.clean", False
+        )
+        maximum_resource_age = Helper.get_setting(
+            self.settings, "services.iam.user_policy.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user_policy")
+
+        if is_cleaning_enabled:
+            try:
+                paginator = self.client_iam.get_paginator("list_user_policies")
+                resources = (
+                    paginator.paginate(UserName=user)
+                    .build_full_result()
+                    .get("PolicyNames")
+                )
+            except:
+                self.logging.error(
+                    f"Could not list all IAM User Policies for IAM User '{user}'."
+                )
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for resource in resources:
+                resource_id = resource
+                resource_action = None
+
+                if resource_id not in resource_whitelist:
+                    try:
+                        if not self.is_dry_run:
+                            self.client_iam.delete_user_policy(
+                                UserName=user, PolicyName=resource_id
+                            )
+                    except:
+                        self.logging.error(
+                            f"Could not delete IAM User Policy '{resource_id}' for IAM User '{user}'."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        resource_action = "ERROR"
+                    else:
+                        self.logging.info(
+                            f"IAM User Policy '{resource_id}' for IAM User '{user}' has been deleted."
+                        )
+                        resource_action = "DELETE"
+                else:
+                    self.logging.debug(
+                        f"IAM User Policy '{resource_id}' for IAM User '{user}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "IAM",
+                    "User Policy",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug(
+                f"Finished cleanup of IAM User Policies for IAM User '{user}'."
+            )
+            return True
+        else:
+            self.logging.info(
+                f"Skipping cleanup of IAM User Policies for IAM User '{user}'."
+            )
+            return True
+
+    def delete_login_profile(self, user):
+        """
+        Deletes IAM Login Profile.
+        """
+
+        try:
+            if not self.is_dry_run:
+                self.client_iam.delete_login_profile(UserName=user)
+        except:
+            self.logging.error(f"Could not delete IAM User '{user}' Login Profile.")
+            self.logging.error(sys.exc_info()[1])
+            return False
+        else:
+            self.logging.debug(f"Deleted Login Profile for IAM User '{user}'.")
+            return True
+
+    def remove_user_from_group(self, user):
+        """
+        Removes IAM User from IAM Group.
+        """
+
+        try:
+            paginator = self.client_iam.get_paginator("list_groups_for_user")
+            resources = (
+                paginator.paginate(UserName=user).build_full_result().get("Groups")
+            )
+        except:
+            self.logging.error(f"Could not list all IAM Groups for IAM User '{user}'.")
+            self.logging.error(sys.exc_info()[1])
+            return False
+
+        for resource in resources:
+            resource_id = resource.get("GroupName")
+
+            try:
+                self.client_iam.remove_user_from_group(
+                    GroupName=resource_id, UserName=user
+                )
+            except:
+                self.logging.error(
+                    f"Could not remove IAM User '{user}' from IAM Group '{resource_id}'."
+                )
+                self.logging.error(sys.exc_info()[1])
+            else:
+                self.logging.debug(
+                    f"Removed IAM User '{user}' from IAM Group '{resource_id}'."
+                )
+
+            return True
+
     def users(self):
         """
         Deletes IAM Users.
 
         Before attempting to delete a user, remove the following items:
 
-          - Password ( DeleteLoginProfile )
-          - Access keys ( DeleteAccessKey )
-          - Signing certificate ( DeleteSigningCertificate )
-          - SSH public key ( DeleteSSHPublicKey )
-          - Git credentials ( DeleteServiceSpecificCredential )
-          - Multi-factor authentication (MFA) device ( DeactivateMFADevice , DeleteVirtualMFADevice )
-          - Inline policies ( DeleteUserPolicy )
-          - Attached managed policies ( DetachUserPolicy )
-          - Group memberships ( RemoveUserFromGroup )
+          ☑ Password ( DeleteLoginProfile )
+          ☑ Access keys ( DeleteAccessKey )
+          ☐ Signing certificate ( DeleteSigningCertificate )
+          ☐ SSH public key ( DeleteSSHPublicKey )
+          ☐ Git credentials ( DeleteServiceSpecificCredential )
+          ☐ Multi-factor authentication (MFA) device ( DeactivateMFADevice , DeleteVirtualMFADevice )
+          ☑ Inline policies ( DeleteUserPolicy )
+          ☑ Attached managed policies ( DetachUserPolicy )
+          ☑ Group memberships ( RemoveUserFromGroup )
         """
 
         self.logging.debug("Started cleanup of IAM Users.")
@@ -699,75 +827,39 @@ class IAMCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                self.access_keys(resource_id)
+                if resource_id not in resource_whitelist:
+                    if resource_age > maximum_resource_age:
+                        self.access_keys(resource_id)
+                        self.user_policies(resource_id)
+                        self.delete_login_profile(resource_id)
+                        self.remove_user_from_group(resource_id)
 
-                try:
-                    paginator = self.client_iam.get_paginator("list_access_keys")
-                    active_access_keys = len(
-                        paginator.paginate(UserName=resource_id)
-                        .build_full_result()
-                        .get("AccessKeyMetadata")
-                    )
-                except:
-                    self.logging.error(
-                        f"Could not list all IAM Access Keys for IAM User '{resource_id}'."
-                    )
-                    self.logging.error(sys.exc_info()[1])
-                    resource_action = "ERROR"
-                else:
-                    if resource_id not in resource_whitelist:
-                        if active_access_keys == 0:
-                            if resource_age > maximum_resource_age:
-                                try:
-                                    if not self.is_dry_run:
-                                        self.client_iam.delete_login_profile(
-                                            UserName=resource_id
-                                        )
-                                except:
-                                    self.logging.error(
-                                        f"Could not delete IAM User '{resource_id}' Login Profile."
-                                    )
-                                    self.logging.error(sys.exc_info()[1])
-                                    resource_action = "ERROR"
-                                else:
-                                    self.logging.debug(
-                                        f"Deleted Login Profile for IAM User '{resource_id}'."
-                                    )
-
-                                    try:
-                                        if not self.is_dry_run:
-                                            self.client_iam.delete_user(
-                                                UserName=resource_id
-                                            )
-                                    except:
-                                        self.logging.error(
-                                            f"Could not delete IAM User '{resource_id}'."
-                                        )
-                                        self.logging.error(sys.exc_info()[1])
-                                        resource_action = "ERROR"
-                                    else:
-                                        self.logging.info(
-                                            f"IAM User '{resource_id}' was last used {resource_age} days ago "
-                                            "and has been deleted."
-                                        )
-                                        resource_action = "DELETE"
-                            else:
-                                self.logging.debug(
-                                    f"IAM User '{resource_id}' was last used {resource_age} days ago "
-                                    "(less than TTL setting) and has not been deleted."
-                                )
-                                resource_action = "SKIP - TTL"
-                        else:
-                            self.logging.debug(
-                                f"IAM User '{resource_id}' is associated with {active_access_keys} "
-                                "active IAM Access Key(s) and has not been deleted."
+                        try:
+                            if not self.is_dry_run:
+                                self.client_iam.delete_user(UserName=resource_id)
+                        except:
+                            self.logging.error(
+                                f"Could not delete IAM User '{resource_id}'."
                             )
-                            resource_action = "SKIP - IN USE"
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"IAM User '{resource_id}' was last used {resource_age} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"IAM User '{resource_id}' has been whitelisted and has not been deleted."
+                            f"IAM User '{resource_id}' was last used {resource_age} days ago "
+                            "(less than TTL setting) and has not been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - TTL"
+                else:
+                    self.logging.debug(
+                        f"IAM User '{resource_id}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

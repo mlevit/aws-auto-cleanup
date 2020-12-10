@@ -159,6 +159,7 @@ provider:
         - iam:DeleteRole
         - iam:DeleteRolePolicy
         - iam:DeleteUser
+        - iam:DeleteUserPolicy
         - iam:DetachGroupPolicy
         - iam:DetachRolePolicy
         - iam:DetachUserPolicy
@@ -168,13 +169,16 @@ provider:
         - iam:ListAccessKeys
         - iam:ListAttachedRolePolicies
         - iam:ListEntitiesForPolicy
+        - iam:ListGroupsForUser
         - iam:ListInstanceProfilesForRole
         - iam:ListPolicies
         - iam:ListPolicyVersions
         - iam:ListRolePolicies
         - iam:ListRoles
+        - iam:ListUserPolicies
         - iam:ListUsers
         - iam:RemoveRoleFromInstanceProfile
+        - iam:RemoveUserFromGroup
       Resource: "*"
     - Effect: Allow
       Action:
