@@ -833,9 +833,9 @@ class IAMCleanup:
                 if resource_id not in resource_whitelist:
                     if resource_age > resource_maximum_age:
                         self.access_keys(resource_id)
-                        self.user_policies(resource_id)
                         self.delete_login_profile(resource_id)
                         self.remove_user_from_group(resource_id)
+                        self.user_policies(resource_id)
 
                         try:
                             if not self.is_dry_run:
