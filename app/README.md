@@ -136,7 +136,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | ELB Load Balancers             | Load Balancer Name     | `elb:load_balancer:load_balancer_name`               |
 | EMR Clusters                   | ID                     | `emr:cluster:id`                                     |
 | Glue Crawlers                  | Crawler Name           | `glue:crawler:crawler_name`                          |
-| Glue Dev Databases             | Database Name          | `glue:database:database_name`                        |
+| Glue Databases                 | Database Name          | `glue:database:database_name`                        |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
 | IAM Access Keys                | Access Key ID          | `iam:access_key:access_key_id`                       |
 | IAM Policies                   | Policy Name            | `iam:policy:policy_name`                             |
