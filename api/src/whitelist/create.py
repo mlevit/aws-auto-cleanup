@@ -9,18 +9,18 @@ from dynamodb_json import json_util as dynamodb_json
 def get_settings():
     settings = {}
 
-    try:
-        items = boto3.client("dynamodb").scan(
-            TableName=os.environ.get("SETTINGSTABLE")
-        )["Items"]
-    except Exception as error:
-        raise error
-    else:
-        for item in items:
-            item_json = dynamodb_json.loads(item, True)
-            settings[item_json.get("key")] = item_json.get("value")
+    paginator = boto3.client("dynamodb").get_paginator("scan")
+    items = (
+        paginator.paginate(TableName=os.environ.get("SETTINGS_TABLE"))
+        .build_full_result()
+        .get("Items")
+    )
 
-        return settings
+    for item in items:
+        item_json = dynamodb_json.loads(item, True)
+        settings[item_json.get("key")] = item_json.get("value")
+
+    return settings
 
 
 def get_return(code, message, request, response):
@@ -95,7 +95,7 @@ def lambda_handler(event, context):
 
     try:
         boto3.client("dynamodb").put_item(
-            TableName=os.environ.get("WHITELISTTABLE"),
+            TableName=os.environ.get("WHITELIST_TABLE"),
             Item={
                 "resource_id": {"S": parameters.get("resource_id")},
                 "expiration": {"N": str(expiration)},

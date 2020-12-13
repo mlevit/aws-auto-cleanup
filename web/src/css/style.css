@@ -33,6 +33,11 @@ td {
   width: 700px !important;
 }
 
+.select,
+select {
+  width: 100%;
+}
+
 tr.dtrg-group {
   background-color: hsl(0, 0%, 98%);
   font-weight: bold;

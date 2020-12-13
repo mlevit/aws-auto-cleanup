@@ -80,15 +80,27 @@ var app = new Vue({
 
       sendApiRequest(convertJsonToGet(formData), "POST");
     },
-    deleteWhitelistEntry: function (resourceID) {
+    createWhitelistEntryFromExecutionLog: function (
+      service,
+      resource,
+      resourceId
+    ) {
+      this.selectedService = service.toLowerCase().replace(/ /g, "_");
+      this.selectedResource = resource.toLowerCase().replace(/ /g, "_");
+      this.selectedResourceId = resourceId;
+      this.updateResourceList(this.selectedService);
+      this.closeExecutionLogPopup();
+      this.openWhitelistInsertPopup();
+    },
+    deleteWhitelistEntry: function (resourceId) {
       let formData = {
-        resource_id: resourceID,
+        resource_id: resourceId,
       };
 
       sendApiRequest(convertJsonToGet(formData), "DELETE");
     },
-    extendWhitelistEntry: function (rowID) {
-      let row = this.whitelist[rowID - 1];
+    extendWhitelistEntry: function (rowId) {
+      let row = this.whitelist[rowId - 1];
       let formData = {
         resource_id: row.resource_id,
         expiration: row.expiration,
@@ -98,14 +110,21 @@ var app = new Vue({
 
       sendApiRequest(convertJsonToGet(formData), "PUT");
     },
-    updateResourceID: function (service, resource) {
+    updateResourceId: function (service, resource) {
       this.resourceIdPlaceholder = this.serviceSettings[service][resource][
         "id"
       ];
     },
     updateResourceList: function (service) {
       this.resourceList = Object.keys(this.serviceSettings[service]);
-      this.resourceIdPlaceholder = "";
+
+      // auto select if only 1 option exists
+      if (this.resourceList.length == 1) {
+        this.selectedResource = this.resourceList[0];
+        this.updateResourceId(service, this.resourceList[0]);
+      } else {
+        this.resourceIdPlaceholder = "";
+      }
     },
     openWhitelistDeletePopup: function (resourceId) {
       this.selectedResourceId = resourceId;
@@ -155,36 +174,40 @@ function sendApiRequest(formURL, requestMethod) {
       app.closeWhitelistDeletePopup();
 
       iziToast.success({
-        message: data.message,
         color: "#3FBF61",
+        message: data.message,
         messageColor: "white",
       });
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
 
 // Get execution log for a single instance
-function getExecutionLog(executionLogURL) {
+function getExecutionLog(executionLogUrl) {
   app.showExecutionLogPopup = true;
   app.showExecutionLogLoadingGif = true;
 
-  fetch(API_EXECLOG + executionLogURL)
+  fetch(API_EXECLOG + executionLogUrl)
     .then((response) => response.json())
     .then((data) => {
       app.executionLogTable = data["response"]["body"];
-      app.executionLogKey = decodeURIComponent(executionLogURL);
+      app.executionLogKey = decodeURIComponent(executionLogUrl);
 
       setTimeout(function () {
         app.executionLogDataTables = $("#execution-log-table").DataTable({
-          dom: "lrti",
           autoWidth: true,
+          columnDefs: [
+            { orderable: false, targets: [6] },
+            { className: "dt-center", targets: [6] },
+          ],
+          dom: "lrti",
           paging: false,
         });
         app.showExecutionLogLoadingGif = false;
@@ -213,10 +236,10 @@ function getExecutionLog(executionLogURL) {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -245,10 +268,10 @@ function getExecutionLogList() {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -277,11 +300,11 @@ function getServices() {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
-        titleColor: "white",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
+        titleColor: "white",
       });
     });
 }
@@ -338,10 +361,10 @@ function getWhitelist() {
     })
     .catch((error) => {
       iziToast.error({
-        title: "Something went wrong",
-        message: error,
         color: "#EC2B55",
+        message: error,
         messageColor: "white",
+        title: "Something went wrong",
       });
     });
 }
@@ -353,14 +376,17 @@ function refreshWhitelist() {
 
 function openTab(evt, tabName) {
   var i, x, tablinks;
+
   x = document.getElementsByClassName("content-tab");
   for (i = 0; i < x.length; i++) {
     x[i].style.display = "none";
   }
+
   tablinks = document.getElementsByClassName("tab");
   for (i = 0; i < x.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" is-active", "");
   }
+
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " is-active";
 }

@@ -14,7 +14,7 @@ class RedshiftCleanup:
         self.region = region
 
         self._client_redshift = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_redshift(self):
@@ -33,40 +33,33 @@ class RedshiftCleanup:
 
         self.logging.debug("Started cleanup of Redshift Clusters.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("redshift", {})
-            .get("cluster", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.redshift.cluster.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.redshift.cluster.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "redshift.cluster")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_redshift.describe_clusters().get("Clusters")
+                paginator = self.client_redshift.get_paginator("describe_clusters")
+                resources = paginator.paginate().build_full_result().get("Clusters")
             except:
                 self.logging.error("Could not list all Redshift Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("redshift", {})
-                .get("cluster", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("ClusterIdentifier")
                 resource_date = resource.get("ClusterCreateTime")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("redshift", {}).get(
-                    "cluster", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_redshift.delete_cluster(
                                     ClusterIdentifier=resource_id,
                                     SkipFinalClusterSnapshot=True,
@@ -79,13 +72,13 @@ class RedshiftCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
+                                f"Redshift Cluster '{resource_id}' was created {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Redshift Cluster '{resource_id}' was created {delta.days} days ago "
+                            f"Redshift Cluster '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -117,43 +110,41 @@ class RedshiftCleanup:
 
         self.logging.debug("Started cleanup of Redshift Snapshots.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("redshift", {})
-            .get("snapshot", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.redshift.snapshot.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.redshift.snapshot.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "redshift.snapshot")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_redshift.describe_cluster_snapshots(
-                    SnapshotType="manual",
-                ).get("Snapshots")
+                paginator = self.client_redshift.get_paginator(
+                    "describe_cluster_snapshots"
+                )
+                resources = (
+                    paginator.paginate(SnapshotType="manual")
+                    .build_full_result()
+                    .get("Snapshots")
+                )
             except:
                 self.logging.error("Could not list all Redshift Snapshots.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("redshift", {})
-                .get("snapshot", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("SnapshotIdentifier")
                 resource_date = resource.get("SnapshotCreateTime")
                 resource_status = resource.get("Status")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("redshift", {}).get(
-                    "snapshot", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         if resource_status in ("available", "final snapshot"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_redshift.delete_cluster_snapshot(
                                         SnapshotIdentifier=resource_id
                                     )
@@ -165,7 +156,7 @@ class RedshiftCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"Redshift Snapshot '{resource_id}' was created {delta.days} days ago "
+                                    f"Redshift Snapshot '{resource_id}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
@@ -176,7 +167,7 @@ class RedshiftCleanup:
                             resource_action = "SKIP - IN USE"
                     else:
                         self.logging.debug(
-                            f"Redshift Snapshot '{resource_id}' was created {delta.days} days ago "
+                            f"Redshift Snapshot '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

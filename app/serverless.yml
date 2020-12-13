@@ -8,10 +8,6 @@ custom:
       name: ${self:service}-${self:provider.stage}-requirements
       compatibleRuntimes:
         - python3.8
-    noDeploy:
-      - boto
-      - boto3
-      - botocore
     slim: true
 
 provider:
@@ -30,6 +26,12 @@ provider:
         ForAnyValue:StringEquals:
           aws:CalledVia:
             - cloudformation.amazonaws.com
+    - Effect: Allow
+      Action:
+        - airflow:DeleteEnvironment
+        - airflow:GetEnvironment
+        - airflow:ListEnvironments
+      Resource: "*"
     - Effect: Allow
       Action:
         - amplify:DeleteApp
@@ -149,24 +151,34 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - iam:DeleteAccessKey
         - iam:DeleteInstanceProfile
+        - iam:DeleteLoginProfile
         - iam:DeletePolicy
         - iam:DeletePolicyVersion
         - iam:DeleteRole
         - iam:DeleteRolePolicy
+        - iam:DeleteUser
+        - iam:DeleteUserPolicy
         - iam:DetachGroupPolicy
         - iam:DetachRolePolicy
         - iam:DetachUserPolicy
         - iam:GenerateServiceLastAccessedDetails
+        - iam:GetAccessKeyLastUsed
         - iam:GetServiceLastAccessedDetails
+        - iam:ListAccessKeys
         - iam:ListAttachedRolePolicies
         - iam:ListEntitiesForPolicy
+        - iam:ListGroupsForUser
         - iam:ListInstanceProfilesForRole
         - iam:ListPolicies
         - iam:ListPolicyVersions
         - iam:ListRolePolicies
         - iam:ListRoles
+        - iam:ListUserPolicies
+        - iam:ListUsers
         - iam:RemoveRoleFromInstanceProfile
+        - iam:RemoveUserFromGroup
       Resource: "*"
     - Effect: Allow
       Action:
@@ -213,8 +225,10 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - sagemaker:DeleteApp
         - sagemaker:DeleteEndpoint
         - sagemaker:DeleteNotebookInstance
+        - sagemaker:ListApps
         - sagemaker:ListEndpoints
         - sagemaker:ListNotebookInstances
         - sagemaker:StopNotebookInstance
@@ -224,6 +238,7 @@ provider:
         - sts:GetCallerIdentity
       Resource: "*"
   tracing:
+    apiGateway: true
     lambda: true
 
 package:
@@ -248,12 +263,12 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      EXECUTIONLOGBUCKET:
+      LOG_LEVEL: ${self:custom.log_level}
+      EXECUTION_LOG_BUCKET:
         Ref: ExecutionLogBucket
-      SETTINGSTABLE:
+      SETTINGS_TABLE:
         Ref: SettingsTable
-      WHITELISTTABLE:
+      WHITELIST_TABLE:
         Ref: WhitelistTable
     events:
       - schedule:

@@ -26,7 +26,7 @@ def lambda_handler(event, context):
 
     try:
         boto3.client("dynamodb").delete_item(
-            TableName=os.environ.get("WHITELISTTABLE"),
+            TableName=os.environ.get("WHITELIST_TABLE"),
             Key={
                 "resource_id": {"S": parameters.get("resource_id")},
             },

@@ -14,7 +14,7 @@ class ELBCleanup:
         self.region = region
 
         self._client_elb = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_elb(self):
@@ -32,43 +32,36 @@ class ELBCleanup:
 
         self.logging.debug("Started cleanup of ELB Load Balancers.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("elb", {})
-            .get("load_balancer", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.elb.load_balancer.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.elb.load_balancer.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "elb.load_balancer")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_elb.describe_load_balancers().get(
-                    "LoadBalancers"
+                paginator = self.client_elb.get_paginator("describe_load_balancers")
+                resources = (
+                    paginator.paginate().build_full_result().get("LoadBalancers")
                 )
             except:
                 self.logging.error("Could not list all ELB Load Balancers.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("elb", {})
-                .get("load_balancer", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("LoadBalancerName")
                 resource_arn = resource.get("LoadBalancerArn")
                 resource_date = resource.get("CreatedTime")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("elb", {}).get(
-                    "load_balancer", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_elb.modify_load_balancer_attributes(
                                     LoadBalancerArn=resource_arn,
                                     Attributes=[
@@ -86,7 +79,7 @@ class ELBCleanup:
                             resource_action = "ERROR"
                         else:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_elb.delete_load_balancer(
                                         LoadBalancerArn=resource_arn
                                     )
@@ -98,13 +91,13 @@ class ELBCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"ELB Load Balancer '{resource_id}' was created {delta.days} days ago "
+                                    f"ELB Load Balancer '{resource_id}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"ELB Load Balancer '{resource_id}' was created {delta.days} days ago "
+                            f"ELB Load Balancer '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

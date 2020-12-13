@@ -16,7 +16,7 @@ class IAMCleanup:
         self.region = "global"
 
         self._client_iam = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_iam(self):
@@ -27,6 +27,125 @@ class IAMCleanup:
     def run(self):
         self.policies()
         self.roles()
+        self.users()
+
+    def access_keys(self, user):
+        """
+        Deletes IAM Access Keys for a User.
+        """
+
+        self.logging.debug(f"Started cleanup of IAM Access Keys for IAM User '{user}'.")
+
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.access_key.clean", False
+        )
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.iam.access_key.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.access_key")
+
+        if is_cleaning_enabled:
+            try:
+                paginator = self.client_iam.get_paginator("list_access_keys")
+                resources = (
+                    paginator.paginate(UserName=user)
+                    .build_full_result()
+                    .get("AccessKeyMetadata")
+                )
+            except:
+                self.logging.error(
+                    f"Could not list all IAM Access Keys for IAM User '{user}'."
+                )
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for resource in resources:
+                resource_id = resource.get("AccessKeyId")
+                resource_status = resource.get("Status")
+
+                if resource_id not in resource_whitelist:
+                    try:
+                        resource_details = self.client_iam.get_access_key_last_used(
+                            AccessKeyId=resource_id
+                        ).get("AccessKeyLastUsed")
+                    except:
+                        self.logging.error(
+                            f"Could not get IAM Access Key's '{resource_id}' details."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        resource_action = "ERROR"
+                    else:
+                        resource_date = resource_details.get(
+                            "resource_details", resource.get("CreateDate")
+                        )
+                        resource_age = Helper.get_day_delta(resource_date).days
+                        resource_action = None
+
+                        if resource_status == "Inactive":
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_iam.delete_access_key(
+                                        UserName=user, AccessKeyId=resource_id
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete IAM Access Key '{resource_id}' for IAM User '{user}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"IAM Access Key '{resource_id}' for IAM User '{user}' in state '{resource_status}' has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        elif resource_age > resource_maximum_age:
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_iam.delete_access_key(
+                                        UserName=user, AccessKeyId=resource_id
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete IAM Access Key '{resource_id}' for IAM User '{user}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"IAM Access Key '{resource_id}' for IAM User '{user}' was "
+                                    f"last used {resource_age} days ago and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"IAM Access Key '{resource_id}' for IAM User '{user}' was last "
+                                f"used {resource_age} days ago (less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
+                else:
+                    self.logging.debug(
+                        f"IAM Access Key '{resource_id}' for IAM User '{user}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "IAM",
+                    "Access Key",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug(
+                f"Finished cleanup of IAM Access Keys for IAM User '{user}'."
+            )
+            return True
+        else:
+            self.logging.info(
+                f"Skipping cleanup of IAM Access Keys for IAM User '{user}'."
+            )
+            return True
 
     def policies(self):
         """
@@ -35,40 +154,34 @@ class IAMCleanup:
 
         self.logging.debug("Started cleanup of IAM Policies.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("iam", {})
-            .get("policy", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.policy.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.iam.policy.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.policy")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_iam.get_paginator("list_policies")
-                response_iterator = paginator.paginate(
-                    Scope="Local"
-                ).build_full_result()
+                resources = paginator.paginate(Scope="Local").build_full_result()[
+                    "Policies"
+                ]
             except:
                 self.logging.error("Could not list all IAM Policies.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("iam", {})
-                .get("policy", {})
-                .get("ttl", 7)
-            )
-
-            for resource in response_iterator.get("Policies"):
+            for resource in resources:
                 resource_id = resource.get("PolicyName")
                 resource_arn = resource.get("Arn")
                 resource_date = resource.get("UpdateDate")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("iam", {}).get("policy", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         if resource.get("AttachmentCount") > 0:
                             # - Detach the policy from all users, groups, and roles that the policy is attached to,
                             #   using the DetachUserPolicy, DetachGroupPolicy, or DetachRolePolicy API operations.
@@ -78,7 +191,7 @@ class IAMCleanup:
                             )
 
                             try:
-                                user_response_iterator = entities_paginator.paginate(
+                                user_resources = entities_paginator.paginate(
                                     PolicyArn=resource_arn, EntityFilter="User"
                                 ).build_full_result()
                             except:
@@ -88,11 +201,9 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for user_resource in user_response_iterator.get(
-                                    "PolicyUsers"
-                                ):
+                                for user_resource in user_resources.get("PolicyUsers"):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.detach_user_policy(
                                                 UserName=user_resource.get("UserName"),
                                                 PolicyArn=resource_arn,
@@ -109,7 +220,7 @@ class IAMCleanup:
                                         )
 
                             try:
-                                role_response_iterator = entities_paginator.paginate(
+                                role_resources = entities_paginator.paginate(
                                     PolicyArn=resource_arn, EntityFilter="Role"
                                 ).build_full_result()
                             except:
@@ -119,11 +230,9 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for role_resource in role_response_iterator.get(
-                                    "PolicyRoles"
-                                ):
+                                for role_resource in role_resources.get("PolicyRoles"):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.detach_role_policy(
                                                 RoleName=role_resource.get("RoleName"),
                                                 PolicyArn=resource_arn,
@@ -140,7 +249,7 @@ class IAMCleanup:
                                         )
 
                             try:
-                                group_response_iterator = entities_paginator.paginate(
+                                group_resources = entities_paginator.paginate(
                                     PolicyArn=resource_arn, EntityFilter="Group"
                                 ).build_full_result()
                             except:
@@ -150,11 +259,11 @@ class IAMCleanup:
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
-                                for group_resource in group_response_iterator.get(
+                                for group_resource in group_resources.get(
                                     "PolicyGroups"
                                 ):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.detach_group_policy(
                                                 GroupName=group_resource.get(
                                                     "GroupName"
@@ -179,7 +288,7 @@ class IAMCleanup:
                             versions_paginator = self.client_iam.get_paginator(
                                 "list_policy_versions"
                             )
-                            versions_response_iterator = versions_paginator.paginate(
+                            versions_resources = versions_paginator.paginate(
                                 PolicyArn=resource_arn
                             ).build_full_result()
                         except:
@@ -189,12 +298,10 @@ class IAMCleanup:
                             self.logging.error(sys.exc_info()[1])
                             resource_action = "ERROR"
                         else:
-                            for versions_resource in versions_response_iterator.get(
-                                "Versions"
-                            ):
+                            for versions_resource in versions_resources.get("Versions"):
                                 if not versions_resource.get("IsDefaultVersion"):
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.delete_policy_version(
                                                 PolicyArn=resource_arn,
                                                 VersionId=versions_resource.get(
@@ -214,7 +321,7 @@ class IAMCleanup:
 
                         # - Delete the policy (this automatically deletes the policy's default version) using this API.
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_iam.delete_policy(PolicyArn=resource_arn)
                         except:
                             self.logging.error(
@@ -224,13 +331,13 @@ class IAMCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"IAM Policy '{resource_id}' was last modified {delta.days} days ago "
+                                f"IAM Policy '{resource_id}' was last modified {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"IAM Policy '{resource_id}' was last modified {delta.days} days ago "
+                            f"IAM Policy '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -262,39 +369,33 @@ class IAMCleanup:
 
         self.logging.debug("Started cleanup of IAM Roles.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("iam", {})
-            .get("role", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.role.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.iam.role.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.role")
+
+        if is_cleaning_enabled:
             try:
                 paginator = self.client_iam.get_paginator("list_roles")
-                response_iterator = paginator.paginate().build_full_result()
+                resources = paginator.paginate().build_full_result().get("Roles")
             except:
                 self.logging.error("Could not list all IAM Roles.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("iam", {})
-                .get("role", {})
-                .get("ttl", 7)
-            )
-
-            for resource in response_iterator.get("Roles"):
+            for resource in resources:
                 resource_id = resource.get("RoleName")
                 resource_arn = resource.get("Arn")
                 resource_date = resource.get("CreateDate")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
                 if "AWSServiceRoleFor" not in resource_id:
-                    if resource_id not in self.whitelist.get("iam", {}).get("role", []):
-                        delta = Helper.get_day_delta(resource_date)
-
-                        if delta.days > ttl_days:
+                    if resource_id not in resource_whitelist:
+                        if resource_age > resource_maximum_age:
                             # check when the role was last accessed
                             try:
                                 gen_last_accessed = self.client_iam.generate_service_last_accessed_details(
@@ -336,7 +437,7 @@ class IAMCleanup:
                                                 )
                                                 self.logging.error(sys.exc_info()[1])
                                                 resource_action = "ERROR"
-                                                backoff = 99
+                                                continue
                                             else:
                                                 backoff = 2 * backoff
                                         else:
@@ -345,6 +446,7 @@ class IAMCleanup:
                                                 "details in a reasonable amount of time."
                                             )
                                             resource_action = "ERROR"
+                                            continue
 
                             if get_last_accessed.get("JobStatus") == "COMPLETED":
                                 last_accessed = (
@@ -366,11 +468,16 @@ class IAMCleanup:
 
                                 delta = Helper.get_day_delta(last_accessed)
 
-                                if delta.days > ttl_days:
+                                if resource_age > resource_maximum_age:
                                     # delete all inline policies
                                     try:
-                                        policies = self.client_iam.list_role_policies(
-                                            RoleName=resource_id
+                                        paginator = self.client_iam.get_paginator(
+                                            "list_role_policies"
+                                        )
+                                        policies = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("PolicyNames")
                                         )
                                     except:
                                         self.logging.error(
@@ -380,9 +487,9 @@ class IAMCleanup:
                                         resource_action = "ERROR"
                                         continue
 
-                                    for policy in policies.get("PolicyNames"):
+                                    for policy in policies:
                                         try:
-                                            if not self._dry_run:
+                                            if not self.is_dry_run:
                                                 self.client_iam.delete_role_policy(
                                                     RoleName=resource_id,
                                                     PolicyName=policy,
@@ -400,10 +507,13 @@ class IAMCleanup:
 
                                     # detach all managed policies
                                     try:
+                                        paginator = self.client_iam.get_paginator(
+                                            "list_attached_role_policies"
+                                        )
                                         policies = (
-                                            self.client_iam.list_attached_role_policies(
-                                                RoleName=resource_id
-                                            )
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("AttachedPolicies")
                                         )
                                     except:
                                         self.logging.error(
@@ -412,9 +522,9 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        for policy in policies.get("AttachedPolicies"):
+                                        for policy in policies:
                                             try:
-                                                if not self._dry_run:
+                                                if not self.is_dry_run:
                                                     self.client_iam.detach_role_policy(
                                                         RoleName=resource_id,
                                                         PolicyArn=policy.get(
@@ -434,8 +544,13 @@ class IAMCleanup:
 
                                     # delete all instance profiles
                                     try:
-                                        profiles = self.client_iam.list_instance_profiles_for_role(
-                                            RoleName=resource_id
+                                        paginator = self.client_iam.get_paginator(
+                                            "list_instance_profiles_for_role"
+                                        )
+                                        profiles = (
+                                            paginator.paginate(RoleName=resource_id)
+                                            .build_full_result()
+                                            .get("InstanceProfiles")
                                         )
                                     except:
                                         self.logging.error(
@@ -444,10 +559,10 @@ class IAMCleanup:
                                         self.logging.error(sys.exc_info()[1])
                                         resource_action = "ERROR"
                                     else:
-                                        for profile in profiles.get("InstanceProfiles"):
+                                        for profile in profiles:
                                             # remove role from instance profile
                                             try:
-                                                if not self._dry_run:
+                                                if not self.is_dry_run:
                                                     self.client_iam.remove_role_from_instance_profile(
                                                         InstanceProfileName=profile.get(
                                                             "InstanceProfileName"
@@ -467,7 +582,7 @@ class IAMCleanup:
 
                                             # delete instance profile
                                             try:
-                                                if not self._dry_run:
+                                                if not self.is_dry_run:
                                                     self.client_iam.delete_instance_profile(
                                                         InstanceProfileName=profile.get(
                                                             "InstanceProfileName"
@@ -486,7 +601,7 @@ class IAMCleanup:
 
                                     # delete role
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_iam.delete_role(
                                                 RoleName=resource_id
                                             )
@@ -498,13 +613,13 @@ class IAMCleanup:
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.info(
-                                            f"IAM Role '{resource_id}' was created {delta.days} days ago "
+                                            f"IAM Role '{resource_id}' was created {resource_age} days ago "
                                             "and has been deleted."
                                         )
                                         resource_action = "DELETE"
                                 else:
                                     self.logging.debug(
-                                        f"IAM Role '{resource_id}' was last accessed {delta.days} days ago "
+                                        f"IAM Role '{resource_id}' was last accessed {resource_age} days ago "
                                         "(less than TTL setting) and has not been deleted."
                                     )
                                     resource_action = "SKIP - TTL"
@@ -515,7 +630,7 @@ class IAMCleanup:
                                 resource_action = "ERROR"
                         else:
                             self.logging.debug(
-                                f"IAM Role '{resource_id}' was created {delta.days} days ago "
+                                f"IAM Role '{resource_id}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"
@@ -538,4 +653,233 @@ class IAMCleanup:
             return True
         else:
             self.logging.info("Skipping cleanup of IAM Roles.")
+            return True
+
+    def user_policies(self, user):
+        """
+        Deletes IAM User Policies.
+        """
+
+        self.logging.debug(
+            f"Started cleanup of IAM User Policies for IAM User '{user}'."
+        )
+
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.user_policy.clean", False
+        )
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.iam.user_policy.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user_policy")
+
+        if is_cleaning_enabled:
+            try:
+                paginator = self.client_iam.get_paginator("list_user_policies")
+                resources = (
+                    paginator.paginate(UserName=user)
+                    .build_full_result()
+                    .get("PolicyNames")
+                )
+            except:
+                self.logging.error(
+                    f"Could not list all IAM User Policies for IAM User '{user}'."
+                )
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for resource in resources:
+                resource_id = resource
+                resource_action = None
+
+                if resource_id not in resource_whitelist:
+                    try:
+                        if not self.is_dry_run:
+                            self.client_iam.delete_user_policy(
+                                UserName=user, PolicyName=resource_id
+                            )
+                    except:
+                        self.logging.error(
+                            f"Could not delete IAM User Policy '{resource_id}' for IAM User '{user}'."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        resource_action = "ERROR"
+                    else:
+                        self.logging.info(
+                            f"IAM User Policy '{resource_id}' for IAM User '{user}' has been deleted."
+                        )
+                        resource_action = "DELETE"
+                else:
+                    self.logging.debug(
+                        f"IAM User Policy '{resource_id}' for IAM User '{user}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "IAM",
+                    "User Policy",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug(
+                f"Finished cleanup of IAM User Policies for IAM User '{user}'."
+            )
+            return True
+        else:
+            self.logging.info(
+                f"Skipping cleanup of IAM User Policies for IAM User '{user}'."
+            )
+            return True
+
+    def delete_login_profile(self, user):
+        """
+        Deletes IAM Login Profile.
+        """
+
+        try:
+            if not self.is_dry_run:
+                self.client_iam.delete_login_profile(UserName=user)
+        except self.client_iam.exceptions.NoSuchEntityException:
+            self.logging.debug(f"No Login Profile to delete for IAM User '{user}'.")
+            return True
+        except:
+            self.logging.error(f"Could not delete IAM User '{user}' Login Profile.")
+            self.logging.error(sys.exc_info()[1])
+            return False
+        else:
+            self.logging.debug(f"Deleted Login Profile for IAM User '{user}'.")
+            return True
+
+    def remove_user_from_group(self, user):
+        """
+        Removes IAM User from IAM Group.
+        """
+
+        try:
+            paginator = self.client_iam.get_paginator("list_groups_for_user")
+            resources = (
+                paginator.paginate(UserName=user).build_full_result().get("Groups")
+            )
+        except:
+            self.logging.error(f"Could not list all IAM Groups for IAM User '{user}'.")
+            self.logging.error(sys.exc_info()[1])
+            return False
+
+        for resource in resources:
+            resource_id = resource.get("GroupName")
+
+            try:
+                self.client_iam.remove_user_from_group(
+                    GroupName=resource_id, UserName=user
+                )
+            except:
+                self.logging.error(
+                    f"Could not remove IAM User '{user}' from IAM Group '{resource_id}'."
+                )
+                self.logging.error(sys.exc_info()[1])
+            else:
+                self.logging.debug(
+                    f"Removed IAM User '{user}' from IAM Group '{resource_id}'."
+                )
+
+            return True
+
+    def users(self):
+        """
+        Deletes IAM Users.
+
+        Before attempting to delete a user, remove the following items:
+
+          ☑ Password ( DeleteLoginProfile )
+          ☑ Access keys ( DeleteAccessKey )
+          ☐ Signing certificate ( DeleteSigningCertificate )
+          ☐ SSH public key ( DeleteSSHPublicKey )
+          ☐ Git credentials ( DeleteServiceSpecificCredential )
+          ☐ Multi-factor authentication (MFA) device ( DeactivateMFADevice , DeleteVirtualMFADevice )
+          ☑ Inline policies ( DeleteUserPolicy )
+          ☑ Attached managed policies ( DetachUserPolicy )
+          ☑ Group memberships ( RemoveUserFromGroup )
+        """
+
+        self.logging.debug("Started cleanup of IAM Users.")
+
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.iam.user.clean", False
+        )
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.iam.user.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user")
+
+        if is_cleaning_enabled:
+            try:
+                paginator = self.client_iam.get_paginator("list_users")
+                resources = paginator.paginate().build_full_result().get("Users")
+            except:
+                self.logging.error("Could not list all IAM Users.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for resource in resources:
+                resource_id = resource.get("UserName")
+                resource_date = resource.get(
+                    "PasswordLastUsed", resource.get("CreateDate")
+                )
+                resource_age = Helper.get_day_delta(resource_date).days
+                resource_action = None
+
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
+                        self.access_keys(resource_id)
+                        self.delete_login_profile(resource_id)
+                        self.remove_user_from_group(resource_id)
+                        self.user_policies(resource_id)
+
+                        try:
+                            if not self.is_dry_run:
+                                self.client_iam.delete_user(UserName=resource_id)
+                        except self.client_iam.exceptions.DeleteConflictException:
+                            self.logging.debug(
+                                f"IAM User '{resource_id}' has dependent objects and has not been deleted."
+                            )
+                            resource_action = "SKIP - IN USE"
+                        except:
+                            self.logging.error(
+                                f"Could not delete IAM User '{resource_id}'."
+                            )
+                            self.logging.error(sys.exc_info()[1])
+                            resource_action = "ERROR"
+                        else:
+                            self.logging.info(
+                                f"IAM User '{resource_id}' was last used {resource_age} days ago "
+                                "and has been deleted."
+                            )
+                            resource_action = "DELETE"
+                    else:
+                        self.logging.debug(
+                            f"IAM User '{resource_id}' was last used {resource_age} days ago "
+                            "(less than TTL setting) and has not been deleted."
+                        )
+                        resource_action = "SKIP - TTL"
+                else:
+                    self.logging.debug(
+                        f"IAM User '{resource_id}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "IAM",
+                    "User",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug("Finished cleanup of IAM Users.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of IAM Users.")
             return True

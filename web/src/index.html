@@ -350,6 +350,7 @@
                           <th>Resource</th>
                           <th>ID</th>
                           <th>Action</th>
+                          <th>Whitelist</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -360,6 +361,17 @@
                           <td style="white-space: nowrap">{{ item[3] }}</td>
                           <td>{{ item[4] }}</td>
                           <td style="white-space: nowrap">{{ item[5] }}</td>
+                          <td style="white-space: nowrap">
+                            <button
+                              class="button is-warning"
+                              v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - WHITELIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"
+                              v-on:click="createWhitelistEntryFromExecutionLog( item[2], item[3], item[4] )"
+                            >
+                              <span class="icon">
+                                <i class="fas fa-plus"></i>
+                              </span>
+                            </button>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -491,7 +503,7 @@
                             required
                             tabindex="2"
                             v-model="selectedResource"
-                            v-on:change="updateResourceID(selectedService, selectedResource)"
+                            v-on:change="updateResourceId(selectedService, selectedResource)"
                           >
                             <option v-for="item of resourceList">
                               {{ item }}
@@ -501,24 +513,22 @@
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div class="column">
-                    <div class="field">
-                      <label class="label">ID</label>
-                      <div class="control has-icons-left">
-                        <input
-                          :placeholder="[[ resourceIdPlaceholder ]]"
-                          class="input"
-                          required
-                          tabindex="3"
-                          type="text"
-                          v-model="selectedResourceId"
-                        />
-                        <span class="icon is-small is-left"
-                          ><i class="fas fa-id-card"></i
-                        ></span>
-                      </div>
-                    </div>
+                <div class="field">
+                  <label class="label">ID</label>
+                  <div class="control has-icons-left">
+                    <input
+                      :placeholder="[[ resourceIdPlaceholder ]]"
+                      class="input"
+                      required
+                      tabindex="3"
+                      type="text"
+                      v-model="selectedResourceId"
+                    />
+                    <span class="icon is-small is-left"
+                      ><i class="fas fa-id-card"></i
+                    ></span>
                   </div>
                 </div>
 
@@ -527,14 +537,14 @@
                   <div class="control has-icons-left">
                     <input
                       class="input"
-                      placeholder="@example.com"
+                      placeholder="Email address"
                       required
                       tabindex="4"
                       type="email"
                       v-model="selectedOwner"
                     />
                     <span class="icon is-small is-left">
-                      <i class="fas fa-envelope"></i>
+                      <i class="fas fa-at"></i>
                     </span>
                   </div>
                 </div>
@@ -544,6 +554,7 @@
                   <div class="control has-icons-left">
                     <input
                       class="input"
+                      placeholder="Reason for whitelisting"
                       required
                       tabindex="5"
                       type="text"

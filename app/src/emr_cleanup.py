@@ -14,7 +14,7 @@ class EMRCleanup:
         self.region = region
 
         self._client_emr = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_emr(self):
@@ -32,26 +32,22 @@ class EMRCleanup:
 
         self.logging.debug("Started cleanup of EMR Clusters.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("emr", {})
-            .get("cluster", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.emr.cluster.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.emr.cluster.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "emr.cluster")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_emr.list_clusters().get("Clusters")
+                paginator = self.client_emr.get_paginator("list_clusters")
+                resources = paginator.paginate().build_full_result().get("Clusters")
             except:
                 self.logging.error("Could not list all EMR Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("emr", {})
-                .get("cluster", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 resource_id = resource.get("Id")
@@ -59,15 +55,14 @@ class EMRCleanup:
                     resource.get("Status").get("Timeline").get("CreationDateTime")
                 )
                 resource_status = resource.get("Status").get("State")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("emr", {}).get("cluster", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         if resource_status in ("RUNNING", "WAITING"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_emr.terminate_job_flows(
                                         JobFlowIds=[resource_id]
                                     )
@@ -79,7 +74,7 @@ class EMRCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
+                                    f"EMR Cluster '{resource_id}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
@@ -90,7 +85,7 @@ class EMRCleanup:
                             resource_action = "SKIP - IN USE"
                     else:
                         self.logging.debug(
-                            f"EMR Cluster '{resource_id}' was created {delta.days} days ago "
+                            f"EMR Cluster '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

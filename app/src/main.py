@@ -6,10 +6,13 @@ import os
 import sys
 import tempfile
 import threading
+from collections import defaultdict
 
 import boto3
 from dynamodb_json import json_util as dynamodb_json
+from func_timeout import func_set_timeout, FunctionTimedOut
 
+from src.airflow_cleanup import AirflowCleanup
 from src.amplify_cleanup import AmplifyCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
 from src.cloudwatch_cleanup import CloudWatchCleanup
@@ -44,11 +47,14 @@ class Cleanup:
         self.setup_dynamodb()
 
         # create dictionaries and variables
-        self.execution_log = {"AWS": {}}
+        self.execution_log = defaultdict(
+            lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+        )
         self.settings = self.get_settings()
         self.whitelist = self.get_whitelist()
-        self.dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
+    @func_set_timeout(840)
     def run_cleanup(self):
         if self.dry_run:
             self.logging.info(f"Auto Cleanup started in DRY RUN mode.")
@@ -83,6 +89,16 @@ class Cleanup:
                     region,
                 )
                 cloudformation_class.run()
+
+                # Managed Workflows for Apache Airflow (MWAA)
+                airflow_class = AirflowCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=airflow_class.run, args=()))
 
                 # Amplify
                 amplify_class = AmplifyCleanup(
@@ -335,12 +351,15 @@ class Cleanup:
         settings = {}
 
         try:
-            items = boto3.client("dynamodb").scan(
-                TableName=os.environ.get("SETTINGSTABLE")
-            )["Items"]
+            paginator = boto3.client("dynamodb").get_paginator("scan")
+            items = (
+                paginator.paginate(TableName=os.environ.get("SETTINGS_TABLE"))
+                .build_full_result()
+                .get("Items")
+            )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ.get("SETTINGSTABLE")}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("SETTINGS_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         else:
@@ -348,27 +367,34 @@ class Cleanup:
                 item_json = dynamodb_json.loads(item, True)
                 settings[item_json.get("key")] = item_json.get("value")
 
-            return settings
+        return settings
 
     def get_whitelist(self):
-        whitelist = {}
-        try:
-            for record in boto3.client("dynamodb").scan(
-                TableName=os.environ.get("WHITELISTTABLE")
-            )["Items"]:
-                record_json = dynamodb_json.loads(record, True)
-                parsed_resource_id = Helper.parse_resource_id(
-                    record_json.get("resource_id")
-                )
+        whitelist = defaultdict(lambda: defaultdict(set))
 
-                whitelist.setdefault(parsed_resource_id.get("service"), {}).setdefault(
-                    parsed_resource_id.get("resource_type"), set()
-                ).add(parsed_resource_id.get("resource"))
+        try:
+            paginator = boto3.client("dynamodb").get_paginator("scan")
+            items = (
+                paginator.paginate(TableName=os.environ.get("WHITELIST_TABLE"))
+                .build_full_result()
+                .get("Items")
+            )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ.get("WHITELISTTABLE")}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("WHITELIST_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
+        else:
+            for item in items:
+                item_json = dynamodb_json.loads(item, True)
+                parsed_resource_id = Helper.parse_resource_id(
+                    item_json.get("resource_id")
+                )
+
+                whitelist[parsed_resource_id["service"]][
+                    parsed_resource_id["resource_type"]
+                ].add(parsed_resource_id["resource"])
+
         return whitelist
 
     def setup_dynamodb(self):
@@ -380,17 +406,18 @@ class Cleanup:
 
         try:
             client = boto3.client("dynamodb")
-            settings_data = open("./src/data/auto-cleanup-settings.json")
-            whitelist_data = open("./src/data/auto-cleanup-whitelist.json")
 
-            settings_json = json.loads(settings_data.read())
-            whitelist_json = json.loads(whitelist_data.read())
+            with open("./src/data/auto-cleanup-settings.json") as settings_data:
+                settings_json = json.loads(settings_data.read())
+
+            with open("./src/data/auto-cleanup-whitelist.json") as whitelist_data:
+                whitelist_json = json.loads(whitelist_data.read())
 
             update_settings = False
 
             # get current settings version
             current_version = client.get_item(
-                TableName=os.environ.get("SETTINGSTABLE"),
+                TableName=os.environ.get("SETTINGS_TABLE"),
                 Key={"key": {"S": "version"}},
             )
 
@@ -406,24 +433,24 @@ class Cleanup:
                     update_settings = True
                     self.logging.info(
                         f"Existing settings with version {current_version} are being updated "
-                        f"""to version {new_version} in DynamoDB Table '{os.environ.get("SETTINGSTABLE")}'."""
+                        f"""to version {new_version} in DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}'."""
                     )
                 else:
                     self.logging.debug(
                         f"Existing settings are at the lastest version {current_version} in "
-                        f"""DynamoDB Table '{os.environ.get("SETTINGSTABLE")}'."""
+                        f"""DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}'."""
                     )
             else:
                 update_settings = True
                 self.logging.info(
-                    f"""Settings are being inserted into DynamoDB Table '{os.environ.get("SETTINGSTABLE")}' for the first time."""
+                    f"""Settings are being inserted into DynamoDB Table '{os.environ.get("SETTINGS_TABLE")}' for the first time."""
                 )
 
             if update_settings:
                 for setting in settings_json:
                     try:
                         client.put_item(
-                            TableName=os.environ.get("SETTINGSTABLE"), Item=setting
+                            TableName=os.environ.get("SETTINGS_TABLE"), Item=setting
                         )
                     except:
                         self.logging.error(sys.exc_info()[1])
@@ -432,14 +459,11 @@ class Cleanup:
             for whitelist in whitelist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ.get("WHITELISTTABLE"), Item=whitelist
+                        TableName=os.environ.get("WHITELIST_TABLE"), Item=whitelist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])
                     continue
-
-            settings_data.close()
-            whitelist_data.close()
         except:
             self.logging.error(sys.exc_info()[1])
 
@@ -484,9 +508,9 @@ class Cleanup:
                                                     region,
                                                     service,
                                                     resource,
-                                                    action["id"],
-                                                    action["action"],
-                                                    action["timestamp"],
+                                                    action.get("id"),
+                                                    action.get("action"),
+                                                    action.get("timestamp"),
                                                     self.dry_run,
                                                     aws_request_id,
                                                 ]
@@ -499,7 +523,7 @@ class Cleanup:
 
                 now = datetime.datetime.now()
                 client = boto3.client("s3")
-                bucket = os.environ.get("EXECUTIONLOGBUCKET")
+                bucket = os.environ.get("EXECUTION_LOG_BUCKET")
                 key = f"""{now.strftime("%Y")}/{now.strftime("%m")}/execution_log_{now.strftime("%Y_%m_%d_%H_%M_%S")}.csv"""
 
                 try:
@@ -509,10 +533,10 @@ class Cleanup:
                         f"Could not upload the execution log to S3 's3://{bucket}/{key}."
                     )
                     return False
-
-                self.logging.info(
-                    f"Execution log has been uploaded to S3 's3://{bucket}/{key}."
-                )
+                else:
+                    self.logging.info(
+                        f"Execution log has been uploaded to S3 's3://{bucket}/{key}."
+                    )
             finally:
                 os.remove(temp_file)
             return True
@@ -536,14 +560,17 @@ def lambda_handler(event, context):
 
     logging.basicConfig(
         format="[%(levelname)s] %(message)s (%(filename)s, %(funcName)s(), line %(lineno)d)",
-        level=os.environ.get("LOGLEVEL", "WARNING").upper(),
+        level=os.environ.get("LOG_LEVEL", "WARNING").upper(),
     )
 
     # create instance of class
     cleanup = Cleanup(logging)
 
-    # run cleanup
-    cleanup.run_cleanup()
+    try:
+        cleanup.run_cleanup()
+    except FunctionTimedOut:
+        logging.warning(
+            "Auto Cleanup execution has exceeded 14 minutes and has been stopped."
+        )
 
-    # export execution log
     cleanup.export_execution_log(cleanup.execution_log, context.aws_request_id)

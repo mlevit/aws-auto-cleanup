@@ -14,7 +14,7 @@ class RDSCleanup:
         self.region = region
 
         self._client_rds = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_rds(self):
@@ -35,39 +35,34 @@ class RDSCleanup:
 
         self.logging.debug("Started cleanup of RDS Instances.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("rds", {})
-            .get("instance", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.rds.instance.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.rds.instance.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "rds.instance")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_rds.describe_db_instances().get("DBInstances")
+                paginator = self.client_rds.get_paginator("describe_db_instances")
+                resources = paginator.paginate().build_full_result().get("DBInstances")
             except:
                 self.logging.error("Could not list all RDS Instances.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("rds", {})
-                .get("instance", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("DBInstanceIdentifier")
                 resource_date = resource.get("InstanceCreateTime")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("rds", {}).get("instance", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         if resource.get("DeletionProtection"):
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_rds.modify_db_instance(
                                         DBInstanceIdentifier=resource_id,
                                         DeletionProtection=False,
@@ -86,7 +81,7 @@ class RDSCleanup:
 
                         if resource_action != "ERROR":
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_rds.delete_db_instance(
                                         DBInstanceIdentifier=resource_id,
                                         SkipFinalSnapshot=True,
@@ -99,13 +94,13 @@ class RDSCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"RDS Instance '{resource_id}' was created {delta.days} days ago "
+                                    f"RDS Instance '{resource_id}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"RDS Instance '{resource_id}' was created {delta.days} days ago "
+                            f"RDS Instance '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -137,40 +132,37 @@ class RDSCleanup:
 
         self.logging.debug("Started cleanup of RDS Snapshots.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("rds", {})
-            .get("snapshot", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.rds.snapshot.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.rds.snapshot.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "rds.snapshot")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_rds.describe_db_snapshots(
-                    SnapshotType="manual"
-                ).get("DBSnapshots")
+                paginator = self.client_rds.get_paginator("describe_db_snapshots")
+                resources = (
+                    paginator.paginate(SnapshotType="manual")
+                    .build_full_result()
+                    .get("DBSnapshots")
+                )
             except:
                 self.logging.error("Could not list all RDS Snapshots.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("rds", {})
-                .get("snapshot", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("DBSnapshotIdentifier")
                 resource_date = resource.get("SnapshotCreateTime")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("rds", {}).get("snapshot", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_rds.delete_db_snapshot(
                                     DBSnapshotIdentifier=resource_id
                                 )
@@ -182,13 +174,13 @@ class RDSCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
+                                f"RDS Snapshot '{resource_id}' was created {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"RDS Snapshot '{resource_id}' was created {delta.days} days ago "
+                            f"RDS Snapshot '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

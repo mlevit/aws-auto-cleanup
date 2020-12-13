@@ -28,7 +28,7 @@ def lambda_handler(event, context):
     try:
         body = []
         page_iterator = paginator.paginate(
-            TableName=os.environ.get("WHITELISTTABLE"),
+            TableName=os.environ.get("WHITELIST_TABLE"),
         )
 
         for page in page_iterator:

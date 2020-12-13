@@ -14,7 +14,7 @@ class ElasticBeanstalkCleanup:
         self.region = region
 
         self._client_elasticbeanstalk = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_elasticbeanstalk(self):
@@ -34,13 +34,17 @@ class ElasticBeanstalkCleanup:
 
         self.logging.debug("Started cleanup of Elastic Beanstalk Applications.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("elasticbeanstalk", {})
-            .get("application", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.elasticbeanstalk.application.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.elasticbeanstalk.application.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(
+            self.whitelist, "elasticbeanstalk.application"
+        )
+
+        if is_cleaning_enabled:
             try:
                 resources = self.client_elasticbeanstalk.describe_applications().get(
                     "Applications"
@@ -50,26 +54,16 @@ class ElasticBeanstalkCleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("elasticbeanstalk", {})
-                .get("application", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("ApplicationName")
                 resource_date = resource.get("DateUpdated")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("elasticbeanstalk", {}).get(
-                    "application", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_elasticbeanstalk.delete_application(
                                     ApplicationName=resource_id,
                                     TerminateEnvByForce=True,
@@ -82,13 +76,13 @@ class ElasticBeanstalkCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
+                                f"Elastic Beanstalk Application '{resource_id}' was last modified {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Elastic Beanstalk Application '{resource_id}' was last modified {delta.days} days ago "
+                            f"Elastic Beanstalk Application '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

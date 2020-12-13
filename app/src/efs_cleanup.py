@@ -14,7 +14,7 @@ class EFSCleanup:
         self.region = region
 
         self._client_efs = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_efs(self):
@@ -32,39 +32,32 @@ class EFSCleanup:
 
         self.logging.debug("Started cleanup of EFS File Systems.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("efs", {})
-            .get("file_system", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.efs.file_system.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.efs.file_system.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "efs.file_system")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_efs.describe_file_systems().get("FileSystems")
+                paginator = self.client_efs.get_paginator("describe_file_systems")
+                resources = paginator.paginate().build_full_result().get("FileSystems")
             except:
                 self.logging.error("Could not list all EFS File Systems.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("efs", {})
-                .get("file_system", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("FileSystemId")
                 resource_date = resource.get("CreationTime")
                 resource_number_of_mount_targets = resource.get("NumberOfMountTargets")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("efs", {}).get(
-                    "file_system", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         if resource_number_of_mount_targets > 0:
                             try:
                                 resource_mount_targets = (
@@ -83,7 +76,7 @@ class EFSCleanup:
                                     mount_target_id = mount_target.get("MountTargetId")
 
                                     try:
-                                        if not self._dry_run:
+                                        if not self.is_dry_run:
                                             self.client_efs.delete_mount_target(
                                                 MountTargetId=mount_target_id
                                             )
@@ -95,12 +88,12 @@ class EFSCleanup:
                                         resource_action = "ERROR"
                                     else:
                                         self.logging.info(
-                                            f"EFS Mount Target '{mount_target_id}' was deleted for EFS File System {resource_id}."
+                                            f"EFS Mount Target '{mount_target_id}' was deleted for EFS File System '{resource_id}'."
                                         )
 
                         if resource_action != "ERROR":
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_efs.delete_file_system(
                                         FileSystemId=resource_id
                                     )
@@ -112,13 +105,13 @@ class EFSCleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"EFS File System '{resource_id}' was created {delta.days} days ago "
+                                    f"EFS File System '{resource_id}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"EFS File System '{resource_id}' was created {delta.days} days ago "
+                            f"EFS File System '{resource_id}' was created {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

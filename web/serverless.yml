@@ -10,7 +10,6 @@ custom:
 
 provider:
   name: aws
-  runtime: python3.8
   stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"

@@ -14,7 +14,7 @@ class AmplifyCleanup:
         self.region = region
 
         self._client_amplify = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_amplify(self):
@@ -32,39 +32,34 @@ class AmplifyCleanup:
 
         self.logging.debug("Started cleanup of Amplify Apps.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("amplify", {})
-            .get("app", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.amplify.app.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.amplify.app.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "amplify.app")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_amplify.list_apps().get("apps")
+                paginator = self.client_amplify.get_paginator("list_apps")
+                resources = paginator.paginate().build_full_result().get("apps")
             except:
                 self.logging.error("Could not list all Amplify Apps.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("amplify", {})
-                .get("app", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("name")
                 resource_app_id = resource.get("appId")
                 resource_date = resource.get("updateTime")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("amplify", {}).get("app", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in resource_whitelist:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_amplify.delete_app(appId=resource_app_id)
                         except:
                             self.logging.error(
@@ -74,13 +69,13 @@ class AmplifyCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"Amplify App '{resource_id}' was last modified {delta.days} days ago "
+                                f"Amplify App '{resource_id}' was last modified {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"Amplify App '{resource_id}' was last modified {delta.days} days ago "
+                            f"Amplify App '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"

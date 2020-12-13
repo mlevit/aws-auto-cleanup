@@ -39,6 +39,7 @@ provider:
         - s3:List*
       Resource: "*"
   tracing:
+    apiGateway: true
     lambda: true
 
 package:
@@ -59,9 +60,9 @@ functions:
       exclude:
         - "**"
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      LOG_LEVEL: ${self:custom.log_level}
+      SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     layers:
       - Ref: PythonRequirementsLambdaLayer
     events:
@@ -81,8 +82,8 @@ functions:
       exclude:
         - "**"
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      LOG_LEVEL: ${self:custom.log_level}
+      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
       - http:
           method: GET
@@ -102,9 +103,9 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      LOG_LEVEL: ${self:custom.log_level}
+      SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
       - http:
           method: PUT
@@ -122,8 +123,8 @@ functions:
       exclude:
         - "**"
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      WHITELISTTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      LOG_LEVEL: ${self:custom.log_level}
+      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
       - http:
           method: DELETE
@@ -143,8 +144,8 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      SETTINGSTABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      LOG_LEVEL: ${self:custom.log_level}
+      SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
     events:
       - http:
           method: GET
@@ -162,8 +163,8 @@ functions:
       exclude:
         - "**"
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      EXECUTIONLOGBUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+      LOG_LEVEL: ${self:custom.log_level}
+      EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
     events:
       - http:
           method: GET
@@ -181,8 +182,8 @@ functions:
       exclude:
         - "**"
     environment:
-      LOGLEVEL: ${self:custom.log_level}
-      EXECUTIONLOGBUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+      LOG_LEVEL: ${self:custom.log_level}
+      EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
     events:
       - http:
           method: GET

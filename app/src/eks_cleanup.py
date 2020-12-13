@@ -14,7 +14,7 @@ class EKSCleanup:
         self.region = region
 
         self._client_eks = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_eks(self):
@@ -32,26 +32,22 @@ class EKSCleanup:
 
         self.logging.debug("Started cleanup of EKS Clusters.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("eks", {})
-            .get("cluster", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.eks.cluster.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.eks.cluster.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "eks.cluster")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_eks.list_clusters().get("clusters")
+                paginator = self.client_eks.get_paginator("list_clusters")
+                resources = paginator.paginate().build_full_result().get("clusters")
             except:
                 self.logging.error("Could not list all EKS Clusters.")
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("eks", {})
-                .get("cluster", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 # for each cluster, we must first delete all the Node Groups
@@ -68,56 +64,66 @@ class EKSCleanup:
                         f"Could not get EKS Cluster's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
-                    return False
+                    resource_action = "ERROR"
+                else:
+                    resource_id = resource_details.get("name")
+                    resource_date = resource_details.get("createdAt")
+                    resource_age = Helper.get_day_delta(resource_date).days
+                    resource_action = None
 
-                resource_id = resource_details.get("name")
-                resource_date = resource_details.get("createdAt")
-                resource_action = None
+                    if resource_id not in resource_whitelist:
+                        paginator = self.client_eks.get_paginator(
+                            "list_fargate_profiles"
+                        )
+                        list_fargate_profiles = (
+                            paginator.paginate(clusterName=resource_id)
+                            .build_full_result()
+                            .get("fargateProfileNames")
+                        )
 
-                if resource_id not in self.whitelist.get("eks", {}).get("cluster", []):
-                    list_fargate_profiles = self.client_eks.list_fargate_profiles(
-                        clusterName=resource_id,
-                    ).get("fargateProfileNames")
+                        paginator = self.client_eks.get_paginator("list_nodegroups")
+                        list_nodegroups = (
+                            paginator.paginate(clusterName=resource_id)
+                            .build_full_result()
+                            .get("nodegroups")
+                        )
 
-                    list_nodegroups = self.client_eks.list_nodegroups(
-                        clusterName=resource_id,
-                    ).get("nodegroups")
-
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if len(list_fargate_profiles) == 0 and len(list_nodegroups) == 0:
-                        if delta.days > ttl_days:
-                            try:
-                                if not self._dry_run:
-                                    self.client_eks.delete_cluster(name=resource_id)
-                            except:
-                                self.logging.error(
-                                    f"Could not delete EKS Cluster '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
+                        if (
+                            len(list_fargate_profiles) == 0
+                            and len(list_nodegroups) == 0
+                        ):
+                            if resource_age > resource_maximum_age:
+                                try:
+                                    if not self.is_dry_run:
+                                        self.client_eks.delete_cluster(name=resource_id)
+                                except:
+                                    self.logging.error(
+                                        f"Could not delete EKS Cluster '{resource_id}'."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.info(
+                                        f"EKS Cluster '{resource_id}' was created {resource_age} days ago "
+                                        "and has been deleted."
+                                    )
+                                    resource_action = "DELETE"
                             else:
-                                self.logging.info(
-                                    f"EKS Cluster '{resource_id}' was created {delta.days} days ago "
-                                    "and has been deleted."
+                                self.logging.debug(
+                                    f"EKS Cluster '{resource_id}' was created {resource_age} days ago "
+                                    "(less than TTL setting) and has not been deleted."
                                 )
-                                resource_action = "DELETE"
+                                resource_action = "SKIP - TTL"
                         else:
                             self.logging.debug(
-                                f"EKS Cluster '{resource_id}' was created {delta.days} days ago "
-                                "(less than TTL setting) and has not been deleted."
+                                f"EKS Cluster '{resource_id}' is associated with EKS Fargate Profiles or EKS Node Groups and has not been deleted."
                             )
-                            resource_action = "SKIP - TTL"
+                            resource_action = "SKIP - IN USE"
                     else:
                         self.logging.debug(
-                            f"EKS Cluster '{resource_id}' is associated with EKS Fargate Profiles or EKS Node Groups and has not been deleted."
+                            f"EKS Cluster '{resource_id}' has been whitelisted and has not been deleted."
                         )
-                        resource_action = "SKIP - IN USE"
-                else:
-                    self.logging.debug(
-                        f"EKS Cluster '{resource_id}' has been whitelisted and has not been deleted."
-                    )
-                    resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - WHITELIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -143,30 +149,26 @@ class EKSCleanup:
             f"Started cleanup of EKS Fargate Profiles for EKS Cluster {cluster}."
         )
 
-        clean = (
-            self.settings.get("services", {})
-            .get("eks", {})
-            .get("fargate_profile", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.eks.fargate_profile.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.eks.fargate_profile.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "eks.fargate_profile")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_eks.list_fargate_profiles(
-                    clusterName=cluster
-                ).get("fargateProfileNames")
+                paginator = self.client_eks.get_paginator("list_fargate_profiles")
+                resources = paginator.paginate(clusterName=cluster).build_full_result()[
+                    "fargateProfileNames"
+                ]
             except:
                 self.logging.error(
                     f"Could not list all EKS Fargate Profiles for EKS Cluster {cluster}."
                 )
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("eks", {})
-                .get("fargate_profile", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 try:
@@ -179,46 +181,44 @@ class EKSCleanup:
                         f"Could not get EKS Fargate Profile's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
-                    return False
+                    resource_action = "ERROR"
+                else:
+                    resource_id = resource_details.get("fargateProfileName")
+                    resource_date = resource_details.get("createdAt")
+                    resource_age = Helper.get_day_delta(resource_date).days
+                    resource_action = None
 
-                resource_id = resource_details.get("fargateProfileName")
-                resource_date = resource_details.get("createdAt")
-                resource_action = None
-
-                if resource_id not in self.whitelist.get("eks", {}).get(
-                    "fargate_profile", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
-                        try:
-                            if not self._dry_run:
-                                self.client_eks.delete_fargate_profile(
-                                    clusterName=cluster, fargateProfileName=resource_id
+                    if resource_id not in resource_whitelist:
+                        if resource_age > resource_maximum_age:
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_eks.delete_fargate_profile(
+                                        clusterName=cluster,
+                                        fargateProfileName=resource_id,
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete EKS Fargate Profile '{resource_id}'."
                                 )
-                        except:
-                            self.logging.error(
-                                f"Could not delete EKS Fargate Profile '{resource_id}'."
-                            )
-                            self.logging.error(sys.exc_info()[1])
-                            resource_action = "ERROR"
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"EKS Fargate Profile '{resource_id}' was created {resource_age} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                         else:
-                            self.logging.info(
-                                f"EKS Fargate Profile '{resource_id}' was created {delta.days} days ago "
-                                "and has been deleted."
+                            self.logging.debug(
+                                f"EKS Fargate Profile '{resource_id}' was created {resource_age} days ago "
+                                "(less than TTL setting) and has not been deleted."
                             )
-                            resource_action = "DELETE"
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"EKS Fargate Profile '{resource_id}' was created {delta.days} days ago "
-                            "(less than TTL setting) and has not been deleted."
+                            f"EKS Fargate Profile '{resource_id}' has been whitelisted and has not been deleted."
                         )
-                        resource_action = "SKIP - TTL"
-                else:
-                    self.logging.debug(
-                        f"EKS Fargate Profile '{resource_id}' has been whitelisted and has not been deleted."
-                    )
-                    resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - WHITELIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -248,30 +248,26 @@ class EKSCleanup:
             f"Started cleanup of EKS Node Groups for EKS Cluster {cluster}."
         )
 
-        clean = (
-            self.settings.get("services", {})
-            .get("eks", {})
-            .get("node_group", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.eks.node_group.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.eks.node_group.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "eks.node_group")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_eks.list_nodegroups(clusterName=cluster).get(
+                paginator = self.client_eks.get_paginator("list_nodegroups")
+                resources = paginator.paginate(clusterName=cluster).build_full_result()[
                     "nodegroups"
-                )
+                ]
             except:
                 self.logging.error(
                     f"Could not list all EKS Node Groups for EKS Cluster {cluster}."
                 )
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("eks", {})
-                .get("node_group", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 try:
@@ -284,46 +280,43 @@ class EKSCleanup:
                         f"Could not get EKS Node Group's '{resource}' details."
                     )
                     self.logging.error(sys.exc_info()[1])
-                    return False
+                    resource_action = "ERROR"
+                else:
+                    resource_id = resource_details.get("nodegroupName")
+                    resource_date = resource_details.get("createdAt")
+                    resource_age = Helper.get_day_delta(resource_date).days
+                    resource_action = None
 
-                resource_id = resource_details.get("nodegroupName")
-                resource_date = resource_details.get("createdAt")
-                resource_action = None
-
-                if resource_id not in self.whitelist.get("eks", {}).get(
-                    "nodegroup", []
-                ):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
-                        try:
-                            if not self._dry_run:
-                                self.client_eks.delete_nodegroup(
-                                    clusterName=cluster, nodegroupName=resource_id
+                    if resource_id not in resource_whitelist:
+                        if resource_age > resource_maximum_age:
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_eks.delete_nodegroup(
+                                        clusterName=cluster, nodegroupName=resource_id
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete EKS Node Group '{resource_id}'."
                                 )
-                        except:
-                            self.logging.error(
-                                f"Could not delete EKS Node Group '{resource_id}'."
-                            )
-                            self.logging.error(sys.exc_info()[1])
-                            resource_action = "ERROR"
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"EKS Node Group '{resource_id}' was created {resource_age} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
                         else:
-                            self.logging.info(
-                                f"EKS Node Group '{resource_id}' was created {delta.days} days ago "
-                                "and has been deleted."
+                            self.logging.debug(
+                                f"EKS Node Group '{resource_id}' was created {resource_age} days ago "
+                                "(less than TTL setting) and has not been deleted."
                             )
-                            resource_action = "DELETE"
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"EKS Node Group '{resource_id}' was created {delta.days} days ago "
-                            "(less than TTL setting) and has not been deleted."
+                            f"EKS Node Group '{resource_id}' has been whitelisted and has not been deleted."
                         )
-                        resource_action = "SKIP - TTL"
-                else:
-                    self.logging.debug(
-                        f"EKS Node Group '{resource_id}' has been whitelisted and has not been deleted."
-                    )
-                    resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - WHITELIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

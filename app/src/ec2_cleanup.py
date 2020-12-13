@@ -16,7 +16,7 @@ class EC2Cleanup:
         self._client_ec2 = None
         self._client_sts = None
         self._resource_ec2 = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_sts(self):
@@ -26,7 +26,7 @@ class EC2Cleanup:
 
     @property
     def account_number(self):
-        return self.client_sts.get_caller_identity()["Account"]
+        return self.client_sts.get_caller_identity().get("Account")
 
     @property
     def client_ec2(self):
@@ -55,13 +55,15 @@ class EC2Cleanup:
 
         self.logging.debug("Started cleanup of EC2 Addresses.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ec2", {})
-            .get("address", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.address.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.address.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.address")
+
+        if is_cleaning_enabled:
             try:
                 resources = self.client_ec2.describe_addresses().get("Addresses")
             except:
@@ -73,10 +75,10 @@ class EC2Cleanup:
                 resource_id = resource.get("AllocationId")
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("ec2", {}).get("address", []):
+                if resource_id not in resource_whitelist:
                     if resource.get("AssociationId") is None:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ec2.release_address(
                                     AllocationId=resource_id
                                 )
@@ -127,13 +129,15 @@ class EC2Cleanup:
 
         self.logging.debug("Started cleanup of EC2 Images.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ec2", {})
-            .get("image", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.image.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.image.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.image")
+
+        if is_cleaning_enabled:
             try:
                 resources = self.client_ec2.describe_images(
                     Owners=[
@@ -145,24 +149,17 @@ class EC2Cleanup:
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ec2", {})
-                .get("image", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("ImageId")
                 resource_date = resource.get("CreationDate")
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("ec2", {}).get("image", []):
-                    delta = Helper.get_day_delta(resource_date)
+                if resource_id not in resource_whitelist:
+                    resource_age = Helper.get_day_delta(resource_date).days
 
-                    if delta.days > ttl_days:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ec2.deregister_image(ImageId=resource_id)
                         except:
                             self.logging.error(
@@ -172,13 +169,13 @@ class EC2Cleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
+                                f"EC2 Image '{resource_id}' was last modified {resource_age} days ago "
                                 "and has been deregistered."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"EC2 Image '{resource_id}' was last modified {delta.days} days ago "
+                            f"EC2 Image '{resource_id}' was last modified {resource_age} days ago "
                             "(less than TTL setting) and has not been deregistered."
                         )
                         resource_action = "SKIP - TTL"
@@ -213,43 +210,47 @@ class EC2Cleanup:
 
         self.logging.debug("Started cleanup of EC2 Instances.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ec2", {})
-            .get("instance", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.instance.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.instance.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.instance")
+
+        if is_cleaning_enabled:
             try:
-                reservations = self.client_ec2.describe_instances().get("Reservations")
+                paginator = self.client_ec2.get_paginator("describe_instances")
+                reservations = (
+                    paginator.paginate(
+                        Filters=[
+                            {
+                                "Name": "state-reason-message",
+                                "Values": ["running", "stopped"],
+                            },
+                        ]
+                    )
+                    .build_full_result()
+                    .get("Reservations")
+                )
             except:
                 self.logging.error("Could not list all EC2 Instances.")
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ec2", {})
-                .get("instance", {})
-                .get("ttl", 7)
-            )
 
             for reservation in reservations:
                 for resource in reservation.get("Instances"):
                     resource_id = resource.get("InstanceId")
                     resource_date = resource.get("LaunchTime")
                     resource_state = resource.get("State").get("Name")
+                    resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in self.whitelist.get("ec2", {}).get(
-                        "instance", []
-                    ):
-                        delta = Helper.get_day_delta(resource_date)
-
-                        if delta.days > ttl_days:
+                    if resource_id not in resource_whitelist:
+                        if resource_age > resource_maximum_age:
                             if resource_state == "running":
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         self.client_ec2.stop_instances(
                                             InstanceIds=[resource_id]
                                         )
@@ -262,7 +263,7 @@ class EC2Cleanup:
                                 else:
                                     self.logging.info(
                                         f"EC2 Instance '{resource_id}' in a 'running' state was last "
-                                        f"launched {delta.days} days ago and has been stopped."
+                                        f"launched {resource_age} days ago and has been stopped."
                                     )
                                     resource_action = "STOP"
                             elif resource_state == "stopped":
@@ -285,7 +286,7 @@ class EC2Cleanup:
                                 else:
                                     if resource_protection:
                                         try:
-                                            if not self._dry_run:
+                                            if not self.is_dry_run:
                                                 self.client_ec2.modify_instance_attribute(
                                                     DisableApiTermination={
                                                         "Value": False
@@ -306,7 +307,7 @@ class EC2Cleanup:
 
                                     if resource_action != "ERROR":
                                         try:
-                                            if not self._dry_run:
+                                            if not self.is_dry_run:
                                                 self.client_ec2.terminate_instances(
                                                     InstanceIds=[resource_id]
                                                 )
@@ -315,15 +316,16 @@ class EC2Cleanup:
                                                 f"Could not delete Instance EC2 '{resource_id}'."
                                             )
                                             self.logging.error(sys.exc_info()[1])
+                                            resource_action = "ERROR"
                                         else:
                                             self.logging.info(
                                                 f"EC2 Instance '{resource_id}' in a 'stopped' state was last "
-                                                f"launched {delta.days} days ago and has been terminated."
+                                                f"launched {resource_age} days ago and has been terminated."
                                             )
                                             resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"EC2 Instance '{resource_id}' was created {delta.days} days ago "
+                                f"EC2 Instance '{resource_id}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"
@@ -355,29 +357,36 @@ class EC2Cleanup:
 
         self.logging.debug("Started cleanup of EC2 Security Groups.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ec2", {})
-            .get("security_group", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.security_group.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.security_group.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.security_group")
+
+        if is_cleaning_enabled:
             try:
                 # help from https://stackoverflow.com/a/41150217
-                instances = self.client_ec2.describe_instances()
-                security_groups = self.client_ec2.describe_security_groups()
+                paginator = self.client_ec2.get_paginator("describe_instances")
+                instances = paginator.paginate().build_full_result().get("Reservations")
+
+                paginator = self.client_ec2.get_paginator("describe_security_groups")
+                security_groups = paginator.paginate().build_full_result()[
+                    "SecurityGroups"
+                ]
 
                 instance_security_group_set = set()
                 security_group_set = set()
 
-                for reservation in instances.get("Reservations"):
+                for reservation in instances:
                     for instance in reservation.get("Instances"):
                         for security_group in instance.get("SecurityGroups"):
                             instance_security_group_set.add(
                                 security_group.get("GroupId")
                             )
 
-                for security_group in security_groups.get("SecurityGroups"):
+                for security_group in security_groups:
                     if security_group.get("GroupName") != "default":
                         security_group_set.add(security_group.get("GroupId"))
 
@@ -390,15 +399,13 @@ class EC2Cleanup:
             for resource in resources:
                 resource_action = None
 
-                if resource not in self.whitelist.get("ec2", {}).get(
-                    "security_group", []
-                ):
+                if resource not in resource_whitelist:
                     try:
-                        if not self._dry_run:
+                        if not self.is_dry_run:
                             self.client_ec2.delete_security_group(GroupId=resource)
                     except:
                         if "DependencyViolation" in str(sys.exc_info()[1]):
-                            self.logging.warn(
+                            self.logging.debug(
                                 f"EC2 Security Group '{resource}' has a dependent object "
                                 "and cannot been deleted without deleting the dependent object first."
                             )
@@ -438,37 +445,37 @@ class EC2Cleanup:
 
         self.logging.debug("Started cleanup of EC2 Snapshots.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ec2", {})
-            .get("snapshot", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.snapshot.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.snapshot.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.snapshot")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_ec2.describe_snapshots(
-                    OwnerIds=[
-                        "self",
-                    ]
-                ).get("Snapshots")
+                paginator = self.client_ec2.get_paginator("describe_snapshots")
+                resources = (
+                    paginator.paginate(
+                        OwnerIds=[
+                            "self",
+                        ]
+                    )
+                    .build_full_result()
+                    .get("Snapshots")
+                )
             except:
                 self.logging.error("Could not list all EC2 Snapshots.")
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ec2", {})
-                .get("snapshot", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 resource_id = resource.get("SnapshotId")
                 resource_date = resource.get("StartTime")
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("ec2", {}).get("snapshot", []):
+                if resource_id not in resource_whitelist:
                     snapshots_in_use = []
                     try:
                         images = self.client_ec2.describe_images(
@@ -493,11 +500,11 @@ class EC2Cleanup:
                                     )
 
                         if resource_id not in snapshots_in_use:
-                            delta = Helper.get_day_delta(resource_date)
+                            resource_age = Helper.get_day_delta(resource_date).days
 
-                            if delta.days > ttl_days:
+                            if resource_age > resource_maximum_age:
                                 try:
-                                    if not self._dry_run:
+                                    if not self.is_dry_run:
                                         self.client_ec2.delete_snapshot(
                                             SnapshotId=resource_id
                                         )
@@ -509,13 +516,13 @@ class EC2Cleanup:
                                     resource_action = "ERROR"
                                 else:
                                     self.logging.info(
-                                        f"EC2 Snapshot '{resource_id}' was created {delta.days} days ago "
+                                        f"EC2 Snapshot '{resource_id}' was created {resource_age} days ago "
                                         "and has been deleted."
                                     )
                                     resource_action = "DELETE"
                             else:
                                 self.logging.debug(
-                                    f"EC2 Snapshot '{resource_id} was created {delta.days} days ago "
+                                    f"EC2 Snapshot '{resource_id} was created {resource_age} days ago "
                                     "(less than TTL setting) and has not been deleted."
                                 )
                                 resource_action = "SKIP - TTL"
@@ -553,39 +560,35 @@ class EC2Cleanup:
 
         self.logging.debug("Started cleanup of EC2 Volumes.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ec2", {})
-            .get("volume", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.volume.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.volume.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.volume")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_ec2.describe_volumes().get("Volumes")
+                paginator = self.client_ec2.get_paginator("describe_volumes")
+                resources = paginator.paginate().build_full_result().get("Volumes")
             except:
                 self.logging.error("Could not list all EC2 Volumes.")
                 self.logging.error(sys.exc_info()[1])
                 return False
-
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ec2", {})
-                .get("volume", {})
-                .get("ttl", 7)
-            )
 
             for resource in resources:
                 resource_id = resource.get("VolumeId")
                 resource_date = resource.get("CreateTime")
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("ec2", {}).get("volume", []):
+                if resource_id not in resource_whitelist:
                     if resource.get("Attachments") == []:
-                        delta = Helper.get_day_delta(resource_date)
+                        resource_age = Helper.get_day_delta(resource_date).days
 
-                        if delta.days > ttl_days:
+                        if resource_age > resource_maximum_age:
                             try:
-                                if not self._dry_run:
+                                if not self.is_dry_run:
                                     self.client_ec2.delete_volume(VolumeId=resource_id)
                             except:
                                 self.logging.error(
@@ -595,13 +598,13 @@ class EC2Cleanup:
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
-                                    f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
+                                    f"EC2 Volume '{resource_id}' was created {resource_age} days ago "
                                     "and has been deleted."
                                 )
                                 resource_action = "DELETE"
                         else:
                             self.logging.debug(
-                                f"EC2 Volume '{resource_id}' was created {delta.days} days ago "
+                                f"EC2 Volume '{resource_id}' was created {resource_age} days ago "
                                 "(less than TTL setting) and has not been deleted."
                             )
                             resource_action = "SKIP - TTL"

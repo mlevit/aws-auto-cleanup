@@ -14,7 +14,7 @@ class ECRCleanup:
         self.region = region
 
         self._client_ecr = None
-        self._dry_run = self.settings.get("general", {}).get("dry_run", True)
+        self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @property
     def client_ecr(self):
@@ -32,75 +32,78 @@ class ECRCleanup:
 
         self.logging.debug("Started cleanup of ECR Repositories.")
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ecr", {})
-            .get("repository", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ecr.repository.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ecr.repository.ttl", 7
+        )
+        whitelisted_resources = Helper.get_whitelist(self.whitelist, "ecr.repository")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_ecr.describe_repositories().get("repositories")
+                paginator = self.client_ecr.get_paginator("describe_repositories")
+                resources = paginator.paginate().build_full_result().get("repositories")
             except:
                 self.logging.error("Could not list all ECR Repositories.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ecr", {})
-                .get("repository", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("repositoryName")
                 resource_date = resource.get("createdAt")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
                 # for each repository, we must first delete all the
                 # images before deleting the repository itself
                 self.images(resource_id)
 
-                if resource_id not in self.whitelist.get("ecr", {}).get(
-                    "repository", []
-                ):
-                    list_images = self.client_ecr.list_images(
-                        repositoryName=resource_id,
-                    ).get("imageIds")
-
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if len(list_images) == 0:
-                        if delta.days > ttl_days:
-                            try:
-                                if not self._dry_run:
-                                    self.client_ecr.delete_repository(
-                                        repositoryName=resource_id
+                if resource_id not in whitelisted_resources:
+                    try:
+                        paginator = self.client_ecr.get_paginator("list_images")
+                        list_images = (
+                            paginator.paginate(repositoryName=resource_id)
+                            .build_full_result()
+                            .get("imageIds")
+                        )
+                    except:
+                        self.logging.error(
+                            f"Could not list all ECR Images for ECR Repository '{resource_id}'."
+                        )
+                        self.logging.error(sys.exc_info()[1])
+                        resource_action = "ERROR"
+                    else:
+                        if len(list_images) == 0:
+                            if resource_age > resource_maximum_age:
+                                try:
+                                    if not self.is_dry_run:
+                                        self.client_ecr.delete_repository(
+                                            repositoryName=resource_id
+                                        )
+                                except:
+                                    self.logging.error(
+                                        f"Could not delete ECR Repository '{resource_id}'."
                                     )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete ECR Repository '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.info(
+                                        f"ECR Repository '{resource_id}' was created {resource_age} days ago "
+                                        "and has been deleted."
+                                    )
+                                    resource_action = "DELETE"
                             else:
-                                self.logging.info(
-                                    f"ECR Repository '{resource_id}' was created {delta.days} days ago "
-                                    "and has been deleted."
+                                self.logging.debug(
+                                    f"ECR Repository '{resource_id}' was created {resource_age} days ago "
+                                    "(less than TTL setting) and has not been deleted."
                                 )
-                                resource_action = "DELETE"
+                                resource_action = "SKIP - TTL"
                         else:
                             self.logging.debug(
-                                f"ECR Repository '{resource_id}' was created {delta.days} days ago "
-                                "(less than TTL setting) and has not been deleted."
+                                f"ECR Repository '{resource_id}' contains ECR Images and has not been deleted."
                             )
-                            resource_action = "SKIP - TTL"
-                    else:
-                        self.logging.debug(
-                            f"ECR Repository '{resource_id}' contains ECR Images and has not been deleted."
-                        )
-                        resource_action = "SKIP - IN USE"
+                            resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
                         f"ECR Repository '{resource_id}' has been whitelisted and has not been deleted."
@@ -128,45 +131,42 @@ class ECRCleanup:
         """
 
         self.logging.debug(
-            f"Started cleanup of ECR Images for ECR Repository {repository}."
+            f"Started cleanup of ECR Images for ECR Repository '{repository}'."
         )
 
-        clean = (
-            self.settings.get("services", {})
-            .get("ecr", {})
-            .get("image", {})
-            .get("clean", False)
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ecr.image.clean", False
         )
-        if clean:
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ecr.image.ttl", 7
+        )
+        whitelisted_resources = Helper.get_whitelist(self.whitelist, "ecr.image")
+
+        if is_cleaning_enabled:
             try:
-                resources = self.client_ecr.describe_images(
-                    repositoryName=repository
-                ).get("imageDetails")
+                paginator = self.client_ecr.get_paginator("describe_images")
+                resources = (
+                    paginator.paginate(repositoryName=repository)
+                    .build_full_result()
+                    .get("imageDetails")
+                )
             except:
                 self.logging.error(
-                    f"Could not list all ECR Images for ECR Repository {repository}."
+                    f"Could not list all ECR Images for ECR Repository '{repository}'."
                 )
                 self.logging.error(sys.exc_info()[1])
                 return False
 
-            ttl_days = (
-                self.settings.get("services", {})
-                .get("ecr", {})
-                .get("image", {})
-                .get("ttl", 7)
-            )
-
             for resource in resources:
                 resource_id = resource.get("imageDigest")
                 resource_date = resource.get("imagePushedAt")
+                resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in self.whitelist.get("ecr", {}).get("image", []):
-                    delta = Helper.get_day_delta(resource_date)
-
-                    if delta.days > ttl_days:
+                if resource_id not in whitelisted_resources:
+                    if resource_age > resource_maximum_age:
                         try:
-                            if not self._dry_run:
+                            if not self.is_dry_run:
                                 self.client_ecr.batch_delete_image(
                                     repositoryName=repository,
                                     imageIds=[{"imageDigest": resource_id}],
@@ -179,13 +179,13 @@ class ECRCleanup:
                             resource_action = "ERROR"
                         else:
                             self.logging.info(
-                                f"ECR Image '{resource_id}' was pushed {delta.days} days ago "
+                                f"ECR Image '{resource_id}' was pushed {resource_age} days ago "
                                 "and has been deleted."
                             )
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"ECR Image '{resource_id}' was pushed {delta.days} days ago "
+                            f"ECR Image '{resource_id}' was pushed {resource_age} days ago "
                             "(less than TTL setting) and has not been deleted."
                         )
                         resource_action = "SKIP - TTL"
@@ -205,11 +205,11 @@ class ECRCleanup:
                 )
 
             self.logging.debug(
-                f"Finished cleanup of ECR Images for ECR Repository {repository}."
+                f"Finished cleanup of ECR Images for ECR Repository '{repository}'."
             )
             return True
         else:
             self.logging.info(
-                f"Skipping cleanup of ECR Images for ECR Repository {repository}."
+                f"Skipping cleanup of ECR Images for ECR Repository '{repository}'."
             )
             return True

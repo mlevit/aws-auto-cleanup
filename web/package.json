@@ -1,7 +1,7 @@
 {
   "name": "auto-cleanup-web",
   "description": "Auto Cleanup Web",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "dependencies": {},
   "devDependencies": {
