@@ -138,6 +138,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | Glue Crawlers                  | Crawler Name           | `glue:crawler:crawler_name`                          |
 | Glue Dev Databases             | Database Name          | `glue:database:database_name`                        |
 | Glue Dev Endpoints             | Endpoint Name          | `glue:dev_endpoint:endpoint_name`                    |
+| IAM Access Keys                | Access Key ID          | `iam:access_key:access_key_id`                       |
 | IAM Policies                   | Policy Name            | `iam:policy:policy_name`                             |
 | IAM Roles                      | Role Name              | `iam:role:role_name`                                 |
 | IAM Users                      | User Name              | `iam:user:user_name`                                 |
