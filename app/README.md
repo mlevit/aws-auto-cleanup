@@ -185,53 +185,54 @@ General settings.
 
 Service-specific settings indicating the supported AWS services, resources, and their lifespan.
 
-| Service               | Resource Type            | Clean | TTL | Comment                                                        |
-| --------------------- | ------------------------ | ----- | --- | -------------------------------------------------------------- |
-| Airflow               | Environments :new:       | True  | 7   |                                                                |
-| Amplify               | Apps :new:               | True  | 7   |                                                                |
-| CloudFormation        | Stacks                   | True  | 7   |                                                                |
-| CloudWatch            | Log Groups :new:         | True  | 30  |                                                                |
-| DynamoDB              | Tables                   | True  | 7   |                                                                |
-| EC2                   | Addresses                | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
-| EC2                   | Images :new:             | True  | 7   |                                                                |
-| EC2                   | Instances                | True  | 7   |                                                                |
-| EC2                   | Security Groups          | True  | N/A | Deletes Security Group if not associated with an EC2 instance. |
-| EC2                   | Snapshots                | True  | 7   |                                                                |
-| EC2                   | Volumes                  | True  | 7   |                                                                |
-| ECR                   | Images :new:             | True  | 7   |                                                                |
-| ECR                   | Repositories :new:       | True  | 7   | Deletes Repository if no Images exist.                         |
-| ECS                   | Clusters :new:           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
-| ECS                   | Services :new:           | True  | 7   |                                                                |
-| EFS                   | Clusters :new:           | True  | 7   |                                                                |
-| EFS                   | Fargate Profiles :new:   | True  | 7   |                                                                |
-| EFS                   | File Systems :new:       | True  | 7   |                                                                |
-| EFS                   | Node Groups :new:        | True  | 7   |                                                                |
-| EKS                   | Clusters :new:           | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist.   |
-| EKS                   | Fargate Profiles :new:   | True  | 7   |                                                                |
-| EKS                   | Node Groups :new:        | True  | 7   |                                                                |
-| ElastCache            | Clusters :new:           | True  | 7   |                                                                |
-| ElastCache            | Replication Groups :new: | True  | 7   |                                                                |
-| Elastic Beanstalk     | Applications             | True  | 7   |                                                                |
-| Elasticsearch Service | Domain Name :new:        | True  | 7   |                                                                |
-| ELB                   | Load Balancers :new:     | True  | 7   |                                                                |
-| EMR                   | Clusters                 | True  | 7   |                                                                |
-| Glue                  | Crawlers :new:           | True  | 7   |                                                                |
-| Glue                  | Databases :new:          | True  | 30  |                                                                |
-| Glue                  | Dev Endpoints            | True  | 7   |                                                                |
-| IAM                   | Policies :new:           | True  | 30  |                                                                |
-| IAM                   | Roles                    | True  | 30  |                                                                |
-| IAM                   | Users :new:              | True  | 30  |                                                                |
-| Kafka                 | Clusters :new:           | True  | 7   |                                                                |
-| Kinesis               | Streams :new:            | True  | 7   |                                                                |
-| Lambda                | Functions                | True  | 30  |                                                                |
-| RDS                   | Instances                | True  | 7   |                                                                |
-| RDS                   | Snapshots                | True  | 7   |                                                                |
-| Redshift              | Clusters                 | True  | 7   |                                                                |
-| Redshift              | Snapshots                | True  | 7   |                                                                |
-| S3                    | Buckets                  | True  | 30  |                                                                |
-| SageMaker             | Apps :new:               | True  | 7   |                                                                |
-| SageMaker             | Endpoints :new:          | True  | 7   |                                                                |
-| SageMaker             | Notebook Instances :new: | True  | 7   |                                                                |
+| Service               | Resource Type      | Clean | TTL | Comment                                                        |
+| --------------------- | ------------------ | ----- | --- | -------------------------------------------------------------- |
+| Airflow               | Environments :new: | True  | 7   |                                                                |
+| Amplify               | Apps               | True  | 7   |                                                                |
+| CloudFormation        | Stacks             | True  | 7   |                                                                |
+| CloudWatch            | Log Groups         | True  | 30  |                                                                |
+| DynamoDB              | Tables             | True  | 7   |                                                                |
+| EC2                   | Addresses          | True  | N/A | Deletes Address if not associated with an EC2 instance.        |
+| EC2                   | Images             | True  | 7   |                                                                |
+| EC2                   | Instances          | True  | 7   |                                                                |
+| EC2                   | Security Groups    | True  | N/A | Deletes Security Group if not associated with an EC2 instance. |
+| EC2                   | Snapshots          | True  | 7   |                                                                |
+| EC2                   | Volumes            | True  | 7   |                                                                |
+| ECR                   | Images             | True  | 7   |                                                                |
+| ECR                   | Repositories       | True  | 7   | Deletes Repository if no Images exist.                         |
+| ECS                   | Clusters           | True  | N/A | Deletes Cluster if no running Services or Tasks.               |
+| ECS                   | Services           | True  | 7   |                                                                |
+| EFS                   | Clusters           | True  | 7   |                                                                |
+| EFS                   | Fargate Profiles   | True  | 7   |                                                                |
+| EFS                   | File Systems       | True  | 7   |                                                                |
+| EFS                   | Node Groups        | True  | 7   |                                                                |
+| EKS                   | Clusters           | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist.   |
+| EKS                   | Fargate Profiles   | True  | 7   |                                                                |
+| EKS                   | Node Groups        | True  | 7   |                                                                |
+| ElastCache            | Clusters           | True  | 7   |                                                                |
+| ElastCache            | Replication Groups | True  | 7   |                                                                |
+| Elastic Beanstalk     | Applications       | True  | 7   |                                                                |
+| Elasticsearch Service | Domain Name        | True  | 7   |                                                                |
+| ELB                   | Load Balancers     | True  | 7   |                                                                |
+| EMR                   | Clusters           | True  | 7   |                                                                |
+| Glue                  | Crawlers           | True  | 7   |                                                                |
+| Glue                  | Databases          | True  | 30  |                                                                |
+| Glue                  | Dev Endpoints      | True  | 7   |                                                                |
+| IAM                   | Access Keys :new:  | True  | 30  |                                                                |
+| IAM                   | Policies           | True  | 30  |                                                                |
+| IAM                   | Roles              | True  | 30  |                                                                |
+| IAM                   | Users :new:        | True  | 30  |                                                                |
+| Kafka                 | Clusters           | True  | 7   |                                                                |
+| Kinesis               | Streams            | True  | 7   |                                                                |
+| Lambda                | Functions          | True  | 30  |                                                                |
+| RDS                   | Instances          | True  | 7   |                                                                |
+| RDS                   | Snapshots          | True  | 7   |                                                                |
+| Redshift              | Clusters           | True  | 7   |                                                                |
+| Redshift              | Snapshots          | True  | 7   |                                                                |
+| S3                    | Buckets            | True  | 30  |                                                                |
+| SageMaker             | Apps :new:         | True  | 7   |                                                                |
+| SageMaker             | Endpoints          | True  | 7   |                                                                |
+| SageMaker             | Notebook Instances | True  | 7   |                                                                |
 
 #### Regions
 
