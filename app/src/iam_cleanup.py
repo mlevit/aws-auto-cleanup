@@ -466,8 +466,6 @@ class IAMCleanup:
                                     ) > Helper.convert_to_datetime(last_accessed):
                                         last_accessed = service_date
 
-                                delta = Helper.get_day_delta(last_accessed)
-
                                 if resource_age > resource_maximum_age:
                                     # delete all inline policies
                                     try:
@@ -666,9 +664,6 @@ class IAMCleanup:
 
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.user_policy.clean", False
-        )
-        resource_maximum_age = Helper.get_setting(
-            self.settings, "services.iam.user_policy.ttl", 7
         )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user_policy")
 

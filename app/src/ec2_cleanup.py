@@ -58,9 +58,6 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.address.clean", False
         )
-        resource_maximum_age = Helper.get_setting(
-            self.settings, "services.ec2.address.ttl", 7
-        )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.address")
 
         if is_cleaning_enabled:

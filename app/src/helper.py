@@ -34,12 +34,12 @@ class Helper:
         return result
 
     @staticmethod
-    def get_whitelist(whitelist, path, default=[]):
+    def get_whitelist(whitelist, path, default=None):
         result = whitelist
         for key in path.split("."):
             result = result.get(key)
             if result is None:
-                return default
+                return default or []
         return result
 
     @staticmethod
