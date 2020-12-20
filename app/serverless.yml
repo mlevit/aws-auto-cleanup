@@ -47,6 +47,10 @@ provider:
       Resource: "*"
     - Effect: Allow
       Action:
+        - codecommit:GetRepository
+      Resource: "*"
+    - Effect: Allow
+      Action:
         - dynamodb:BatchWriteItem
         - dynamodb:DeleteItem
         - dynamodb:DeleteTable
