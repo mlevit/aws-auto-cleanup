@@ -92,6 +92,7 @@ class CloudFormationCleanup:
         resource_id = resource.get("StackName")
         resource_date = resource.get("LastUpdatedTime", resource.get("CreationTime"))
         resource_status = resource.get("StackStatus")
+        resource_root_stack_id = resource.get("RootId")
         resource_protection = True  # resource.get("EnableTerminationProtection")
         resource_age = Helper.get_day_delta(resource_date).days
         resource_action = None
@@ -133,7 +134,7 @@ class CloudFormationCleanup:
                                     )
 
                     # remove termination protection
-                    if resource_protection:
+                    if resource_protection and resource_root_stack_id is None:
                         try:
                             if not self.is_dry_run:
                                 self.client_cloudformation.update_termination_protection(
