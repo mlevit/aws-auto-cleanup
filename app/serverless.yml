@@ -339,7 +339,7 @@ resources:
       Type: "AWS::Glue::Database"
       Properties:
         DatabaseInput:
-          Name: ${self:service}-${self:provider.stage}
+          Name: auto_cleanup_app_${self:provider.stage}
         CatalogId: !Ref AWS::AccountId
     ExecutionLogTable:
       Type: AWS::Glue::Table
@@ -365,13 +365,13 @@ resources:
               - Name: timestamp
                 Type: timestamp
               - Name: dry_run_flag
-                Type: boolean
+                Type: string
               - Name: execution_id
                 Type: string
             Compressed: False
             Location: !Join ["", ["s3://", !Ref ExecutionLogBucket, "/"]]
             InputFormat: org.apache.hadoop.mapred.TextInputFormat
-            OutputFormat: org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat
+            OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             SerdeInfo:
               SerializationLibrary: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
               Parameters:
@@ -379,7 +379,9 @@ resources:
           Parameters:
             delimiter: ","
             classification: csv
-            "skip.header.line.count": 1'
+            "skip.header.line.count": 1
+            has_encrypted_data: true
+            EXTERNAL: true
   Outputs:
     ExecutionLogBucketName:
       Value:

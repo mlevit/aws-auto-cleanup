@@ -1,5 +1,9 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.0
+
+- Fixed `execution_log` Glue table.
+
 ## 1.4.0
 
 - Added ability to whitelist entries directly from the execution log.
