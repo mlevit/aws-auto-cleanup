@@ -25,8 +25,6 @@ provider:
   profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
   apiGateway:
     minimumCompressionSize: 1024
-  apiKeys:
-    - ${self:service}-${self:provider.stage}-key
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -62,7 +60,6 @@ functions:
       exclude:
         - "**"
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
       WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
@@ -85,7 +82,6 @@ functions:
       exclude:
         - "**"
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
@@ -107,7 +103,6 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
       WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
@@ -128,7 +123,6 @@ functions:
       exclude:
         - "**"
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
@@ -150,7 +144,6 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
     events:
@@ -170,7 +163,6 @@ functions:
       exclude:
         - "**"
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
     events:
@@ -190,7 +182,6 @@ functions:
       exclude:
         - "**"
     environment:
-      API_KEY: ${self:service}-${self:provider.stage}-key
       LOG_LEVEL: ${self:custom.log_level}
       EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
     events:
