@@ -121,6 +121,12 @@
                 </span>
                 <span>Help</span>
               </button>
+              <button class="button is-danger" v-on:click="resetApiKey()">
+                <span class="icon">
+                  <i class="fas fa-trash"></i>
+                </span>
+                <span>Reset API Key</span>
+              </button>
             </div>
           </div>
         </div>
@@ -617,6 +623,42 @@
       </div>
 
       <div
+        class="modal"
+        id="apiKey"
+        v-bind:class="{ 'is-active': showApiKeyPopup }"
+      >
+        <div class="modal-background"></div>
+        <div class="modal-card">
+          <form action="#" v-on:submit.prevent="setApiKey()">
+            <header class="modal-card-head">
+              <p class="modal-card-title">API Key</p>              
+            </header>
+            <section class="modal-card-body">              
+              <div class="field">
+                <label class="label">Insert the API Key</label>
+                <div class="control has-icons-left">
+                  <input
+                    class="input"
+                    placeholder="API key"
+                    required
+                    tabindex="1"
+                    type="text"
+                    v-model="apiKey"
+                  />
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-key"></i>
+                  </span>
+                </div>
+              </div>
+            </section>
+            <footer class="modal-card-foot">
+              <button class="button is-success" tabindex="2">Save</button>              
+            </footer>
+          </form>      
+        </div>
+      </div>    
+
+    <div
         class="modal"
         id="help"
         v-bind:class="{ 'is-active': showHelpPopup }"

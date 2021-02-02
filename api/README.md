@@ -33,6 +33,9 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
    npm run deploy -- [--region] [--aws-profile]
    ```
 
+5. After the deployment has completed, annotate the webAppKey as it's the x-api-key needed to call the API and the API key to use in the web app.
+   ![API Key](./static/api-key.png)
+
 ## Removal
 
 1. Change directory
@@ -63,7 +66,7 @@ Inserts a new whitelist entry into DynamoDB.
 
 **Method**: `POST`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
@@ -147,7 +150,7 @@ Returns the entire whitelist table.
 
 **Method**: `GET`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
@@ -214,7 +217,7 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 **Method**: `PUT`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
@@ -299,7 +302,7 @@ Deletes a new whitelist entry into DynamoDB.
 
 **Method**: `DELETE`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
@@ -359,7 +362,7 @@ Returns a list of all Auto Cleanup App executions in descending order
 
 **Method**: `GET`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
@@ -413,7 +416,7 @@ Returns executions logs for a particular Auto Cleanup execution log S3 key.
 
 **Method**: `GET`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
@@ -473,7 +476,7 @@ Returns a list AWS services that are supported by Auto Cleanup.
 
 **Method**: `GET`
 
-**Auth required**: No
+**Auth required**: `x-api-key`
 
 **Permissions required**: None
 
