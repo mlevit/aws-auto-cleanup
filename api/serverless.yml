@@ -25,7 +25,7 @@ provider:
   profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
   apiGateway:
     apiKeys:
-      - webAppKey
+      - ${self:service}-${self:provider.stage}-api-key
     minimumCompressionSize: 1024
   iamRoleStatements:
     - Effect: Allow

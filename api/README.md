@@ -33,7 +33,7 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
    npm run deploy -- [--region] [--aws-profile]
    ```
 
-5. After the deployment has completed, annotate the webAppKey as it's the x-api-key needed to call the API and the API key to use in the web app.
+5. After the deployment has completed, annotate the api key as it's the x-api-key needed to call the API and to use in the web app.
    ![API Key](./static/api-key.png)
 
 ## Removal
