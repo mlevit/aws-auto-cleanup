@@ -9,6 +9,7 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
 - [Table of contents](#table-of-contents)
 - [Deployment](#deployment)
 - [Removal](#removal)
+- [Authentication](#authentication)
 - [Screenshots](#screenshots)
 
 ## Deployment
@@ -58,6 +59,10 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    ```bash
    npm run remove -- [--region] [--aws-profile]
    ```
+
+## Authentication
+
+The first time you access the web client from a new browser, you need to insert the API key that has been generated during the deployment of the API.
 
 ## Screenshots
 
