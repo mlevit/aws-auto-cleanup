@@ -98,10 +98,30 @@
         </div>
 
         <div class="navbar-end">
-          <div class="navbar-item">
-            <div class="buttons">
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">Menu</a>
+            <div class="navbar-dropdown is-right is-boxed">
+              <a class="navbar-item" v-on:click="openHelpPopup()">
+                <span class="icon">
+                  <i class="fas fa-question"></i>
+                </span>
+                <span>Help</span>
+              </a>
+              <a class="navbar-item">
+                <span class="icon">
+                  <i class="fab fa-aws"></i>
+                </span>
+                <span>{{accountId}}</span>
+              </a>
+              <a class="navbar-item" v-on:click="resetApiKey()">
+                <span class="icon">
+                  <i class="fas fa-trash"></i>
+                </span>
+                <span>Reset API Key</span>
+              </a>
+              <hr class="navbar-divider" />
               <a
-                class="button is-light"
+                class="navbar-item"
                 href="https://github.com/servian/aws-auto-cleanup/"
               >
                 <span class="icon">
@@ -109,24 +129,6 @@
                 </span>
                 <span>servian/aws-auto-cleanup</span>
               </a>
-              <button class="button is-static">
-                <span class="icon">
-                  <i class="fab fa-aws"></i>
-                </span>
-                <span>{{accountId}}</span>
-              </button>
-              <button class="button is-info" v-on:click="openHelpPopup()">
-                <span class="icon">
-                  <i class="fas fa-question"></i>
-                </span>
-                <span>Help</span>
-              </button>
-              <button class="button is-danger" v-on:click="resetApiKey()">
-                <span class="icon">
-                  <i class="fas fa-trash"></i>
-                </span>
-                <span>Reset API Key</span>
-              </button>
             </div>
           </div>
         </div>
@@ -631,9 +633,9 @@
         <div class="modal-card">
           <form action="#" v-on:submit.prevent="setApiKey()">
             <header class="modal-card-head">
-              <p class="modal-card-title">API Key</p>              
+              <p class="modal-card-title">API Key</p>
             </header>
-            <section class="modal-card-body">              
+            <section class="modal-card-body">
               <div class="field">
                 <label class="label">Insert the API Key</label>
                 <div class="control has-icons-left">
@@ -652,13 +654,13 @@
               </div>
             </section>
             <footer class="modal-card-foot">
-              <button class="button is-success" tabindex="2">Save</button>              
+              <button class="button is-success" tabindex="2">Save</button>
             </footer>
-          </form>      
+          </form>
         </div>
-      </div>    
+      </div>
 
-    <div
+      <div
         class="modal"
         id="help"
         v-bind:class="{ 'is-active': showHelpPopup }"
