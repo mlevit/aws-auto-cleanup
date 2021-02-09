@@ -2,6 +2,8 @@
 
 ## 1.5.0
 
+- Added API authentation (thanks to @miki79)
+- Added API key prompt to web app (thanks to @miki79).
 - Fixed `execution_log` Glue table.
 
 ## 1.4.0
