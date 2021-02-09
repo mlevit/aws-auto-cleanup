@@ -24,6 +24,8 @@ provider:
   region: ${self:custom.region}
   profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
   apiGateway:
+    apiKeys:
+      - ${self:service}-${self:provider.stage}-api-key
     minimumCompressionSize: 1024
   iamRoleStatements:
     - Effect: Allow
@@ -70,6 +72,7 @@ functions:
           method: POST
           path: /whitelist/entry
           cors: true
+          private: true
   WhitelistRead:
     handler: src/whitelist/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-whitelist-read
@@ -89,6 +92,7 @@ functions:
           method: GET
           path: /whitelist
           cors: true
+          private: true
   WhitelistUpdate:
     handler: src/whitelist/update.lambda_handler
     name: ${self:service}-${self:provider.stage}-whitelist-update
@@ -111,6 +115,7 @@ functions:
           method: PUT
           path: /whitelist/entry
           cors: true
+          private: true
   WhitelistDelete:
     handler: src/whitelist/delete.lambda_handler
     name: ${self:service}-${self:provider.stage}-whitelist-delete
@@ -130,6 +135,7 @@ functions:
           method: DELETE
           path: /whitelist/entry
           cors: true
+          private: true
   ServiceRead:
     handler: src/service/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-service-read
@@ -151,6 +157,7 @@ functions:
           method: GET
           path: /settings/service
           cors: true
+          private: true
   ExecutionLogList:
     handler: src/execution_log/list.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-list
@@ -170,6 +177,7 @@ functions:
           method: GET
           path: /execution
           cors: true
+          private: true
   ExecutionLogRead:
     handler: src/execution_log/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-read
@@ -189,6 +197,7 @@ functions:
           method: GET
           path: /execution/{key}
           cors: true
+          private: true
 
 resources:
   Outputs:

@@ -2,6 +2,7 @@ var API_GET_WHITELIST = "/whitelist";
 var API_SERVICES = "/settings/service";
 var API_CRUD_WHITELIST = "/whitelist/entry/";
 var API_EXECLOG = "/execution/";
+var API_KEY = "";
 
 // Utility functions
 function convertJsonToGet(formJSON) {
@@ -18,6 +19,7 @@ var app = new Vue({
   el: "#app",
   data: {
     accountId: "",
+    apiKey: "",
     executionLogActionStats: {},
     executionLogDataTables: "",
     executionLogKey: "",
@@ -38,6 +40,7 @@ var app = new Vue({
     serviceList: [],
     serviceSettings: [],
     serviceSettingsFlat: [],
+    showApiKeyPopup: true,
     showExecutionLogListLoadingGif: false,
     showExecutionLogLoadingGif: false,
     showExecutionLogPopup: false,
@@ -160,12 +163,36 @@ var app = new Vue({
     openHelpPopup: function () {
       this.showHelpPopup = true;
     },
+    // Api Key
+    closeApiKeyPopup: function () {
+      this.showApiKeyPopup = false;
+    },
+    setApiKey: function () {
+      this.showApiKeyPopup = false;
+      API_KEY = this.apiKey;
+      localStorage.setItem("x-api-key", this.apiKey);
+      init();
+    },
+    resetApiKey: function () {
+      API_KEY = "";
+      localStorage.removeItem("x-api-key");
+      location.reload();
+    },
+  },
+  mounted: function () {
+    API_KEY = localStorage.getItem("x-api-key");
+    if (API_KEY !== null) {
+      this.showApiKeyPopup = false;
+    }
   },
 });
 
 function sendApiRequest(formURL, requestMethod) {
   fetch(API_CRUD_WHITELIST + "?" + formURL, {
     method: requestMethod,
+    headers: {
+      "x-api-key": API_KEY,
+    },
   })
     .then((response) => response.json())
     .then((data) => {
@@ -194,7 +221,11 @@ function getExecutionLog(executionLogUrl) {
   app.showExecutionLogPopup = true;
   app.showExecutionLogLoadingGif = true;
 
-  fetch(API_EXECLOG + executionLogUrl)
+  fetch(API_EXECLOG + executionLogUrl, {
+    headers: {
+      "x-api-key": API_KEY,
+    },
+  })
     .then((response) => response.json())
     .then((data) => {
       app.executionLogTable = data["response"]["body"];
@@ -247,7 +278,11 @@ function getExecutionLog(executionLogUrl) {
 // Get execution logs list
 function getExecutionLogList() {
   app.showExecutionLogListLoadingGif = true;
-  fetch(API_EXECLOG)
+  fetch(API_EXECLOG, {
+    headers: {
+      "x-api-key": API_KEY,
+    },
+  })
     .then((response) => response.json())
     .then((data) => {
       app.executionLogList = data["response"]["logs"].map((row) => {
@@ -278,7 +313,11 @@ function getExecutionLogList() {
 
 // Get supported services
 function getServices() {
-  fetch(API_SERVICES)
+  fetch(API_SERVICES, {
+    headers: {
+      "x-api-key": API_KEY,
+    },
+  })
     .then((response) => response.json())
     .then((data) => {
       app.serviceSettings = data["response"];
@@ -313,7 +352,11 @@ function getServices() {
 function getWhitelist() {
   app.whitelist = [];
   app.showWhitelistLoadingGif = true;
-  fetch(API_GET_WHITELIST)
+  fetch(API_GET_WHITELIST, {
+    headers: {
+      "x-api-key": API_KEY,
+    },
+  })
     .then((response) => response.json())
     .then((data) => {
       let i = 1;
@@ -391,6 +434,12 @@ function openTab(evt, tabName) {
   evt.currentTarget.className += " is-active";
 }
 
+function init() {
+  getWhitelist();
+  getExecutionLogList();
+  getServices();
+}
+
 // Get the API Gateway Base URL from manifest file
 fetch("serverless.manifest.json").then(function (response) {
   response.json().then(function (data) {
@@ -408,9 +457,8 @@ fetch("serverless.manifest.json").then(function (response) {
         break;
       }
     }
-
-    getWhitelist();
-    getExecutionLogList();
-    getServices();
+    if (API_KEY) {
+      init();
+    }
   });
 });
