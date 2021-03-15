@@ -180,7 +180,7 @@
             <tr v-for="item in whitelist" :key="item.row_id">
               <td style="white-space: nowrap">{{ item.service }}</td>
               <td style="white-space: nowrap">{{ item.resource }}</td>
-              <td style="white-space: nowrap">{{ item.id }}</td>
+              <td>{{ item.id }}</td>
               <td style="white-space: nowrap">
                 <span v-if="item.expiration < '4102444800'"
                   >{{ item.expiration_readable }}</span
@@ -368,7 +368,7 @@
                           <td style="white-space: nowrap">{{ item[2] }}</td>
                           <td style="white-space: nowrap">{{ item[3] }}</td>
                           <td>{{ item[4] }}</td>
-                          <td style="white-space: nowrap">{{ item[5] }}</td>
+                          <td>{{ item[5] }}</td>
                           <td style="white-space: nowrap">
                             <button
                               class="button is-warning"
