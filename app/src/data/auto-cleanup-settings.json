@@ -724,7 +724,7 @@
         "ap-northeast-3": {
           "M": {
             "clean": {
-              "BOOL": false
+              "BOOL": true
             }
           }
         },
