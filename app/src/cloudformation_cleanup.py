@@ -25,6 +25,22 @@ class CloudFormationCleanup:
             )
         return self._client_cloudformation
 
+    def get_stack_name(self, stack_id):
+        try:
+            paginator = self.client_cloudformation.get_paginator("describe_stacks")
+            resources = (
+                paginator.paginate(StackName=stack_id).build_full_result().get("Stacks")
+            )
+        except:
+            self.logging.error(f"Could not describe CloudFormation Stack '{stack_id}'.")
+            self.logging.error(sys.exc_info()[1])
+            return False
+        else:
+            for resource in resources:
+                return resource["StackName"]
+
+        return None
+
     def run(self):
         self.stacks()
 
@@ -92,12 +108,17 @@ class CloudFormationCleanup:
         resource_id = resource.get("StackName")
         resource_date = resource.get("LastUpdatedTime", resource.get("CreationTime"))
         resource_status = resource.get("StackStatus")
-        resource_root_stack_id = resource.get("RootId")
         resource_protection = True  # resource.get("EnableTerminationProtection")
+        resource_parent_stack_id = self.get_stack_name(resource.get("ParentId"))
+        resource_root_stack_id = self.get_stack_name(resource.get("RootId"))
         resource_age = Helper.get_day_delta(resource_date).days
         resource_action = None
 
-        if resource_id not in resource_whitelist:
+        if (
+            resource_id not in resource_whitelist
+            and resource_parent_stack_id not in resource_whitelist
+            and resource_root_stack_id not in resource_whitelist
+        ):
             if resource_age > resource_maximum_age:
                 if resource_status not in (
                     "DELETE_PENDING",
@@ -178,10 +199,28 @@ class CloudFormationCleanup:
                 )
                 resource_action = "SKIP - TTL"
         else:
-            self.logging.debug(
-                f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
-                "been deleted."
-            )
+            if resource_id not in resource_whitelist:
+                self.logging.debug(
+                    f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
+                    "been deleted."
+                )
+            elif (
+                resource_parent_stack_id not in resource_whitelist
+                and resource_parent_stack_id is not None
+            ):
+                self.logging.debug(
+                    f"CloudFormation Stack's '{resource_id}' parent Cloudformation Stack '{resource_parent_stack_id}' "
+                    "has been whitelisted and has not been deleted."
+                )
+            elif (
+                resource_root_stack_id not in resource_whitelist
+                and resource_root_stack_id is not None
+            ):
+                self.logging.debug(
+                    f"CloudFormation Stack's '{resource_id}' root Cloudformation Stack '{resource_root_stack_id}' "
+                    "has been whitelisted and has not been deleted."
+                )
+
             resource_action = "SKIP - WHITELIST"
 
         # For CloudFormation Stacks that are not deleted, add all physical
