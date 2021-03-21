@@ -4,6 +4,7 @@
 
 - Added API authentation (thanks to @miki79)
 - Added API key prompt to web app (thanks to @miki79).
+- Added CloudFormation nested Stack whitelisted when parent or root Stacks are whitelisted.
 - Fixed `execution_log` Glue table.
 
 ## 1.4.0
