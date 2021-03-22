@@ -1,5 +1,12 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.0
+
+- Added API authentication (thanks to @miki79)
+- Added API key prompt to the web app (thanks to @miki79).
+- Added CloudFormation nested Stack whitelisted when the parent or root Stacks are whitelisted.
+- Fixed `execution_log` Glue table.
+
 ## 1.4.0
 
 - Added ability to whitelist entries directly from the execution log.

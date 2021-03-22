@@ -122,7 +122,7 @@ var app = new Vue({
       this.resourceList = Object.keys(this.serviceSettings[service]);
 
       // auto select if only 1 option exists
-      if (this.resourceList.length == 1) {
+      if (this.resourceList.length === 1) {
         this.selectedResource = this.resourceList[0];
         this.updateResourceId(service, this.resourceList[0]);
       } else {

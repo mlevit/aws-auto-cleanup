@@ -36,9 +36,6 @@ class ECSCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ecs.cluster.clean", False
         )
-        resource_maximum_age = Helper.get_setting(
-            self.settings, "services.ecs.cluster.ttl", 7
-        )
         resource_whitelist = Helper.get_whitelist(self.whitelist, "ecs.cluster")
 
         if is_cleaning_enabled:
