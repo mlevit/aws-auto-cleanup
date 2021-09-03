@@ -114,9 +114,8 @@ var app = new Vue({
       sendApiRequest(convertJsonToGet(formData), "PUT");
     },
     updateResourceId: function (service, resource) {
-      this.resourceIdPlaceholder = this.serviceSettings[service][resource][
-        "id"
-      ];
+      this.resourceIdPlaceholder =
+        this.serviceSettings[service][resource]["id"];
     },
     updateResourceList: function (service) {
       this.resourceList = Object.keys(this.serviceSettings[service]);
@@ -245,6 +244,7 @@ function getExecutionLog(executionLogUrl) {
       }, 10);
 
       // Get execution mode
+
       if (data["response"]["body"][0][7] == "True") {
         app.executionLogMode = "Dry Run";
       } else {
@@ -287,6 +287,11 @@ function getExecutionLogList() {
     .then((data) => {
       app.executionLogList = data["response"]["logs"].map((row) => {
         row["key_escape"] = encodeURIComponent(row["key"]);
+
+        let log_date = new Date(row["date"] + " UTC");
+        let local_date = log_date.toString().split(/ GMT/)[0];
+
+        row["local_date"] = local_date;
         return row;
       });
       setTimeout(function () {
