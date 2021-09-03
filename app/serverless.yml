@@ -385,18 +385,12 @@ resources:
     ExecutionLogBucketName:
       Value:
         Ref: ExecutionLogBucket
-      Export:
-        Name: ExecutionLogBucketName
     SettingsTableName:
       Value:
         Ref: SettingsTable
-      Export:
-        Name: SettingsTableName
     WhitelistTableName:
       Value:
         Ref: WhitelistTable
-      Export:
-        Name: WhitelistTableName
 
 plugins:
   - serverless-pseudo-parameters
