@@ -286,11 +286,10 @@ function getExecutionLogList() {
     .then((response) => response.json())
     .then((data) => {
       app.executionLogList = data["response"]["logs"].map((row) => {
-        row["key_escape"] = encodeURIComponent(row["key"]);
-
         let log_date = new Date(row["date"] + " UTC");
         let local_date = log_date.toString().split(/ GMT/)[0];
 
+        row["key_escape"] = encodeURIComponent(row["key"]);
         row["local_date"] = local_date;
         return row;
       });
