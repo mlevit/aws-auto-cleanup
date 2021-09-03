@@ -1,5 +1,10 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.1
+
+- Fixed broken EC2 Instance cleanup. The existing filter on the `describe-instances` API request was invalid and filtering out all EC2 instances.
+- Modified the TTL expiration set when adding new whitelist entries. New entries will now be whitelisted for double the TTL duration. In other words, when creating a new EC2 instance, it will automatically be whitelisted for 14 days instead of the default 7. The previous functionality didn't make too much sense as the whitelisting duration was the same as the default non-whitelisted behaviour.
+
 ## 1.5.0
 
 - Added API authentication (thanks to @miki79)
