@@ -91,7 +91,7 @@ def lambda_handler(event, context):
     if parameters.get("permanent", False):
         expiration = 4102444800
     else:
-        expiration = int(time.time()) + (resource_ttl * 86400)
+        expiration = int(time.time()) + ((resource_ttl * 2) * 86400)
 
     try:
         boto3.client("dynamodb").put_item(
