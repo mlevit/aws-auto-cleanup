@@ -142,6 +142,8 @@ var app = new Vue({
     },
     // Execution Log
     closeExecutionLogPopup: function () {
+      $("html").removeClass("remove-overflow");
+
       this.executionLogDataTables.destroy();
 
       this.executionLogActionStats = {};
@@ -150,6 +152,8 @@ var app = new Vue({
       this.showExecutionLogPopup = false;
     },
     openExecutionLog: function (keyURL) {
+      $("html").addClass("remove-overflow");
+
       getExecutionLog(keyURL);
     },
     searchExecutionLog: function () {
