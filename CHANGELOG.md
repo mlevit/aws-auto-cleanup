@@ -2,8 +2,9 @@
 
 ## 1.5.3
 
-- Reduced EC2 Security Group cleanup complexity.
 - Added missing execution log action for whitelisted EC2 Security Groups.
+- Reduced EC2 Security Group cleanup complexity.
+- Resolved Serverless deprecation warnings.
 
 ## 1.5.2
 
