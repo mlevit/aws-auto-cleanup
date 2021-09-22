@@ -23,6 +23,7 @@ td {
 .execution-log-modal {
   width: calc(100vw - 40px) !important;
   height: calc(100vh - 40px) !important;
+  overflow: overlay;
 }
 
 .execution-log-modal .table {
@@ -41,4 +42,8 @@ select {
 tr.dtrg-group {
   background-color: hsl(0, 0%, 98%);
   font-weight: bold;
+}
+
+.remove-overflow {
+  overflow: hidden;
 }

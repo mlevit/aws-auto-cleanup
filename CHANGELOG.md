@@ -1,5 +1,9 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.2
+
+- Converted execution log timestamp to local time.
+
 ## 1.5.1
 
 - Fixed broken EC2 Instance cleanup. The existing filter on the `describe-instances` API request was invalid and filtering out all EC2 instances.

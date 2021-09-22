@@ -240,7 +240,7 @@
           <tbody>
             <tr v-for="item in executionLogList" :value="item" :key="item.key">
               <td>{{ item.key }}</td>
-              <td>{{ item.date }}</td>
+              <td>{{ item.local_date }}</td>
               <td>
                 <button
                   v-on:click="openExecutionLog( item.key_escape )"
