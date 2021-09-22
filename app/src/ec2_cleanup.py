@@ -367,7 +367,7 @@ class EC2Cleanup:
                 resource_action = None
 
                 if resource.get("GroupName") != "default":
-                    if resource not in resource_whitelist:
+                    if resource_id not in resource_whitelist:
                         try:
                             if not self.is_dry_run:
                                 self.client_ec2.delete_security_group(
