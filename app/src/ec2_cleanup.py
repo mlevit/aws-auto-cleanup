@@ -410,6 +410,11 @@ class EC2Cleanup:
                             "been deleted."
                         )
                         resource_action = "DELETE"
+                else:
+                    self.logging.debug(
+                        f"EC2 Security Group '{resource}' has been whitelisted and has not been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
