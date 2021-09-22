@@ -294,7 +294,7 @@ function getExecutionLogList() {
         let localDate = logDate.toString().split(/ GMT/)[0];
 
         row["key_escape"] = encodeURIComponent(row["key"]);
-        row["localDate"] = localDate;
+        row["local_date"] = localDate;
         return row;
       });
       setTimeout(function () {
