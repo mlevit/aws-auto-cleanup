@@ -22,7 +22,6 @@ provider:
   runtime: python3.8
   stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
-  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
   apiGateway:
     apiKeys:
       - ${self:service}-${self:provider.stage}-api-key
@@ -46,8 +45,8 @@ provider:
 
 package:
   individually: true
-  exclude:
-    - node_modules/**
+  patterns:
+    - "!node_modules/**"
 
 functions:
   WhitelistCreate:
@@ -57,10 +56,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/whitelist/create.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/whitelist/create.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
@@ -80,10 +78,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/whitelist/read.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/whitelist/read.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
@@ -100,10 +97,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/whitelist/update.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/whitelist/update.py"
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
@@ -123,10 +119,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/whitelist/delete.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/whitelist/delete.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
@@ -143,10 +138,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/service/read.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/service/read.py"
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
@@ -165,10 +159,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/execution_log/list.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/execution_log/list.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
@@ -185,10 +178,9 @@ functions:
     memorySize: 128
     timeout: 30
     package:
-      include:
-        - src/execution_log/read.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/execution_log/read.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
@@ -206,5 +198,4 @@ resources:
 
 plugins:
   - serverless-manifest-plugin
-  - serverless-pseudo-parameters
   - serverless-python-requirements

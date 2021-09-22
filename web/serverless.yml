@@ -12,12 +12,11 @@ provider:
   name: aws
   stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
-  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
 
 package:
   individually: true
-  exclude:
-    - node_modules/**
+  patterns:
+    - "!node_modules/**"
 
 resources:
   Resources:

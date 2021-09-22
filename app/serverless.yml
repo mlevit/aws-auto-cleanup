@@ -15,7 +15,6 @@ provider:
   runtime: python3.8
   stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
-  profile: ${opt:profile, ""} # overwrite via CLI "--aws-profile saml"
   apiGateway:
     minimumCompressionSize: 1024
   iamRoleStatements:
@@ -247,8 +246,8 @@ provider:
 
 package:
   individually: true
-  exclude:
-    - node_modules/**
+  patterns:
+    - "!node_modules/**"
 
 functions:
   AutoCleanup:
@@ -259,11 +258,10 @@ functions:
     timeout: 900
     maximumRetryAttempts: 0
     package:
-      include:
-        - src/data/**
-        - src/**.py
-      exclude:
-        - "**"
+      patterns:
+        - "!**"
+        - "src/data/**"
+        - "src/**.py"
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
@@ -314,7 +312,7 @@ resources:
       Type: AWS::S3::Bucket
       DeletionPolicy: Retain
       Properties:
-        BucketName: ${self:service}-${self:provider.stage}-execution-log-#{AWS::AccountId}
+        BucketName: ${self:service}-${self:provider.stage}-execution-log-${AWS::AccountId}
         AccessControl: Private
         BucketEncryption:
           ServerSideEncryptionConfiguration:
@@ -324,7 +322,7 @@ resources:
       Type: AWS::S3::Bucket
       DeletionPolicy: Retain
       Properties:
-        BucketName: ${self:service}-${self:provider.stage}-athena-results-#{AWS::AccountId}
+        BucketName: ${self:service}-${self:provider.stage}-athena-results-${AWS::AccountId}
         AccessControl: Private
         BucketEncryption:
           ServerSideEncryptionConfiguration:
@@ -393,5 +391,4 @@ resources:
         Ref: WhitelistTable
 
 plugins:
-  - serverless-pseudo-parameters
   - serverless-python-requirements

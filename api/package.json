@@ -5,7 +5,6 @@
   "private": true,
   "devDependencies": {
     "serverless-manifest-plugin": "^1.0.6",
-    "serverless-pseudo-parameters": "^2.5.0",
     "serverless-python-requirements": "^5.1.0"
   },
   "repository": {
