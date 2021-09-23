@@ -61,8 +61,8 @@ functions:
         - "src/whitelist/create.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      SETTINGS_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     layers:
       - Ref: PythonRequirementsLambdaLayer
     events:
@@ -83,7 +83,7 @@ functions:
         - "src/whitelist/read.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
       - http:
           method: GET
@@ -104,8 +104,8 @@ functions:
       - Ref: PythonRequirementsLambdaLayer
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      SETTINGS_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
       - http:
           method: PUT
@@ -124,7 +124,7 @@ functions:
         - "src/whitelist/delete.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      WHITELIST_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
     events:
       - http:
           method: DELETE
@@ -145,7 +145,7 @@ functions:
       - Ref: PythonRequirementsLambdaLayer
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      SETTINGS_TABLE: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
+      SETTINGS_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
     events:
       - http:
           method: GET
@@ -164,7 +164,7 @@ functions:
         - "src/execution_log/list.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+      EXECUTION_LOG_BUCKET: ${cf:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
     events:
       - http:
           method: GET
@@ -183,7 +183,7 @@ functions:
         - "src/execution_log/read.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      EXECUTION_LOG_BUCKET: ${cf.${self:custom.region}:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
+      EXECUTION_LOG_BUCKET: ${cf:auto-cleanup-app-${self:provider.stage}.ExecutionLogBucketName}
     events:
       - http:
           method: GET
