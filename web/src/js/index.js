@@ -290,11 +290,11 @@ function getExecutionLogList() {
     .then((response) => response.json())
     .then((data) => {
       app.executionLogList = data["response"]["logs"].map((row) => {
-        let log_date = new Date(row["date"] + " UTC");
-        let local_date = log_date.toString().split(/ GMT/)[0];
+        let logDate = new Date(row["date"] + " UTC");
+        let localDate = logDate.toString().split(/ GMT/)[0];
 
         row["key_escape"] = encodeURIComponent(row["key"]);
-        row["local_date"] = local_date;
+        row["local_date"] = localDate;
         return row;
       });
       setTimeout(function () {

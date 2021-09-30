@@ -6,12 +6,21 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 
 ## Table of contents
 
-- [Deployment](#deployment)
-- [Removal](#removal)
-- [Features](#features)
-  - [Whitelist](#whitelist)
-  - [Settings](#settings)
-  - [Execution Log](#execution-log)
+- [AWS Auto Cleanup App](#aws-auto-cleanup-app)
+  - [Table of contents](#table-of-contents)
+  - [Deployment](#deployment)
+  - [Removal](#removal)
+  - [Features](#features)
+    - [Whitelist](#whitelist)
+      - [Resource ID](#resource-id)
+      - [Expiration](#expiration)
+    - [Settings](#settings)
+      - [Version](#version)
+      - [General](#general)
+      - [Services](#services)
+      - [Regions](#regions)
+    - [Execution Log](#execution-log)
+      - [Athena](#athena)
 
 ## Deployment
 
@@ -186,54 +195,54 @@ General settings.
 
 Service-specific settings indicating the supported AWS services, resources, and their lifespan.
 
-| Service               | Resource Type      | Clean | TTL | Comment                                                                    |
-| --------------------- | ------------------ | ----- | --- | -------------------------------------------------------------------------- |
-| Airflow               | Environments :new: | True  | 7   |                                                                            |
-| Amplify               | Apps               | True  | 7   |                                                                            |
-| CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not whitelisted or not part of a whitelistd nested Stack. |
-| CloudWatch            | Log Groups         | True  | 30  |                                                                            |
-| DynamoDB              | Tables             | True  | 7   |                                                                            |
-| EC2                   | Addresses          | True  | N/A | Deletes Address if not associated with an EC2 instance.                    |
-| EC2                   | Images             | True  | 7   |                                                                            |
-| EC2                   | Instances          | True  | 7   |                                                                            |
-| EC2                   | Security Groups    | True  | N/A | Deletes Security Group if not associated with an EC2 instance.             |
-| EC2                   | Snapshots          | True  | 7   |                                                                            |
-| EC2                   | Volumes            | True  | 7   |                                                                            |
-| ECR                   | Images             | True  | 7   |                                                                            |
-| ECR                   | Repositories       | True  | 7   | Deletes Repository if no Images exist.                                     |
-| ECS                   | Clusters           | True  | N/A | Deletes Cluster if no running Services or Tasks.                           |
-| ECS                   | Services           | True  | 7   |                                                                            |
-| EFS                   | Clusters           | True  | 7   |                                                                            |
-| EFS                   | Fargate Profiles   | True  | 7   |                                                                            |
-| EFS                   | File Systems       | True  | 7   |                                                                            |
-| EFS                   | Node Groups        | True  | 7   |                                                                            |
-| EKS                   | Clusters           | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist.               |
-| EKS                   | Fargate Profiles   | True  | 7   |                                                                            |
-| EKS                   | Node Groups        | True  | 7   |                                                                            |
-| ElastCache            | Clusters           | True  | 7   |                                                                            |
-| ElastCache            | Replication Groups | True  | 7   |                                                                            |
-| Elastic Beanstalk     | Applications       | True  | 7   |                                                                            |
-| Elasticsearch Service | Domain Name        | True  | 7   |                                                                            |
-| ELB                   | Load Balancers     | True  | 7   |                                                                            |
-| EMR                   | Clusters           | True  | 7   |                                                                            |
-| Glue                  | Crawlers           | True  | 7   |                                                                            |
-| Glue                  | Databases          | True  | 30  |                                                                            |
-| Glue                  | Dev Endpoints      | True  | 7   |                                                                            |
-| IAM                   | Access Keys :new:  | True  | 30  |                                                                            |
-| IAM                   | Policies           | True  | 30  |                                                                            |
-| IAM                   | Roles              | True  | 30  |                                                                            |
-| IAM                   | Users :new:        | True  | 30  |                                                                            |
-| Kafka                 | Clusters           | True  | 7   |                                                                            |
-| Kinesis               | Streams            | True  | 7   |                                                                            |
-| Lambda                | Functions          | True  | 30  |                                                                            |
-| RDS                   | Instances          | True  | 7   |                                                                            |
-| RDS                   | Snapshots          | True  | 7   |                                                                            |
-| Redshift              | Clusters           | True  | 7   |                                                                            |
-| Redshift              | Snapshots          | True  | 7   |                                                                            |
-| S3                    | Buckets            | True  | 30  |                                                                            |
-| SageMaker             | Apps :new:         | True  | 7   |                                                                            |
-| SageMaker             | Endpoints          | True  | 7   |                                                                            |
-| SageMaker             | Notebook Instances | True  | 7   |                                                                            |
+| Service               | Resource Type      | Clean | TTL | Comment                                                                                                                                                                            |
+| --------------------- | ------------------ | ----- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Airflow               | Environments :new: | True  | 7   |                                                                                                                                                                                    |
+| Amplify               | Apps               | True  | 7   |                                                                                                                                                                                    |
+| CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not whitelisted or not part of a whitelistd nested Stack.                                                                                                         |
+| CloudWatch            | Log Groups         | True  | 30  |                                                                                                                                                                                    |
+| DynamoDB              | Tables             | True  | 7   |                                                                                                                                                                                    |
+| EC2                   | Addresses          | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                            |
+| EC2                   | Images             | True  | 7   |                                                                                                                                                                                    |
+| EC2                   | Instances          | True  | 7   |                                                                                                                                                                                    |
+| EC2                   | Security Groups    | True  | N/A | Deletes Security Group if not associated with an EC2 instance.                                                                                                                     |
+| EC2                   | Snapshots          | True  | 7   |                                                                                                                                                                                    |
+| EC2                   | Volumes            | True  | 7   | Volumes that are attached to an EC2 Instance when it launched will be deleted if the EC2 Instance is terminated. This is an AWS behavior and not something that can be controlled. |
+| ECR                   | Images             | True  | 7   |                                                                                                                                                                                    |
+| ECR                   | Repositories       | True  | 7   | Deletes Repository if no Images exist.                                                                                                                                             |
+| ECS                   | Clusters           | True  | N/A | Deletes Cluster if no running Services or Tasks.                                                                                                                                   |
+| ECS                   | Services           | True  | 7   |                                                                                                                                                                                    |
+| EFS                   | Clusters           | True  | 7   |                                                                                                                                                                                    |
+| EFS                   | Fargate Profiles   | True  | 7   |                                                                                                                                                                                    |
+| EFS                   | File Systems       | True  | 7   |                                                                                                                                                                                    |
+| EFS                   | Node Groups        | True  | 7   |                                                                                                                                                                                    |
+| EKS                   | Clusters           | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist.                                                                                                                       |
+| EKS                   | Fargate Profiles   | True  | 7   |                                                                                                                                                                                    |
+| EKS                   | Node Groups        | True  | 7   |                                                                                                                                                                                    |
+| ElastCache            | Clusters           | True  | 7   |                                                                                                                                                                                    |
+| ElastCache            | Replication Groups | True  | 7   |                                                                                                                                                                                    |
+| Elastic Beanstalk     | Applications       | True  | 7   |                                                                                                                                                                                    |
+| Elasticsearch Service | Domain Name        | True  | 7   |                                                                                                                                                                                    |
+| ELB                   | Load Balancers     | True  | 7   |                                                                                                                                                                                    |
+| EMR                   | Clusters           | True  | 7   |                                                                                                                                                                                    |
+| Glue                  | Crawlers           | True  | 7   |                                                                                                                                                                                    |
+| Glue                  | Databases          | True  | 30  |                                                                                                                                                                                    |
+| Glue                  | Dev Endpoints      | True  | 7   |                                                                                                                                                                                    |
+| IAM                   | Access Keys :new:  | True  | 30  |                                                                                                                                                                                    |
+| IAM                   | Policies           | True  | 30  |                                                                                                                                                                                    |
+| IAM                   | Roles              | True  | 30  |                                                                                                                                                                                    |
+| IAM                   | Users :new:        | True  | 30  |                                                                                                                                                                                    |
+| Kafka                 | Clusters           | True  | 7   |                                                                                                                                                                                    |
+| Kinesis               | Streams            | True  | 7   |                                                                                                                                                                                    |
+| Lambda                | Functions          | True  | 30  |                                                                                                                                                                                    |
+| RDS                   | Instances          | True  | 7   |                                                                                                                                                                                    |
+| RDS                   | Snapshots          | True  | 7   |                                                                                                                                                                                    |
+| Redshift              | Clusters           | True  | 7   |                                                                                                                                                                                    |
+| Redshift              | Snapshots          | True  | 7   |                                                                                                                                                                                    |
+| S3                    | Buckets            | True  | 30  |                                                                                                                                                                                    |
+| SageMaker             | Apps :new:         | True  | 7   |                                                                                                                                                                                    |
+| SageMaker             | Endpoints          | True  | 7   |                                                                                                                                                                                    |
+| SageMaker             | Notebook Instances | True  | 7   |                                                                                                                                                                                    |
 
 #### Regions
 

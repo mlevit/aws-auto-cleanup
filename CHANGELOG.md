@@ -1,5 +1,11 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.3
+
+- Added missing execution log action for whitelisted EC2 Security Groups.
+- Reduced EC2 Security Group cleanup complexity.
+- Resolved Serverless deprecation warnings.
+
 ## 1.5.2
 
 - Converted execution log timestamp to local time.

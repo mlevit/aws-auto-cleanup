@@ -355,70 +355,57 @@ class EC2Cleanup:
 
         if is_cleaning_enabled:
             try:
-                # help from https://stackoverflow.com/a/41150217
-                paginator = self.client_ec2.get_paginator("describe_instances")
-                instances = paginator.paginate().build_full_result().get("Reservations")
-
                 paginator = self.client_ec2.get_paginator("describe_security_groups")
-                security_groups = paginator.paginate().build_full_result()[
-                    "SecurityGroups"
-                ]
-
-                instance_security_group_set = set()
-                security_group_set = set()
-
-                for reservation in instances:
-                    for instance in reservation.get("Instances"):
-                        for security_group in instance.get("SecurityGroups"):
-                            instance_security_group_set.add(
-                                security_group.get("GroupId")
-                            )
-
-                for security_group in security_groups:
-                    if security_group.get("GroupName") != "default":
-                        security_group_set.add(security_group.get("GroupId"))
-
-                resources = security_group_set - instance_security_group_set
+                resources = paginator.paginate().build_full_result()["SecurityGroups"]
             except:
                 self.logging.error("Could not retrieve all unused Security Groups.")
                 self.logging.error(sys.exc_info()[1])
                 return False
 
             for resource in resources:
+                resource_id = resource.get("GroupId")
                 resource_action = None
 
-                if resource not in resource_whitelist:
-                    try:
-                        if not self.is_dry_run:
-                            self.client_ec2.delete_security_group(GroupId=resource)
-                    except:
-                        if "DependencyViolation" in str(sys.exc_info()[1]):
-                            self.logging.debug(
-                                f"EC2 Security Group '{resource}' has a dependent object "
-                                "and cannot been deleted without deleting the dependent object first."
-                            )
-                            resource_action = "SKIP - IN USE"
+                if resource.get("GroupName") != "default":
+                    if resource_id not in resource_whitelist:
+                        try:
+                            if not self.is_dry_run:
+                                self.client_ec2.delete_security_group(
+                                    GroupId=resource_id
+                                )
+                        except:
+                            if "DependencyViolation" in str(sys.exc_info()[1]):
+                                self.logging.debug(
+                                    f"EC2 Security Group '{resource_id}' has a network association"
+                                    "and cannot been deleted without deleting the association first."
+                                )
+                                resource_action = "SKIP - IN USE"
+                            else:
+                                self.logging.error(
+                                    f"Could not delete EC2 Security Group '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
                         else:
-                            self.logging.error(
-                                f"Could not delete EC2 Security Group '{resource}'."
+                            self.logging.info(
+                                f"EC2 Security Group '{resource_id}' has no network associations and has "
+                                "been deleted."
                             )
-                            self.logging.error(sys.exc_info()[1])
-                            resource_action = "ERROR"
+                            resource_action = "DELETE"
                     else:
-                        self.logging.info(
-                            f"EC2 Security Group '{resource}' is not associated with an EC2 instance and has "
-                            "been deleted."
+                        self.logging.debug(
+                            f"EC2 Security Group '{resource_id}' has been whitelisted and has not been deleted."
                         )
-                        resource_action = "DELETE"
+                        resource_action = "SKIP - WHITELIST"
 
-                Helper.record_execution_log_action(
-                    self.execution_log,
-                    self.region,
-                    "EC2",
-                    "Security Group",
-                    resource,
-                    resource_action,
-                )
+                    Helper.record_execution_log_action(
+                        self.execution_log,
+                        self.region,
+                        "EC2",
+                        "Security Group",
+                        resource_id,
+                        resource_action,
+                    )
 
             self.logging.debug("Finished cleanup of EC2 Security Groups.")
             return True
