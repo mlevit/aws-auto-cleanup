@@ -14,6 +14,7 @@ from func_timeout import func_set_timeout, FunctionTimedOut
 
 from src.airflow_cleanup import AirflowCleanup
 from src.amplify_cleanup import AmplifyCleanup
+from src.apprunner_cleanup import AppRunnerCleanup
 from src.cloudformation_cleanup import CloudFormationCleanup
 from src.cloudwatch_cleanup import CloudWatchCleanup
 from src.dynamodb_cleanup import DynamoDBCleanup
@@ -109,6 +110,16 @@ class Cleanup:
                     region,
                 )
                 threads.append(threading.Thread(target=amplify_class.run, args=()))
+
+                # App Runner
+                apprunner_class = AppRunnerCleanup(
+                    self.logging,
+                    self.whitelist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=apprunner_class.run, args=()))
 
                 # CloudWatch
                 cloudwatch_class = CloudWatchCleanup(

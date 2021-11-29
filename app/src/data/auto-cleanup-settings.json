@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "6"
+      "N": "7"
     }
   },
   {
@@ -51,6 +51,23 @@
                 },
                 "id": {
                   "S": "App Name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "apprunner": {
+          "M": {
+            "service": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "Service Name"
                 },
                 "ttl": {
                   "N": "7"
