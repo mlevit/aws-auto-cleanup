@@ -248,6 +248,11 @@ class CloudFormationCleanup:
                             "does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."
                         )
                     else:
+                        # Some resources are coming through as full ARNs instead of just
+                        # resource ID. Strip the ARN to just the resource ID.
+                        if "/" in resource_child_id:
+                            resource_child_id = resource_child_id.split("/")[1]
+
                         self.whitelist[service.lower()][resource.lower()].add(
                             resource_child_id
                         )
