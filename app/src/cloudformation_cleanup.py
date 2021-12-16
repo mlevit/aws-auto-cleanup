@@ -17,6 +17,8 @@ class CloudFormationCleanup:
         self._client_cloudformation = None
         self.is_dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
+        self.resource_translations = {"ManagedPolicy": "Policy"}
+
     @property
     def client_cloudformation(self):
         if not self._client_cloudformation:
@@ -248,6 +250,14 @@ class CloudFormationCleanup:
                             "does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."
                         )
                     else:
+                        # Some resources are coming through as full ARNs instead of just
+                        # resource ID. Strip the ARN to just the resource ID.
+                        if "/" in resource_child_id:
+                            resource_child_id = resource_child_id.split("/")[1]
+
+                        if resource in self.resource_translations:
+                            resource = self.resource_translations[resource]
+
                         self.whitelist[service.lower()][resource.lower()].add(
                             resource_child_id
                         )

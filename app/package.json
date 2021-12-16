@@ -1,7 +1,7 @@
 {
   "name": "auto-cleanup-app",
   "description": "Auto Cleanup App",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "private": true,
   "devDependencies": {
     "serverless-python-requirements": "^5.1.0"

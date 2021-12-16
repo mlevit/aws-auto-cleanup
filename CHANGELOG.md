@@ -1,5 +1,9 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.4
+
+- Fixed issue with CloudFormation Stack whitelisted Managed Policies. Whilst the Managed Policies were whitelisted, their resource was `ManagedPolicy` and not `Policy` which is checked for whitelisting.
+
 ## 1.5.3
 
 - Added missing execution log action for whitelisted EC2 Security Groups.
