@@ -239,7 +239,10 @@ class CloudFormationCleanup:
                 resource_action = "ERROR"
             else:
                 for stack_resource in resource_details:
-                    resource_child_id = stack_resource.get("PhysicalResourceId")
+                    resource_child_logical_id = stack_resource.get("LogicalResourceId")
+                    resource_child_physical_id = stack_resource.get(
+                        "PhysicalResourceId"
+                    )
                     resource_type = stack_resource.get("ResourceType")
 
                     try:
@@ -250,21 +253,29 @@ class CloudFormationCleanup:
                             "does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."
                         )
                     else:
-                        # Some resources are coming through as full ARNs instead of just
-                        # resource ID. Strip the ARN to just the resource ID.
-                        if "/" in resource_child_id:
-                            resource_child_id = resource_child_id.split("/")[1]
+                        if resource_child_physical_id not in (None, ""):
+                            # Some resources are coming through as full ARNs instead of just
+                            # resource ID. Strip the ARN to just the resource ID.
+                            if "/" in resource_child_physical_id:
+                                resource_child_physical_id = (
+                                    resource_child_physical_id.split("/")[1]
+                                )
 
-                        if resource in self.resource_translations:
-                            resource = self.resource_translations[resource]
+                            if resource in self.resource_translations:
+                                resource = self.resource_translations[resource]
 
-                        self.whitelist[service.lower()][resource.lower()].add(
-                            resource_child_id
-                        )
+                            self.whitelist[service.lower()][resource.lower()].add(
+                                resource_child_physical_id
+                            )
 
-                        self.logging.debug(
-                            f"{service} {resource} '{resource_child_id}' has been added to the whitelist."
-                        )
+                            self.logging.debug(
+                                f"{service} {resource} '{resource_child_physical_id}' has been added to the whitelist."
+                            )
+                        else:
+                            self.logging.debug(
+                                f"CloudFormation Stack '{resource_id}' resource '{resource_child_logical_id}' "
+                                "does not have a PhysicalResourceId and cannot be whitelisted."
+                            )
 
         Helper.record_execution_log_action(
             self.execution_log,

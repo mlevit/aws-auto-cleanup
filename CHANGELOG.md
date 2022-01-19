@@ -1,5 +1,9 @@
 # AWS Auto Cleanup Changelog
 
+## 1.5.5
+
+- Fixed issue that was introduced in 1.5.4. Deleted Cloudformation Stack Resources no longer have a `PhysicalResourceId` property. This caused an error when attempting to whitelist the Stack Resources.
+
 ## 1.5.4
 
 - Fixed issue with CloudFormation Stack whitelisted Managed Policies. Whilst the Managed Policies were whitelisted, their resource was `ManagedPolicy` and not `Policy` which is checked for whitelisting.
