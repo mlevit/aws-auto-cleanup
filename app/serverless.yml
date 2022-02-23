@@ -17,229 +17,233 @@ provider:
   region: ${self:custom.region}
   apiGateway:
     minimumCompressionSize: 1024
-  iamRoleStatements:
-    - Effect: Allow
-      Action: "*"
-      Resource: "*"
-      Condition:
-        ForAnyValue:StringEquals:
-          aws:CalledVia:
-            - cloudformation.amazonaws.com
-    - Effect: Allow
-      Action:
-        - airflow:DeleteEnvironment
-        - airflow:GetEnvironment
-        - airflow:ListEnvironments
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - amplify:DeleteApp
-        - amplify:ListApps
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - cloudformation:DeleteStack
-        - cloudformation:DescribeStacks
-        - cloudformation:DescribeStackResources
-        - cloudformation:ListStackResources
-        - cloudformation:UpdateTerminationProtection
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - codecommit:GetRepository
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - dynamodb:BatchWriteItem
-        - dynamodb:DeleteItem
-        - dynamodb:DeleteTable
-        - dynamodb:DescribeTable
-        - dynamodb:GetItem
-        - dynamodb:ListTables
-        - dynamodb:PutItem
-        - dynamodb:Scan
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - ec2:DeleteSecurityGroup
-        - ec2:DeleteSnapshot
-        - ec2:DeleteVolume
-        - ec2:DeregisterImage
-        - ec2:DescribeAddresses
-        - ec2:DescribeImages
-        - ec2:DescribeInstanceAttribute
-        - ec2:DescribeInstances
-        - ec2:DescribeSecurityGroups
-        - ec2:DescribeSnapshots
-        - ec2:DescribeVolumes
-        - ec2:ModifyInstanceAttribute
-        - ec2:ReleaseAddress
-        - ec2:StopInstances
-        - ec2:TerminateInstances
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - ecr:BatchDeleteImage
-        - ecr:DeleteRepository
-        - ecr:DescribeImages
-        - ecr:DescribeRepositories
-        - ecr:ListImages
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - ecs:DeleteCluster
-        - ecs:DeleteService
-        - ecs:DescribeClusters
-        - ecs:DescribeServices
-        - ecs:ListClusters
-        - ecs:ListServices
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - eks:DeleteCluster
-        - eks:DeleteFargateProfile
-        - eks:DeleteNodegroup
-        - eks:DescribeCluster
-        - eks:DescribeFargateProfile
-        - eks:DescribeNodegroup
-        - eks:ListClusters
-        - eks:ListFargateProfiles
-        - eks:ListNodegroups
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - elasticbeanstalk:DeleteApplication
-        - elasticbeanstalk:DescribeApplications
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - elasticache:DeleteCacheCluster
-        - elasticache:DeleteReplicationGroup
-        - elasticache:DescribeCacheClusters
-        - elasticache:DescribeReplicationGroups
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - elasticfilesystem:DeleteFileSystem
-        - elasticfilesystem:DeleteMountTarget
-        - elasticfilesystem:DescribeFileSystems
-        - elasticfilesystem:DescribeMountTargets
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - elasticloadbalancing:DeleteLoadBalancer
-        - elasticloadbalancing:DescribeLoadBalancers
-        - elasticloadbalancing:ModifyLoadBalancerAttributes
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - elasticmapreduce:ListClusters
-        - elasticmapreduce:TerminateJobFlows
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - es:DeleteElasticsearchDomain
-        - es:DescribeElasticsearchDomainConfig
-        - es:ListDomainNames
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - glue:DeleteCrawler
-        - glue:DeleteDatabase
-        - glue:DeleteDevEndPoint
-        - glue:GetCrawlers
-        - glue:GetDatabases
-        - glue:GetDevEndpoints
-        - glue:GetTable
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - iam:DeleteAccessKey
-        - iam:DeleteInstanceProfile
-        - iam:DeleteLoginProfile
-        - iam:DeletePolicy
-        - iam:DeletePolicyVersion
-        - iam:DeleteRole
-        - iam:DeleteRolePolicy
-        - iam:DeleteUser
-        - iam:DeleteUserPolicy
-        - iam:DetachGroupPolicy
-        - iam:DetachRolePolicy
-        - iam:DetachUserPolicy
-        - iam:GenerateServiceLastAccessedDetails
-        - iam:GetAccessKeyLastUsed
-        - iam:GetServiceLastAccessedDetails
-        - iam:ListAccessKeys
-        - iam:ListAttachedRolePolicies
-        - iam:ListEntitiesForPolicy
-        - iam:ListGroupsForUser
-        - iam:ListInstanceProfilesForRole
-        - iam:ListPolicies
-        - iam:ListPolicyVersions
-        - iam:ListRolePolicies
-        - iam:ListRoles
-        - iam:ListUserPolicies
-        - iam:ListUsers
-        - iam:RemoveRoleFromInstanceProfile
-        - iam:RemoveUserFromGroup
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - kafka:DeleteCluster
-        - kafka:ListClusters
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - kinesis:DeleteStream
-        - kinesis:DescribeStream
-        - kinesis:ListStreams
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - lambda:DeleteFunction
-        - lambda:ListFunctions
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - logs:DeleteLogGroup
-        - logs:DescribeLogGroups
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - redshift:DeleteCluster
-        - redshift:DeleteClusterSnapshot
-        - redshift:DescribeClusterSnapshots
-        - redshift:DescribeClusters
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - rds:DeleteDBInstance
-        - rds:DeleteDBSnapshot
-        - rds:DescribeDBInstances
-        - rds:DescribeDBSnapshots
-        - rds:ModifyDBInstance
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - s3:Delete*
-        - s3:Get*
-        - s3:List*
-        - s3:Put*
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - sagemaker:DeleteApp
-        - sagemaker:DeleteEndpoint
-        - sagemaker:DeleteNotebookInstance
-        - sagemaker:ListApps
-        - sagemaker:ListEndpoints
-        - sagemaker:ListNotebookInstances
-        - sagemaker:StopNotebookInstance
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - sts:GetCallerIdentity
-      Resource: "*"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: "*"
+          Resource: "*"
+          Condition:
+            ForAnyValue:StringEquals:
+              aws:CalledVia:
+                - cloudformation.amazonaws.com
+        - Effect: Allow
+          Action:
+            - airflow:DeleteEnvironment
+            - airflow:GetEnvironment
+            - airflow:ListEnvironments
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - amplify:DeleteApp
+            - amplify:ListApps
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - cloudformation:DeleteStack
+            - cloudformation:DescribeStacks
+            - cloudformation:DescribeStackResources
+            - cloudformation:ListStackResources
+            - cloudformation:UpdateTerminationProtection
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - codecommit:GetRepository
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - dynamodb:BatchWriteItem
+            - dynamodb:DeleteItem
+            - dynamodb:DeleteTable
+            - dynamodb:DescribeTable
+            - dynamodb:GetItem
+            - dynamodb:ListTables
+            - dynamodb:PutItem
+            - dynamodb:Scan
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - ec2:DeleteNatGateway
+            - ec2:DeleteSecurityGroup
+            - ec2:DeleteSnapshot
+            - ec2:DeleteVolume
+            - ec2:DeregisterImage
+            - ec2:DescribeAddresses
+            - ec2:DescribeImages
+            - ec2:DescribeInstanceAttribute
+            - ec2:DescribeInstances
+            - ec2:DescribeNatGateways
+            - ec2:DescribeSecurityGroups
+            - ec2:DescribeSnapshots
+            - ec2:DescribeVolumes
+            - ec2:ModifyInstanceAttribute
+            - ec2:ReleaseAddress
+            - ec2:StopInstances
+            - ec2:TerminateInstances
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - ecr:BatchDeleteImage
+            - ecr:DeleteRepository
+            - ecr:DescribeImages
+            - ecr:DescribeRepositories
+            - ecr:ListImages
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - ecs:DeleteCluster
+            - ecs:DeleteService
+            - ecs:DescribeClusters
+            - ecs:DescribeServices
+            - ecs:ListClusters
+            - ecs:ListServices
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - eks:DeleteCluster
+            - eks:DeleteFargateProfile
+            - eks:DeleteNodegroup
+            - eks:DescribeCluster
+            - eks:DescribeFargateProfile
+            - eks:DescribeNodegroup
+            - eks:ListClusters
+            - eks:ListFargateProfiles
+            - eks:ListNodegroups
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - elasticbeanstalk:DeleteApplication
+            - elasticbeanstalk:DescribeApplications
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - elasticache:DeleteCacheCluster
+            - elasticache:DeleteReplicationGroup
+            - elasticache:DescribeCacheClusters
+            - elasticache:DescribeReplicationGroups
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - elasticfilesystem:DeleteFileSystem
+            - elasticfilesystem:DeleteMountTarget
+            - elasticfilesystem:DescribeFileSystems
+            - elasticfilesystem:DescribeMountTargets
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - elasticloadbalancing:DeleteLoadBalancer
+            - elasticloadbalancing:DescribeLoadBalancers
+            - elasticloadbalancing:ModifyLoadBalancerAttributes
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - elasticmapreduce:ListClusters
+            - elasticmapreduce:TerminateJobFlows
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - es:DeleteElasticsearchDomain
+            - es:DescribeElasticsearchDomainConfig
+            - es:ListDomainNames
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - glue:DeleteCrawler
+            - glue:DeleteDatabase
+            - glue:DeleteDevEndPoint
+            - glue:GetCrawlers
+            - glue:GetDatabases
+            - glue:GetDevEndpoints
+            - glue:GetTable
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - iam:DeleteAccessKey
+            - iam:DeleteInstanceProfile
+            - iam:DeleteLoginProfile
+            - iam:DeletePolicy
+            - iam:DeletePolicyVersion
+            - iam:DeleteRole
+            - iam:DeleteRolePolicy
+            - iam:DeleteUser
+            - iam:DeleteUserPolicy
+            - iam:DetachGroupPolicy
+            - iam:DetachRolePolicy
+            - iam:DetachUserPolicy
+            - iam:GenerateServiceLastAccessedDetails
+            - iam:GetAccessKeyLastUsed
+            - iam:GetServiceLastAccessedDetails
+            - iam:ListAccessKeys
+            - iam:ListAttachedRolePolicies
+            - iam:ListEntitiesForPolicy
+            - iam:ListGroupsForUser
+            - iam:ListInstanceProfilesForRole
+            - iam:ListPolicies
+            - iam:ListPolicyVersions
+            - iam:ListRolePolicies
+            - iam:ListRoles
+            - iam:ListUserPolicies
+            - iam:ListUsers
+            - iam:RemoveRoleFromInstanceProfile
+            - iam:RemoveUserFromGroup
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - kafka:DeleteCluster
+            - kafka:ListClusters
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - kinesis:DeleteStream
+            - kinesis:DescribeStream
+            - kinesis:ListStreams
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - lambda:DeleteFunction
+            - lambda:ListFunctions
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - logs:DeleteLogGroup
+            - logs:DescribeLogGroups
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - redshift:DeleteCluster
+            - redshift:DeleteClusterSnapshot
+            - redshift:DescribeClusterSnapshots
+            - redshift:DescribeClusters
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - rds:DeleteDBInstance
+            - rds:DeleteDBSnapshot
+            - rds:DescribeDBInstances
+            - rds:DescribeDBSnapshots
+            - rds:ModifyDBInstance
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - s3:Delete*
+            - s3:Get*
+            - s3:List*
+            - s3:Put*
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - sagemaker:DeleteApp
+            - sagemaker:DeleteEndpoint
+            - sagemaker:DeleteNotebookInstance
+            - sagemaker:ListApps
+            - sagemaker:ListEndpoints
+            - sagemaker:ListNotebookInstances
+            - sagemaker:StopNotebookInstance
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - sts:GetCallerIdentity
+          Resource: "*"
   tracing:
     apiGateway: true
     lambda: true

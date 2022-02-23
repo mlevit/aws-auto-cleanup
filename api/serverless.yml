@@ -26,19 +26,21 @@ provider:
     apiKeys:
       - ${self:service}-${self:provider.stage}-api-key
     minimumCompressionSize: 1024
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:DeleteItem
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:Scan
-      Resource: "*"
-    - Effect: Allow
-      Action:
-        - s3:Get*
-        - s3:List*
-      Resource: "*"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DeleteItem
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:Scan
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - s3:Get*
+            - s3:List*
+          Resource: "*"
   tracing:
     apiGateway: true
     lambda: true

@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "6"
+      "N": "7"
     }
   },
   {
@@ -142,6 +142,19 @@
                 },
                 "id": {
                   "S": "Instance ID"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            },
+            "nat_gateway": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "NAT Gateway ID"
                 },
                 "ttl": {
                   "N": "7"

@@ -127,6 +127,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Elastic IPs                | Allocation ID          | `ec2:address:allocation_id`                          |
 | EC2 Images                     | Image ID               | `ec2:image:image_id`                                 |
 | EC2 Instances                  | Instance ID            | `ec2:instance:instance_id`                           |
+| EC2 NAT Gateways               | NAT Gateway ID         | `ec2:instance:nat_gateway_id`                        |
 | EC2 Security Groups            | Group ID               | `ec2:security_group:group_id`                        |
 | EC2 Snapshots                  | Snapshot ID            | `ec2:snapshot:snapshot_id`                           |
 | EC2 Volumes                    | Volume ID              | `ec2:volume:volume_id`                               |
@@ -197,7 +198,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 
 | Service               | Resource Type      | Clean | TTL | Comment                                                                                                                                                                            |
 | --------------------- | ------------------ | ----- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Airflow               | Environments :new: | True  | 7   |                                                                                                                                                                                    |
+| Airflow               | Environments       | True  | 7   |                                                                                                                                                                                    |
 | Amplify               | Apps               | True  | 7   |                                                                                                                                                                                    |
 | CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not whitelisted or not part of a whitelistd nested Stack.                                                                                                         |
 | CloudWatch            | Log Groups         | True  | 30  |                                                                                                                                                                                    |
@@ -205,6 +206,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | EC2                   | Addresses          | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                            |
 | EC2                   | Images             | True  | 7   |                                                                                                                                                                                    |
 | EC2                   | Instances          | True  | 7   |                                                                                                                                                                                    |
+| EC2                   | NAT Gateways :new: | True  | 7   |                                                                                                                                                                                    |
 | EC2                   | Security Groups    | True  | N/A | Deletes Security Group if not associated with an EC2 instance.                                                                                                                     |
 | EC2                   | Snapshots          | True  | 7   |                                                                                                                                                                                    |
 | EC2                   | Volumes            | True  | 7   | Volumes that are attached to an EC2 Instance when it launched will be deleted if the EC2 Instance is terminated. This is an AWS behavior and not something that can be controlled. |
@@ -228,10 +230,10 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | Glue                  | Crawlers           | True  | 7   |                                                                                                                                                                                    |
 | Glue                  | Databases          | True  | 30  |                                                                                                                                                                                    |
 | Glue                  | Dev Endpoints      | True  | 7   |                                                                                                                                                                                    |
-| IAM                   | Access Keys :new:  | True  | 30  |                                                                                                                                                                                    |
+| IAM                   | Access Keys        | True  | 30  |                                                                                                                                                                                    |
 | IAM                   | Policies           | True  | 30  |                                                                                                                                                                                    |
 | IAM                   | Roles              | True  | 30  |                                                                                                                                                                                    |
-| IAM                   | Users :new:        | True  | 30  |                                                                                                                                                                                    |
+| IAM                   | Users              | True  | 30  |                                                                                                                                                                                    |
 | Kafka                 | Clusters           | True  | 7   |                                                                                                                                                                                    |
 | Kinesis               | Streams            | True  | 7   |                                                                                                                                                                                    |
 | Lambda                | Functions          | True  | 30  |                                                                                                                                                                                    |
@@ -240,7 +242,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | Redshift              | Clusters           | True  | 7   |                                                                                                                                                                                    |
 | Redshift              | Snapshots          | True  | 7   |                                                                                                                                                                                    |
 | S3                    | Buckets            | True  | 30  |                                                                                                                                                                                    |
-| SageMaker             | Apps :new:         | True  | 7   |                                                                                                                                                                                    |
+| SageMaker             | Apps               | True  | 7   |                                                                                                                                                                                    |
 | SageMaker             | Endpoints          | True  | 7   |                                                                                                                                                                                    |
 | SageMaker             | Notebook Instances | True  | 7   |                                                                                                                                                                                    |
 

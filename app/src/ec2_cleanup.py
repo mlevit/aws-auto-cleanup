@@ -44,6 +44,7 @@ class EC2Cleanup:
         self.addresses()
         self.images()
         self.instances()
+        self.nat_gateways()
         self.security_groups()
         self.snapshots()
         self.volumes()
@@ -336,6 +337,90 @@ class EC2Cleanup:
             return True
         else:
             self.logging.info("Skipping cleanup of EC2 Instances.")
+            return True
+
+    def nat_gateways(self):
+        """
+        Deletes NAT Gateways.
+        """
+
+        self.logging.debug("Started cleanup of EC2 NAT Gateways.")
+
+        is_cleaning_enabled = Helper.get_setting(
+            self.settings, "services.ec2.nat_gateway.clean", False
+        )
+        resource_maximum_age = Helper.get_setting(
+            self.settings, "services.ec2.nat_gateway.ttl", 7
+        )
+        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.nat_gateway")
+
+        if is_cleaning_enabled:
+            try:
+                resources = self.client_ec2.describe_nat_gateways().get("NatGateways")
+            except:
+                self.logging.error("Could not list all EC2 NAT Gateways.")
+                self.logging.error(sys.exc_info()[1])
+                return False
+
+            for resource in resources:
+                resource_id = resource.get("NatGatewayId")
+                resource_date = resource.get("CreateTime")
+                resource_state = resource.get("State")
+                resource_action = None
+
+                if resource_id not in resource_whitelist:
+                    if resource_state in ("available"):
+                        resource_age = Helper.get_day_delta(resource_date).days
+
+                        if resource_age > resource_maximum_age:
+                            try:
+                                if not self.is_dry_run:
+                                    self.client_ec2.delete_nat_gateway(
+                                        NatGatewayId=resource_id
+                                    )
+                            except:
+                                self.logging.error(
+                                    f"Could not delete EC2 NAT Gateway '{resource_id}'."
+                                )
+                                self.logging.error(sys.exc_info()[1])
+                                resource_action = "ERROR"
+                            else:
+                                self.logging.info(
+                                    f"EC2 NAT Gateway '{resource_id}' was last modified {resource_age} days ago "
+                                    "and has been deleted."
+                                )
+                                resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"EC2 NAT Gateway '{resource_id}' was last modified {resource_age} days ago "
+                                "(less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
+                    else:
+                        self.logging.warn(
+                            f"ECS NAT Gateway '{resource_id}' in state '{resource_state}' cannot be deleted."
+                        )
+                        resource_action = "SKIP - IN USE"
+                else:
+                    self.logging.debug(
+                        f"EC2 NAT Gateway '{resource_id}' has been whitelisted and has not "
+                        "been deleted."
+                    )
+                    resource_action = "SKIP - WHITELIST"
+
+                Helper.record_execution_log_action(
+                    self.execution_log,
+                    self.region,
+                    "EC2",
+                    "NAT Gateway",
+                    resource_id,
+                    resource_action,
+                )
+
+            self.logging.debug("Finished cleanup of EC2 NAT Gateways.")
+            return True
+        else:
+            self.logging.info("Skipping cleanup of EC2 NAT Gateways.")
             return True
 
     def security_groups(self):

@@ -1,5 +1,10 @@
 # AWS Auto Cleanup Changelog
 
+## 1.6.0
+
+- Added NAT Gateway cleanup.
+- Added support for Serverless V3.
+
 ## 1.5.5
 
 - Fixed issue that was introduced in 1.5.4. Deleted Cloudformation Stack Resources no longer have a `PhysicalResourceId` property. This caused an error when attempting to whitelist the Stack Resources.
