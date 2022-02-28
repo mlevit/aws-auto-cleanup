@@ -4,7 +4,6 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
 
 ## Table of contents
 
-- [Table of contents](#table-of-contents)
 - [Deployment](#deployment)
 - [Removal](#removal)
 - [Architecture](#architecture)

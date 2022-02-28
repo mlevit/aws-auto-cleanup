@@ -4,23 +4,21 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 
 ## Table of contents
 
-- [AWS Auto Cleanup App](#aws-auto-cleanup-app)
-  - [Table of contents](#table-of-contents)
-  - [Deployment](#deployment)
-  - [Removal](#removal)
-  - [Architecture](#architecture)
-  - [Features](#features)
-    - [Allowlist](#allowlist)
-      - [Resource ID](#resource-id)
-      - [Expiration](#expiration)
-    - [Settings](#settings)
-      - [Version](#version)
-      - [General](#general)
-      - [Services](#services)
-      - [Regions](#regions)
-    - [Execution Log](#execution-log)
-      - [Athena](#athena)
-    - [Schedule](#schedule)
+- [Deployment](#deployment)
+- [Removal](#removal)
+- [Architecture](#architecture)
+- [Features](#features)
+  - [Allowlist](#allowlist)
+  - [Resource ID](#resource-id)
+  - [Expiration](#expiration)
+  - [Settings](#settings)
+  - [Version](#version)
+  - [General](#general)
+  - [Services](#services)
+  - [Regions](#regions)
+  - [Execution Log](#execution-log)
+  - [Athena](#athena)
+  - [Schedule](#schedule)
 
 ## Deployment
 
