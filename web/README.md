@@ -1,6 +1,6 @@
 # AWS Auto Cleanup Website
 
-The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The website utilises the Auto Cleanup API to serve content and enable user interaction.
+The AWS Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The website utilises the AWS Auto Cleanup API to serve content and enable user interaction.
 
 ## Table of contents
 
