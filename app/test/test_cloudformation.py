@@ -11,7 +11,7 @@ class TestStacksMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_cloudformation():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"cloudformation": {"stacks": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestStacksMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = cloudformation_cleanup.CloudFormationCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -47,7 +47,7 @@ class TestStacksLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_cloudformation():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {
@@ -57,7 +57,7 @@ class TestStacksLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = cloudformation_cleanup.CloudFormationCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -81,11 +81,11 @@ class TestStacksLessThanTTL:
         assert response["StackSummaries"][0]["StackStatus"] == "CREATE_COMPLETE"
 
 
-class TestStacksWhitelist:
+class TestStacksAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_cloudformation():
-            whitelist = {"cloudformation": {"stack": ["sample-sqs"]}}
+            allowlist = {"cloudformation": {"stack": ["sample-sqs"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {
@@ -95,7 +95,7 @@ class TestStacksWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = cloudformation_cleanup.CloudFormationCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

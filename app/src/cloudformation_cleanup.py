@@ -7,9 +7,9 @@ from src.helper import Helper
 
 
 class CloudFormationCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -63,8 +63,8 @@ class CloudFormationCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.cloudformation.stack.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(
-            self.whitelist, "cloudformation.stack"
+        resource_allowlist = Helper.get_allowlist(
+            self.allowlist, "cloudformation.stack"
         )
         semaphore = threading.Semaphore(value=1)
 
@@ -87,7 +87,7 @@ class CloudFormationCleanup:
                         args=(
                             semaphore,
                             resource,
-                            resource_whitelist,
+                            resource_allowlist,
                             resource_maximum_age,
                         ),
                     )
@@ -107,7 +107,7 @@ class CloudFormationCleanup:
             return True
 
     def delete_stack(
-        self, semaphore, resource, resource_whitelist, resource_maximum_age
+        self, semaphore, resource, resource_allowlist, resource_maximum_age
     ):
         semaphore.acquire()
 
@@ -121,9 +121,9 @@ class CloudFormationCleanup:
         resource_action = None
 
         if (
-            resource_id not in resource_whitelist
-            and resource_parent_stack_id not in resource_whitelist
-            and resource_root_stack_id not in resource_whitelist
+            resource_id not in resource_allowlist
+            and resource_parent_stack_id not in resource_allowlist
+            and resource_root_stack_id not in resource_allowlist
         ):
             if resource_age > resource_maximum_age:
                 if resource_status not in (
@@ -205,28 +205,28 @@ class CloudFormationCleanup:
                 )
                 resource_action = "SKIP - TTL"
         else:
-            if resource_id in resource_whitelist:
+            if resource_id in resource_allowlist:
                 self.logging.debug(
-                    f"CloudFormation Stack '{resource_id}' has been whitelisted and has not "
+                    f"CloudFormation Stack '{resource_id}' has been allowlisted and has not "
                     "been deleted."
                 )
-            elif resource_parent_stack_id in resource_whitelist:
+            elif resource_parent_stack_id in resource_allowlist:
                 self.logging.debug(
                     f"CloudFormation Stack's '{resource_id}' parent CloudFormation Stack '{resource_parent_stack_id}' "
-                    "has been whitelisted and has not been deleted."
+                    "has been allowlisted and has not been deleted."
                 )
-            elif resource_root_stack_id in resource_whitelist:
+            elif resource_root_stack_id in resource_allowlist:
                 self.logging.debug(
                     f"CloudFormation Stack's '{resource_id}' root CloudFormation Stack '{resource_root_stack_id}' "
-                    "has been whitelisted and has not been deleted."
+                    "has been allowlisted and has not been deleted."
                 )
 
-            resource_action = "SKIP - WHITELIST"
+            resource_action = "SKIP - ALLOWLIST"
 
         # For CloudFormation Stacks that are not deleted, add all physical
-        # resources into the Whitelist dictionary to prevent the need to whitelist
+        # resources into the Allowlist dictionary to prevent the need to allowlist
         # each and every resource
-        if resource_action in ("SKIP - WHITELIST", "SKIP - TTL"):
+        if resource_action in ("SKIP - ALLOWLIST", "SKIP - TTL"):
             try:
                 resource_details = self.client_cloudformation.describe_stack_resources(
                     StackName=resource_id
@@ -250,7 +250,7 @@ class CloudFormationCleanup:
                     except:
                         self.logging.debug(
                             f"CloudFormation Stack '{resource_id}' resource '{resource_type}' "
-                            "does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be whitelisted."
+                            "does not conform to the standard 'service-provider::service-name::data-type-name' and cannot be allowlisted."
                         )
                     else:
                         if resource_child_physical_id not in (None, ""):
@@ -264,17 +264,17 @@ class CloudFormationCleanup:
                             if resource in self.resource_translations:
                                 resource = self.resource_translations[resource]
 
-                            self.whitelist[service.lower()][resource.lower()].add(
+                            self.allowlist[service.lower()][resource.lower()].add(
                                 resource_child_physical_id
                             )
 
                             self.logging.debug(
-                                f"{service} {resource} '{resource_child_physical_id}' has been added to the whitelist."
+                                f"{service} {resource} '{resource_child_physical_id}' has been added to the allowlist."
                             )
                         else:
                             self.logging.debug(
                                 f"CloudFormation Stack '{resource_id}' resource '{resource_child_logical_id}' "
-                                "does not have a PhysicalResourceId and cannot be whitelisted."
+                                "does not have a PhysicalResourceId and cannot be allowlisted."
                             )
 
         Helper.record_execution_log_action(

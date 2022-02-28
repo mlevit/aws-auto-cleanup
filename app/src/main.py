@@ -43,7 +43,7 @@ class Cleanup:
     def __init__(self, logging):
         self.logging = logging
 
-        # insert default values into settings and whitelist tables
+        # insert default values into settings and allowlist tables
         self.setup_dynamodb()
 
         # create dictionaries and variables
@@ -51,7 +51,7 @@ class Cleanup:
             lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
         )
         self.settings = self.get_settings()
-        self.whitelist = self.get_whitelist()
+        self.allowlist = self.get_allowlist()
         self.dry_run = Helper.get_setting(self.settings, "general.dry_run", True)
 
     @func_set_timeout(840)
@@ -83,7 +83,7 @@ class Cleanup:
                 # through the removal of CloudFormation Stacks, many of the other resource will be removed
                 cloudformation_class = CloudFormationCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -93,7 +93,7 @@ class Cleanup:
                 # Managed Workflows for Apache Airflow (MWAA)
                 airflow_class = AirflowCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -103,7 +103,7 @@ class Cleanup:
                 # Amplify
                 amplify_class = AmplifyCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -113,7 +113,7 @@ class Cleanup:
                 # CloudWatch
                 cloudwatch_class = CloudWatchCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -123,7 +123,7 @@ class Cleanup:
                 # DynamoDB
                 dynamodb_class = DynamoDBCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -133,7 +133,7 @@ class Cleanup:
                 # ECR
                 ecr_class = ECRCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -143,7 +143,7 @@ class Cleanup:
                 # ECS
                 ecs_class = ECSCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -153,7 +153,7 @@ class Cleanup:
                 # EFS
                 efs_class = EFSCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -163,7 +163,7 @@ class Cleanup:
                 # Elastic Beanstalk
                 elasticbeanstalk_class = ElasticBeanstalkCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -175,7 +175,7 @@ class Cleanup:
                 # ElastiCache
                 elasticache_class = ElastiCacheCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -185,7 +185,7 @@ class Cleanup:
                 # Elasticsearch Service
                 elasticsearch_class = ElasticsearchServiceCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -197,7 +197,7 @@ class Cleanup:
                 # ELB
                 elb_class = ELBCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -207,7 +207,7 @@ class Cleanup:
                 # EKS
                 eks_class = EKSCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -217,7 +217,7 @@ class Cleanup:
                 # EMR
                 emr_class = EMRCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -227,7 +227,7 @@ class Cleanup:
                 # Glue
                 glue_class = GlueCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -237,7 +237,7 @@ class Cleanup:
                 # Kafka
                 kafka_class = KafkaCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -247,7 +247,7 @@ class Cleanup:
                 # Kinesis
                 kinesis_class = KinesisCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -257,7 +257,7 @@ class Cleanup:
                 # Lambda
                 lambda_class = LambdaCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -267,7 +267,7 @@ class Cleanup:
                 # RDS
                 rds_class = RDSCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -277,7 +277,7 @@ class Cleanup:
                 # Redshift
                 redshift_class = RedshiftCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -287,7 +287,7 @@ class Cleanup:
                 # SageMaker
                 sagemaker_class = SageMakerCleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -307,7 +307,7 @@ class Cleanup:
                 # through the removal of other services, EC2 instances will be cleaned up
                 ec2_class = EC2Cleanup(
                     self.logging,
-                    self.whitelist,
+                    self.allowlist,
                     self.settings,
                     self.execution_log,
                     region,
@@ -324,7 +324,7 @@ class Cleanup:
 
         # S3
         s3_class = S3Cleanup(
-            self.logging, self.whitelist, self.settings, self.execution_log
+            self.logging, self.allowlist, self.settings, self.execution_log
         )
         threads.append(threading.Thread(target=s3_class.run, args=()))
 
@@ -332,7 +332,7 @@ class Cleanup:
         # IAM will run after all other cleanup operations as there is a potential
         # through the removal of other services, IAM resources will be freed up
         iam_class = IAMCleanup(
-            self.logging, self.whitelist, self.settings, self.execution_log
+            self.logging, self.allowlist, self.settings, self.execution_log
         )
         threads.append(threading.Thread(target=iam_class.run, args=()))
 
@@ -369,19 +369,19 @@ class Cleanup:
 
         return settings
 
-    def get_whitelist(self):
-        whitelist = defaultdict(lambda: defaultdict(set))
+    def get_allowlist(self):
+        allowlist = defaultdict(lambda: defaultdict(set))
 
         try:
             paginator = boto3.client("dynamodb").get_paginator("scan")
             items = (
-                paginator.paginate(TableName=os.environ.get("WHITELIST_TABLE"))
+                paginator.paginate(TableName=os.environ.get("ALLOWLIST_TABLE"))
                 .build_full_result()
                 .get("Items")
             )
         except:
             self.logging.error(
-                f"""Could not read DynamoDB table '{os.environ.get("WHITELIST_TABLE")}'."""
+                f"""Could not read DynamoDB table '{os.environ.get("ALLOWLIST_TABLE")}'."""
             )
             self.logging.error(sys.exc_info()[1])
         else:
@@ -391,15 +391,15 @@ class Cleanup:
                     item_json.get("resource_id")
                 )
 
-                whitelist[parsed_resource_id["service"]][
+                allowlist[parsed_resource_id["service"]][
                     parsed_resource_id["resource_type"]
                 ].add(parsed_resource_id["resource"])
 
-        return whitelist
+        return allowlist
 
     def setup_dynamodb(self):
         """
-        Inserts all the default settings and whitelist data
+        Inserts all the default settings and allowlist data
         into their respective DynamoDB tables. Records will be
         skipped if they already exist in the table.
         """
@@ -410,8 +410,8 @@ class Cleanup:
             with open("./src/data/auto-cleanup-settings.json") as settings_data:
                 settings_json = json.loads(settings_data.read())
 
-            with open("./src/data/auto-cleanup-whitelist.json") as whitelist_data:
-                whitelist_json = json.loads(whitelist_data.read())
+            with open("./src/data/auto-cleanup-allowlist.json") as allowlist_data:
+                allowlist_json = json.loads(allowlist_data.read())
 
             update_settings = False
 
@@ -456,10 +456,10 @@ class Cleanup:
                         self.logging.error(sys.exc_info()[1])
                         continue
 
-            for whitelist in whitelist_json:
+            for allowlist in allowlist_json:
                 try:
                     client.put_item(
-                        TableName=os.environ.get("WHITELIST_TABLE"), Item=whitelist
+                        TableName=os.environ.get("ALLOWLIST_TABLE"), Item=allowlist
                     )
                 except:
                     self.logging.error(sys.exc_info()[1])

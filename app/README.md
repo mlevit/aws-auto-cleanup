@@ -11,7 +11,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
   - [Deployment](#deployment)
   - [Removal](#removal)
   - [Features](#features)
-    - [Whitelist](#whitelist)
+    - [Allowlist](#allowlist)
       - [Resource ID](#resource-id)
       - [Expiration](#expiration)
     - [Settings](#settings)
@@ -70,7 +70,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
    npm run invoke -- [--region] [--aws-profile]
    ```
 
-   - _Settings and Whitelist tables will be populated at the start of the first run._
+   - _Settings and Allowlist tables will be populated at the start of the first run._
 
    - _Dry run mode is automatically activated by default._
 
@@ -98,22 +98,22 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 
 ## Features
 
-### Whitelist
+### Allowlist
 
-The whitelist table (DynamoDB) maintains a record of all AWS resources that have been whitelisted (and therefore preserved). During the execution of Auto Cleanup, the scanned resources will be checked against the whitelist. If the resource exists within the whitelist table, it will not be deleted.
+The allowlist table (DynamoDB) maintains a record of all AWS resources that have been allowlisted (and therefore preserved). During the execution of Auto Cleanup, the scanned resources will be checked against the allowlist. If the resource exists within the allowlist table, it will not be deleted.
 
-The whitelist table adheres to the following schema:
+The allowlist table adheres to the following schema:
 
 | Column      | Format                      | Description                                                                                                                                                      |
 | ----------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource>:<id>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., `ec2`, `s3`), the resource<br>(e.g., `instance`, `bucket`) and `id`. |
 | expiration  | Epoch timestamp             | Epoch timestamp when the record<br>will be removed from the settings table                                                                                       |
-| comment     | Text field                  | Comment field describing the resource<br>and why it has been whitelisted                                                                                         |
-| owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                                   |
+| comment     | Text field                  | Comment field describing the resource<br>and why it has been allowlisted                                                                                         |
+| owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the allowlisting                                                   |
 
 #### Resource ID
 
-The `resource_id` field within the whitelist table holds a unique identifier for the whitelisted AWS resource. Due to some limitations with AWS, ARNs are not a viable unique identifier for all AWS resources and therefore an alternative was identifier was created.
+The `resource_id` field within the allowlist table holds a unique identifier for the allowlisted AWS resource. Due to some limitations with AWS, ARNs are not a viable unique identifier for all AWS resources and therefore an alternative was identifier was created.
 
 The below table indicates AWS resources that are supported by Auto Cleanup along with indications and examples of `resource_id` values for each resource.
 
@@ -164,13 +164,13 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | SageMaker Endpoints            | Endpoint Name          | `sagemaker:endpoint:endpoint_name`                   |
 | SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
 
-_Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
+_Note: Resources that are a part of a CloudFormation Stack will be automatically allowlisted at run time to prevent the need to allowlist the CloudFormation Stack and each resource the Stack provisions._
 
 #### Expiration
 
-The `expiration` field within the whitelist table is marked as a TTL field. This means that when the current timestamp exceeds the value within the `expiration` field, DynamoDB will remove the record from the table.
+The `expiration` field within the allowlist table is marked as a TTL field. This means that when the current timestamp exceeds the value within the `expiration` field, DynamoDB will remove the record from the table.
 
-This has been designed in such a way as to prevent AWS resources from being whitelisted indefinitely.
+This has been designed in such a way as to prevent AWS resources from being allowlisted indefinitely.
 
 ### Settings
 
@@ -200,7 +200,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | --------------------- | ------------------ | ----- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Airflow               | Environments       | True  | 7   |                                                                                                                                                                                    |
 | Amplify               | Apps               | True  | 7   |                                                                                                                                                                                    |
-| CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not whitelisted or not part of a whitelistd nested Stack.                                                                                                         |
+| CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not allowlisted or not part of a allowlistd nested Stack.                                                                                                         |
 | CloudWatch            | Log Groups         | True  | 30  |                                                                                                                                                                                    |
 | DynamoDB              | Tables             | True  | 7   |                                                                                                                                                                                    |
 | EC2                   | Addresses          | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                            |

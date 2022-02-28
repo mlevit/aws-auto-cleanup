@@ -26,7 +26,7 @@ def lambda_handler(event, context):
 
     try:
         boto3.client("dynamodb").delete_item(
-            TableName=os.environ.get("WHITELIST_TABLE"),
+            TableName=os.environ.get("ALLOWLIST_TABLE"),
             Key={
                 "resource_id": {"S": parameters.get("resource_id")},
             },
@@ -34,7 +34,7 @@ def lambda_handler(event, context):
 
         return get_return(
             200,
-            f"""Whitelist entry '{parameters.get("resource_id")}' has been deleted""",
+            f"""Allowlist entry '{parameters.get("resource_id")}' has been deleted""",
             parameters,
             parameters,
         )
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
         print(f"[ERROR] {error}")
         return get_return(
             400,
-            f"""Could not delete whitelist entry '{parameters.get("resource_id")}'""",
+            f"""Could not delete allowlist entry '{parameters.get("resource_id")}'""",
             parameters,
             None,
         )

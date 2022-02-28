@@ -1,7 +1,7 @@
 {
   "name": "auto-cleanup-web",
   "description": "Auto Cleanup Web",
-  "version": "1.5.3",
+  "version": "2.0.0",
   "private": true,
   "dependencies": {},
   "devDependencies": {
@@ -16,7 +16,7 @@
   "scripts": {
     "deploy": "serverless deploy",
     "remove": "serverless remove",
-    "deploy:client": "serverless client deploy --no-confirm",
+    "deploy:client": "serverless client deploy",
     "remove:client": "serverless client remove"
   }
 }

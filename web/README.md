@@ -21,7 +21,7 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    ```bash
    cd aws-auto-cleanup/web/
    ```
-   
+
 3. Install dependencies
 
    ```bash
@@ -68,8 +68,8 @@ The first time you access the web client from a new browser, you need to insert 
 
 | ![main](./static/main.png) | ![add](./static/add.png) |
 | :------------------------: | :----------------------: |
-|         dashboard          |   add whitelist entry    |
+|         dashboard          |   add allowlist entry    |
 
 | ![delete](./static/delete.png) | ![log](./static/log.png) |
 | :----------------------------: | :----------------------: |
-|     delete whitelist entry     |      execution logs      |
+|     delete allowlist entry     |      execution logs      |

@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class EC2Cleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -59,7 +59,7 @@ class EC2Cleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.address.clean", False
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.address")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.address")
 
         if is_cleaning_enabled:
             try:
@@ -73,7 +73,7 @@ class EC2Cleanup:
                 resource_id = resource.get("AllocationId")
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource.get("AssociationId") is None:
                         try:
                             if not self.is_dry_run:
@@ -100,10 +100,10 @@ class EC2Cleanup:
                         resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
-                        f"EC2 Address '{resource_id}' has been whitelisted and has not "
+                        f"EC2 Address '{resource_id}' has been allowlisted and has not "
                         "been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -133,7 +133,7 @@ class EC2Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.image.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.image")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.image")
 
         if is_cleaning_enabled:
             try:
@@ -152,7 +152,7 @@ class EC2Cleanup:
                 resource_date = resource.get("CreationDate")
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     resource_age = Helper.get_day_delta(resource_date).days
 
                     if resource_age > resource_maximum_age:
@@ -179,10 +179,10 @@ class EC2Cleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"EC2 Image '{resource_id}' has been whitelisted and has not "
+                        f"EC2 Image '{resource_id}' has been allowlisted and has not "
                         "been deregistered."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -214,7 +214,7 @@ class EC2Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.instance.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.instance")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.instance")
 
         if is_cleaning_enabled:
             try:
@@ -235,7 +235,7 @@ class EC2Cleanup:
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in resource_whitelist:
+                    if resource_id not in resource_allowlist:
                         if resource_age > resource_maximum_age:
                             if resource_state == "running":
                                 try:
@@ -320,9 +320,9 @@ class EC2Cleanup:
                             resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"EC2 Instance '{resource_id}' has been whitelisted and has not been deleted."
+                            f"EC2 Instance '{resource_id}' has been allowlisted and has not been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                     Helper.record_execution_log_action(
                         self.execution_log,
@@ -352,7 +352,7 @@ class EC2Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.nat_gateway.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.nat_gateway")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.nat_gateway")
 
         if is_cleaning_enabled:
             try:
@@ -368,7 +368,7 @@ class EC2Cleanup:
                 resource_state = resource.get("State")
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_state in ("available"):
                         resource_age = Helper.get_day_delta(resource_date).days
 
@@ -403,10 +403,10 @@ class EC2Cleanup:
                         resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
-                        f"EC2 NAT Gateway '{resource_id}' has been whitelisted and has not "
+                        f"EC2 NAT Gateway '{resource_id}' has been allowlisted and has not "
                         "been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -436,7 +436,7 @@ class EC2Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.security_group.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.security_group")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.security_group")
 
         if is_cleaning_enabled:
             try:
@@ -452,7 +452,7 @@ class EC2Cleanup:
                 resource_action = None
 
                 if resource.get("GroupName") != "default":
-                    if resource_id not in resource_whitelist:
+                    if resource_id not in resource_allowlist:
                         try:
                             if not self.is_dry_run:
                                 self.client_ec2.delete_security_group(
@@ -479,9 +479,9 @@ class EC2Cleanup:
                             resource_action = "DELETE"
                     else:
                         self.logging.debug(
-                            f"EC2 Security Group '{resource_id}' has been whitelisted and has not been deleted."
+                            f"EC2 Security Group '{resource_id}' has been allowlisted and has not been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                     Helper.record_execution_log_action(
                         self.execution_log,
@@ -511,7 +511,7 @@ class EC2Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.snapshot.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.snapshot")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.snapshot")
 
         if is_cleaning_enabled:
             try:
@@ -535,7 +535,7 @@ class EC2Cleanup:
                 resource_date = resource.get("StartTime")
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     snapshots_in_use = []
                     try:
                         images = self.client_ec2.describe_images(
@@ -594,9 +594,9 @@ class EC2Cleanup:
                             resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
-                        f"EC2 Snapshot '{resource_id}' has been whitelisted and has not been deleted."
+                        f"EC2 Snapshot '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -626,7 +626,7 @@ class EC2Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ec2.volume.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "ec2.volume")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.volume")
 
         if is_cleaning_enabled:
             try:
@@ -642,7 +642,7 @@ class EC2Cleanup:
                 resource_date = resource.get("CreateTime")
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource.get("Attachments") == []:
                         resource_age = Helper.get_day_delta(resource_date).days
 
@@ -676,9 +676,9 @@ class EC2Cleanup:
                         resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
-                        f"EC2 Volume '{resource_id}' has been whitelisted and has not been deleted."
+                        f"EC2 Volume '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

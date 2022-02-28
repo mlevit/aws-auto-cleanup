@@ -34,8 +34,8 @@ class Helper:
         return result
 
     @staticmethod
-    def get_whitelist(whitelist, path, default=None):
-        result = whitelist
+    def get_allowlist(allowlist, path, default=None):
+        result = allowlist
         for key in path.split("."):
             result = result.get(key)
             if result is None:

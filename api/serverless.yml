@@ -51,86 +51,86 @@ package:
     - "!node_modules/**"
 
 functions:
-  WhitelistCreate:
-    handler: src/whitelist/create.lambda_handler
-    name: ${self:service}-${self:provider.stage}-whitelist-create
-    description: Create whitelist entry
+  AllowlistCreate:
+    handler: src/allowlist/create.lambda_handler
+    name: ${self:service}-${self:provider.stage}-allowlist-create
+    description: Create allowlist entry
     memorySize: 128
     timeout: 30
     package:
       patterns:
         - "!**"
-        - "src/whitelist/create.py"
+        - "src/allowlist/create.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       SETTINGS_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      ALLOWLIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.AllowlistTableName}
     layers:
       - Ref: PythonRequirementsLambdaLayer
     events:
       - http:
           method: POST
-          path: /whitelist/entry
+          path: /allowlist/entry
           cors: true
           private: true
-  WhitelistRead:
-    handler: src/whitelist/read.lambda_handler
-    name: ${self:service}-${self:provider.stage}-whitelist-read
-    description: Read whitelist
+  AllowlistRead:
+    handler: src/allowlist/read.lambda_handler
+    name: ${self:service}-${self:provider.stage}-allowlist-read
+    description: Read allowlist
     memorySize: 128
     timeout: 30
     package:
       patterns:
         - "!**"
-        - "src/whitelist/read.py"
+        - "src/allowlist/read.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      ALLOWLIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.AllowlistTableName}
     events:
       - http:
           method: GET
-          path: /whitelist
+          path: /allowlist
           cors: true
           private: true
-  WhitelistUpdate:
-    handler: src/whitelist/update.lambda_handler
-    name: ${self:service}-${self:provider.stage}-whitelist-update
-    description: Update whitelist entry
+  AllowlistUpdate:
+    handler: src/allowlist/update.lambda_handler
+    name: ${self:service}-${self:provider.stage}-allowlist-update
+    description: Update allowlist entry
     memorySize: 128
     timeout: 30
     package:
       patterns:
         - "!**"
-        - "src/whitelist/update.py"
+        - "src/allowlist/update.py"
     layers:
       - Ref: PythonRequirementsLambdaLayer
     environment:
       LOG_LEVEL: ${self:custom.log_level}
       SETTINGS_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.SettingsTableName}
-      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      ALLOWLIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.AllowlistTableName}
     events:
       - http:
           method: PUT
-          path: /whitelist/entry
+          path: /allowlist/entry
           cors: true
           private: true
-  WhitelistDelete:
-    handler: src/whitelist/delete.lambda_handler
-    name: ${self:service}-${self:provider.stage}-whitelist-delete
-    description: Delete whitelist entry
+  AllowlistDelete:
+    handler: src/allowlist/delete.lambda_handler
+    name: ${self:service}-${self:provider.stage}-allowlist-delete
+    description: Delete allowlist entry
     memorySize: 128
     timeout: 30
     package:
       patterns:
         - "!**"
-        - "src/whitelist/delete.py"
+        - "src/allowlist/delete.py"
     environment:
       LOG_LEVEL: ${self:custom.log_level}
-      WHITELIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.WhitelistTableName}
+      ALLOWLIST_TABLE: ${cf:auto-cleanup-app-${self:provider.stage}.AllowlistTableName}
     events:
       - http:
           method: DELETE
-          path: /whitelist/entry
+          path: /allowlist/entry
           cors: true
           private: true
   ServiceRead:

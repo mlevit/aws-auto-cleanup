@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class ElastiCacheCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -41,7 +41,7 @@ class ElastiCacheCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.elasticache.cluster.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "elasticache.cluster")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "elasticache.cluster")
 
         if is_cleaning_enabled:
             try:
@@ -64,7 +64,7 @@ class ElastiCacheCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
@@ -91,9 +91,9 @@ class ElastiCacheCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"ElastiCache Cluster '{resource_id}' has been whitelisted and has not been deleted."
+                        f"ElastiCache Cluster '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -123,8 +123,8 @@ class ElastiCacheCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.elasticache.replication_group.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(
-            self.whitelist, "elasticache.replication_group"
+        resource_allowlist = Helper.get_allowlist(
+            self.allowlist, "elasticache.replication_group"
         )
 
         if is_cleaning_enabled:
@@ -160,7 +160,7 @@ class ElastiCacheCleanup:
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in resource_whitelist:
+                    if resource_id not in resource_allowlist:
                         if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
@@ -187,9 +187,9 @@ class ElastiCacheCleanup:
                             resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"ElastiCache Replication Group '{resource_id}' has been whitelisted and has not been deleted."
+                            f"ElastiCache Replication Group '{resource_id}' has been allowlisted and has not been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

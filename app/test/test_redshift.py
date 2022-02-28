@@ -11,7 +11,7 @@ class TestClustersMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"redshift": {"clusters": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestClustersMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -50,7 +50,7 @@ class TestClustersLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"redshift": {"clusters": {"clean": True, "ttl": 7}}},
@@ -58,7 +58,7 @@ class TestClustersLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -85,11 +85,11 @@ class TestClustersLessThanTTL:
         assert response["Clusters"][0]["ClusterIdentifier"] == "test_class123"
 
 
-class TestClustersWhitelist:
+class TestClustersAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {"redshift": {"cluster": ["test_class123"]}}
+            allowlist = {"redshift": {"cluster": ["test_class123"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"redshift": {"clusters": {"clean": True, "ttl": -1}}},
@@ -97,7 +97,7 @@ class TestClustersWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -128,7 +128,7 @@ class TestSnapshotsMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
@@ -136,7 +136,7 @@ class TestSnapshotsMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -172,7 +172,7 @@ class TestSnapshotsLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"redshift": {"snapshots": {"clean": True, "ttl": 7}}},
@@ -180,7 +180,7 @@ class TestSnapshotsLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -212,11 +212,11 @@ class TestSnapshotsLessThanTTL:
         assert response["Snapshots"][0]["SnapshotIdentifier"] == "snapshot123"
 
 
-class TestSnapshotsWhitelist:
+class TestSnapshotsAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_redshift():
-            whitelist = {"redshift": {"snapshot": ["snapshot123"]}}
+            allowlist = {"redshift": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"redshift": {"snapshots": {"clean": True, "ttl": -1}}},
@@ -224,7 +224,7 @@ class TestSnapshotsWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = redshift_cleanup.RedshiftCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

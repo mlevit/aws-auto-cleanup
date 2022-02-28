@@ -8,7 +8,7 @@
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings"
+      content="Open-source application to programmatically clean your AWS resources based on a allowlist and time to live (TTL) settings"
     />
 
     <!-- Open Graph / Facebook -->
@@ -16,7 +16,7 @@
     <meta property="og:title" content="AWS Auto Cleanup" />
     <meta
       property="og:description"
-      content="Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings"
+      content="Open-source application to programmatically clean your AWS resources based on a allowlist and time to live (TTL) settings"
     />
     <meta
       property="og:image"
@@ -28,7 +28,7 @@
     <meta property="twitter:title" content="AWS Auto Cleanup" />
     <meta
       property="twitter:description"
-      content="Open-source application to programmatically clean your AWS resources based on a whitelist and time to live (TTL) settings"
+      content="Open-source application to programmatically clean your AWS resources based on a allowlist and time to live (TTL) settings"
     />
     <meta
       property="twitter:image"
@@ -138,11 +138,11 @@
       <div class="container body-container">
         <nav class="level">
           <div class="level-left">
-            <h3 class="title is-3 mb-0 mr-2">Whitelist</h3>
-            <!-- <h2 class="title">Whitelist</h2> -->
+            <h3 class="title is-3 mb-0 mr-2">Allowlist</h3>
+            <!-- <h2 class="title">Allowlist</h2> -->
             <button
               class="button is-warning"
-              v-on:click="openWhitelistInsertPopup()"
+              v-on:click="openAllowlistInsertPopup()"
             >
               <span class="icon"> <i class="fas fa-plus"></i> </span>
               <span>New Entry</span>
@@ -154,8 +154,8 @@
                 class="input"
                 placeholder="Search"
                 type="text"
-                v-model="whitelistSearchTerm"
-                v-on:keyup="searchWhitelist()"
+                v-model="allowlistSearchTerm"
+                v-on:keyup="searchAllowlist()"
               />
               <span class="icon is-left">
                 <i class="fas fa-search"></i>
@@ -163,7 +163,7 @@
             </div>
           </div>
         </nav>
-        <table class="table" id="whitelist">
+        <table class="table" id="allowlist">
           <thead>
             <tr>
               <th>Service</th>
@@ -177,7 +177,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in whitelist" :key="item.row_id">
+            <tr v-for="item in allowlist" :key="item.row_id">
               <td style="white-space: nowrap">{{ item.service }}</td>
               <td style="white-space: nowrap">{{ item.resource }}</td>
               <td>{{ item.id }}</td>
@@ -196,7 +196,7 @@
                 <button
                   class="button is-warning"
                   v-if="item.expiration < '4102444800'"
-                  v-on:click="extendWhitelistEntry( item.row_id )"
+                  v-on:click="extendAllowlistEntry( item.row_id )"
                 >
                   <span class="icon">
                     <i class="far fa-calendar-plus"></i>
@@ -205,7 +205,7 @@
                 <button
                   class="button is-danger"
                   v-if="item.expiration < '4102444800'"
-                  v-on:click="openWhitelistDeletePopup( item.resource_id )"
+                  v-on:click="openAllowlistDeletePopup( item.resource_id )"
                 >
                   <span class="icon">
                     <i class="far fa-trash-alt"></i>
@@ -218,7 +218,7 @@
         <!-- Refreshing Animation -->
         <div
           class="container has-text-centered"
-          v-show="showWhitelistLoadingGif"
+          v-show="showAllowlistLoadingGif"
         >
           <button class="button is-warning is-loading">Loading</button>
         </div>
@@ -358,7 +358,7 @@
                           <th>Resource</th>
                           <th>ID</th>
                           <th>Action</th>
-                          <th>Whitelist</th>
+                          <th>Allowlist</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -372,8 +372,8 @@
                           <td style="white-space: nowrap">
                             <button
                               class="button is-warning"
-                              v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - WHITELIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"
-                              v-on:click="createWhitelistEntryFromExecutionLog( item[2], item[3], item[4] )"
+                              v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - ALLOWLIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"
+                              v-on:click="createAllowlistEntryFromExecutionLog( item[2], item[3], item[4] )"
                             >
                               <span class="icon">
                                 <i class="fas fa-plus"></i>
@@ -460,24 +460,24 @@
           <!-- .model-content -->
         </div>
 
-        <!-- Popup: Add Whitelist Rule -->
+        <!-- Popup: Add Allowlist Rule -->
         <div
           class="modal"
-          v-bind:class="{ 'is-active': showWhitelistPopup }"
-          id="add-whitelist"
+          v-bind:class="{ 'is-active': showAllowlistPopup }"
+          id="add-allowlist"
         >
           <div
             class="modal-background"
-            v-on:click="closeWhitelistInsertPopup()"
+            v-on:click="closeAllowlistInsertPopup()"
           ></div>
-          <div class="modal-card add-whitelist-modal">
-            <form action="#" v-on:submit.prevent="createWhitelistEntry()">
+          <div class="modal-card add-allowlist-modal">
+            <form action="#" v-on:submit.prevent="createAllowlistEntry()">
               <header class="modal-card-head">
-                <p class="modal-card-title">Add Whitelist Entry</p>
+                <p class="modal-card-title">Add Allowlist Entry</p>
                 <button
                   aria-label="close"
                   class="delete"
-                  v-on:click="closeWhitelistInsertPopup()"
+                  v-on:click="closeAllowlistInsertPopup()"
                 ></button>
               </header>
               <section class="modal-card-body">
@@ -562,7 +562,7 @@
                   <div class="control has-icons-left">
                     <input
                       class="input"
-                      placeholder="Reason for whitelisting"
+                      placeholder="Reason for allowlisting"
                       required
                       tabindex="5"
                       type="text"
@@ -576,7 +576,7 @@
               </section>
               <footer class="modal-card-foot">
                 <button class="button is-success" tabindex="6">Add</button>
-                <button class="button" v-on:click="closeWhitelistInsertPopup()">
+                <button class="button" v-on:click="closeAllowlistInsertPopup()">
                   Cancel
                 </button>
               </footer>
@@ -584,23 +584,23 @@
           </div>
         </div>
 
-        <!-- Popup: Delete Whitelist Rule -->
+        <!-- Popup: Delete Allowlist Rule -->
         <div
           class="modal"
-          id="delete-whitelist"
-          v-bind:class="{ 'is-active': showWhitelistDeletePopup }"
+          id="delete-allowlist"
+          v-bind:class="{ 'is-active': showAllowlistDeletePopup }"
         >
           <div
             class="modal-background"
-            v-on:click="closeWhitelistDeletePopup()"
+            v-on:click="closeAllowlistDeletePopup()"
           ></div>
           <div class="modal-card">
             <header class="modal-card-head">
-              <p class="modal-card-title">Delete Whitelist Entry</p>
+              <p class="modal-card-title">Delete Allowlist Entry</p>
               <button
                 class="delete"
                 aria-label="close"
-                v-on:click="closeWhitelistDeletePopup()"
+                v-on:click="closeAllowlistDeletePopup()"
               ></button>
             </header>
             <section class="modal-card-body">
@@ -612,11 +612,11 @@
             <footer class="modal-card-foot">
               <button
                 class="button is-danger"
-                v-on:click="deleteWhitelistEntry(selectedResourceId)"
+                v-on:click="deleteAllowlistEntry(selectedResourceId)"
               >
                 Delete
               </button>
-              <button class="button" v-on:click="closeWhitelistDeletePopup()">
+              <button class="button" v-on:click="closeAllowlistDeletePopup()">
                 Cancel
               </button>
             </footer>
@@ -678,15 +678,15 @@
             <div class="content">
               <p>
                 AWS Auto Cleanup is an open-source application to
-                programmatically clean AWS resources based on a Whitelist and
+                programmatically clean AWS resources based on a Allowlist and
                 time-to-live (TTL) settings.
               </p>
-              <h2>Whitelist</h2>
+              <h2>Allowlist</h2>
               <p>
-                The whitelist maintains a record of all AWS resources that have
+                The allowlist maintains a record of all AWS resources that have
                 been preserved. During the execution of Auto Cleanup, the
-                scanned resources will be checked against the whitelist. If the
-                resource exists within the whitelist table, it will not be
+                scanned resources will be checked against the allowlist. If the
+                resource exists within the allowlist table, it will not be
                 deleted.
               </p>
               <h2>Services</h2>

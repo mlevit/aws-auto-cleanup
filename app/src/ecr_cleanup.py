@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class ECRCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -38,7 +38,7 @@ class ECRCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ecr.repository.ttl", 7
         )
-        whitelisted_resources = Helper.get_whitelist(self.whitelist, "ecr.repository")
+        allowlisted_resources = Helper.get_allowlist(self.allowlist, "ecr.repository")
 
         if is_cleaning_enabled:
             try:
@@ -59,7 +59,7 @@ class ECRCleanup:
                 # images before deleting the repository itself
                 self.images(resource_id)
 
-                if resource_id not in whitelisted_resources:
+                if resource_id not in allowlisted_resources:
                     try:
                         paginator = self.client_ecr.get_paginator("list_images")
                         list_images = (
@@ -106,9 +106,9 @@ class ECRCleanup:
                             resource_action = "SKIP - IN USE"
                 else:
                     self.logging.debug(
-                        f"ECR Repository '{resource_id}' has been whitelisted and has not been deleted."
+                        f"ECR Repository '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -140,7 +140,7 @@ class ECRCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ecr.image.ttl", 7
         )
-        whitelisted_resources = Helper.get_whitelist(self.whitelist, "ecr.image")
+        allowlisted_resources = Helper.get_allowlist(self.allowlist, "ecr.image")
 
         if is_cleaning_enabled:
             try:
@@ -163,7 +163,7 @@ class ECRCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in whitelisted_resources:
+                if resource_id not in allowlisted_resources:
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
@@ -191,9 +191,9 @@ class ECRCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"ECR Image '{resource_id}' has been whitelisted and has not been deleted."
+                        f"ECR Image '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

@@ -1,11 +1,7 @@
 ![](./static/banner.png)
 
 <p align="center">
-<a href="https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/4f20fbbb03464b9aa6c558a4415d2288"></a>
-</p>
-
-<p align="center">
-Open-source application to programmatically delete AWS resources based on a whitelist and time to live (TTL) settings
+Open-source application to programmatically delete AWS resources based on a allowlist and time to live (TTL) settings
 </p>
 <p align="center">
 Auto Cleanup is comprised of three modues, APP, API, and WEB. Click through to learn more and follow the steps to deploy the modules to your environment
