@@ -38,6 +38,6 @@ AWS Auto Cleanup is using the [Python Black](https://github.com/python/black) co
 
 When you think your code is ready for review create a pull request within GitHub. Maintainers of the repository will watch out for new PR‘s and review them in regular intervals.
 
-By default, for each change in the PR will automatically trigger pytests, Serverless AWS deployment via [Travis CI](https://travis-ci.org/servian/aws-auto-cleanup) as well as a code quality review via [Codacy](https://app.codacy.com/project/servian/aws-auto-cleanup/dashboard). If either Travis CI or Codacy fails make sure to address the failures immediately.
+<!-- By default, for each change in the PR will automatically trigger pytests, Serverless AWS deployment via [Travis CI](https://travis-ci.org/servian/aws-auto-cleanup) as well as a code quality review via [Codacy](https://app.codacy.com/project/servian/aws-auto-cleanup/dashboard). If either Travis CI or Codacy fails make sure to address the failures immediately. -->
 
 If comments have been given in a review, they have to get integrated. For those changes a separate commit should be created and pushed to your remote development branch. Don’t forget to add a comment in the PR afterward, so everyone gets notified by GitHub. Keep in mind that reviews can span multiple cycles until the maintainers are happy with the code.
