@@ -21,6 +21,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
       - [Regions](#regions)
     - [Execution Log](#execution-log)
       - [Athena](#athena)
+    - [Schedule](#schedule)
 
 ## Deployment
 
@@ -100,7 +101,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 
 ### Allowlist
 
-The allowlist table (DynamoDB) maintains a record of all AWS resources that have been allowlisted (and therefore preserved). During the execution of Auto Cleanup, the scanned resources will be checked against the allowlist. If the resource exists within the allowlist table, it will not be deleted.
+The allowlist table (DynamoDB) maintains a record of all AWS resources that have been allowlisted (and therefore preserved). During the execution of Auto Cleanup, the scanned resources will be checked against the allowlist. If the resource exists within the allowlist table, it will not be deleted. Users are responsible for ensuring that the allowlist is up to date with the resources that they wish to preserve. This can be achieved manually by inserting records into the DynamoDB table or by using the AWS Auto Cleanup Web application.
 
 The allowlist table adheres to the following schema:
 
@@ -113,7 +114,7 @@ The allowlist table adheres to the following schema:
 
 #### Resource ID
 
-The `resource_id` field within the allowlist table holds a unique identifier for the allowlisted AWS resource. Due to some limitations with AWS, ARNs are not a viable unique identifier for all AWS resources and therefore an alternative was identifier was created.
+The `resource_id` field within the allowlist table holds a unique identifier for the allowlisted AWS resource. Due to some limitations with AWS, ARNs are not a viable unique identifier for all AWS resources and therefore an alternative identifier was created.
 
 The below table indicates AWS resources that are supported by Auto Cleanup along with indications and examples of `resource_id` values for each resource.
 
@@ -297,3 +298,7 @@ Post every Auto Cleanup run, an execution log is generated and stored as a flat 
 #### Athena
 
 To enable analytical access to the generated execution logs, a Glue Database and Glue Table are provisioned based on the S3 Bucket and file schema of the execution log. This database and table can be accessed directly from within Athena enabling the logs to be queried using SQL.
+
+### Schedule
+
+By default, the Auto Cleanup Lambda is scheduled to run every three days from the time of deployment. You can manually trigger the app to run by executing the `npm run invoke` command found in the Deployment section above.
