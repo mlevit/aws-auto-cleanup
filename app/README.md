@@ -2,14 +2,13 @@
 
 The Auto Cleanup App consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
 
-![architecture](./static/architecture.drawio.svg)
-
 ## Table of contents
 
 - [AWS Auto Cleanup App](#aws-auto-cleanup-app)
   - [Table of contents](#table-of-contents)
   - [Deployment](#deployment)
   - [Removal](#removal)
+  - [Architecture](#architecture)
   - [Features](#features)
     - [Allowlist](#allowlist)
       - [Resource ID](#resource-id)
@@ -96,6 +95,10 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
    ```
 
    - _S3 buckets provisioned by Serverless will not be deleted through this process. To finalise removal, please delete the `athena-results` and `execution-log` buckets manually._
+
+## Architecture
+
+![architecture](./static/architecture.drawio.svg)
 
 ## Features
 

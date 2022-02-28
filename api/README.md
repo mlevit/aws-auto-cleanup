@@ -2,13 +2,12 @@
 
 The Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships with one another.
 
-![architecture](./static/architecture.drawio.svg)
-
 ## Table of contents
 
 - [Table of contents](#table-of-contents)
 - [Deployment](#deployment)
 - [Removal](#removal)
+- [Architecture](#architecture)
 - [API](#api)
 
 ## Deployment
@@ -49,6 +48,10 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
    ```bash
    npm run remove -- [--region] [--aws-profile]
    ```
+
+## Architecture
+
+![architecture](./static/architecture.drawio.svg)
 
 ## API
 
