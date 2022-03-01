@@ -169,6 +169,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | SageMaker Apps                 | App Name               | `sagemaker:app:app_name`                             |
 | SageMaker Endpoints            | Endpoint Name          | `sagemaker:endpoint:endpoint_name`                   |
 | SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
+| Transfer Servers               | Server ID              | `transfer:server:server_id`                          |
 
 _Note: Resources that are a part of a CloudFormation Stack will be automatically allowlisted at run time to prevent the need to allowlist the CloudFormation Stack and each resource the Stack provisions._
 
@@ -251,6 +252,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | SageMaker             | Apps               | True  | 7   |                                                                                                                                                                                    |
 | SageMaker             | Endpoints          | True  | 7   |                                                                                                                                                                                    |
 | SageMaker             | Notebook Instances | True  | 7   |                                                                                                                                                                                    |
+| Transfer              | Servers            | True  | N/A | Deletes any Servers running that are not allowlisted. The AWS API does not provide creation dates for Servers.                                                                     |
 
 #### Regions
 

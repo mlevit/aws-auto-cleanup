@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "7"
+      "N": "8"
     }
   },
   {
@@ -692,6 +692,20 @@
                 },
                 "ttl": {
                   "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "transfer": {
+          "M": {
+            "server": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "Server ID"
                 }
               }
             }

@@ -37,6 +37,7 @@ from src.rds_cleanup import RDSCleanup
 from src.redshift_cleanup import RedshiftCleanup
 from src.s3_cleanup import S3Cleanup
 from src.sagemaker_cleanup import SageMakerCleanup
+from src.transfer_cleanup import TransferCleanup
 
 
 class Cleanup:
@@ -293,6 +294,16 @@ class Cleanup:
                     region,
                 )
                 threads.append(threading.Thread(target=sagemaker_class.run, args=()))
+
+                # Transfer
+                transfer_class = TransferCleanup(
+                    self.logging,
+                    self.allowlist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=transfer_class.run, args=()))
 
                 # start all threads
                 for thread in threads:

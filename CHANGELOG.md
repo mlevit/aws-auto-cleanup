@@ -2,6 +2,7 @@
 
 ## 2.0.0
 
+- Added Transfer Family Server (SFTP, FTPS, and FTP) cleanup.
 - Replaced all references to `whitelist` with `allowlist`.
 
 ## 1.6.0

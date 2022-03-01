@@ -244,6 +244,11 @@ provider:
           Action:
             - sts:GetCallerIdentity
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - transfer:DeleteServer
+            - transfer:ListServers
+          Resource: "*"
   tracing:
     apiGateway: true
     lambda: true
