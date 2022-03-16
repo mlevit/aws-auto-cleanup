@@ -28,7 +28,7 @@ def lambda_handler(event, context):
     try:
         body = []
         page_iterator = paginator.paginate(
-            TableName=os.environ.get("WHITELIST_TABLE"),
+            TableName=os.environ.get("ALLOWLIST_TABLE"),
         )
 
         for page in page_iterator:
@@ -41,10 +41,10 @@ def lambda_handler(event, context):
 
         return get_return(
             200,
-            "Whitelist retrieved",
+            "Allowlist retrieved",
             None,
-            {"whitelist": sorted(body, key=itemgetter("resource_id", "expiration"))},
+            {"allowlist": sorted(body, key=itemgetter("resource_id", "expiration"))},
         )
     except Exception as error:
         print(f"[ERROR] {error}")
-        return get_return(400, "Could not retrieve whitelist", None, None)
+        return get_return(400, "Could not retrieve allowlist", None, None)

@@ -11,7 +11,7 @@ class TestInstancesMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"instances": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestInstancesMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -54,7 +54,7 @@ class TestInstancesLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"instances": {"clean": True, "ttl": 7}}},
@@ -62,7 +62,7 @@ class TestInstancesLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -84,11 +84,11 @@ class TestInstancesLessThanTTL:
         assert response["Reservations"][0]["Instances"][0]["State"]["Name"] == "running"
 
 
-class TestInstancesWhitelist:
+class TestInstancesAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"instances": {"clean": True, "ttl": -1}}},
@@ -96,7 +96,7 @@ class TestInstancesWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -110,8 +110,8 @@ class TestInstancesWhitelist:
         response = test_class.client_ec2.describe_instances()
         assert response["Reservations"][0]["Instances"][0]["ImageId"] == "ami-43a15f3e"
 
-        # get instance id and add to whitelist
-        test_class.whitelist = {
+        # get instance id and add to allowlist
+        test_class.allowlist = {
             "ec2": {
                 "instance": [response["Reservations"][0]["Instances"][0]["InstanceId"]]
             }
@@ -125,11 +125,11 @@ class TestInstancesWhitelist:
         assert response["Reservations"][0]["Instances"][0]["State"]["Name"] == "running"
 
 
-class TestSecurityGroupsNotWhitelist:
+class TestSecurityGroupsNotAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"security_groups": {"clean": True, "ttl": -1}}},
@@ -137,7 +137,7 @@ class TestSecurityGroupsNotWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -160,11 +160,11 @@ class TestSecurityGroupsNotWhitelist:
             assert group["GroupName"] != "test-security-group"
 
 
-class TestSecurityGroupsWhitelist:
+class TestSecurityGroupsAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {"ec2": {"security_group": ["test-security-group"]}}
+            allowlist = {"ec2": {"security_group": ["test-security-group"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"security_groups": {"clean": True, "ttl": -1}}},
@@ -172,7 +172,7 @@ class TestSecurityGroupsWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -186,8 +186,8 @@ class TestSecurityGroupsWhitelist:
         response = test_class.client_ec2.describe_security_groups()
         assert response["SecurityGroups"][1]["GroupName"] == "test-security-group"
 
-        # get security group id and add to whitelist
-        test_class.whitelist = {
+        # get security group id and add to allowlist
+        test_class.allowlist = {
             "ec2": {"security_group": [response["SecurityGroups"][1]["GroupId"]]}
         }
 
@@ -203,7 +203,7 @@ class TestVolumesMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"volumes": {"clean": True, "ttl": -1}}},
@@ -211,7 +211,7 @@ class TestVolumesMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -235,7 +235,7 @@ class TestVolumesLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"volumes": {"clean": True, "ttl": 7}}},
@@ -243,7 +243,7 @@ class TestVolumesLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -263,11 +263,11 @@ class TestVolumesLessThanTTL:
         assert len(response["Volumes"]) == 1
 
 
-class TestVolumesWhitelist:
+class TestVolumesAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_ec2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"ec2": {"volumes": {"clean": True, "ttl": -1}}},
@@ -275,7 +275,7 @@ class TestVolumesWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = ec2_cleanup.EC2Cleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -287,8 +287,8 @@ class TestVolumesWhitelist:
         response = test_class.client_ec2.describe_volumes()
         assert len(response["Volumes"]) == 1
 
-        # get volume id and add to whitelist
-        test_class.whitelist = {"ec2": {"volume": [response["Volumes"][0]["VolumeId"]]}}
+        # get volume id and add to allowlist
+        test_class.allowlist = {"ec2": {"volume": [response["Volumes"][0]["VolumeId"]]}}
 
         # test instances functions for running instace
         test_class.volumes()

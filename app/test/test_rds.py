@@ -11,7 +11,7 @@ class TestSnapshotsMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_rds2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"rds": {"snapshots": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestSnapshotsMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = rds_cleanup.RDSCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -56,7 +56,7 @@ class TestSnapshotsLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_rds2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
@@ -64,7 +64,7 @@ class TestSnapshotsLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = rds_cleanup.RDSCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -97,11 +97,11 @@ class TestSnapshotsLessThanTTL:
         assert response["DBSnapshots"][0]["DBSnapshotIdentifier"] == "snapshot123"
 
 
-class TestSnapshotsWhitelist:
+class TestSnapshotsAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_rds2():
-            whitelist = {"rds": {"snapshot": ["snapshot123"]}}
+            allowlist = {"rds": {"snapshot": ["snapshot123"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"rds": {"snapshots": {"clean": True, "ttl": 7}}},
@@ -109,7 +109,7 @@ class TestSnapshotsWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = rds_cleanup.RDSCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

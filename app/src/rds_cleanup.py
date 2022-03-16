@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class RDSCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -41,7 +41,7 @@ class RDSCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.rds.instance.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "rds.instance")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "rds.instance")
 
         if is_cleaning_enabled:
             try:
@@ -58,7 +58,7 @@ class RDSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         if resource.get("DeletionProtection"):
                             try:
@@ -106,9 +106,9 @@ class RDSCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"RDS Instance '{resource_id}' has been whitelisted and has not been deleted."
+                        f"RDS Instance '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -138,7 +138,7 @@ class RDSCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.rds.snapshot.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "rds.snapshot")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "rds.snapshot")
 
         if is_cleaning_enabled:
             try:
@@ -159,7 +159,7 @@ class RDSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
@@ -186,9 +186,9 @@ class RDSCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"RDS Snapshot '{resource_id}' has been whitelisted and has not been deleted."
+                        f"RDS Snapshot '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

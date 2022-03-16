@@ -1,14 +1,12 @@
 # AWS Auto Cleanup API
 
-The Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships with one another.
-
-![architecture](./static/architecture.drawio.svg)
+The AWS Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships with one another.
 
 ## Table of contents
 
-- [Table of contents](#table-of-contents)
 - [Deployment](#deployment)
 - [Removal](#removal)
+- [Architecture](#architecture)
 - [API](#api)
 
 ## Deployment
@@ -50,19 +48,23 @@ The Auto Cleanup API is a serverless Lambda-based API built to facilitate the we
    npm run remove -- [--region] [--aws-profile]
    ```
 
+## Architecture
+
+![architecture](./static/architecture.drawio.svg)
+
 ## API
 
-- [Whitelist](#whitelist)
+- [Allowlist](#allowlist)
 - [Execution Log](#execution-log)
 - [Service](#service)
 
-### Whitelist
+### Allowlist
 
 #### Create
 
-Inserts a new whitelist entry into DynamoDB.
+Inserts a new allowlist entry into DynamoDB.
 
-**URL**: `/whitelist/entry`
+**URL**: `/allowlist/entry`
 
 **Method**: `POST`
 
@@ -85,13 +87,13 @@ Inserts a new whitelist entry into DynamoDB.
 
 - _(dict)_
 
-  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
+  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#allowlist).
 
-  - **owner** (string) -- The email address belonging to the owner of the whitelist entry.
+  - **owner** (string) -- The email address belonging to the owner of the allowlist entry.
 
-  - **comment** (string) -- Comment associated with the whitelist entry.
+  - **comment** (string) -- Comment associated with the allowlist entry.
 
-  - **permanent** (bool) -- If the whitelist entry should be created as a permanent.
+  - **permanent** (bool) -- If the allowlist entry should be created as a permanent.
 
 ##### Return type
 
@@ -128,13 +130,13 @@ dict
 
   - **response** (dict) -- Response payload.
 
-    - **resource_id** (string) -- Whitelist entry resource ID.
+    - **resource_id** (string) -- Allowlist entry resource ID.
 
-    - **expiration** (epoch) -- Epoch timestamp when the whitelist entry will expire.
+    - **expiration** (epoch) -- Epoch timestamp when the allowlist entry will expire.
 
-    - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+    - **owner** (string) -- The name or email address belonging to the owner of the allowlist entry.
 
-    - **comment** (string) -- Comment associated with the whitelist entry.
+    - **comment** (string) -- Comment associated with the allowlist entry.
 
 ##### Notes
 
@@ -144,9 +146,9 @@ dict
 
 #### Read
 
-Returns the entire whitelist table.
+Returns the entire allowlist table.
 
-**URL**: `/whitelist`
+**URL**: `/allowlist`
 
 **Method**: `GET`
 
@@ -175,7 +177,7 @@ dict
   "message": "string",
   "request": null,
   "response": {
-    "whitelist": [
+    "allowlist": [
       {
         "resource_id": "string",
         "expiration": "epoch",
@@ -197,23 +199,23 @@ dict
 
   - **response** (dict) -- Response payload.
 
-    - **whitelist** (list) -- List of all whitelist entries.
+    - **allowlist** (list) -- List of all allowlist entries.
 
       - _(dict)_
 
-        - **resource_id** (string) -- Whitelist entry resource ID.
+        - **resource_id** (string) -- Allowlist entry resource ID.
 
-        - **expiration** (epoch) -- Epoch timestamp when the whitelist entry will expire.
+        - **expiration** (epoch) -- Epoch timestamp when the allowlist entry will expire.
 
-        - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+        - **owner** (string) -- The name or email address belonging to the owner of the allowlist entry.
 
-        - **comment** (string) -- Comment associated with the whitelist entry.
+        - **comment** (string) -- Comment associated with the allowlist entry.
 
 #### Update
 
-Updates an existing whitelist entry into DynamoDB. This is not meant to be used to update the `owner` or `comment` fields, but rather to extend the `expiration` date to ensure the resources are kept alive for longer.
+Updates an existing allowlist entry into DynamoDB. This is not meant to be used to update the `owner` or `comment` fields, but rather to extend the `expiration` date to ensure the resources are kept alive for longer.
 
-**URL**: `/whitelist/entry`
+**URL**: `/allowlist/entry`
 
 **Method**: `PUT`
 
@@ -236,13 +238,13 @@ Updates an existing whitelist entry into DynamoDB. This is not meant to be used 
 
 - _(dict)_
 
-  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
+  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#allowlist).
 
-  - **expiration** (epoch) -- **[REQUIRED]** Epoch timestamp of the existing whitelist entry.
+  - **expiration** (epoch) -- **[REQUIRED]** Epoch timestamp of the existing allowlist entry.
 
-  - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+  - **owner** (string) -- The name or email address belonging to the owner of the allowlist entry.
 
-  - **comment** (string) -- Comment associated with the whitelist entry.
+  - **comment** (string) -- Comment associated with the allowlist entry.
 
 ##### Return type
 
@@ -280,13 +282,13 @@ dict
 
   - **response** (dict) -- Response payload.
 
-    - **resource_id** (string) -- Whitelist entry resource ID.
+    - **resource_id** (string) -- Allowlist entry resource ID.
 
-    - **expiration** (epoch) -- Extended Epoch timestamp when the whitelist entry will expire.
+    - **expiration** (epoch) -- Extended Epoch timestamp when the allowlist entry will expire.
 
-    - **owner** (string) -- The name or email address belonging to the owner of the whitelist entry.
+    - **owner** (string) -- The name or email address belonging to the owner of the allowlist entry.
 
-    - **comment** (string) -- Comment associated with the whitelist entry.
+    - **comment** (string) -- Comment associated with the allowlist entry.
 
 ##### Notes
 
@@ -296,9 +298,9 @@ dict
 
 #### Delete
 
-Deletes a new whitelist entry into DynamoDB.
+Deletes a new allowlist entry into DynamoDB.
 
-**URL**: `/whitelist/entry`
+**URL**: `/allowlist/entry`
 
 **Method**: `DELETE`
 
@@ -318,7 +320,7 @@ Deletes a new whitelist entry into DynamoDB.
 
 - _(dict)_
 
-  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#whitelist).
+  - **resource_id** (string) -- **[REQUIRED]** Unique resource ID in format `service:resource:id`. For a list of acceptable values, [see this table](https://github.com/servian/aws-auto-cleanup#allowlist).
 
 ##### Return type
 
@@ -350,7 +352,7 @@ dict
 
   - **response** (dict) -- Response payload.
 
-    - **resource_id** (string) -- Whitelist entry resource ID that was deleted.
+    - **resource_id** (string) -- Allowlist entry resource ID that was deleted.
 
 ### Execution Log
 
@@ -524,4 +526,4 @@ dict
 
         - **ttl** (123) -- Default time-to-live for the AWS service resource
 
-        - **id** (string) -- Type of resource ID required for whitelisting
+        - **id** (string) -- Type of resource ID required for allowlisting

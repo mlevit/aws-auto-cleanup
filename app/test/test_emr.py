@@ -11,7 +11,7 @@ class TestClustersMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_emr():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestClustersMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = emr_cleanup.EMRCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -50,7 +50,7 @@ class TestClustersLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_emr():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"emr": {"clusters": {"clean": True, "ttl": 7}}},
@@ -58,7 +58,7 @@ class TestClustersLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = emr_cleanup.EMRCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -85,11 +85,11 @@ class TestClustersLessThanTTL:
         assert response["Clusters"][0]["Status"]["State"] == "WAITING"
 
 
-class TestClustersWhitelist:
+class TestClustersAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_emr():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"emr": {"clusters": {"clean": True, "ttl": -1}}},
@@ -97,7 +97,7 @@ class TestClustersWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = emr_cleanup.EMRCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -116,8 +116,8 @@ class TestClustersWhitelist:
         response = test_class.client_emr.list_clusters()
         assert response["Clusters"][0]["Name"] == "test"
 
-        # get test_class Cluster ID and add to whitelist
-        test_class.whitelist = {"emr": {"cluster": [response["Clusters"][0]["Id"]]}}
+        # get test_class Cluster ID and add to allowlist
+        test_class.allowlist = {"emr": {"cluster": [response["Clusters"][0]["Id"]]}}
 
         # test clusters functions
         test_class.clusters()

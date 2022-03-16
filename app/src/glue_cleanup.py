@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class GlueCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -40,7 +40,7 @@ class GlueCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.glue.crawler.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.crawler")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "glue.crawler")
 
         if is_cleaning_enabled:
             try:
@@ -58,7 +58,7 @@ class GlueCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         if resource_status != "RUNNING":
                             try:
@@ -89,9 +89,9 @@ class GlueCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"Glue Crawler '{resource_id}' has been whitelisted and has not been deleted."
+                        f"Glue Crawler '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -121,7 +121,7 @@ class GlueCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.glue.database.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.database")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "glue.database")
 
         if is_cleaning_enabled:
             try:
@@ -138,7 +138,7 @@ class GlueCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
@@ -163,9 +163,9 @@ class GlueCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"Glue Database '{resource_id}' has been whitelisted and has not been deleted."
+                        f"Glue Database '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -195,7 +195,7 @@ class GlueCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.glue.dev_endpoint.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "glue.dev_endpoint")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "glue.dev_endpoint")
 
         if is_cleaning_enabled:
             try:
@@ -212,7 +212,7 @@ class GlueCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
@@ -239,9 +239,9 @@ class GlueCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"Glue Dev Endpoint '{resource_id}' has been whitelisted and has not been deleted."
+                        f"Glue Dev Endpoint '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

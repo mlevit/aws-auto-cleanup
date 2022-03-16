@@ -1,26 +1,28 @@
 # AWS Auto Cleanup App
 
-The Auto Cleanup App consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
+The AWS Auto Cleanup App consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
 
-![architecture](./static/architecture.drawio.svg)
+In its simplest form, the AWS Auto Cleanup App is a serverless AWS Lambda Function that is triggered by a CloudWatch Event Rule every 3 days. The Lambda Function then queries the AWS API to find all resources that are either not allowlisted or have exceeded their time-to-live timeframe before deleting them.
+
+The tool can be run independently of the API and WEB modules.
 
 ## Table of contents
 
-- [AWS Auto Cleanup App](#aws-auto-cleanup-app)
-  - [Table of contents](#table-of-contents)
-  - [Deployment](#deployment)
-  - [Removal](#removal)
-  - [Features](#features)
-    - [Whitelist](#whitelist)
-      - [Resource ID](#resource-id)
-      - [Expiration](#expiration)
-    - [Settings](#settings)
-      - [Version](#version)
-      - [General](#general)
-      - [Services](#services)
-      - [Regions](#regions)
-    - [Execution Log](#execution-log)
-      - [Athena](#athena)
+- [Deployment](#deployment)
+- [Removal](#removal)
+- [Architecture](#architecture)
+- [Features](#features)
+  - [Allowlist](#allowlist)
+    - [Resource ID](#resource-id)
+    - [Expiration](#expiration)
+  - [Settings](#settings)
+    - [Version](#version)
+    - [General](#general)
+    - [Services](#services)
+    - [Regions](#regions)
+  - [Execution Log](#execution-log)
+    - [Athena](#athena)
+  - [Schedule](#schedule)
 
 ## Deployment
 
@@ -70,7 +72,7 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
    npm run invoke -- [--region] [--aws-profile]
    ```
 
-   - _Settings and Whitelist tables will be populated at the start of the first run._
+   - _Settings and Allowlist tables will be populated at the start of the first run._
 
    - _Dry run mode is automatically activated by default._
 
@@ -96,24 +98,28 @@ The Auto Cleanup App consists of several serverless AWS resource that all work t
 
    - _S3 buckets provisioned by Serverless will not be deleted through this process. To finalise removal, please delete the `athena-results` and `execution-log` buckets manually._
 
+## Architecture
+
+![architecture](./static/architecture.drawio.svg)
+
 ## Features
 
-### Whitelist
+### Allowlist
 
-The whitelist table (DynamoDB) maintains a record of all AWS resources that have been whitelisted (and therefore preserved). During the execution of Auto Cleanup, the scanned resources will be checked against the whitelist. If the resource exists within the whitelist table, it will not be deleted.
+The allowlist table (DynamoDB) maintains a record of all AWS resources that have been allowlisted (and therefore preserved). During the execution of Auto Cleanup, the scanned resources will be checked against the allowlist. If the resource exists within the allowlist table, it will not be deleted. Users are responsible for ensuring that the allowlist is up to date with the resources that they wish to preserve. This can be achieved manually by inserting records into the DynamoDB table or by using the AWS Auto Cleanup Web application.
 
-The whitelist table adheres to the following schema:
+The allowlist table adheres to the following schema:
 
 | Column      | Format                      | Description                                                                                                                                                      |
 | ----------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | resource_id | `<service>:<resource>:<id>` | Unique identifier of the resource.<br>This is a custom format base on the<br>service (e.g., `ec2`, `s3`), the resource<br>(e.g., `instance`, `bucket`) and `id`. |
 | expiration  | Epoch timestamp             | Epoch timestamp when the record<br>will be removed from the settings table                                                                                       |
-| comment     | Text field                  | Comment field describing the resource<br>and why it has been whitelisted                                                                                         |
-| owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the whitelisting                                                   |
+| comment     | Text field                  | Comment field describing the resource<br>and why it has been allowlisted                                                                                         |
+| owner       | Text field                  | Email address or name of the resource<br>owner in case they need to be contacted<br>regarding the allowlisting                                                   |
 
 #### Resource ID
 
-The `resource_id` field within the whitelist table holds a unique identifier for the whitelisted AWS resource. Due to some limitations with AWS, ARNs are not a viable unique identifier for all AWS resources and therefore an alternative was identifier was created.
+The `resource_id` field within the allowlist table holds a unique identifier for the allowlisted AWS resource. Due to some limitations with AWS, ARNs are not a viable unique identifier for all AWS resources and therefore an alternative identifier was created.
 
 The below table indicates AWS resources that are supported by Auto Cleanup along with indications and examples of `resource_id` values for each resource.
 
@@ -163,14 +169,15 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | SageMaker Apps                 | App Name               | `sagemaker:app:app_name`                             |
 | SageMaker Endpoints            | Endpoint Name          | `sagemaker:endpoint:endpoint_name`                   |
 | SageMaker Notebook Instances   | Notebook Instance Name | `sagemaker:notebook_instance:notebook_instance_name` |
+| Transfer Servers               | Server ID              | `transfer:server:server_id`                          |
 
-_Note: Resources that are a part of a CloudFormation Stack will be automatically whitelisted at run time to prevent the need to whitelist the CloudFormation Stack and each resource the Stack provisions._
+_Note: Resources that are a part of a CloudFormation Stack will be automatically allowlisted at run time to prevent the need to allowlist the CloudFormation Stack and each resource the Stack provisions._
 
 #### Expiration
 
-The `expiration` field within the whitelist table is marked as a TTL field. This means that when the current timestamp exceeds the value within the `expiration` field, DynamoDB will remove the record from the table.
+The `expiration` field within the allowlist table is marked as a TTL field. This means that when the current timestamp exceeds the value within the `expiration` field, DynamoDB will remove the record from the table.
 
-This has been designed in such a way as to prevent AWS resources from being whitelisted indefinitely.
+This has been designed in such a way as to prevent AWS resources from being allowlisted indefinitely.
 
 ### Settings
 
@@ -200,7 +207,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | --------------------- | ------------------ | ----- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Airflow               | Environments       | True  | 7   |                                                                                                                                                                                    |
 | Amplify               | Apps               | True  | 7   |                                                                                                                                                                                    |
-| CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not whitelisted or not part of a whitelistd nested Stack.                                                                                                         |
+| CloudFormation        | Stacks             | True  | 7   | Deletes Stack if not allowlisted or not part of a allowlistd nested Stack.                                                                                                         |
 | CloudWatch            | Log Groups         | True  | 30  |                                                                                                                                                                                    |
 | DynamoDB              | Tables             | True  | 7   |                                                                                                                                                                                    |
 | EC2                   | Addresses          | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                            |
@@ -245,6 +252,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | SageMaker             | Apps               | True  | 7   |                                                                                                                                                                                    |
 | SageMaker             | Endpoints          | True  | 7   |                                                                                                                                                                                    |
 | SageMaker             | Notebook Instances | True  | 7   |                                                                                                                                                                                    |
+| Transfer              | Servers            | True  | N/A | Deletes any Servers running that are not allowlisted. The AWS API does not provide creation dates for Servers.                                                                     |
 
 #### Regions
 
@@ -297,3 +305,7 @@ Post every Auto Cleanup run, an execution log is generated and stored as a flat 
 #### Athena
 
 To enable analytical access to the generated execution logs, a Glue Database and Glue Table are provisioned based on the S3 Bucket and file schema of the execution log. This database and table can be accessed directly from within Athena enabling the logs to be queried using SQL.
+
+### Schedule
+
+By default, the Auto Cleanup Lambda is scheduled to run every three days from the time of deployment. You can manually trigger the app to run by executing the `npm run invoke` command found in the Deployment section above.

@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class ElasticsearchServiceCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -38,8 +38,8 @@ class ElasticsearchServiceCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.elasticsearch.domain.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(
-            self.whitelist, "elasticsearch.domain"
+        resource_allowlist = Helper.get_allowlist(
+            self.allowlist, "elasticsearch.domain"
         )
 
         if is_cleaning_enabled:
@@ -74,7 +74,7 @@ class ElasticsearchServiceCleanup:
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in resource_whitelist:
+                    if resource_id not in resource_allowlist:
                         if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
@@ -101,9 +101,9 @@ class ElasticsearchServiceCleanup:
                             resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"Elasticsearch Service Domain '{resource_id}' has been whitelisted and has not been deleted."
+                            f"Elasticsearch Service Domain '{resource_id}' has been allowlisted and has not been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

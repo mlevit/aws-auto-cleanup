@@ -1,14 +1,12 @@
 # AWS Auto Cleanup Website
 
-The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The website utilises the Auto Cleanup API to serve content and enable user interaction.
-
-![architecture](./static/architecture.drawio.svg)
+The AWS Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The website utilises the AWS Auto Cleanup API to serve content and enable user interaction.
 
 ## Table of contents
 
-- [Table of contents](#table-of-contents)
 - [Deployment](#deployment)
 - [Removal](#removal)
+- [Architecture](#architecture)
 - [Authentication](#authentication)
 - [Screenshots](#screenshots)
 
@@ -21,7 +19,7 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    ```bash
    cd aws-auto-cleanup/web/
    ```
-   
+
 3. Install dependencies
 
    ```bash
@@ -60,6 +58,10 @@ The Auto Cleanup Website is a static Vue.js website hosted within Amazon S3. The
    npm run remove -- [--region] [--aws-profile]
    ```
 
+## Architecture
+
+![architecture](./static/architecture.drawio.svg)
+
 ## Authentication
 
 The first time you access the web client from a new browser, you need to insert the API key that has been generated during the deployment of the API.
@@ -68,8 +70,8 @@ The first time you access the web client from a new browser, you need to insert 
 
 | ![main](./static/main.png) | ![add](./static/add.png) |
 | :------------------------: | :----------------------: |
-|         dashboard          |   add whitelist entry    |
+|         dashboard          |   add allowlist entry    |
 
 | ![delete](./static/delete.png) | ![log](./static/log.png) |
 | :----------------------------: | :----------------------: |
-|     delete whitelist entry     |      execution logs      |
+|     delete allowlist entry     |      execution logs      |

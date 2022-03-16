@@ -95,7 +95,7 @@ def lambda_handler(event, context):
 
     try:
         boto3.client("dynamodb").put_item(
-            TableName=os.environ.get("WHITELIST_TABLE"),
+            TableName=os.environ.get("ALLOWLIST_TABLE"),
             Item={
                 "resource_id": {"S": parameters.get("resource_id")},
                 "expiration": {"N": str(expiration)},
@@ -106,7 +106,7 @@ def lambda_handler(event, context):
 
         return get_return(
             201,
-            f"""Whitelist entry '{parameters.get("resource_id")}' has been created""",
+            f"""Allowlist entry '{parameters.get("resource_id")}' has been created""",
             parameters,
             {
                 "resource_id": parameters.get("resource_id"),
@@ -119,7 +119,7 @@ def lambda_handler(event, context):
         print(f"[ERROR] {error}")
         return get_return(
             400,
-            f"""Could not create new whitelist entry '{parameters.get("resource_id")}'""",
+            f"""Could not create new allowlist entry '{parameters.get("resource_id")}'""",
             parameters,
             None,
         )

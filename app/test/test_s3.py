@@ -11,7 +11,7 @@ class TestBucketsMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_s3():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestBucketsMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = s3_cleanup.S3Cleanup(
-                logging, whitelist, settings, execution_log
+                logging, allowlist, settings, execution_log
             )
             yield test_class
 
@@ -43,7 +43,7 @@ class TestBucketsLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_s3():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"s3": {"buckets": {"clean": True, "ttl": 5000}}},
@@ -51,7 +51,7 @@ class TestBucketsLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = s3_cleanup.S3Cleanup(
-                logging, whitelist, settings, execution_log
+                logging, allowlist, settings, execution_log
             )
             yield test_class
 
@@ -71,11 +71,11 @@ class TestBucketsLessThanTTL:
         assert response["Buckets"][0]["Name"] == "test"
 
 
-class TestBucketsWhitelist:
+class TestBucketsAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_s3():
-            whitelist = {"s3": {"bucket": ["test"]}}
+            allowlist = {"s3": {"bucket": ["test"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"s3": {"buckets": {"clean": True, "ttl": -1}}},
@@ -83,7 +83,7 @@ class TestBucketsWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = s3_cleanup.S3Cleanup(
-                logging, whitelist, settings, execution_log
+                logging, allowlist, settings, execution_log
             )
             yield test_class
 

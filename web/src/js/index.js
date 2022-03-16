@@ -1,6 +1,6 @@
-var API_GET_WHITELIST = "/whitelist";
+var API_GET_ALLOWLIST = "/allowlist";
 var API_SERVICES = "/settings/service";
-var API_CRUD_WHITELIST = "/whitelist/entry/";
+var API_CRUD_ALLOWLIST = "/allowlist/entry/";
 var API_EXECLOG = "/execution/";
 var API_KEY = "";
 
@@ -45,20 +45,20 @@ var app = new Vue({
     showExecutionLogLoadingGif: false,
     showExecutionLogPopup: false,
     showHelpPopup: false,
-    showWhitelistDeletePopup: false,
-    showWhitelistLoadingGif: false,
-    showWhitelistPopup: false,
-    whitelist: [],
-    whitelistDataTables: "",
-    whitelistSearchTerm: "",
+    showAllowlistDeletePopup: false,
+    showAllowlistLoadingGif: false,
+    showAllowlistPopup: false,
+    allowlist: [],
+    allowlistDataTables: "",
+    allowlistSearchTerm: "",
   },
   methods: {
-    // Whitelist
-    closeWhitelistDeletePopup: function () {
+    // Allowlist
+    closeAllowlistDeletePopup: function () {
       this.selectedResourceId = "";
-      this.showWhitelistDeletePopup = false;
+      this.showAllowlistDeletePopup = false;
     },
-    closeWhitelistInsertPopup: function () {
+    closeAllowlistInsertPopup: function () {
       this.resourceIdPlaceholder = "";
       this.resourceList = [];
       this.selectedComment = "";
@@ -67,9 +67,9 @@ var app = new Vue({
       this.selectedResource = "";
       this.selectedResourceId = "";
       this.selectedService = "";
-      this.showWhitelistPopup = false;
+      this.showAllowlistPopup = false;
     },
-    createWhitelistEntry: function () {
+    createAllowlistEntry: function () {
       let formData = {
         resource_id:
           this.selectedService +
@@ -83,7 +83,7 @@ var app = new Vue({
 
       sendApiRequest(convertJsonToGet(formData), "POST");
     },
-    createWhitelistEntryFromExecutionLog: function (
+    createAllowlistEntryFromExecutionLog: function (
       service,
       resource,
       resourceId
@@ -93,17 +93,17 @@ var app = new Vue({
       this.selectedResourceId = resourceId;
       this.updateResourceList(this.selectedService);
       this.closeExecutionLogPopup();
-      this.openWhitelistInsertPopup();
+      this.openAllowlistInsertPopup();
     },
-    deleteWhitelistEntry: function (resourceId) {
+    deleteAllowlistEntry: function (resourceId) {
       let formData = {
         resource_id: resourceId,
       };
 
       sendApiRequest(convertJsonToGet(formData), "DELETE");
     },
-    extendWhitelistEntry: function (rowId) {
-      let row = this.whitelist[rowId - 1];
+    extendAllowlistEntry: function (rowId) {
+      let row = this.allowlist[rowId - 1];
       let formData = {
         resource_id: row.resource_id,
         expiration: row.expiration,
@@ -128,17 +128,17 @@ var app = new Vue({
         this.resourceIdPlaceholder = "";
       }
     },
-    openWhitelistDeletePopup: function (resourceId) {
+    openAllowlistDeletePopup: function (resourceId) {
       this.selectedResourceId = resourceId;
-      this.showWhitelistDeletePopup = true;
+      this.showAllowlistDeletePopup = true;
       this.resourceIdPlaceholder = "";
     },
-    openWhitelistInsertPopup: function () {
-      this.showWhitelistPopup = true;
+    openAllowlistInsertPopup: function () {
+      this.showAllowlistPopup = true;
       this.resourceIdPlaceholder = "";
     },
-    searchWhitelist: function () {
-      this.whitelistDataTables.search(this.whitelistSearchTerm).draw();
+    searchAllowlist: function () {
+      this.allowlistDataTables.search(this.allowlistSearchTerm).draw();
     },
     // Execution Log
     closeExecutionLogPopup: function () {
@@ -191,7 +191,7 @@ var app = new Vue({
 });
 
 function sendApiRequest(formURL, requestMethod) {
-  fetch(API_CRUD_WHITELIST + "?" + formURL, {
+  fetch(API_CRUD_ALLOWLIST + "?" + formURL, {
     method: requestMethod,
     headers: {
       "x-api-key": API_KEY,
@@ -199,9 +199,9 @@ function sendApiRequest(formURL, requestMethod) {
   })
     .then((response) => response.json())
     .then((data) => {
-      refreshWhitelist();
-      app.closeWhitelistInsertPopup();
-      app.closeWhitelistDeletePopup();
+      refreshAllowlist();
+      app.closeAllowlistInsertPopup();
+      app.closeAllowlistDeletePopup();
 
       iziToast.success({
         color: "#3FBF61",
@@ -356,11 +356,11 @@ function getServices() {
     });
 }
 
-// Get whitelist
-function getWhitelist() {
-  app.whitelist = [];
-  app.showWhitelistLoadingGif = true;
-  fetch(API_GET_WHITELIST, {
+// Get allowlist
+function getAllowlist() {
+  app.allowlist = [];
+  app.showAllowlistLoadingGif = true;
+  fetch(API_GET_ALLOWLIST, {
     headers: {
       "x-api-key": API_KEY,
     },
@@ -368,12 +368,12 @@ function getWhitelist() {
     .then((response) => response.json())
     .then((data) => {
       let i = 1;
-      let whitelistRaw = data["response"]["whitelist"];
+      let allowlistRaw = data["response"]["allowlist"];
 
       dayjs.extend(dayjs_plugin_utc);
       dayjs.extend(dayjs_plugin_timezone);
 
-      app.whitelist = whitelistRaw.map((item) => {
+      app.allowlist = allowlistRaw.map((item) => {
         let readableDate = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
 
         item["row_id"] = i++;
@@ -389,7 +389,7 @@ function getWhitelist() {
       });
 
       setTimeout(function () {
-        app.whitelistDataTables = $("#whitelist").DataTable({
+        app.allowlistDataTables = $("#allowlist").DataTable({
           columnDefs: [
             { className: "dt-center", targets: [5] },
             { orderable: false, targets: [0, 1, 2, 3, 4, 5, 6, 7] },
@@ -408,7 +408,7 @@ function getWhitelist() {
         });
       }, 10);
 
-      app.showWhitelistLoadingGif = false;
+      app.showAllowlistLoadingGif = false;
     })
     .catch((error) => {
       iziToast.error({
@@ -420,9 +420,9 @@ function getWhitelist() {
     });
 }
 
-function refreshWhitelist() {
-  app.whitelistDataTables.destroy();
-  getWhitelist();
+function refreshAllowlist() {
+  app.allowlistDataTables.destroy();
+  getAllowlist();
 }
 
 function openTab(evt, tabName) {
@@ -443,7 +443,7 @@ function openTab(evt, tabName) {
 }
 
 function init() {
-  getWhitelist();
+  getAllowlist();
   getExecutionLogList();
   getServices();
 }
@@ -451,14 +451,15 @@ function init() {
 // Get the API Gateway Base URL from manifest file
 fetch("serverless.manifest.json").then(function (response) {
   response.json().then(function (data) {
-    let API_BASE = data["prod"]["urls"]["apiGatewayBaseURL"];
+    let env = Object.keys(data)[0];
+    let API_BASE = data[env]["urls"]["apiGatewayBaseURL"];
 
-    API_GET_WHITELIST = API_BASE + API_GET_WHITELIST;
+    API_GET_ALLOWLIST = API_BASE + API_GET_ALLOWLIST;
     API_SERVICES = API_BASE + API_SERVICES;
-    API_CRUD_WHITELIST = API_BASE + API_CRUD_WHITELIST;
+    API_CRUD_ALLOWLIST = API_BASE + API_CRUD_ALLOWLIST;
     API_EXECLOG = API_BASE + API_EXECLOG;
 
-    for (output of data["prod"]["outputs"]) {
+    for (output of data[env]["outputs"]) {
       if (output["OutputKey"] === "AccountID") {
         app.accountId = output["OutputValue"];
         document.title = "AWS Auto Cleanup - " + output["OutputValue"];

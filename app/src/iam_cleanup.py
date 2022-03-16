@@ -8,9 +8,9 @@ from src.helper import Helper
 
 
 class IAMCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log):
+    def __init__(self, logging, allowlist, settings, execution_log):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = "global"
@@ -42,7 +42,7 @@ class IAMCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.access_key.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.access_key")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "iam.access_key")
 
         if is_cleaning_enabled:
             try:
@@ -63,7 +63,7 @@ class IAMCleanup:
                 resource_id = resource.get("AccessKeyId")
                 resource_status = resource.get("Status")
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     try:
                         resource_details = self.client_iam.get_access_key_last_used(
                             AccessKeyId=resource_id
@@ -124,9 +124,9 @@ class IAMCleanup:
                             resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"IAM Access Key '{resource_id}' for IAM User '{user}' has been whitelisted and has not been deleted."
+                        f"IAM Access Key '{resource_id}' for IAM User '{user}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -160,7 +160,7 @@ class IAMCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.policy.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.policy")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "iam.policy")
 
         if is_cleaning_enabled:
             try:
@@ -180,7 +180,7 @@ class IAMCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         if resource.get("AttachmentCount") > 0:
                             # - Detach the policy from all users, groups, and roles that the policy is attached to,
@@ -343,9 +343,9 @@ class IAMCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"IAM Policy '{resource_id}' has been whitelisted and has not been deleted."
+                        f"IAM Policy '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -375,7 +375,7 @@ class IAMCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.role.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.role")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "iam.role")
 
         if is_cleaning_enabled:
             try:
@@ -394,7 +394,7 @@ class IAMCleanup:
                 resource_action = None
 
                 if "AWSServiceRoleFor" not in resource_id:
-                    if resource_id not in resource_whitelist:
+                    if resource_id not in resource_allowlist:
                         if resource_age > resource_maximum_age:
                             # check when the role was last accessed
                             try:
@@ -634,9 +634,9 @@ class IAMCleanup:
                             resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"IAM Role '{resource_id}' has been whitelisted and has not been deleted."
+                            f"IAM Role '{resource_id}' has been allowlisted and has not been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                     Helper.record_execution_log_action(
                         self.execution_log,
@@ -665,7 +665,7 @@ class IAMCleanup:
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.iam.user_policy.clean", False
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user_policy")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "iam.user_policy")
 
         if is_cleaning_enabled:
             try:
@@ -686,7 +686,7 @@ class IAMCleanup:
                 resource_id = resource
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     try:
                         if not self.is_dry_run:
                             self.client_iam.delete_user_policy(
@@ -705,9 +705,9 @@ class IAMCleanup:
                         resource_action = "DELETE"
                 else:
                     self.logging.debug(
-                        f"IAM User Policy '{resource_id}' for IAM User '{user}' has been whitelisted and has not been deleted."
+                        f"IAM User Policy '{resource_id}' for IAM User '{user}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -806,7 +806,7 @@ class IAMCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.iam.user.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "iam.user")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "iam.user")
 
         if is_cleaning_enabled:
             try:
@@ -825,7 +825,7 @@ class IAMCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         self.access_keys(resource_id)
                         self.delete_login_profile(resource_id)
@@ -860,9 +860,9 @@ class IAMCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"IAM User '{resource_id}' has been whitelisted and has not been deleted."
+                        f"IAM User '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

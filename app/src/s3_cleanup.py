@@ -7,9 +7,9 @@ from src.helper import Helper
 
 
 class S3Cleanup:
-    def __init__(self, logging, whitelist, settings, execution_log):
+    def __init__(self, logging, allowlist, settings, execution_log):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = "global"
@@ -47,7 +47,7 @@ class S3Cleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.s3.bucket.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "s3.bucket")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "s3.bucket")
         semaphore = threading.Semaphore(value=5)
 
         if is_cleaning_enabled:
@@ -68,7 +68,7 @@ class S3Cleanup:
                         args=(
                             semaphore,
                             resource,
-                            resource_whitelist,
+                            resource_allowlist,
                             resource_maximum_age,
                         ),
                     )
@@ -89,7 +89,7 @@ class S3Cleanup:
             return True
 
     def delete_bucket(
-        self, semaphore, resource, resource_whitelist, resource_maximum_age
+        self, semaphore, resource, resource_allowlist, resource_maximum_age
     ):
         semaphore.acquire()
 
@@ -98,7 +98,7 @@ class S3Cleanup:
         resource_age = Helper.get_day_delta(resource_date).days
         resource_action = None
 
-        if resource_id not in resource_whitelist:
+        if resource_id not in resource_allowlist:
             if resource_age > resource_maximum_age:
                 # delete bucket policy
                 try:
@@ -171,9 +171,9 @@ class S3Cleanup:
                 resource_action = "SKIP - TTL"
         else:
             self.logging.debug(
-                f"S3 Bucket '{resource_id}' has been whitelisted and has not been deleted."
+                f"S3 Bucket '{resource_id}' has been allowlisted and has not been deleted."
             )
-            resource_action = "SKIP - WHITELIST"
+            resource_action = "SKIP - ALLOWLIST"
 
         Helper.record_execution_log_action(
             self.execution_log,

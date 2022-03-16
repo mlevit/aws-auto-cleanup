@@ -11,7 +11,7 @@ class TestTablesMoreThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_dynamodb2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"dynamodb": {"tables": {"clean": True, "ttl": -1}}},
@@ -19,7 +19,7 @@ class TestTablesMoreThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = dynamodb_cleanup.DynamoDBCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -48,7 +48,7 @@ class TestTablesLessThanTTL:
     @pytest.fixture
     def test_class(self):
         with moto.mock_dynamodb2():
-            whitelist = {}
+            allowlist = {}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"dynamodb": {"tables": {"clean": True, "ttl": 7}}},
@@ -56,7 +56,7 @@ class TestTablesLessThanTTL:
             execution_log = {"AWS": {}}
 
             test_class = dynamodb_cleanup.DynamoDBCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 
@@ -81,11 +81,11 @@ class TestTablesLessThanTTL:
         assert "settings-table" in response["TableNames"]
 
 
-class TestTablesWhitelist:
+class TestTablesAllowlist:
     @pytest.fixture
     def test_class(self):
         with moto.mock_dynamodb2():
-            whitelist = {"dynamodb": {"table": ["settings-table"]}}
+            allowlist = {"dynamodb": {"table": ["settings-table"]}}
             settings = {
                 "general": {"dry_run": False},
                 "services": {"dynamodb": {"tables": {"clean": True, "ttl": -1}}},
@@ -93,7 +93,7 @@ class TestTablesWhitelist:
             execution_log = {"AWS": {}}
 
             test_class = dynamodb_cleanup.DynamoDBCleanup(
-                logging, whitelist, settings, execution_log, "ap-southeast-2"
+                logging, allowlist, settings, execution_log, "ap-southeast-2"
             )
             yield test_class
 

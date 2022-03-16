@@ -244,6 +244,11 @@ provider:
           Action:
             - sts:GetCallerIdentity
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - transfer:DeleteServer
+            - transfer:ListServers
+          Resource: "*"
   tracing:
     apiGateway: true
     lambda: true
@@ -273,8 +278,8 @@ functions:
         Ref: ExecutionLogBucket
       SETTINGS_TABLE:
         Ref: SettingsTable
-      WHITELIST_TABLE:
-        Ref: WhitelistTable
+      ALLOWLIST_TABLE:
+        Ref: AllowlistTable
     events:
       - schedule:
           rate: rate(3 days)
@@ -295,10 +300,10 @@ resources:
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
-    WhitelistTable:
+    AllowlistTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:service}-${self:provider.stage}-whitelist
+        TableName: ${self:service}-${self:provider.stage}-allowlist
         AttributeDefinitions:
           - AttributeName: resource_id
             AttributeType: S
@@ -389,9 +394,9 @@ resources:
     SettingsTableName:
       Value:
         Ref: SettingsTable
-    WhitelistTableName:
+    AllowlistTableName:
       Value:
-        Ref: WhitelistTable
+        Ref: AllowlistTable
 
 plugins:
   - serverless-python-requirements

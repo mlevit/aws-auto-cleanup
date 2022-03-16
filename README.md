@@ -1,26 +1,6 @@
-![](./static/banner.png)
+AWS Auto Cleanup is a tool that helps you to clean up your AWS resources, keeping your AWS accounts neat and tidy whilst reducing costs. AWS Auto Cleanup uses a combination of user-defined allowlists and time-based policies to automatically delete resources that are no longer needed.
 
-<p align="center">
-<a href="https://www.codacy.com/app/servian/aws-auto-cleanup?utm_source=github.com&utm_medium=referral&utm_content=servian/aws-auto-cleanup&utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/4f20fbbb03464b9aa6c558a4415d2288"></a>
-</p>
-
-<p align="center">
-Open-source application to programmatically delete AWS resources based on a whitelist and time to live (TTL) settings
-</p>
-<p align="center">
-Auto Cleanup is comprised of three modues, APP, API, and WEB. Click through to learn more and follow the steps to deploy the modules to your environment
-</p>
-<p align="center">
-<strong>Version 1 is not backwards compatible with previous versions of AWS Auto Cleanup, please proceed with fresh deployments</strong>
-</p>
+The tool is comprised of three modules, APP, API, and WEB. Click through each module to learn more and follow the steps within deploy them to your environment.
 
 | [![app](./static/app.png)](./app/) | [![api](./static/api.png)](./api/) | [![web](./static/web.png)](./web/) |
 | :--------------------------------: | :--------------------------------: | :--------------------------------: |
-
-## Maintainers
-
-- [Marat Levit](https://github.com/mlevit)
-
-## Contributors
-
-- [Perth Ngarmtrakulchol](https://github.com/woraperth)

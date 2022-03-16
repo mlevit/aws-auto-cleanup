@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class SageMakerCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -40,7 +40,7 @@ class SageMakerCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.sagemaker.app.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "sagemaker.app")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "sagemaker.app")
 
         if is_cleaning_enabled:
             try:
@@ -61,7 +61,7 @@ class SageMakerCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         if resource_status in ("Failed", "InService"):
                             try:
@@ -92,9 +92,9 @@ class SageMakerCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"SageMaker App '{resource_id}' has been whitelisted and has not been deleted."
+                        f"SageMaker App '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -124,7 +124,7 @@ class SageMakerCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.sagemaker.endpoint.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "sagemaker.endpoint")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "sagemaker.endpoint")
 
         if is_cleaning_enabled:
             try:
@@ -142,7 +142,7 @@ class SageMakerCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         if resource_status in (
                             "OutOfService",
@@ -174,9 +174,9 @@ class SageMakerCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"SageMaker Endpoint '{resource_id}' has been whitelisted and has not been deleted."
+                        f"SageMaker Endpoint '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
@@ -206,8 +206,8 @@ class SageMakerCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.sagemaker.notebook_instance.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(
-            self.whitelist, "sagemaker.notebook_instance"
+        resource_allowlist = Helper.get_allowlist(
+            self.allowlist, "sagemaker.notebook_instance"
         )
 
         if is_cleaning_enabled:
@@ -230,7 +230,7 @@ class SageMakerCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_whitelist:
+                if resource_id not in resource_allowlist:
                     if resource_age > resource_maximum_age:
                         if resource_status == "InService":
                             try:
@@ -276,9 +276,9 @@ class SageMakerCleanup:
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"SageMaker Notebook Instance '{resource_id}' has been whitelisted and has not been deleted."
+                        f"SageMaker Notebook Instance '{resource_id}' has been allowlisted and has not been deleted."
                     )
-                    resource_action = "SKIP - WHITELIST"
+                    resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,

@@ -6,9 +6,9 @@ from src.helper import Helper
 
 
 class DynamoDBCleanup:
-    def __init__(self, logging, whitelist, settings, execution_log, region):
+    def __init__(self, logging, allowlist, settings, execution_log, region):
         self.logging = logging
-        self.whitelist = whitelist
+        self.allowlist = allowlist
         self.settings = settings
         self.execution_log = execution_log
         self.region = region
@@ -38,7 +38,7 @@ class DynamoDBCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.dynamodb.table.ttl", 7
         )
-        resource_whitelist = Helper.get_whitelist(self.whitelist, "dynamodb.table")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "dynamodb.table")
 
         if is_cleaning_enabled:
             try:
@@ -65,7 +65,7 @@ class DynamoDBCleanup:
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource not in resource_whitelist:
+                    if resource not in resource_allowlist:
                         if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:
@@ -92,10 +92,10 @@ class DynamoDBCleanup:
                             resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"DynamoDB Table '{resource}' has been whitelisted and has not "
+                            f"DynamoDB Table '{resource}' has been allowlisted and has not "
                             "been deleted."
                         )
-                        resource_action = "SKIP - WHITELIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
