@@ -217,10 +217,15 @@ provider:
           Resource: "*"
         - Effect: Allow
           Action:
+            - rds:DeleteDBCluster
+            - rds:DeleteDBClusterSnapshot
             - rds:DeleteDBInstance
             - rds:DeleteDBSnapshot
+            - rds:DescribeDBClusters
+            - rds:DescribeDBClusterSnapshots
             - rds:DescribeDBInstances
             - rds:DescribeDBSnapshots
+            - rds:ModifyDBCluster
             - rds:ModifyDBInstance
           Resource: "*"
         - Effect: Allow
