@@ -7,12 +7,12 @@ custom:
     layer:
       name: ${self:service}-${self:provider.stage}-requirements
       compatibleRuntimes:
-        - python3.8
+        - python3.9
     slim: true
 
 provider:
   name: aws
-  runtime: python3.8
+  runtime: python3.9
   stage: ${opt:stage, "prod"} # overwrite via CLI "--stage dev"
   region: ${self:custom.region}
   apiGateway:
