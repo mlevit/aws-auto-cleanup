@@ -319,14 +319,14 @@ class RDSCleanup:
                         )
                         resource_action = "SKIP - ALLOWLIST"
 
-                Helper.record_execution_log_action(
-                    self.execution_log,
-                    self.region,
-                    "RDS",
-                    "Instance",
-                    resource_id,
-                    resource_action,
-                )
+                    Helper.record_execution_log_action(
+                        self.execution_log,
+                        self.region,
+                        "RDS",
+                        "Instance",
+                        resource_id,
+                        resource_action,
+                    )
 
             self.logging.debug("Finished cleanup of RDS Instances.")
             return True
