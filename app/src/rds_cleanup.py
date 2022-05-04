@@ -82,6 +82,29 @@ class RDSCleanup:
                                 )
 
                         if resource_action != "ERROR":
+                            subresources = resource.get("DBClusterMembers")
+
+                            # Delete all DB Instances in Cluster
+                            for subresource in subresources:
+                                subresource_id = subresource.get("DBInstanceIdentifier")
+
+                                try:
+                                    if not self.is_dry_run:
+                                        self.client_rds.delete_db_instance(
+                                            DBInstanceIdentifier=subresource_id,
+                                            SkipFinalSnapshot=True,
+                                        )
+                                except:
+                                    self.logging.error(
+                                        f"Could not delete RDS Cluster '{resource_id}' DB Instance '{subresource_id}'."
+                                    )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.debug(
+                                        f"RDS Cluster '{resource_id}' DB Instance '{subresource_id}' has been deleted."
+                                    )
+
                             try:
                                 if not self.is_dry_run:
                                     self.client_rds.delete_db_cluster(
