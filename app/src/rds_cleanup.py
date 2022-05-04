@@ -266,57 +266,58 @@ class RDSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
-                    if resource_age > resource_maximum_age:
-                        if resource.get("DeletionProtection"):
-                            try:
-                                if not self.is_dry_run:
-                                    self.client_rds.modify_db_instance(
-                                        DBInstanceIdentifier=resource_id,
-                                        DeletionProtection=False,
+                if not resource.get("DBClusterIdentifier"):
+                    if resource_id not in resource_allowlist:
+                        if resource_age > resource_maximum_age:
+                            if resource.get("DeletionProtection"):
+                                try:
+                                    if not self.is_dry_run:
+                                        self.client_rds.modify_db_instance(
+                                            DBInstanceIdentifier=resource_id,
+                                            DeletionProtection=False,
+                                        )
+                                except:
+                                    self.logging.error(
+                                        f"Could not remove termination protection from RDS Instance '{resource_id}'."
                                     )
-                            except:
-                                self.logging.error(
-                                    f"Could not remove termination protection from RDS Instance '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.debug(
-                                    f"RDS Instance '{resource_id}' had delete protection turned on "
-                                    "and now has been turned off."
-                                )
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.debug(
+                                        f"RDS Instance '{resource_id}' had delete protection turned on "
+                                        "and now has been turned off."
+                                    )
 
-                        if resource_action != "ERROR":
-                            try:
-                                if not self.is_dry_run:
-                                    self.client_rds.delete_db_instance(
-                                        DBInstanceIdentifier=resource_id,
-                                        SkipFinalSnapshot=True,
+                            if resource_action != "ERROR":
+                                try:
+                                    if not self.is_dry_run:
+                                        self.client_rds.delete_db_instance(
+                                            DBInstanceIdentifier=resource_id,
+                                            SkipFinalSnapshot=True,
+                                        )
+                                except:
+                                    self.logging.error(
+                                        f"Could not delete RDS Instance '{resource_id}'."
                                     )
-                            except:
-                                self.logging.error(
-                                    f"Could not delete RDS Instance '{resource_id}'."
-                                )
-                                self.logging.error(sys.exc_info()[1])
-                                resource_action = "ERROR"
-                            else:
-                                self.logging.info(
-                                    f"RDS Instance '{resource_id}' was created {resource_age} days ago "
-                                    "and has been deleted."
-                                )
-                                resource_action = "DELETE"
+                                    self.logging.error(sys.exc_info()[1])
+                                    resource_action = "ERROR"
+                                else:
+                                    self.logging.info(
+                                        f"RDS Instance '{resource_id}' was created {resource_age} days ago "
+                                        "and has been deleted."
+                                    )
+                                    resource_action = "DELETE"
+                        else:
+                            self.logging.debug(
+                                f"RDS Instance '{resource_id}' was created {resource_age} days ago "
+                                "(less than TTL setting) and has not been deleted."
+                            )
+                            resource_action = "SKIP - TTL"
                     else:
                         self.logging.debug(
-                            f"RDS Instance '{resource_id}' was created {resource_age} days ago "
-                            "(less than TTL setting) and has not been deleted."
+                            f"RDS Instance '{resource_id}' has been allowlisted and has not been deleted."
                         )
-                        resource_action = "SKIP - TTL"
-                else:
-                    self.logging.debug(
-                        f"RDS Instance '{resource_id}' has been allowlisted and has not been deleted."
-                    )
-                    resource_action = "SKIP - ALLOWLIST"
+                        resource_action = "SKIP - ALLOWLIST"
 
                 Helper.record_execution_log_action(
                     self.execution_log,
