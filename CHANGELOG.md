@@ -1,5 +1,10 @@
 # AWS Auto Cleanup Changelog
 
+## 2.1.0
+
+- Added RDS Cluster and Cluster Snapshot cleanup.
+- Migrated to Python 3.9.
+
 ## 2.0.0
 
 - Added Transfer Family Server (SFTP, FTPS, and FTP) cleanup.

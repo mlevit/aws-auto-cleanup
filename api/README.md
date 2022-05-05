@@ -1,6 +1,6 @@
 # AWS Auto Cleanup API
 
-The AWS Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships with one another.
+The AWS Auto Cleanup API is a serverless Lambda-based API built to facilitate the website. The architecture diagram below illustrates the various services and their relationships.
 
 ## Table of contents
 
