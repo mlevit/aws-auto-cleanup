@@ -1,10 +1,10 @@
 # AWS Auto Cleanup App
 
-The AWS Auto Cleanup App consists of several serverless AWS resource that all work together to find, and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships with one another.
+The AWS Auto Cleanup App consists of several serverless AWS resources that all work together to find and delete AWS resources that may have been abandoned. The architecture diagram below illustrates the various services and their relationships.
 
-In its simplest form, the AWS Auto Cleanup App is a serverless AWS Lambda Function that is triggered by a CloudWatch Event Rule every 3 days. The Lambda Function then queries the AWS API to find all resources that are either not allowlisted or have exceeded their time-to-live time frame before deleting them.
+In its simplest form, the AWS Auto Cleanup App is a serverless AWS Lambda Function triggered by a CloudWatch Event Rule every three days. The Lambda Function then queries the AWS API to find all resources that are either not allowlisted or have exceeded their time-to-live time frame before deleting them.
 
-The tool can be run independently of the API and WEB modules.
+AWS Auto Cleanup App can run independently of the API and WEB modules.
 
 ## Table of contents
 
