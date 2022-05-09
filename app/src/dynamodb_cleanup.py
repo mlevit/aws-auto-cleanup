@@ -74,9 +74,7 @@ class DynamoDBCleanup:
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
-                                self.client_dynamodb.delete_cluster(
-                                    ClusterName=resource_id
-                                )
+                                self.client_dax.delete_cluster(ClusterName=resource_id)
                         except:
                             self.logging.error(
                                 f"Could not delete DynamoDB DAX Cluster '{resource_id}'."
