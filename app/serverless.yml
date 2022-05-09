@@ -52,6 +52,11 @@ provider:
           Resource: "*"
         - Effect: Allow
           Action:
+            - dax:DeleteCluster
+            - dax:DescribeClusters
+          Resource: "*"
+        - Effect: Allow
+          Action:
             - dynamodb:BatchWriteItem
             - dynamodb:DeleteItem
             - dynamodb:DeleteTable
