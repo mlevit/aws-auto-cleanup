@@ -129,6 +129,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | Amplify Apps                   | App Name                 | `amplify:app:app_name`                               |
 | CloudFormation Stacks          | Stack Name               | `cloudformation:stack:stack_name`                    |
 | CloudWatch Log Groups          | Log Group Name           | `cloudwatch:log_group:log_group_name`                |
+| DynamoDB DAX Clusters          | Cluster Name             | `dynamodb:dax_cluster:cluster_name`                  |
 | DynamoDB Tables                | Table Name               | `dynamodb:table:table_name`                          |
 | EC2 Elastic IPs                | Allocation ID            | `ec2:address:allocation_id`                          |
 | EC2 Images                     | Image ID                 | `ec2:image:image_id`                                 |
@@ -203,7 +204,7 @@ General settings.
 
 #### Services
 
-Service-specific settings indicating the supported AWS services, resources, and their lifespan.
+Service-specific settings indicate supported AWS services, resources, and their lifespan.
 
 | Service               | Resource Type           | Clean | TTL | Comment                                                                                                                                                                             |
 | --------------------- | ----------------------- | ----- | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -211,6 +212,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | Amplify               | Apps                    | True  | 7   |                                                                                                                                                                                     |
 | CloudFormation        | Stacks                  | True  | 7   | Deletes Stack if not allowlisted or not part of a allowlisted nested Stack.                                                                                                         |
 | CloudWatch            | Log Groups              | True  | 30  |                                                                                                                                                                                     |
+| DynamoDB              | DAX Cluster             | True  | 7   |                                                                                                                                                                                     |
 | DynamoDB              | Tables                  | True  | 7   |                                                                                                                                                                                     |
 | EC2                   | Addresses               | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                             |
 | EC2                   | Images                  | True  | 7   |                                                                                                                                                                                     |
@@ -260,7 +262,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 
 #### Regions
 
-Region-specific settings indicating the regions to be cleaned.
+Region-specific settings indicate the regions to be cleaned.
 
 | Region            | Clean |
 | ----------------- | ----- |

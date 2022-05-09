@@ -1,5 +1,9 @@
 # AWS Auto Cleanup Changelog
 
+## 2.2.0
+
+- Added DynamoDB DAX Clusters cleanup.
+
 ## 2.1.0
 
 - Added RDS Cluster and Cluster Snapshot cleanup.
