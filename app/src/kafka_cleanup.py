@@ -42,7 +42,7 @@ class KafkaCleanup:
 
         if is_cleaning_enabled:
             try:
-                paginator = self.client_kafka.get_paginator("list_clusters")
+                paginator = self.client_kafka.get_paginator("list_clusters_v2")
                 resources = (
                     paginator.paginate().build_full_result().get("ClusterInfoList")
                 )
