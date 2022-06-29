@@ -35,13 +35,13 @@ class ElasticBeanstalkCleanup:
         self.logging.debug("Started cleanup of Elastic Beanstalk Applications.")
 
         is_cleaning_enabled = Helper.get_setting(
-            self.settings, "services.elasticbeanstalk.application.clean", False
+            self.settings, "services.elastic_beanstalk.application.clean", False
         )
         resource_maximum_age = Helper.get_setting(
-            self.settings, "services.elasticbeanstalk.application.ttl", 7
+            self.settings, "services.elastic_beanstalk.application.ttl", 7
         )
         resource_allowlist = Helper.get_allowlist(
-            self.allowlist, "elasticbeanstalk.application"
+            self.allowlist, "elastic_beanstalk.application"
         )
 
         if is_cleaning_enabled:
