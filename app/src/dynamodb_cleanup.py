@@ -65,7 +65,7 @@ class DynamoDBCleanup:
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource not in resource_allowlist:
+                    if Helper.not_allowlisted(resource, resource_allowlist):
                         if resource_age > resource_maximum_age:
                             try:
                                 if not self.is_dry_run:

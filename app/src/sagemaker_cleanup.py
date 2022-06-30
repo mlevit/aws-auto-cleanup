@@ -61,7 +61,7 @@ class SageMakerCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         if resource_status in ("Failed", "InService"):
                             try:
@@ -142,7 +142,7 @@ class SageMakerCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         if resource_status in (
                             "OutOfService",
@@ -230,7 +230,7 @@ class SageMakerCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         if resource_status == "InService":
                             try:

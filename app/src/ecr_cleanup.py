@@ -38,7 +38,7 @@ class ECRCleanup:
         resource_maximum_age = Helper.get_setting(
             self.settings, "services.ecr.repository.ttl", 7
         )
-        allowlisted_resources = Helper.get_allowlist(self.allowlist, "ecr.repository")
+        resource_allowlist = Helper.get_allowlist(self.allowlist, "ecr.repository")
 
         if is_cleaning_enabled:
             try:
@@ -59,7 +59,7 @@ class ECRCleanup:
                 # images before deleting the repository itself
                 self.images(resource_id)
 
-                if resource_id not in allowlisted_resources:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     try:
                         paginator = self.client_ecr.get_paginator("list_images")
                         list_images = (
