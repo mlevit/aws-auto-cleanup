@@ -174,7 +174,7 @@
               <th>Owner</th>
               <th>Comment</th>
               <th>Type</th>
-              <th>Actions</th>
+              <th style="text-align: center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -193,7 +193,7 @@
                 <span v-if="item.expiration < '4102444800'">Temporary</span>
                 <span v-if="item.expiration >= '4102444800'">Permanent</span>
               </td>
-              <td style="white-space: nowrap">
+              <td style="white-space: nowrap; text-align: center">
                 <button
                   class="button is-warning"
                   v-if="item.expiration < '4102444800'"
@@ -359,7 +359,7 @@
                           <th>Resource</th>
                           <th>ID</th>
                           <th>Action</th>
-                          <th>Allowlist</th>
+                          <th style="text-align: center">Allowlist</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -370,7 +370,7 @@
                           <td style="white-space: nowrap">{{ item[3] }}</td>
                           <td>{{ item[4] }}</td>
                           <td>{{ item[5] }}</td>
-                          <td style="white-space: nowrap">
+                          <td style="white-space: nowrap; text-align: center">
                             <button
                               class="button is-warning"
                               v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - ALLOWLIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"
