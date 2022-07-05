@@ -68,7 +68,7 @@ class KinesisCleanup:
                     resource_date = resource_details.get("StreamCreationTimestamp")
                     resource_age = Helper.get_day_delta(resource_date).days
 
-                    if resource_id not in resource_allowlist:
+                    if Helper.not_allowlisted(resource_id, resource_allowlist):
 
                         if resource_age > resource_maximum_age:
                             if resource_status == "ACTIVE":

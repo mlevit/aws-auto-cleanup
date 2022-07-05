@@ -63,7 +63,7 @@ class IAMCleanup:
                 resource_id = resource.get("AccessKeyId")
                 resource_status = resource.get("Status")
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     try:
                         resource_details = self.client_iam.get_access_key_last_used(
                             AccessKeyId=resource_id
@@ -180,7 +180,7 @@ class IAMCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         if resource.get("AttachmentCount") > 0:
                             # - Detach the policy from all users, groups, and roles that the policy is attached to,
@@ -394,7 +394,7 @@ class IAMCleanup:
                 resource_action = None
 
                 if "AWSServiceRoleFor" not in resource_id:
-                    if resource_id not in resource_allowlist:
+                    if Helper.not_allowlisted(resource_id, resource_allowlist):
                         if resource_age > resource_maximum_age:
                             # check when the role was last accessed
                             try:
@@ -686,7 +686,7 @@ class IAMCleanup:
                 resource_id = resource
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     try:
                         if not self.is_dry_run:
                             self.client_iam.delete_user_policy(
@@ -825,7 +825,7 @@ class IAMCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         self.access_keys(resource_id)
                         self.delete_login_profile(resource_id)

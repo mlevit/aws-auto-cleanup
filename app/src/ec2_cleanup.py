@@ -73,7 +73,7 @@ class EC2Cleanup:
                 resource_id = resource.get("AllocationId")
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource.get("AssociationId") is None:
                         try:
                             if not self.is_dry_run:
@@ -152,7 +152,7 @@ class EC2Cleanup:
                 resource_date = resource.get("CreationDate")
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     resource_age = Helper.get_day_delta(resource_date).days
 
                     if resource_age > resource_maximum_age:
@@ -235,7 +235,7 @@ class EC2Cleanup:
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
 
-                    if resource_id not in resource_allowlist:
+                    if Helper.not_allowlisted(resource_id, resource_allowlist):
                         if resource_age > resource_maximum_age:
                             if resource_state == "running":
                                 try:
@@ -368,7 +368,7 @@ class EC2Cleanup:
                 resource_state = resource.get("State")
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_state in ("available"):
                         resource_age = Helper.get_day_delta(resource_date).days
 
@@ -452,7 +452,7 @@ class EC2Cleanup:
                 resource_action = None
 
                 if resource.get("GroupName") != "default":
-                    if resource_id not in resource_allowlist:
+                    if Helper.not_allowlisted(resource_id, resource_allowlist):
                         try:
                             if not self.is_dry_run:
                                 self.client_ec2.delete_security_group(
@@ -535,7 +535,7 @@ class EC2Cleanup:
                 resource_date = resource.get("StartTime")
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     snapshots_in_use = []
                     try:
                         images = self.client_ec2.describe_images(
@@ -642,7 +642,7 @@ class EC2Cleanup:
                 resource_date = resource.get("CreateTime")
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource.get("Attachments") == []:
                         resource_age = Helper.get_day_delta(resource_date).days
 

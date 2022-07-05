@@ -1,4 +1,5 @@
 import datetime
+import fnmatch
 
 import dateutil.parser
 
@@ -41,6 +42,13 @@ class Helper:
             if result is None:
                 return default or []
         return result
+
+    @staticmethod
+    def not_allowlisted(resource_id, allowlist):
+        if not any(fnmatch.fnmatch(resource_id, pattern) for pattern in allowlist):
+            return True
+        else:
+            return False
 
     @staticmethod
     def parse_resource_id(resource_id):

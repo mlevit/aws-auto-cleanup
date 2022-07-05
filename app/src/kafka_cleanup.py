@@ -42,7 +42,7 @@ class KafkaCleanup:
 
         if is_cleaning_enabled:
             try:
-                paginator = self.client_kafka.get_paginator("list_clusters")
+                paginator = self.client_kafka.get_paginator("list_clusters_v2")
                 resources = (
                     paginator.paginate().build_full_result().get("ClusterInfoList")
                 )
@@ -58,7 +58,7 @@ class KafkaCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
