@@ -121,7 +121,7 @@ class CloudFormationCleanup:
         resource_action = None
 
         if (
-            resource_id not in resource_allowlist
+            Helper.not_allowlisted(resource_id, resource_allowlist)
             and resource_parent_stack_id not in resource_allowlist
             and resource_root_stack_id not in resource_allowlist
         ):
