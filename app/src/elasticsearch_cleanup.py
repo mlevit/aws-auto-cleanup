@@ -33,13 +33,13 @@ class ElasticsearchServiceCleanup:
         self.logging.debug("Started cleanup of Elasticsearch Service Domains.")
 
         is_cleaning_enabled = Helper.get_setting(
-            self.settings, "services.elasticsearch.domain.clean", False
+            self.settings, "services.elasticsearch_service.domain.clean", False
         )
         resource_maximum_age = Helper.get_setting(
-            self.settings, "services.elasticsearch.domain.ttl", 7
+            self.settings, "services.elasticsearch_service.domain.ttl", 7
         )
         resource_allowlist = Helper.get_allowlist(
-            self.allowlist, "elasticsearch.domain"
+            self.allowlist, "elasticsearch_service.domain"
         )
 
         if is_cleaning_enabled:
