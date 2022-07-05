@@ -60,7 +60,7 @@ class RDSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         if resource.get("DeletionProtection"):
                             try:
@@ -188,7 +188,7 @@ class RDSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:
@@ -267,7 +267,7 @@ class RDSCleanup:
                 resource_action = None
 
                 if not resource.get("DBClusterIdentifier"):
-                    if resource_id not in resource_allowlist:
+                    if Helper.not_allowlisted(resource_id, resource_allowlist):
                         if resource_age > resource_maximum_age:
                             if resource.get("DeletionProtection"):
                                 try:
@@ -368,7 +368,7 @@ class RDSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
                         try:
                             if not self.is_dry_run:

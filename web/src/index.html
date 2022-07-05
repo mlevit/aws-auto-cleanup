@@ -54,9 +54,10 @@
     <link rel="manifest" href="./img/site.webmanifest" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css"
-      integrity="sha512-ZRv40llEogRmoWgZwnsqke3HNzJ0kiI0+pcMgiz2bxO6Ew1DVBtWjVn0qjrXdT3+u+pSN36gLgmJiiQ3cQtyzA=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
+      integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ=="
       crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
     <link
       rel="stylesheet"
@@ -173,7 +174,7 @@
               <th>Owner</th>
               <th>Comment</th>
               <th>Type</th>
-              <th>Actions</th>
+              <th style="text-align: center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -192,7 +193,7 @@
                 <span v-if="item.expiration < '4102444800'">Temporary</span>
                 <span v-if="item.expiration >= '4102444800'">Permanent</span>
               </td>
-              <td style="white-space: nowrap">
+              <td style="white-space: nowrap; text-align: center">
                 <button
                   class="button is-warning"
                   v-if="item.expiration < '4102444800'"
@@ -358,7 +359,7 @@
                           <th>Resource</th>
                           <th>ID</th>
                           <th>Action</th>
-                          <th>Allowlist</th>
+                          <th style="text-align: center">Allowlist</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -369,7 +370,7 @@
                           <td style="white-space: nowrap">{{ item[3] }}</td>
                           <td>{{ item[4] }}</td>
                           <td>{{ item[5] }}</td>
-                          <td style="white-space: nowrap">
+                          <td style="white-space: nowrap; text-align: center">
                             <button
                               class="button is-warning"
                               v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - ALLOWLIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"

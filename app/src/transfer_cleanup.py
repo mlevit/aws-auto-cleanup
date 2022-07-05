@@ -54,7 +54,7 @@ class TransferCleanup:
                 resource_state = resource.get("State")
                 resource_action = None
 
-                if resource_id not in resource_allowlist:
+                if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_state in ("ONLINE", "START_FAILED", "STOP_FAILED"):
                         try:
                             if not self.is_dry_run:

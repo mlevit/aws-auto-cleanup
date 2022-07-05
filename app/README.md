@@ -175,6 +175,17 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 
 _Note: Resources that are a part of a CloudFormation Stack will be automatically allowlisted at run time to prevent the need to allowlist the CloudFormation Stack and each resource the Stack provisions._
 
+##### Wildcard
+
+Resource IDs can be specified with wildcards. The following table indicates the wildcard characters that can be used when definining your resource ID.
+
+| Pattern | Meaning                          |
+| ------- | -------------------------------- |
+| \*      | matches everything               |
+| ?       | matches any single character     |
+| [seq]   | matches any character in seq     |
+| [!seq]  | matches any character not in seq |
+
 #### Expiration
 
 The `expiration` field within the allowlist table is marked as a TTL field. This means that when the current timestamp exceeds the value within the `expiration` field, DynamoDB will remove the record from the table.
