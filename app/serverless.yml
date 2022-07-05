@@ -190,7 +190,7 @@ provider:
         - Effect: Allow
           Action:
             - kafka:DeleteCluster
-            - kafka:ListClusters
+            - kafka:ListClustersV2
           Resource: "*"
         - Effect: Allow
           Action:
