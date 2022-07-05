@@ -1,6 +1,6 @@
 # AWS Auto Cleanup Changelog
 
-## UNRELEASED
+## 2.2.0
 
 - Added wildcard support to allowlist resource ID. Comparisons are now performed using the [fnmatch](https://docs.python.org/3/library/fnmatch.html) Python module. The following special characters can be used:
 
@@ -12,6 +12,7 @@
   | [!seq]  | matches any character not in seq |
 
 - Added Kafka Serverless Cluster cleanup.
+- Fixed mismatch between app settings and exeuction log for Elastic Beanstalk and Elasticsearch Service. This prevented allowlisting via the execution log in the web app.
 
 ## 2.1.0
 
