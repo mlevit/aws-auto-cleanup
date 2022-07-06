@@ -133,7 +133,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EC2 Elastic IPs                | Allocation ID            | `ec2:address:allocation_id`                          |
 | EC2 Images                     | Image ID                 | `ec2:image:image_id`                                 |
 | EC2 Instances                  | Instance ID              | `ec2:instance:instance_id`                           |
-| EC2 NAT Gateways               | NAT Gateway ID           | `ec2:instance:nat_gateway_id`                        |
+| EC2 NAT Gateways               | NAT Gateway ID           | `ec2:nat_gateway:nat_gateway_id`                     |
 | EC2 Security Groups            | Group ID                 | `ec2:security_group:group_id`                        |
 | EC2 Snapshots                  | Snapshot ID              | `ec2:snapshot:snapshot_id`                           |
 | EC2 Volumes                    | Volume ID                | `ec2:volume:volume_id`                               |
