@@ -424,7 +424,7 @@
                   <div class="level-item control has-icons-left">
                     <input
                       class="input"
-                      placeholder="Search"
+                      placeholder="Search (⏎ to search)"
                       type="text"
                       v-model="executionLogSearchTerm"
                       v-on:keyup.enter="searchExecutionLog()"
@@ -435,6 +435,7 @@
                   </div>
                 </div>
                 <div class="level-right">
+                  <div class="level-item" id="execution-log-table-info"></div>
                   <div
                     class="level-item"
                     id="execution-log-table-paginate"
@@ -664,9 +665,11 @@
           <section class="modal-card-body">
             <div class="content">
               <p>
-                AWS Auto Cleanup is an open-source application to
-                programmatically clean AWS resources based on a Allowlist and
-                time-to-live (TTL) settings.
+                AWS Auto Cleanup helps clean up your AWS resources, keeping your
+                AWS accounts neat and tidy whilst reducing costs. AWS Auto
+                Cleanup uses a combination of user-defined allowlists and
+                time-based policies to delete resources that are no longer
+                needed.
               </p>
               <h2>Allowlist</h2>
               <p>
@@ -701,8 +704,8 @@
               </table>
               <h2>Execution Log</h2>
               <p>
-                Post every Auto Cleanup run, an execution log is generated and
-                stored as a flat CSV file within an S3 Bucket. The execution log
+                After every Auto Cleanup run, an execution log is generated and
+                stored as a CSV file within an S3 Bucket. The execution log
                 details the actions taken for each AWS service and resource that
                 was scanned and identified.
               </p>
