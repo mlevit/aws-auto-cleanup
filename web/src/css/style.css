@@ -34,6 +34,10 @@ td {
   width: 700px !important;
 }
 
+.modal-card {
+  width: calc(100vw - 40px) !important;
+}
+
 .select,
 select {
   width: 100%;

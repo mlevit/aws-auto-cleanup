@@ -149,6 +149,7 @@ var app = new Vue({
       this.executionLogActionStats = {};
       this.executionLogRegionStats = {};
       this.executionLogServiceStats = {};
+      this.executionLogTable = [];
       this.showExecutionLogPopup = false;
     },
     openExecutionLog: function (keyURL) {
@@ -231,31 +232,18 @@ function getExecutionLog(executionLogUrl) {
   })
     .then((response) => response.json())
     .then((data) => {
-      app.executionLogTable = data["response"]["body"];
       app.executionLogKey = decodeURIComponent(executionLogUrl);
 
-      setTimeout(function () {
-        app.executionLogDataTables = $("#execution-log-table").DataTable({
-          autoWidth: true,
-          columnDefs: [
-            { orderable: false, targets: [6] },
-            { className: "dt-center", targets: [6] },
-          ],
-          dom: "lrti",
-          paging: false,
-        });
-        app.showExecutionLogLoadingGif = false;
-      }, 10);
-
-      // Get execution mode
-
-      if (data["response"]["body"][0][7] == "True") {
-        app.executionLogMode = "Dry Run";
-      } else {
-        app.executionLogMode = "Destroy";
-      }
-
       for (const log of data["response"]["body"]) {
+        app.executionLogTable.push([
+          log[6],
+          log[1],
+          log[2],
+          log[3],
+          log[4],
+          log[5],
+        ]);
+
         // action taken
         app.executionLogActionStats[log["5"]] =
           ++app.executionLogActionStats[log["5"]] || 1;
@@ -268,6 +256,27 @@ function getExecutionLog(executionLogUrl) {
         app.executionLogRegionStats[log["1"]] =
           ++app.executionLogRegionStats[log["1"]] || 1;
       }
+
+      // Get execution mode
+      if (data["response"]["body"][0][7] == "True") {
+        app.executionLogMode = "Dry Run";
+      } else {
+        app.executionLogMode = "Destroy";
+      }
+
+      setTimeout(function () {
+        app.executionLogDataTables = $("#execution-log-table").DataTable({
+          data: app.executionLogTable,
+          autoWidth: true,
+          deferRender: true,
+          pageLength: 1000,
+          dom: "rtip",
+        });
+        app.showExecutionLogLoadingGif = false;
+        $("#execution-log-table-paginate").html(
+          $("#execution-log-table_paginate")
+        );
+      }, 10);
     })
     .catch((error) => {
       iziToast.error({

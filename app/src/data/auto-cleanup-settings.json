@@ -207,7 +207,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Imagine Digest (e.g., sha256:f1d4ae3f7261a72e98c6ebefe9985cf10a0ea5bd762585a43e0700ed99863807)"
+                  "S": "Imagine Digest (e.g., sha256:f1d4ae3f7261a72e98c6ebefe)"
                 },
                 "ttl": {
                   "N": "7"
