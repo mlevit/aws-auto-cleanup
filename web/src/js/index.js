@@ -273,6 +273,7 @@ function getExecutionLog(executionLogUrl) {
           dom: "rtip",
         });
         app.showExecutionLogLoadingGif = false;
+        $("#execution-log-table-info").html($("#execution-log-table_info"));
         $("#execution-log-table-paginate").html(
           $("#execution-log-table_paginate")
         );
