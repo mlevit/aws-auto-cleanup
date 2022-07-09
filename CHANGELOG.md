@@ -1,5 +1,11 @@
 # AWS Auto Cleanup Changelog
 
+- UNRELEASED
+
+- Added support for very large (20K+) execution log files.
+- Added better resource ID placeholders giving users a better indication of expected value.
+- Deprecated option to allowlist resources from execution log.
+
 ## 2.2.0
 
 - Added wildcard support to allowlist resource ID. Comparisons are now performed using the [fnmatch](https://docs.python.org/3/library/fnmatch.html) Python module. The following special characters can be used:
