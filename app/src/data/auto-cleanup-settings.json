@@ -405,7 +405,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "id"
+                  "S": "Job Flow ID"
                 },
                 "ttl": {
                   "N": "7"
