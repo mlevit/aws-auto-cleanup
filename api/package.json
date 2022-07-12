@@ -16,5 +16,8 @@
   "scripts": {
     "deploy": "serverless deploy",
     "remove": "serverless remove"
+  },
+  "dependencies": {
+    "serverless-api-gateway-caching": "^1.8.1"
   }
 }
