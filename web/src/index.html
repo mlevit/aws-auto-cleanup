@@ -278,24 +278,28 @@
           ></div>
           <div class="modal-card execution-log-modal">
             <header class="modal-card-head">
-              <p
-                class="modal-card-title is-vcentered"
+              <div
+                class="modal-card-title is-vcentered field has-addons"
                 style="line-height: unset !important"
               >
-                <button
-                  class="button is-danger"
-                  v-if="executionLogMode === 'Destroy'"
-                >
-                  <span>{{executionLogMode}}</span>
-                </button>
-                <button
-                  class="button is-success"
-                  v-if="executionLogMode === 'Dry Run'"
-                >
-                  <span>{{executionLogMode}}</span>
-                </button>
-                <span>{{executionLogKey}}</span>
-              </p>
+                <p class="control">
+                  <span
+                    class="button is-danger"
+                    v-if="executionLogMode === 'Destroy'"
+                    >{{executionLogMode}}
+                  </span>
+                </p>
+                <p class="control">
+                  <span
+                    class="button is-success"
+                    v-if="executionLogMode === 'Dry Run'"
+                    >{{executionLogMode}}
+                  </span>
+                </p>
+                <p class="control">
+                  <span class="button">{{executionLogKey}}</span>
+                </p>
+              </div>
               <button
                 aria-label="close"
                 class="delete"

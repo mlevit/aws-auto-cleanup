@@ -143,13 +143,17 @@ var app = new Vue({
     // Execution Log
     closeExecutionLogPopup: function () {
       $("html").removeClass("remove-overflow");
-
+      this.executionLogDataTables.clear();
       this.executionLogDataTables.destroy();
 
+      // Reseet variables
       this.executionLogActionStats = {};
+      this.executionLogKey = "";
+      this.executionLogMode = "";
       this.executionLogRegionStats = {};
       this.executionLogServiceStats = {};
       this.executionLogTable = [];
+
       this.showExecutionLogPopup = false;
     },
     openExecutionLog: function (keyURL) {
