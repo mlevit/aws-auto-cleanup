@@ -237,57 +237,33 @@ function getExecutionLog(executionLogUrl) {
     .then((response) => response.json())
     .then((data) => {
       app.executionLogKey = decodeURIComponent(executionLogUrl);
-      var body = data["response"]["body"];
-      var isCompressed = data["response"]["is_compressed"];
+      app.executionLogTable = data["response"]["body"];
 
-      if (isCompressed) {
+      if (data["response"]["is_compressed"]) {
         try {
-          let compressedData = Uint8Array.from(atob(body), (c) =>
-            c.charCodeAt(0)
+          let compressedData = Uint8Array.from(
+            atob(app.executionLogTable),
+            (c) => c.charCodeAt(0)
           );
           let decompressedData = pako.inflate(compressedData, { to: "string" });
-          body = JSON.parse(decompressedData);
+          app.executionLogTable = JSON.parse(decompressedData);
         } catch (error) {
           console.log(error);
         }
       }
 
-      for (const log of body) {
-        app.executionLogTable.push([
-          log[6],
-          log[1],
-          log[2],
-          log[3],
-          log[4],
-          log[5],
-        ]);
-
-        // action taken
-        app.executionLogActionStats[log["5"]] =
-          ++app.executionLogActionStats[log["5"]] || 1;
-
-        // service and resource
-        app.executionLogServiceStats[log["2"] + " " + log["3"]] =
-          ++app.executionLogServiceStats[log["2"] + " " + log["3"]] || 1;
-
-        // region
-        app.executionLogRegionStats[log["1"]] =
-          ++app.executionLogRegionStats[log["1"]] || 1;
-      }
-
-      // Get execution mode
-      if (body[0][7] == "True") {
-        app.executionLogMode = "Dry Run";
-      } else {
-        app.executionLogMode = "Destroy";
-      }
+      app.executionLogActionStats = data["response"]["statistics"]["action"];
+      app.executionLogServiceStats = data["response"]["statistics"]["service"];
+      app.executionLogRegionStats = data["response"]["statistics"]["region"];
+      app.executionLogMode =
+        data["response"]["is_dry_run"] == true ? "Dry Run" : "Destroy";
 
       setTimeout(function () {
         app.executionLogDataTables = $("#execution-log-table").DataTable({
           data: app.executionLogTable,
           autoWidth: true,
           deferRender: true,
-          pageLength: 1000,
+          pageLength: 500,
           dom: "rtip",
         });
         app.showExecutionLogLoadingGif = false;
