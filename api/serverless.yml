@@ -179,7 +179,7 @@ functions:
     handler: src/execution_log/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-read
     description: Returns execution logs
-    memorySize: 512
+    memorySize: 2048
     timeout: 30
     package:
       patterns:
