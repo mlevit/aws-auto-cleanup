@@ -3,7 +3,6 @@ import csv
 import json
 import os
 import zlib
-from collections import Counter
 from urllib.parse import unquote
 
 import boto3
