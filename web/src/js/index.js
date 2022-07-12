@@ -234,7 +234,7 @@ function getExecutionLog(executionLogUrl) {
     .then((data) => {
       app.executionLogKey = decodeURIComponent(executionLogUrl);
       var body = data["response"]["body"];
-      var isCompressed = data["response"]["compression"];
+      var isCompressed = data["response"]["is_compressed"];
 
       if (isCompressed) {
         try {

@@ -442,7 +442,11 @@ dict
 {
   "message": "string",
   "request": { "key": "string" },
-  "response": { "header": ["string"], "body": [["string"]] }
+  "response": {
+    "header": ["string"],
+    "is_compressed": "boolean",
+    "body": [["string"]] or Base64 encoded zlib compressed JSON object
+  }
 }
 ```
 

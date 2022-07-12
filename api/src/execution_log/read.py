@@ -56,12 +56,12 @@ def lambda_handler(event, context):
         )
 
     header = file_body[0]
-    compression = True if len(file_body) > 10000 else False
+    is_compressed = True if len(file_body) > 10000 else False
     body = (
         base64.b64encode(
             zlib.compress(bytes(json.dumps(file_body[1:]), "utf-8"))
         ).decode("ascii")
-        if compression
+        if is_compressed
         else file_body[1:]
     )
 
@@ -69,5 +69,5 @@ def lambda_handler(event, context):
         200,
         f"Execution log for S3 file '{key}' retrieved",
         parameters,
-        {"header": header, "compression": compression, "body": body},
+        {"header": header, "is_compressed": is_compressed, "body": body},
     )
