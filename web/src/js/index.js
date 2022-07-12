@@ -233,8 +233,22 @@ function getExecutionLog(executionLogUrl) {
     .then((response) => response.json())
     .then((data) => {
       app.executionLogKey = decodeURIComponent(executionLogUrl);
+      var body = data["response"]["body"];
+      var isCompressed = data["response"]["compression"];
 
-      for (const log of data["response"]["body"]) {
+      if (isCompressed) {
+        try {
+          let compressedData = Uint8Array.from(atob(body), (c) =>
+            c.charCodeAt(0)
+          );
+          let decompressedData = pako.inflate(compressedData, { to: "string" });
+          body = JSON.parse(decompressedData);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      for (const log of body) {
         app.executionLogTable.push([
           log[6],
           log[1],
@@ -258,7 +272,7 @@ function getExecutionLog(executionLogUrl) {
       }
 
       // Get execution mode
-      if (data["response"]["body"][0][7] == "True") {
+      if (body[0][7] == "True") {
         app.executionLogMode = "Dry Run";
       } else {
         app.executionLogMode = "Destroy";

@@ -1,6 +1,8 @@
+import base64
 import csv
 import json
 import os
+import zlib
 from urllib.parse import unquote
 
 import boto3
@@ -43,8 +45,7 @@ def lambda_handler(event, context):
             .read()
             .decode("utf-8")
         )
-
-        body = list(csv.reader(file_contents.splitlines()))
+        file_body = list(csv.reader(file_contents.splitlines()))
     except Exception as error:
         print(f"[ERROR] {error}")
         return get_return(
@@ -54,9 +55,19 @@ def lambda_handler(event, context):
             None,
         )
 
+    header = file_body[0]
+    compression = True if len(file_body) > 10000 else False
+    body = (
+        base64.b64encode(
+            zlib.compress(bytes(json.dumps(file_body[1:]), "utf-8"))
+        ).decode("ascii")
+        if compression
+        else file_body[1:]
+    )
+
     return get_return(
         200,
         f"Execution log for S3 file '{key}' retrieved",
         parameters,
-        {"header": body[0], "body": body[1:None]},
+        {"header": header, "compression": compression, "body": body},
     )
