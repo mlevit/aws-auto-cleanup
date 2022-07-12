@@ -79,7 +79,7 @@ functions:
     handler: src/allowlist/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-allowlist-read
     description: Read allowlist
-    memorySize: 128
+    memorySize: 512
     timeout: 30
     package:
       patterns:
@@ -139,7 +139,7 @@ functions:
     handler: src/service/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-service-read
     description: Returns AWS services supported by Auto Cleanup
-    memorySize: 128
+    memorySize: 512
     timeout: 30
     package:
       patterns:
@@ -160,7 +160,7 @@ functions:
     handler: src/execution_log/list.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-list
     description: Returns execution logs
-    memorySize: 128
+    memorySize: 512
     timeout: 30
     package:
       patterns:
