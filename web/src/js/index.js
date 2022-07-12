@@ -265,6 +265,12 @@ function getExecutionLog(executionLogUrl) {
           deferRender: true,
           pageLength: 500,
           dom: "rtip",
+          columnDefs: [
+            {
+              targets: 5,
+              className: "dt-body-nowrap",
+            },
+          ],
         });
         app.showExecutionLogLoadingGif = false;
         $("#execution-log-table-info").html($("#execution-log-table_info"));
