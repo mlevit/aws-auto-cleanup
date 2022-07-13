@@ -2,7 +2,7 @@ const API_GET_ALLOWLIST = "/allowlist";
 const API_SERVICES = "/settings/service";
 const API_CRUD_ALLOWLIST = "/allowlist/entry/";
 const API_EXECLOG = "/execution/";
-const API_KEY = "";
+var API_KEY = "";
 
 // Utility functions
 function convertJsonToGet(formJSON) {
