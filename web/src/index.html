@@ -281,7 +281,10 @@
             <header class="modal-card-head">
               <div
                 class="modal-card-title is-vcentered field has-addons"
-                style="line-height: unset !important"
+                style="
+                  line-height: unset !important;
+                  margin-bottom: 0px !important;
+                "
               >
                 <p class="control">
                   <span
@@ -291,8 +294,6 @@
                       <i class="fas fa-exclamation"></i> </span
                     ><span>{{executionLogMode}}</span>
                   </span>
-                </p>
-                <p class="control">
                   <span
                     class="button is-success"
                     v-if="executionLogMode === 'Dry Run'"
