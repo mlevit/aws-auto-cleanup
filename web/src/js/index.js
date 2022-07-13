@@ -1,7 +1,7 @@
-const API_GET_ALLOWLIST = "/allowlist";
-const API_SERVICES = "/settings/service";
-const API_CRUD_ALLOWLIST = "/allowlist/entry/";
-const API_EXECLOG = "/execution/";
+var API_GET_ALLOWLIST = "/allowlist";
+var API_SERVICES = "/settings/service";
+var API_CRUD_ALLOWLIST = "/allowlist/entry/";
+var API_EXECLOG = "/execution/";
 var API_KEY = "";
 
 // Utility functions
