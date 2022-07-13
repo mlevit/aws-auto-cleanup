@@ -255,7 +255,7 @@ function getExecutionLog(executionLogUrl) {
       app.executionLogServiceStats = data["response"]["statistics"]["service"];
       app.executionLogRegionStats = data["response"]["statistics"]["region"];
       app.executionLogMode =
-        data["response"]["is_dry_run"] == true ? "Dry Run" : "Destroy";
+        data["response"]["is_dry_run"] === true ? "Dry Run" : "Destroy";
 
       setTimeout(function () {
         if (!app.executionLogDataTables) {

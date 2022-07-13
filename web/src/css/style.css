@@ -20,7 +20,7 @@ td {
   vertical-align: middle !important;
 }
 
-td.dt-body-nowrap { white-space: nowrap }
+td.dt-body-nowrap { white-space: nowrap; }
 
 .execution-log-modal {
   width: calc(100vw - 40px) !important;
