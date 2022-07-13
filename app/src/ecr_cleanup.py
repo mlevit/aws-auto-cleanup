@@ -24,6 +24,7 @@ class ECRCleanup:
 
     def run(self):
         self.repositories()
+        self.images()
 
     def repositories(self):
         """
