@@ -444,8 +444,10 @@ dict
   "request": { "key": "string" },
   "response": {
     "header": ["string"],
+    "body": [["string"]] // or Base64 encoded zlib compressed JSON object,
+    "statistics": { "key": { "key": "string" } },
     "is_compressed": "boolean",
-    "body": [["string"]] or Base64 encoded zlib compressed JSON object
+    "is_dry_run": "boolean"
   }
 }
 ```
@@ -471,6 +473,18 @@ dict
         - _(list)_
 
           - _string_
+
+      - **statistics** (dict) -- Statistics for the execution log.
+
+        - _(dict)_
+
+          - **key** (string) -- Key for the statistics.
+
+          - **string** (string) -- Value for the statistics.
+
+      - **is_compressed** (boolean) -- Whether the execution log is compressed.
+
+      - **is_dry_run** (boolean) -- Whether the execution log is a dry run.
 
 ### Service
 
