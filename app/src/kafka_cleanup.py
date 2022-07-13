@@ -27,7 +27,6 @@ class KafkaCleanup:
 
     def clusters(self):
         """Deletes Kafka Clusters."""
-
         self.logging.debug("Started cleanup of Kafka Clusters.")
 
         is_cleaning_enabled = Helper.get_setting(

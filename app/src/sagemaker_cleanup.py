@@ -29,7 +29,6 @@ class SageMakerCleanup:
 
     def apps(self):
         """Deletes SageMaker Apps."""
-
         self.logging.debug("Started cleanup of SageMaker Apps.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -111,7 +110,6 @@ class SageMakerCleanup:
 
     def endpoints(self):
         """Deletes SageMaker Endpoints."""
-
         self.logging.debug("Started cleanup of SageMaker Endpoints.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -191,7 +189,6 @@ class SageMakerCleanup:
 
     def notebook_instances(self):
         """Deletes SageMaker Notebook Instances."""
-
         self.logging.debug("Started cleanup of SageMaker Notebook Instances.")
 
         is_cleaning_enabled = Helper.get_setting(

@@ -28,7 +28,6 @@ class RedshiftCleanup:
 
     def clusters(self):
         """Deletes Redshift Clusters."""
-
         self.logging.debug("Started cleanup of Redshift Clusters.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -103,7 +102,6 @@ class RedshiftCleanup:
 
     def snapshots(self):
         """Deletes Redshift Snapshots."""
-
         self.logging.debug("Started cleanup of Redshift Snapshots.")
 
         is_cleaning_enabled = Helper.get_setting(

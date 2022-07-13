@@ -29,7 +29,6 @@ class GlueCleanup:
 
     def crawlers(self):
         """Deletes Glue Crawlers."""
-
         self.logging.debug("Started cleanup of Glue Crawlers.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -108,7 +107,6 @@ class GlueCleanup:
 
     def databases(self):
         """Deletes Glue Databases."""
-
         self.logging.debug("Started cleanup of Glue Databases.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -180,7 +178,6 @@ class GlueCleanup:
 
     def dev_endpoints(self):
         """Deletes Glue Dev Endpoints."""
-
         self.logging.debug("Started cleanup of Glue Dev Endpoints.")
 
         is_cleaning_enabled = Helper.get_setting(

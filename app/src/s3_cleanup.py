@@ -38,7 +38,6 @@ class S3Cleanup:
         Deletes Buckets. All Bucket Objects, Versions and Deleted Markers
         are first deleted before the Bucket can be deleted.
         """
-
         self.logging.debug("Started cleanup of S3 Buckets.")
 
         is_cleaning_enabled = Helper.get_setting(

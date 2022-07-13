@@ -29,7 +29,6 @@ class ElasticBeanstalkCleanup:
 
     def applications(self):
         """Deletes Elastic Beanstalk Applications."""
-
         self.logging.debug("Started cleanup of Elastic Beanstalk Applications.")
 
         is_cleaning_enabled = Helper.get_setting(

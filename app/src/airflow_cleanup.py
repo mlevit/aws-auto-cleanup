@@ -28,7 +28,6 @@ class AirflowCleanup:
 
     def environments(self):
         """Deletes Airflow Environments."""
-
         self.logging.debug("Started cleanup of Airflow Environments.")
 
         is_cleaning_enabled = Helper.get_setting(

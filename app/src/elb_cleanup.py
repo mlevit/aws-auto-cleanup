@@ -27,7 +27,6 @@ class ELBCleanup:
 
     def load_balancers(self):
         """Deletes ELB Load Balancers."""
-
         self.logging.debug("Started cleanup of ELB Load Balancers.")
 
         is_cleaning_enabled = Helper.get_setting(

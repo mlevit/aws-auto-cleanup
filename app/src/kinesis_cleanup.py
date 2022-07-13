@@ -27,7 +27,6 @@ class KinesisCleanup:
 
     def streams(self):
         """Deletes Kinesis Streams."""
-
         self.logging.debug("Started cleanup of Kinesis Streams.")
 
         is_cleaning_enabled = Helper.get_setting(

@@ -28,7 +28,6 @@ class ECSCleanup:
 
     def clusters(self):
         """Deletes ECS Clusters."""
-
         self.logging.debug("Started cleanup of ECS Clusters.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -125,7 +124,6 @@ class ECSCleanup:
 
     def services(self):
         """Deletes ECS Services."""
-
         self.logging.debug("Started cleanup of ECS Services.")
 
         is_cleaning_enabled = Helper.get_setting(

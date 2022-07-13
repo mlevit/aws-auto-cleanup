@@ -27,7 +27,6 @@ class EKSCleanup:
 
     def clusters(self):
         """Deletes EKS Clusters."""
-
         self.logging.debug("Started cleanup of EKS Clusters.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -140,7 +139,6 @@ class EKSCleanup:
 
     def fargate_profiles(self, cluster):
         """Deletes EKS Fargate Profiles for a Cluster."""
-
         self.logging.debug(
             f"Started cleanup of EKS Fargate Profiles for EKS Cluster {cluster}."
         )
@@ -237,7 +235,6 @@ class EKSCleanup:
 
     def node_groups(self, cluster):
         """Deletes EKS Node Groups for a Cluster."""
-
         self.logging.debug(
             f"Started cleanup of EKS Node Groups for EKS Cluster {cluster}."
         )

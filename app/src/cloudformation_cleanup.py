@@ -52,7 +52,6 @@ class CloudFormationCleanup:
 
     def stacks(self):
         """Deletes CloudFormation Stacks."""
-
         self.logging.debug("Started cleanup of CloudFormation Stacks.")
 
         is_cleaning_enabled = Helper.get_setting(

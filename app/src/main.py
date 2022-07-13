@@ -414,7 +414,6 @@ class Cleanup:
         into their respective DynamoDB tables. Records will be
         skipped if they already exist in the table.
         """
-
         try:
             client = boto3.client("dynamodb")
 

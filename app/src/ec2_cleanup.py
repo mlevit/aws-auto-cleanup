@@ -51,7 +51,6 @@ class EC2Cleanup:
 
     def addresses(self):
         """Deletes Addresses not allocated to an EC2 Instance."""
-
         self.logging.debug("Started cleanup of EC2 Addresses.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -120,7 +119,6 @@ class EC2Cleanup:
 
     def images(self):
         """Deletes Images not allocated to an EC2 Instance."""
-
         self.logging.debug("Started cleanup of EC2 Images.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -201,7 +199,6 @@ class EC2Cleanup:
         If Instance has termination protection enabled, the protection will
         be first disabled and then the Instance will be terminated.
         """
-
         self.logging.debug("Started cleanup of EC2 Instances.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -337,7 +334,6 @@ class EC2Cleanup:
 
     def nat_gateways(self):
         """Deletes NAT Gateways."""
-
         self.logging.debug("Started cleanup of EC2 NAT Gateways.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -419,7 +415,6 @@ class EC2Cleanup:
 
     def security_groups(self):
         """Deletes Security Groups not attached to an EC2 Instance."""
-
         self.logging.debug("Started cleanup of EC2 Security Groups.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -489,7 +484,6 @@ class EC2Cleanup:
 
     def snapshots(self):
         """Deletes Snapshots not attached to EBS volumes."""
-
         self.logging.debug("Started cleanup of EC2 Snapshots.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -602,7 +596,6 @@ class EC2Cleanup:
 
     def volumes(self):
         """Deletes Volumes not attached to an EC2 Instance."""
-
         self.logging.debug("Started cleanup of EC2 Volumes.")
 
         is_cleaning_enabled = Helper.get_setting(

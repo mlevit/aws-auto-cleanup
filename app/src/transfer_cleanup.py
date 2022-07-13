@@ -27,7 +27,6 @@ class TransferCleanup:
 
     def servers(self):
         """Deletes Transfer Servers."""
-
         self.logging.debug("Started cleanup of Transfer Servers.")
 
         is_cleaning_enabled = Helper.get_setting(
