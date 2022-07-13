@@ -143,8 +143,7 @@ var app = new Vue({
     // Execution Log
     closeExecutionLogPopup: function () {
       $("html").removeClass("remove-overflow");
-      this.executionLogDataTables.clear();
-      this.executionLogDataTables.destroy();
+      this.executionLogDataTables.clear().draw();
 
       // Reseet variables
       this.executionLogActionStats = {};
@@ -259,19 +258,26 @@ function getExecutionLog(executionLogUrl) {
         data["response"]["is_dry_run"] == true ? "Dry Run" : "Destroy";
 
       setTimeout(function () {
-        app.executionLogDataTables = $("#execution-log-table").DataTable({
-          data: app.executionLogTable,
-          autoWidth: true,
-          deferRender: true,
-          pageLength: 500,
-          dom: "rtip",
-          columnDefs: [
-            {
-              targets: 5,
-              className: "dt-body-nowrap",
-            },
-          ],
-        });
+        if (!app.executionLogDataTables) {
+          app.executionLogDataTables = $("#execution-log-table").DataTable({
+            data: app.executionLogTable,
+            autoWidth: true,
+            deferRender: true,
+            pageLength: 500,
+            dom: "rtip",
+            columnDefs: [
+              {
+                targets: 5,
+                className: "dt-body-nowrap",
+              },
+            ],
+          });
+        } else {
+          app.executionLogDataTables
+            .clear()
+            .rows.add(app.executionLogTable)
+            .draw();
+        }
         app.showExecutionLogLoadingGif = false;
         $("#execution-log-table-info").html($("#execution-log-table_info"));
         $("#execution-log-table-paginate").html(
