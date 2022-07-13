@@ -29,9 +29,7 @@ class ElastiCacheCleanup:
         self.replication_groups()
 
     def clusters(self):
-        """
-        Deletes ElastiCache Clusters.
-        """
+        """Deletes ElastiCache Clusters."""
 
         self.logging.debug("Started cleanup of ElastiCache Clusters.")
 
@@ -111,9 +109,7 @@ class ElastiCacheCleanup:
             return True
 
     def replication_groups(self):
-        """
-        Deletes ElastiCache Replication Groups.
-        """
+        """Deletes ElastiCache Replication Groups."""
 
         self.logging.debug("Started cleanup of ElastiCache Replication Groups.")
 

@@ -28,9 +28,7 @@ class SageMakerCleanup:
         self.notebook_instances()
 
     def apps(self):
-        """
-        Deletes SageMaker Apps.
-        """
+        """Deletes SageMaker Apps."""
 
         self.logging.debug("Started cleanup of SageMaker Apps.")
 
@@ -112,9 +110,7 @@ class SageMakerCleanup:
             return True
 
     def endpoints(self):
-        """
-        Deletes SageMaker Endpoints.
-        """
+        """Deletes SageMaker Endpoints."""
 
         self.logging.debug("Started cleanup of SageMaker Endpoints.")
 
@@ -194,9 +190,7 @@ class SageMakerCleanup:
             return True
 
     def notebook_instances(self):
-        """
-        Deletes SageMaker Notebook Instances.
-        """
+        """Deletes SageMaker Notebook Instances."""
 
         self.logging.debug("Started cleanup of SageMaker Notebook Instances.")
 

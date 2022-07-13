@@ -51,9 +51,7 @@ class CloudFormationCleanup:
         self.stacks()
 
     def stacks(self):
-        """
-        Deletes CloudFormation Stacks.
-        """
+        """Deletes CloudFormation Stacks."""
 
         self.logging.debug("Started cleanup of CloudFormation Stacks.")
 

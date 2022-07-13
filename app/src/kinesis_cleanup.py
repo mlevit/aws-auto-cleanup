@@ -26,9 +26,7 @@ class KinesisCleanup:
         self.streams()
 
     def streams(self):
-        """
-        Deletes Kinesis Streams.
-        """
+        """Deletes Kinesis Streams."""
 
         self.logging.debug("Started cleanup of Kinesis Streams.")
 

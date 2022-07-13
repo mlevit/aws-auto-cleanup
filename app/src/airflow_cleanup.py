@@ -1,8 +1,8 @@
-import fnmatch
 import sys
 
 import boto3
 import botocore
+
 from src.helper import Helper
 
 
@@ -27,9 +27,7 @@ class AirflowCleanup:
         self.environments()
 
     def environments(self):
-        """
-        Deletes Airflow Environments.
-        """
+        """Deletes Airflow Environments."""
 
         self.logging.debug("Started cleanup of Airflow Environments.")
 

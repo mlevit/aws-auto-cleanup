@@ -1,8 +1,8 @@
-var API_GET_ALLOWLIST = "/allowlist";
-var API_SERVICES = "/settings/service";
-var API_CRUD_ALLOWLIST = "/allowlist/entry/";
-var API_EXECLOG = "/execution/";
-var API_KEY = "";
+const API_GET_ALLOWLIST = "/allowlist";
+const API_SERVICES = "/settings/service";
+const API_CRUD_ALLOWLIST = "/allowlist/entry/";
+const API_EXECLOG = "/execution/";
+const API_KEY = "";
 
 // Utility functions
 function convertJsonToGet(formJSON) {
@@ -15,7 +15,7 @@ function convertJsonToGet(formJSON) {
 }
 
 // Init Vue instance
-var app = new Vue({
+const app = new Vue({
   el: "#app",
   data: {
     accountId: "",

@@ -26,9 +26,7 @@ class EKSCleanup:
         self.clusters()
 
     def clusters(self):
-        """
-        Deletes EKS Clusters.
-        """
+        """Deletes EKS Clusters."""
 
         self.logging.debug("Started cleanup of EKS Clusters.")
 
@@ -141,9 +139,7 @@ class EKSCleanup:
             return True
 
     def fargate_profiles(self, cluster):
-        """
-        Deletes EKS Fargate Profiles for a Cluster.
-        """
+        """Deletes EKS Fargate Profiles for a Cluster."""
 
         self.logging.debug(
             f"Started cleanup of EKS Fargate Profiles for EKS Cluster {cluster}."
@@ -240,9 +236,7 @@ class EKSCleanup:
             return True
 
     def node_groups(self, cluster):
-        """
-        Deletes EKS Node Groups for a Cluster.
-        """
+        """Deletes EKS Node Groups for a Cluster."""
 
         self.logging.debug(
             f"Started cleanup of EKS Node Groups for EKS Cluster {cluster}."

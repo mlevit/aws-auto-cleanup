@@ -27,9 +27,7 @@ class ECSCleanup:
         self.clusters()
 
     def clusters(self):
-        """
-        Deletes ECS Clusters.
-        """
+        """Deletes ECS Clusters."""
 
         self.logging.debug("Started cleanup of ECS Clusters.")
 
@@ -126,9 +124,7 @@ class ECSCleanup:
             return True
 
     def services(self):
-        """
-        Deletes ECS Services.
-        """
+        """Deletes ECS Services."""
 
         self.logging.debug("Started cleanup of ECS Services.")
 

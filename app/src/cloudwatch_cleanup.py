@@ -27,9 +27,7 @@ class CloudWatchCleanup:
         self.log_groups()
 
     def log_groups(self):
-        """
-        Deletes CloudWatch Log Groups.
-        """
+        """Deletes CloudWatch Log Groups."""
 
         self.logging.debug("Started cleanup of CloudWatch Log Groups.")
 

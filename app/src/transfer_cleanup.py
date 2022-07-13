@@ -26,17 +26,12 @@ class TransferCleanup:
         self.servers()
 
     def servers(self):
-        """
-        Deletes Transfer Servers.
-        """
+        """Deletes Transfer Servers."""
 
         self.logging.debug("Started cleanup of Transfer Servers.")
 
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.transfer.server.clean", False
-        )
-        resource_maximum_age = Helper.get_setting(
-            self.settings, "services.transfer.server.ttl", 7
         )
         resource_allowlist = Helper.get_allowlist(self.allowlist, "transfer.server")
 

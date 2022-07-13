@@ -26,9 +26,7 @@ class DynamoDBCleanup:
         self.tables()
 
     def tables(self):
-        """
-        Deletes DynamoDB Tables.
-        """
+        """Deletes DynamoDB Tables."""
 
         self.logging.debug("Started cleanup of DynamoDB Tables.")
 

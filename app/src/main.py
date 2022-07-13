@@ -58,7 +58,7 @@ class Cleanup:
     @func_set_timeout(840)
     def run_cleanup(self):
         if self.dry_run:
-            self.logging.info(f"Auto Cleanup started in DRY RUN mode.")
+            self.logging.info("Auto Cleanup started in DRY RUN mode.")
         else:
             self.logging.info(f"Auto Cleanup started in DESTROY mode.")
 
@@ -479,9 +479,7 @@ class Cleanup:
             self.logging.error(sys.exc_info()[1])
 
     def export_execution_log(self, execution_log, aws_request_id):
-        """
-        Export a CSV file with all execution logs during run.
-        """
+        """Export a CSV file with all execution logs during run."""
         try:
             os.chdir(tempfile.gettempdir())
 

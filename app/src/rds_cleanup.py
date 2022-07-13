@@ -151,9 +151,7 @@ class RDSCleanup:
             return True
 
     def cluster_snapshots(self):
-        """
-        Deletes RDS Cluster Snapshots.
-        """
+        """Deletes RDS Cluster Snapshots."""
 
         self.logging.debug("Started cleanup of RDS Cluster Snapshots.")
 
@@ -335,9 +333,7 @@ class RDSCleanup:
             return True
 
     def snapshots(self):
-        """
-        Deletes RDS Snapshots.
-        """
+        """Deletes RDS Snapshots."""
 
         self.logging.debug("Started cleanup of RDS Snapshots.")
 

@@ -27,9 +27,7 @@ class RedshiftCleanup:
         self.snapshots()
 
     def clusters(self):
-        """
-        Deletes Redshift Clusters.
-        """
+        """Deletes Redshift Clusters."""
 
         self.logging.debug("Started cleanup of Redshift Clusters.")
 
@@ -104,9 +102,7 @@ class RedshiftCleanup:
             return True
 
     def snapshots(self):
-        """
-        Deletes Redshift Snapshots.
-        """
+        """Deletes Redshift Snapshots."""
 
         self.logging.debug("Started cleanup of Redshift Snapshots.")
 

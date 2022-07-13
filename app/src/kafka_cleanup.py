@@ -26,9 +26,7 @@ class KafkaCleanup:
         self.clusters()
 
     def clusters(self):
-        """
-        Deletes Kafka Clusters.
-        """
+        """Deletes Kafka Clusters."""
 
         self.logging.debug("Started cleanup of Kafka Clusters.")
 

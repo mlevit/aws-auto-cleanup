@@ -26,9 +26,7 @@ class ELBCleanup:
         self.load_balancers()
 
     def load_balancers(self):
-        """
-        Deletes ELB Load Balancers.
-        """
+        """Deletes ELB Load Balancers."""
 
         self.logging.debug("Started cleanup of ELB Load Balancers.")
 
