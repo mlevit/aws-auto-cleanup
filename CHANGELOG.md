@@ -1,5 +1,10 @@
 # AWS Auto Cleanup Changelog
 
+- UNRELEASED
+
+- Fixed issue with not being able to allowlist ECR Images.
+- Fixed issue with ECR Image cleanup never being run.
+
 ## 2.2.0
 
 - Added wildcard support to allowlist resource ID. Comparisons are now performed using the [fnmatch](https://docs.python.org/3/library/fnmatch.html) Python module. The following special characters can be used:
