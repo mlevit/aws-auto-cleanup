@@ -165,7 +165,7 @@
             </div>
           </div>
         </nav>
-        <table class="table" id="allowlist">
+        <table class="table" id="allowlist" style="table-layout: fixed">
           <thead>
             <tr>
               <th>Service</th>
@@ -182,14 +182,14 @@
             <tr v-for="item in allowlist" :key="item.row_id">
               <td style="white-space: nowrap">{{ item.service }}</td>
               <td style="white-space: nowrap">{{ item.resource }}</td>
-              <td>{{ item.id }}</td>
+              <td style="word-break: break-all">{{ item.id }}</td>
               <td>
                 <span v-if="item.expiration < '4102444800'"
                   >{{ item.expiration_readable }}</span
                 >
               </td>
               <td style="white-space: nowrap">{{ item.owner }}</td>
-              <td>{{ item.comment }}</td>
+              <td style="word-break: break-all">{{ item.comment }}</td>
               <td>
                 <span v-if="item.expiration < '4102444800'">Temporary</span>
                 <span v-if="item.expiration >= '4102444800'">Permanent</span>
