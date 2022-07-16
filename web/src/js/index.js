@@ -15,7 +15,7 @@ function convertJsonToGet(formJSON) {
 }
 
 // Init Vue instance
-const app = new Vue({
+var app = new Vue({
   el: "#app",
   data: {
     accountId: "",
@@ -390,12 +390,18 @@ function getAllowlist() {
       dayjs.extend(dayjs_plugin_timezone);
 
       app.allowlist = allowlistRaw.map((item) => {
+        // Parse Resource ID, i.e. split on ":"
+        let parsedResourceId = item["resource_id"].split(":", 2);
+        parsedResourceId.push(
+          item["resource_id"].slice(parsedResourceId.join("").length + 2)
+        );
+
         let readableDate = dayjs.unix(item["expiration"]).tz(dayjs.tz.guess());
 
         item["row_id"] = i++;
-        item["service"] = item["resource_id"].split(":", 3)[0];
-        item["resource"] = item["resource_id"].split(":", 3)[1];
-        item["id"] = item["resource_id"].split(":", 3)[2];
+        item["service"] = parsedResourceId[0];
+        item["resource"] = parsedResourceId[1];
+        item["id"] = parsedResourceId[2];
 
         item["expiration_readable"] = readableDate.format(
           "ddd MMM DD HH:mm:ss YYYY"
