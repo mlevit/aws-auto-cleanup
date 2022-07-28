@@ -191,6 +191,7 @@ provider:
           Action:
             - kafka:DeleteCluster
             - kafka:ListClustersV2
+            - ec2:DeleteVpcEndpoints
           Resource: "*"
         - Effect: Allow
           Action:
