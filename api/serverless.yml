@@ -3,6 +3,8 @@ service: auto-cleanup-api
 custom:
   log_level: INFO # DEBUG for dev | INFO for prod
   region: ${opt:region, "ap-southeast-2"} # AWS deployment region
+  apiGatewayCaching:
+    enabled: true
   manifest:
     output: ../web/src/serverless.manifest.json
     silent: true
@@ -25,7 +27,7 @@ provider:
   apiGateway:
     apiKeys:
       - ${self:service}-${self:provider.stage}-api-key
-    minimumCompressionSize: 1024
+    minimumCompressionSize: 0
   iam:
     role:
       statements:
@@ -77,7 +79,7 @@ functions:
     handler: src/allowlist/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-allowlist-read
     description: Read allowlist
-    memorySize: 128
+    memorySize: 512
     timeout: 30
     package:
       patterns:
@@ -137,7 +139,7 @@ functions:
     handler: src/service/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-service-read
     description: Returns AWS services supported by Auto Cleanup
-    memorySize: 128
+    memorySize: 512
     timeout: 30
     package:
       patterns:
@@ -158,7 +160,7 @@ functions:
     handler: src/execution_log/list.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-list
     description: Returns execution logs
-    memorySize: 128
+    memorySize: 512
     timeout: 30
     package:
       patterns:
@@ -177,7 +179,7 @@ functions:
     handler: src/execution_log/read.lambda_handler
     name: ${self:service}-${self:provider.stage}-execution-log-read
     description: Returns execution logs
-    memorySize: 128
+    memorySize: 2048
     timeout: 30
     package:
       patterns:
@@ -192,6 +194,10 @@ functions:
           path: /execution/{key}
           cors: true
           private: true
+          caching:
+            enabled: true
+            cacheKeyParameters:
+              - name: request.path.key
 
 resources:
   Outputs:
@@ -199,5 +205,6 @@ resources:
       Value: !Ref AWS::AccountId
 
 plugins:
+  - serverless-api-gateway-caching
   - serverless-manifest-plugin
   - serverless-python-requirements

@@ -50,10 +50,7 @@ class EC2Cleanup:
         self.volumes()
 
     def addresses(self):
-        """
-        Deletes Addresses not allocated to an EC2 Instance.
-        """
-
+        """Deletes Addresses not allocated to an EC2 Instance."""
         self.logging.debug("Started cleanup of EC2 Addresses.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -121,10 +118,7 @@ class EC2Cleanup:
             return True
 
     def images(self):
-        """
-        Deletes Images not allocated to an EC2 Instance.
-        """
-
+        """Deletes Images not allocated to an EC2 Instance."""
         self.logging.debug("Started cleanup of EC2 Images.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -205,7 +199,6 @@ class EC2Cleanup:
         If Instance has termination protection enabled, the protection will
         be first disabled and then the Instance will be terminated.
         """
-
         self.logging.debug("Started cleanup of EC2 Instances.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -340,10 +333,7 @@ class EC2Cleanup:
             return True
 
     def nat_gateways(self):
-        """
-        Deletes NAT Gateways.
-        """
-
+        """Deletes NAT Gateways."""
         self.logging.debug("Started cleanup of EC2 NAT Gateways.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -424,17 +414,11 @@ class EC2Cleanup:
             return True
 
     def security_groups(self):
-        """
-        Deletes Security Groups not attached to an EC2 Instance.
-        """
-
+        """Deletes Security Groups not attached to an EC2 Instance."""
         self.logging.debug("Started cleanup of EC2 Security Groups.")
 
         is_cleaning_enabled = Helper.get_setting(
             self.settings, "services.ec2.security_group.clean", False
-        )
-        resource_maximum_age = Helper.get_setting(
-            self.settings, "services.ec2.security_group.ttl", 7
         )
         resource_allowlist = Helper.get_allowlist(self.allowlist, "ec2.security_group")
 
@@ -499,10 +483,7 @@ class EC2Cleanup:
             return True
 
     def snapshots(self):
-        """
-        Deletes Snapshots not attached to EBS volumes.
-        """
-
+        """Deletes Snapshots not attached to EBS volumes."""
         self.logging.debug("Started cleanup of EC2 Snapshots.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -544,7 +525,7 @@ class EC2Cleanup:
                             ]
                         ).get("Images")
                     except:
-                        self.logging.error(f"Could not retrieve EC2 Images.")
+                        self.logging.error("Could not retrieve EC2 Images.")
                         self.logging.error(sys.exc_info()[1])
                         resource_action = "ERROR"
                     else:
@@ -614,10 +595,7 @@ class EC2Cleanup:
             return True
 
     def volumes(self):
-        """
-        Deletes Volumes not attached to an EC2 Instance.
-        """
-
+        """Deletes Volumes not attached to an EC2 Instance."""
         self.logging.debug("Started cleanup of EC2 Volumes.")
 
         is_cleaning_enabled = Helper.get_setting(

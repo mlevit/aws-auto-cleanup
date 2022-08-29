@@ -26,10 +26,7 @@ class ElasticsearchServiceCleanup:
         self.domains()
 
     def domains(self):
-        """
-        Deletes Elasticsearch Service Domains.
-        """
-
+        """Deletes Elasticsearch Service Domains."""
         self.logging.debug("Started cleanup of Elasticsearch Service Domains.")
 
         is_cleaning_enabled = Helper.get_setting(

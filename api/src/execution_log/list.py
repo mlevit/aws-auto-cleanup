@@ -45,4 +45,4 @@ def lambda_handler(event, context):
             None,
         )
 
-    return get_return(200, f"List of execution logs retrieved", None, {"logs": logs})
+    return get_return(200, "List of execution logs retrieved", None, {"logs": logs})

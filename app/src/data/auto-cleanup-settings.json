@@ -84,7 +84,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Log Group Name"
+                  "S": "Log Group Name (e.g., /aws/lambda/auto-cleanup-app-prod)"
                 },
                 "ttl": {
                   "N": "30"
@@ -118,7 +118,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Allocation ID"
+                  "S": "Allocation ID (e.g., eipalloc-048e1ccf5ae5d63fb)"
                 }
               }
             },
@@ -128,7 +128,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Imagine ID"
+                  "S": "Image ID (e.g., ami-0cff7528ff583bf9a)"
                 },
                 "ttl": {
                   "N": "7"
@@ -141,7 +141,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Instance ID"
+                  "S": "Instance ID (e.g., i-0d97729996c07c6dd)"
                 },
                 "ttl": {
                   "N": "7"
@@ -154,7 +154,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "NAT Gateway ID"
+                  "S": "NAT Gateway ID (e.g., nat-0d97729996c07c6dd)"
                 },
                 "ttl": {
                   "N": "7"
@@ -167,7 +167,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Group ID"
+                  "S": "Group ID (e.g., sg-0b3bbfe81679125ff)"
                 }
               }
             },
@@ -177,7 +177,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Snapshot ID"
+                  "S": "Snapshot ID (e.g., snap-0a3dda5966b9b089)"
                 },
                 "ttl": {
                   "N": "7"
@@ -190,7 +190,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Volume ID"
+                  "S": "Volume ID (e.g., vol-0462d1b55dd229191)"
                 },
                 "ttl": {
                   "N": "7"
@@ -207,7 +207,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Imagine Digest"
+                  "S": "Imagine Digest (e.g., sha256:f1d4ae3f7261a72e98c6ebefe)"
                 },
                 "ttl": {
                   "N": "7"
@@ -264,7 +264,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "File System ID"
+                  "S": "File System ID (e.g., fs-0edccd369d527c526)"
                 },
                 "ttl": {
                   "N": "7"
@@ -341,7 +341,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Cache Cluster ID"
+                  "S": "Cache Cluster Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -405,7 +405,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "id"
+                  "S": "Job Flow ID"
                 },
                 "ttl": {
                   "N": "7"
@@ -465,7 +465,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Access Key ID"
+                  "S": "Access Key ID (e.g., AKIA5J4X5W3JGW1JIA4Y)"
                 },
                 "ttl": {
                   "N": "30"
@@ -611,7 +611,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "DB Instance Identifier"
+                  "S": "DB Instance Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -624,7 +624,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "DB Snapshot Identifier"
+                  "S": "DB Snapshot Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -641,7 +641,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Cluster Identifier"
+                  "S": "Cluster Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -654,7 +654,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Snapshot Identifier"
+                  "S": "Snapshot Name"
                 },
                 "ttl": {
                   "N": "7"
@@ -731,7 +731,7 @@
                   "BOOL": true
                 },
                 "id": {
-                  "S": "Server ID"
+                  "S": "Server ID (e.g., s-eafc3fa17242456e9)"
                 }
               }
             }

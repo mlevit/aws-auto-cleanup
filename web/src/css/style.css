@@ -20,6 +20,8 @@ td {
   vertical-align: middle !important;
 }
 
+td.dt-body-nowrap { white-space: nowrap; }
+
 .execution-log-modal {
   width: calc(100vw - 40px) !important;
   height: calc(100vh - 40px) !important;

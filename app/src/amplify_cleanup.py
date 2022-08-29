@@ -26,10 +26,7 @@ class AmplifyCleanup:
         self.apps()
 
     def apps(self):
-        """
-        Deletes Amplify Apps.
-        """
-
+        """Deletes Amplify Apps."""
         self.logging.debug("Started cleanup of Amplify Apps.")
 
         is_cleaning_enabled = Helper.get_setting(

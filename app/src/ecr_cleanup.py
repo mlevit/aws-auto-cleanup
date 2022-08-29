@@ -26,10 +26,7 @@ class ECRCleanup:
         self.repositories()
 
     def repositories(self):
-        """
-        Deletes ECR Repositories.
-        """
-
+        """Deletes ECR Repositories."""
         self.logging.debug("Started cleanup of ECR Repositories.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -126,10 +123,7 @@ class ECRCleanup:
             return True
 
     def images(self, repository):
-        """
-        Deletes ECR Images for a Repository.
-        """
-
+        """Deletes ECR Images for a Repository."""
         self.logging.debug(
             f"Started cleanup of ECR Images for ECR Repository '{repository}'."
         )

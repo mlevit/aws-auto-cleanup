@@ -1,9 +1,11 @@
 # AWS Auto Cleanup Changelog
 
-- UNRELEASED
+## 2.3.0
 
+- Added support for very large (20K+) execution log files.
+- Added better resource ID placeholders giving users a better indication of expected value.
+- Deprecated option to allowlist resources from execution log.
 - Fixed issue with not being able to allowlist ECR Images.
-- Fixed issue with ECR Image cleanup never being run.
 
 ## 2.2.0
 

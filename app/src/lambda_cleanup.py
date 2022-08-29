@@ -26,10 +26,7 @@ class LambdaCleanup:
         self.functions()
 
     def functions(self):
-        """
-        Deletes Lambda Functions.
-        """
-
+        """Deletes Lambda Functions."""
         self.logging.debug("Started cleanup of Lambda Functions.")
 
         is_cleaning_enabled = Helper.get_setting(

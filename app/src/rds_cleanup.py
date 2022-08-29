@@ -34,7 +34,6 @@ class RDSCleanup:
         protection enabled, the protection will be first disabled
         and then the Cluster will be terminated.
         """
-
         self.logging.debug("Started cleanup of RDS Clusters.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -151,10 +150,7 @@ class RDSCleanup:
             return True
 
     def cluster_snapshots(self):
-        """
-        Deletes RDS Cluster Snapshots.
-        """
-
+        """Deletes RDS Cluster Snapshots."""
         self.logging.debug("Started cleanup of RDS Cluster Snapshots.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -240,7 +236,6 @@ class RDSCleanup:
         protection enabled, the protection will be first disabled
         and then the Instance will be terminated.
         """
-
         self.logging.debug("Started cleanup of RDS Instances.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -335,10 +330,7 @@ class RDSCleanup:
             return True
 
     def snapshots(self):
-        """
-        Deletes RDS Snapshots.
-        """
-
+        """Deletes RDS Snapshots."""
         self.logging.debug("Started cleanup of RDS Snapshots.")
 
         is_cleaning_enabled = Helper.get_setting(

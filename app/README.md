@@ -145,12 +145,12 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | EKS Clusters                   | Cluster Name             | `eks:cluster:cluster_name`                           |
 | EKS Fargate Profiles           | Fargate Profile Name     | `eks:fargate_profile:fargate_profile_name`           |
 | EKS Node Groups                | Node Group Name          | `eks:node_group:node_group_name`                     |
-| Elastic Beanstalk Applications | Application Name         | `elasticbeanstalk:application:application_name`      |
+| Elastic Beanstalk Applications | Application Name         | `elastic_beanstalk:application:application_name`     |
 | ElastiCache Clusters           | Cache Cluster ID         | `elasticache:cluster:cache_cluster_id`               |
 | ElastiCache Replication Groups | Replication Group ID     | `elasticache:replication_group:replication_group_id` |
-| Elasticsearch Service          | Domain Name              | `elasticsearch:domain:domain_name`                   |
+| Elasticsearch Service          | Domain Name              | `elasticsearch_service:domain:domain_name`           |
 | ELB Load Balancers             | Load Balancer Name       | `elb:load_balancer:load_balancer_name`               |
-| EMR Clusters                   | ID                       | `emr:cluster:id`                                     |
+| EMR Clusters                   | Job Flow ID              | `emr:cluster:job_flow_id`                            |
 | Glue Crawlers                  | Crawler Name             | `glue:crawler:crawler_name`                          |
 | Glue Databases                 | Database Name            | `glue:database:database_name`                        |
 | Glue Dev Endpoints             | Endpoint Name            | `glue:dev_endpoint:endpoint_name`                    |

@@ -26,10 +26,7 @@ class EMRCleanup:
         self.clusters()
 
     def clusters(self):
-        """
-        Deletes EMR Clusters.
-        """
-
+        """Deletes EMR Clusters."""
         self.logging.debug("Started cleanup of EMR Clusters.")
 
         is_cleaning_enabled = Helper.get_setting(

@@ -143,12 +143,16 @@ var app = new Vue({
     // Execution Log
     closeExecutionLogPopup: function () {
       $("html").removeClass("remove-overflow");
+      this.executionLogDataTables.clear().draw();
 
-      this.executionLogDataTables.destroy();
-
+      // Reseet variables
       this.executionLogActionStats = {};
+      this.executionLogKey = "";
+      this.executionLogMode = "";
       this.executionLogRegionStats = {};
       this.executionLogServiceStats = {};
+      this.executionLogTable = [];
+
       this.showExecutionLogPopup = false;
     },
     openExecutionLog: function (keyURL) {
@@ -231,43 +235,55 @@ function getExecutionLog(executionLogUrl) {
   })
     .then((response) => response.json())
     .then((data) => {
-      app.executionLogTable = data["response"]["body"];
       app.executionLogKey = decodeURIComponent(executionLogUrl);
+      app.executionLogTable = data["response"]["body"];
+
+      if (data["response"]["is_compressed"]) {
+        try {
+          let compressedData = Uint8Array.from(
+            atob(app.executionLogTable),
+            (c) => c.charCodeAt(0)
+          );
+          let decompressedData = pako.inflate(compressedData, { to: "string" });
+          app.executionLogTable = JSON.parse(decompressedData);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      app.executionLogActionStats = data["response"]["statistics"]["action"];
+      app.executionLogServiceStats = data["response"]["statistics"]["service"];
+      app.executionLogRegionStats = data["response"]["statistics"]["region"];
+      app.executionLogMode =
+        data["response"]["is_dry_run"] === true ? "Dry Run" : "Destroy";
 
       setTimeout(function () {
-        app.executionLogDataTables = $("#execution-log-table").DataTable({
-          autoWidth: true,
-          columnDefs: [
-            { orderable: false, targets: [6] },
-            { className: "dt-center", targets: [6] },
-          ],
-          dom: "lrti",
-          paging: false,
-        });
+        if (!app.executionLogDataTables) {
+          app.executionLogDataTables = $("#execution-log-table").DataTable({
+            data: app.executionLogTable,
+            autoWidth: true,
+            deferRender: true,
+            pageLength: 500,
+            dom: "rtip",
+            columnDefs: [
+              {
+                targets: 5,
+                className: "dt-body-nowrap",
+              },
+            ],
+          });
+        } else {
+          app.executionLogDataTables
+            .clear()
+            .rows.add(app.executionLogTable)
+            .draw();
+        }
         app.showExecutionLogLoadingGif = false;
+        $("#execution-log-table-info").html($("#execution-log-table_info"));
+        $("#execution-log-table-paginate").html(
+          $("#execution-log-table_paginate")
+        );
       }, 10);
-
-      // Get execution mode
-
-      if (data["response"]["body"][0][7] == "True") {
-        app.executionLogMode = "Dry Run";
-      } else {
-        app.executionLogMode = "Destroy";
-      }
-
-      for (const log of data["response"]["body"]) {
-        // action taken
-        app.executionLogActionStats[log["5"]] =
-          ++app.executionLogActionStats[log["5"]] || 1;
-
-        // service and resource
-        app.executionLogServiceStats[log["2"] + " " + log["3"]] =
-          ++app.executionLogServiceStats[log["2"] + " " + log["3"]] || 1;
-
-        // region
-        app.executionLogRegionStats[log["1"]] =
-          ++app.executionLogRegionStats[log["1"]] || 1;
-      }
     })
     .catch((error) => {
       iziToast.error({

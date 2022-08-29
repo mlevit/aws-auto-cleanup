@@ -1,7 +1,7 @@
 {
   "name": "auto-cleanup-api",
   "description": "Auto Cleanup API",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "private": true,
   "devDependencies": {
     "serverless-manifest-plugin": "^1.0.6",
@@ -16,5 +16,8 @@
   "scripts": {
     "deploy": "serverless deploy",
     "remove": "serverless remove"
+  },
+  "dependencies": {
+    "serverless-api-gateway-caching": "^1.8.1"
   }
 }

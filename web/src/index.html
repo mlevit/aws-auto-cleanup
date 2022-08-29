@@ -61,9 +61,10 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
-      integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
       crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
     <link
       rel="stylesheet"
@@ -164,7 +165,7 @@
             </div>
           </div>
         </nav>
-        <table class="table" id="allowlist">
+        <table class="table" id="allowlist" style="table-layout: fixed">
           <thead>
             <tr>
               <th>Service</th>
@@ -181,14 +182,14 @@
             <tr v-for="item in allowlist" :key="item.row_id">
               <td style="white-space: nowrap">{{ item.service }}</td>
               <td style="white-space: nowrap">{{ item.resource }}</td>
-              <td>{{ item.id }}</td>
+              <td style="word-break: break-all">{{ item.id }}</td>
               <td>
                 <span v-if="item.expiration < '4102444800'"
                   >{{ item.expiration_readable }}</span
                 >
               </td>
               <td style="white-space: nowrap">{{ item.owner }}</td>
-              <td>{{ item.comment }}</td>
+              <td style="word-break: break-all">{{ item.comment }}</td>
               <td>
                 <span v-if="item.expiration < '4102444800'">Temporary</span>
                 <span v-if="item.expiration >= '4102444800'">Permanent</span>
@@ -249,7 +250,7 @@
                   class="button"
                 >
                   <span class="icon">
-                    <i class="fas fa-external-link-alt"></i>
+                    <i class="fas fa-arrow-up-right-from-square"></i>
                   </span>
                 </button>
               </td>
@@ -276,78 +277,49 @@
             class="modal-background"
             v-on:click="closeExecutionLogPopup()"
           ></div>
-          <div class="modal-content execution-log-modal">
+          <div class="modal-card execution-log-modal">
             <header class="modal-card-head">
-              <p
-                class="modal-card-title is-vcentered"
-                style="line-height: unset !important"
+              <div
+                class="modal-card-title is-vcentered field has-addons"
+                style="
+                  line-height: unset !important;
+                  margin-bottom: 0px !important;
+                "
               >
-                <button
-                  class="button is-danger"
-                  v-if="executionLogMode === 'Destroy'"
-                >
-                  <span>{{executionLogMode}}</span>
-                </button>
-                <button
-                  class="button is-success"
-                  v-if="executionLogMode === 'Dry Run'"
-                >
-                  <span>{{executionLogMode}}</span>
-                </button>
-                <span>{{executionLogKey}}</span>
-              </p>
+                <p class="control">
+                  <span
+                    class="button is-danger"
+                    v-if="executionLogMode === 'Destroy'"
+                    ><span class="icon is-small">
+                      <i class="fas fa-exclamation"></i> </span
+                    ><span>{{executionLogMode}}</span>
+                  </span>
+                  <span
+                    class="button is-success"
+                    v-if="executionLogMode === 'Dry Run'"
+                    ><span class="icon is-small">
+                      <i class="fas fa-check"></i> </span
+                    ><span>{{executionLogMode}}</span>
+                  </span>
+                </p>
+                <p class="control">
+                  <span class="button">{{executionLogKey}}</span>
+                </p>
+              </div>
               <button
                 aria-label="close"
                 class="delete"
                 v-on:click="closeExecutionLogPopup()"
               ></button>
             </header>
-            <div class="box" style="border-radius: 0px !important">
+            <div
+              class="modal-card-body"
+              style="
+                width: calc(100vw - 40px) !important;
+                border-radius: 0px !important;
+              "
+            >
               <div class="content">
-                <nav class="level">
-                  <div class="level-left">
-                    <div class="tabs is-toggle">
-                      <ul class="m-0">
-                        <li
-                          class="tab is-active"
-                          onclick="openTab(event,'logs')"
-                        >
-                          <a>
-                            <span class="icon is-small"
-                              ><i class="fas fa-bars" aria-hidden="true"></i
-                            ></span>
-                            <span>Logs</span>
-                          </a>
-                        </li>
-                        <li class="tab" onclick="openTab(event,'statistics')">
-                          <a>
-                            <span class="icon is-small"
-                              ><i
-                                class="far fa-chart-bar"
-                                aria-hidden="true"
-                              ></i
-                            ></span>
-                            <span>Statistics</span>
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="level-right">
-                    <div class="control has-icons-left is-right">
-                      <input
-                        class="input"
-                        placeholder="Search"
-                        type="text"
-                        v-model="executionLogSearchTerm"
-                        v-on:keyup="searchExecutionLog()"
-                      />
-                      <span class="icon is-left">
-                        <i class="fas fa-search"></i>
-                      </span>
-                    </div>
-                  </div>
-                </nav>
                 <div class="container is-fluid p-0">
                   <div id="logs" class="content-tab">
                     <table class="table" id="execution-log-table">
@@ -359,30 +331,8 @@
                           <th>Resource</th>
                           <th>ID</th>
                           <th>Action</th>
-                          <th style="text-align: center">Allowlist</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr v-for="item in executionLogTable" :key="item.id">
-                          <td style="white-space: nowrap">{{ item[6] }}</td>
-                          <td style="white-space: nowrap">{{ item[1] }}</td>
-                          <td style="white-space: nowrap">{{ item[2] }}</td>
-                          <td style="white-space: nowrap">{{ item[3] }}</td>
-                          <td>{{ item[4] }}</td>
-                          <td>{{ item[5] }}</td>
-                          <td style="white-space: nowrap; text-align: center">
-                            <button
-                              class="button is-warning"
-                              v-if="(executionLogMode === 'Dry Run' && item[5] !== 'SKIP - ALLOWLIST') || (item[5] === 'SKIP - IN USE' || item[5] === 'SKIP - TTL')"
-                              v-on:click="createAllowlistEntryFromExecutionLog( item[2], item[3], item[4] )"
-                            >
-                              <span class="icon">
-                                <i class="fas fa-plus"></i>
-                              </span>
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
                     </table>
                   </div>
                   <div
@@ -452,10 +402,63 @@
                   class="container has-text-centered"
                   v-show="showExecutionLogLoadingGif"
                 >
-                  <button class="button is-warning is-loading">Loading</button>
+                  <button
+                    class="button is-warning is-loading"
+                    style="margin-top: 20px"
+                  >
+                    Loading
+                  </button>
                 </div>
               </div>
             </div>
+            <footer class="modal-card-foot">
+              <div class="level" style="width: 100%">
+                <div class="level-left">
+                  <div
+                    class="level-item tabs is-toggle"
+                    style="margin-bottom: 0px !important"
+                  >
+                    <ul class="m-0">
+                      <li class="tab is-active" onclick="openTab(event,'logs')">
+                        <a>
+                          <span class="icon is-small"
+                            ><i class="fas fa-bars" aria-hidden="true"></i
+                          ></span>
+                          <span>Logs</span>
+                        </a>
+                      </li>
+                      <li class="tab" onclick="openTab(event,'statistics')">
+                        <a>
+                          <span class="icon is-small"
+                            ><i class="far fa-chart-bar" aria-hidden="true"></i
+                          ></span>
+                          <span>Statistics</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="level-item control has-icons-left">
+                    <input
+                      class="input"
+                      placeholder="Search (⏎ to search)"
+                      type="text"
+                      v-model="executionLogSearchTerm"
+                      v-on:keyup.enter="searchExecutionLog()"
+                    />
+                    <span class="icon is-left">
+                      <i class="fas fa-search"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="level-right">
+                  <div class="level-item" id="execution-log-table-info"></div>
+                  <div
+                    class="level-item"
+                    id="execution-log-table-paginate"
+                  ></div>
+                </div>
+              </div>
+            </footer>
             <!-- .box -->
           </div>
           <!-- .model-content -->
@@ -678,9 +681,11 @@
           <section class="modal-card-body">
             <div class="content">
               <p>
-                AWS Auto Cleanup is an open-source application to
-                programmatically clean AWS resources based on a Allowlist and
-                time-to-live (TTL) settings.
+                AWS Auto Cleanup helps clean up your AWS resources, keeping your
+                AWS accounts neat and tidy whilst reducing costs. AWS Auto
+                Cleanup uses a combination of user-defined allowlists and
+                time-based policies to delete resources that are no longer
+                needed.
               </p>
               <h2>Allowlist</h2>
               <p>
@@ -715,8 +720,8 @@
               </table>
               <h2>Execution Log</h2>
               <p>
-                Post every Auto Cleanup run, an execution log is generated and
-                stored as a flat CSV file within an S3 Bucket. The execution log
+                After every Auto Cleanup run, an execution log is generated and
+                stored as a CSV file within an S3 Bucket. The execution log
                 details the actions taken for each AWS service and resource that
                 was scanned and identified.
               </p>
@@ -738,14 +743,16 @@
     </footer> -->
 
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"
-      integrity="sha512-BKbSR+cfyxLdMAsE0naLReFSLg8/pjbgfxHh/k/kUC82Hy7r6HtR5hLhobaln2gcTvzkyyehrdREdjpsQwy2Jw=="
+      src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.4/vue.min.js"
+      integrity="sha512-ReiTH8bLMRWfRdFMuHPWq8Wk+7a2JQhfLWx2YgnjJ35TVU9MkQKioiHt5TfHzbHXIXM58TkFwukQ5+DlyJkg3A=="
       crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
-      integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
       crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     ></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"
@@ -765,6 +772,12 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/dayjs.min.js"
       integrity="sha512-u7elBfdMr+7LhU4rvUk3IM28QZDKTyUxba4Nx2IJ1W9cj4shfRSPq7EZXD2ULD9cBoizw2FQyeR6YBog6LcnHg=="
       crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"
+      integrity="sha512-EAKzSKex+PXC0U9OG13r1059ysjrjkJEpZoONCnZa0mBROY28iBOOxZSErUVw1LzLr2+U5PhR7zPCPKidUVJqg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     ></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.9.3/plugin/utc.min.js"

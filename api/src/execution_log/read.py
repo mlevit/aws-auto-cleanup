@@ -1,6 +1,8 @@
+import base64
 import csv
 import json
 import os
+import zlib
 from urllib.parse import unquote
 
 import boto3
@@ -43,8 +45,7 @@ def lambda_handler(event, context):
             .read()
             .decode("utf-8")
         )
-
-        body = list(csv.reader(file_contents.splitlines()))
+        file_body = list(csv.reader(file_contents.splitlines()))
     except Exception as error:
         print(f"[ERROR] {error}")
         return get_return(
@@ -54,9 +55,51 @@ def lambda_handler(event, context):
             None,
         )
 
+    body = []
+    statistics = {"action": {}, "service": {}, "region": {}}
+
+    for row in file_body[1:]:
+        # Create smaller body object removing unecessary fields
+        body.append(
+            [
+                row[6],
+                row[1],
+                row[2],
+                row[3],
+                row[4],
+                row[5],
+            ]
+        )
+
+        # Gather statistics, group by's
+        statistics["action"][row[5]] = statistics["action"].get(row[5], 0) + 1
+        statistics["service"][row[2] + " " + row[3]] = (
+            statistics["service"].get(row[2] + " " + row[3], 0) + 1
+        )
+        statistics["region"][row[1]] = statistics["region"].get(row[1], 0) + 1
+
+    header = ["timestamp", "region", "service", "resource", "id", "action"]
+    is_dry_run = True if file_body[1][7] == "True" else False
+
+    # Compress data using zlib if file length is greater than 10,000 rows
+    is_compressed = True if len(file_body) > 10000 else False
+    body = (
+        base64.b64encode(zlib.compress(bytes(json.dumps(body), "utf-8"))).decode(
+            "ascii"
+        )
+        if is_compressed
+        else body
+    )
+
     return get_return(
         200,
         f"Execution log for S3 file '{key}' retrieved",
         parameters,
-        {"header": body[0], "body": body[1:None]},
+        {
+            "header": header,
+            "body": body,
+            "statistics": statistics,
+            "is_compressed": is_compressed,
+            "is_dry_run": is_dry_run,
+        },
     )

@@ -30,10 +30,7 @@ class IAMCleanup:
         self.users()
 
     def access_keys(self, user):
-        """
-        Deletes IAM Access Keys for a User.
-        """
-
+        """Deletes IAM Access Keys for a User."""
         self.logging.debug(f"Started cleanup of IAM Access Keys for IAM User '{user}'.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -148,10 +145,7 @@ class IAMCleanup:
             return True
 
     def policies(self):
-        """
-        Deletes IAM Policies.
-        """
-
+        """Deletes IAM Policies."""
         self.logging.debug("Started cleanup of IAM Policies.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -363,10 +357,7 @@ class IAMCleanup:
             return True
 
     def roles(self):
-        """
-        Deletes IAM Roles.
-        """
-
+        """Deletes IAM Roles."""
         self.logging.debug("Started cleanup of IAM Roles.")
 
         is_cleaning_enabled = Helper.get_setting(
@@ -654,10 +645,7 @@ class IAMCleanup:
             return True
 
     def user_policies(self, user):
-        """
-        Deletes IAM User Policies.
-        """
-
+        """Deletes IAM User Policies."""
         self.logging.debug(
             f"Started cleanup of IAM User Policies for IAM User '{user}'."
         )
@@ -729,10 +717,7 @@ class IAMCleanup:
             return True
 
     def delete_login_profile(self, user):
-        """
-        Deletes IAM Login Profile.
-        """
-
+        """Deletes IAM Login Profile."""
         try:
             if not self.is_dry_run:
                 self.client_iam.delete_login_profile(UserName=user)
@@ -748,10 +733,7 @@ class IAMCleanup:
             return True
 
     def remove_user_from_group(self, user):
-        """
-        Removes IAM User from IAM Group.
-        """
-
+        """Removes IAM User from IAM Group."""
         try:
             paginator = self.client_iam.get_paginator("list_groups_for_user")
             resources = (
@@ -797,7 +779,6 @@ class IAMCleanup:
           ☑ Attached managed policies ( DetachUserPolicy )
           ☑ Group memberships ( RemoveUserFromGroup )
         """
-
         self.logging.debug("Started cleanup of IAM Users.")
 
         is_cleaning_enabled = Helper.get_setting(

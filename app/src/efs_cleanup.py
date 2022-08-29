@@ -26,10 +26,7 @@ class EFSCleanup:
         self.file_systems()
 
     def file_systems(self):
-        """
-        Deletes EFS File Systems.
-        """
-
+        """Deletes EFS File Systems."""
         self.logging.debug("Started cleanup of EFS File Systems.")
 
         is_cleaning_enabled = Helper.get_setting(
