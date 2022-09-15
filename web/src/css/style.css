@@ -14,6 +14,10 @@ tr .button {
   box-sizing: border-box !important;
 }
 
+::before {
+  box-shadow: none !important;
+}
+
 td {
   vertical-align: middle !important;
 }

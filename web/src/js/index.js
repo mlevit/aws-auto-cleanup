@@ -423,7 +423,7 @@ function getAllowlist() {
             },
             { responsivePriority: 1, targets: 7 },
           ],
-          // order: [[6, "desc"]],
+          order: [[6, "desc"]],
           pageLength: 20,
           rowGroup: {
             dataSrc: 6,
