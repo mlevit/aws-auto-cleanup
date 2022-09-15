@@ -10,9 +10,7 @@ table.table {
   width: 100%;
 }
 
-tr .button,
-::after,
-::before {
+tr .button {
   box-sizing: border-box !important;
 }
 
