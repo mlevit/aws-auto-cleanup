@@ -193,7 +193,9 @@
               <td>{{ item.resource }}</td>
               <td>{{ item.id }}</td>
               <td>
-                <span v-if="item.expiration < '4102444800'"
+                <span
+                  v-if="item.expiration < '4102444800'"
+                  :title="item.expiration_tooltip"
                   >{{ item.expiration_readable }}</span
                 >
               </td>
@@ -537,7 +539,22 @@
                 </div>
 
                 <div class="field">
-                  <label class="label">ID</label>
+                  <label class="label"
+                    >ID
+                    <span
+                      style="
+                        font-size: x-small;
+                        font-weight: normal;
+                        vertical-align: middle;
+                      "
+                      >(supports
+                      <a
+                        href="https://github.com/servian/aws-auto-cleanup/tree/main/app#wildcard"
+                        target="_blank"
+                        >wildcards</a
+                      >)</span
+                    ></label
+                  >
                   <div class="control has-icons-left">
                     <input
                       :placeholder="[[ resourceIdPlaceholder ]]"

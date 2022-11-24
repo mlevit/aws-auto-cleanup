@@ -403,7 +403,9 @@ function getAllowlist() {
         item["resource"] = parsedResourceId[1];
         item["id"] = parsedResourceId[2];
 
-        item["expiration_readable"] = readableDate.format(
+        item["expiration_readable"] = readableDate.format("DD MMM YYYY");
+
+        item["expiration_tooltip"] = readableDate.format(
           "ddd MMM DD HH:mm:ss YYYY"
         );
 
