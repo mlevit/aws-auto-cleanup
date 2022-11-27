@@ -68,7 +68,12 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/1.10.22/css/dataTables.bulma.min.css"
+      href="https://cdn.datatables.net/1.12.1/css/dataTables.bulma.min.css"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bulma.min.css"
       crossorigin="anonymous"
     />
     <link
@@ -165,36 +170,42 @@
             </div>
           </div>
         </nav>
-        <table class="table" id="allowlist" style="table-layout: fixed">
+        <table
+          id="allowlist"
+          class="table is-striped responsive nowrap"
+          style="width: 100%"
+        >
           <thead>
             <tr>
               <th>Service</th>
               <th>Resource</th>
               <th>ID</th>
               <th>Expiration</th>
-              <th>Owner</th>
-              <th>Comment</th>
+              <th class="none">Owner</th>
+              <th class="none">Comment</th>
               <th>Type</th>
               <th style="text-align: center">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="item in allowlist" :key="item.row_id">
-              <td style="white-space: nowrap">{{ item.service }}</td>
-              <td style="white-space: nowrap">{{ item.resource }}</td>
-              <td style="word-break: break-all">{{ item.id }}</td>
+              <td>{{ item.service }}</td>
+              <td>{{ item.resource }}</td>
+              <td>{{ item.id }}</td>
               <td>
-                <span v-if="item.expiration < '4102444800'"
+                <span
+                  v-if="item.expiration < '4102444800'"
+                  :title="item.expiration_tooltip"
                   >{{ item.expiration_readable }}</span
                 >
               </td>
-              <td style="white-space: nowrap">{{ item.owner }}</td>
-              <td style="word-break: break-all">{{ item.comment }}</td>
+              <td>{{ item.owner }}</td>
+              <td>{{ item.comment }}</td>
               <td>
                 <span v-if="item.expiration < '4102444800'">Temporary</span>
                 <span v-if="item.expiration >= '4102444800'">Permanent</span>
               </td>
-              <td style="white-space: nowrap; text-align: center">
+              <td style="text-align: center">
                 <button
                   class="button is-warning"
                   v-if="item.expiration < '4102444800'"
@@ -233,7 +244,7 @@
           </div>
         </nav>
 
-        <table class="table" id="execution-log-list-table">
+        <table id="execution-log-list-table" class="table">
           <thead>
             <th>Log</th>
             <th>Date</th>
@@ -322,7 +333,7 @@
               <div class="content">
                 <div class="container is-fluid p-0">
                   <div id="logs" class="content-tab">
-                    <table class="table" id="execution-log-table">
+                    <table id="execution-log-table" class="table">
                       <thead>
                         <tr>
                           <th>Timestamp</th>
@@ -342,7 +353,7 @@
                   >
                     <div class="columns">
                       <div class="column">
-                        <table class="table" id="execution-log-table">
+                        <table id="execution-log-table" class="table">
                           <thead>
                             <tr>
                               <th>Resource</th>
@@ -353,14 +364,14 @@
                             <tr
                               v-for="key in Object.keys(executionLogServiceStats).sort()"
                             >
-                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{key}}</td>
                               <td>{{executionLogServiceStats[key]}}</td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                       <div class="column">
-                        <table class="table" id="execution-log-table">
+                        <table id="execution-log-table" class="table">
                           <thead>
                             <tr>
                               <th>Action</th>
@@ -371,14 +382,14 @@
                             <tr
                               v-for="key in Object.keys(executionLogActionStats).sort()"
                             >
-                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{key}}</td>
                               <td>{{executionLogActionStats[key]}}</td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                       <div class="column">
-                        <table class="table" id="execution-log-table">
+                        <table id="execution-log-table" class="table">
                           <thead>
                             <tr>
                               <th>Region</th>
@@ -389,7 +400,7 @@
                             <tr
                               v-for="key in Object.keys(executionLogRegionStats).sort()"
                             >
-                              <td style="white-space: nowrap">{{key}}</td>
+                              <td>{{key}}</td>
                               <td>{{executionLogRegionStats[key]}}</td>
                             </tr>
                           </tbody>
@@ -528,7 +539,22 @@
                 </div>
 
                 <div class="field">
-                  <label class="label">ID</label>
+                  <label class="label"
+                    >ID
+                    <span
+                      style="
+                        font-size: x-small;
+                        font-weight: normal;
+                        vertical-align: middle;
+                      "
+                      >(supports
+                      <a
+                        href="https://github.com/servian/aws-auto-cleanup/tree/main/app#wildcard"
+                        target="_blank"
+                        >wildcards</a
+                      >)</span
+                    ></label
+                  >
                   <div class="control has-icons-left">
                     <input
                       :placeholder="[[ resourceIdPlaceholder ]]"
@@ -744,28 +770,32 @@
 
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.7.4/vue.min.js"
-      integrity="sha512-ReiTH8bLMRWfRdFMuHPWq8Wk+7a2JQhfLWx2YgnjJ35TVU9MkQKioiHt5TfHzbHXIXM58TkFwukQ5+DlyJkg3A=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+      src="https://code.jquery.com/jquery-3.5.1.js"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"
-      integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg=="
+      src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-rowgroup/1.1.2/dataTables.rowGroup.min.js"
-      integrity="sha512-ock7SbKoWBDD9MiniUi9p7WlkqpfRL1sM3CsWX7LxORuyLPRyzR484V8SVrTIWqhxtCVNnfcbOo+cRlHIhiwbg=="
+      src="https://cdn.datatables.net/1.12.1/js/dataTables.bulma.min.js"
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://cdn.datatables.net/1.10.22/js/dataTables.bulma.min.js"
+      src="https://cdn.datatables.net/rowgroup/1.2.0/js/dataTables.rowGroup.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bulma.min.js"
       crossorigin="anonymous"
     ></script>
     <script

@@ -1,4 +1,8 @@
-# AWS Auto Cleanup Changelog
+# Changelog
+
+## UNRELEASED
+
+- Updated Allowlist display hiding Owner and Comment columns behind a expand button. This will allow for a more clean display of resources and their ID's.
 
 ## 2.3.0
 

@@ -10,17 +10,29 @@ table.table {
   width: 100%;
 }
 
-tr .button,
-::after,
-::before {
+tr .button {
   box-sizing: border-box !important;
+}
+
+::before {
+  box-shadow: none !important;
 }
 
 td {
   vertical-align: middle !important;
 }
 
-td.dt-body-nowrap { white-space: nowrap; }
+td.dt-body-nowrap {
+  white-space: nowrap;
+}
+
+td.dtr-control:before {
+  background-color: #ffe08a !important;
+  color: black !important;
+  font-family: inherit !important;
+  line-height: 0.89em !important;
+  border-radius: 4px !important;
+}
 
 .execution-log-modal {
   width: calc(100vw - 40px) !important;

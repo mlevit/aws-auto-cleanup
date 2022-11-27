@@ -403,7 +403,9 @@ function getAllowlist() {
         item["resource"] = parsedResourceId[1];
         item["id"] = parsedResourceId[2];
 
-        item["expiration_readable"] = readableDate.format(
+        item["expiration_readable"] = readableDate.format("DD MMM YYYY");
+
+        item["expiration_tooltip"] = readableDate.format(
           "ddd MMM DD HH:mm:ss YYYY"
         );
 
@@ -412,6 +414,7 @@ function getAllowlist() {
 
       setTimeout(function () {
         app.allowlistDataTables = $("#allowlist").DataTable({
+          dom: "rtp",
           columnDefs: [
             { className: "dt-center", targets: [5] },
             { orderable: false, targets: [0, 1, 2, 3, 4, 5, 6, 7] },
@@ -420,8 +423,8 @@ function getAllowlist() {
               visible: false,
               searchable: false,
             },
+            { responsivePriority: 1, targets: 7 },
           ],
-          dom: "rtp",
           order: [[6, "desc"]],
           pageLength: 20,
           rowGroup: {
