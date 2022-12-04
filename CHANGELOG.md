@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 - Updated Allowlist display hiding Owner and Comment columns behind a expand button. This will allow for a more clean display of resources and their ID's.
+- Changed the date used to calculate the age of an EC2 Instance. Instead of using the EC2 Instance `LaunchTime` which resets everytime an EC2 Instance is stopped and started, the EC2 Instance's ENI `AttachTime` is used instead. [#129](https://github.com/servian/aws-auto-cleanup/issues/129).
 
 ## 2.3.0
 
