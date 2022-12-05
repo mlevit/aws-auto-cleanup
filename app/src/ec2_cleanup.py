@@ -223,7 +223,7 @@ class EC2Cleanup:
             for reservation in reservations:
                 for resource in reservation.get("Instances"):
                     resource_id = resource.get("InstanceId")
-                    resource_date = resource.get("LaunchTime")
+                    resource_date = self.__get_ec2_launch_time(resource)
                     resource_state = resource.get("State").get("Name")
                     resource_age = Helper.get_day_delta(resource_date).days
                     resource_action = None
@@ -672,3 +672,10 @@ class EC2Cleanup:
         else:
             self.logging.info("Skipping cleanup of EC2 Volumes.")
             return True
+
+    def __get_ec2_launch_time(self, resource):
+        for network_interface in resource.get("NetworkInterfaces"):
+            if network_interface.get("Attachment").get("DeviceIndex") == 0:
+                return network_interface.get("Attachment").get("AttachTime")
+
+        return resource.get("LaunchTime")
