@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow: hidden;">
   <head>
     <!-- Primary Meta Tags -->
     <title>AWS Auto Cleanup</title>
@@ -165,6 +165,14 @@
               <p class="control">
                 <button
                   class="button is-white"
+                  v-on:click="expandAllowlist()"
+                >
+                  <span class="icon"> <i id="allowlist-expand-icon" class="fas fa-up-right-and-down-left-from-center"></i> </span>
+                </button>
+              </p>
+              <p class="control">
+                <button
+                  class="button is-warning"
                   v-on:click="openAllowlistInsertPopup()"
                 >
                   <span class="icon"> <i class="fas fa-plus"></i> </span>
@@ -172,7 +180,7 @@
               </p>
             </div>
           </div>
-          <div class="message-body" style="max-height: calc(100vh - 64vh); overflow-y:auto">
+          <div class="message-body" id="allowlist-message-body" style="max-height: calc(36vh); overflow-y:auto">
             <table
               id="allowlist"
               class="table is-striped responsive nowrap"
@@ -249,9 +257,17 @@
             <p class="modal-card-title" style="color: white;">Execution Log</p>
             <div class="field is-grouped">
               <p class="control" id="execution-log-list-table-paginate"></p>
+              <p class="control">
+                <button
+                  class="button is-white"
+                  v-on:click="expandExecutionLog()"
+                >
+                  <span class="icon"> <i id="execution-log-expand-icon" class="fas fa-up-right-and-down-left-from-center"></i> </span>
+                </button>
+              </p>
             </div>
           </div>
-          <div class="message-body" style="max-height: calc(100vh - 64vh); overflow-y:auto">
+          <div class="message-body" id="execution-log-message-body" style="max-height: calc(36vh); overflow-y:auto">
             <table id="execution-log-list-table" class="table">
               <thead>
                 <th>Log</th>

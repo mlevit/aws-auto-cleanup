@@ -20,6 +20,8 @@ var app = new Vue({
   data: {
     accountId: "",
     apiKey: "",
+    allowlistExpanded: false,
+    executionLogExpanded: false,
     executionLogActionStats: {},
     executionLogDataTables: "",
     executionLogKey: "",
@@ -101,6 +103,49 @@ var app = new Vue({
       };
 
       sendApiRequest(convertJsonToGet(formData), "DELETE");
+    },
+    expandAllowlist: function () {
+      if (this.allowlistExpanded) {
+        $("#allowlist-message-body").css({ "max-height": "calc(36vh)" });
+        $("#allowlist-message-body").css({ "min-height": "" });
+        $("#allowlist-expand-icon").attr(
+          "class",
+          "fas fa-up-right-and-down-left-from-center"
+        );
+        // $("html").removeClass("remove-overflow");
+        this.allowlistExpanded = false;
+      } else {
+        $("#allowlist-message-body").css({ "max-height": "calc(83vh)" });
+        $("#allowlist-message-body").css({ "min-height": "calc(83vh)" });
+        $("#allowlist-expand-icon").attr(
+          "class",
+          "fas fa-down-left-and-up-right-to-center"
+        );
+        // $("html").addClass("remove-overflow");
+        this.allowlistExpanded = true;
+      }
+    },
+    expandExecutionLog: function () {
+      if (this.executionLogExpanded) {
+        $("#execution-log-message-body").css({ "max-height": "calc(36vh)" });
+        $("#execution-log-message-body").css({ "min-height": "" });
+        $("#execution-log-expand-icon").attr(
+          "class",
+          "fas fa-up-right-and-down-left-from-center"
+        );
+        // $("html").removeClass("remove-overflow");
+        this.executionLogExpanded = false;
+      } else {
+        $("#execution-log-message-body").css({ "max-height": "calc(88vh)" });
+        $("#execution-log-message-body").css({ "min-height": "calc(88vh)" });
+        $("#execution-log-expand-icon").attr(
+          "class",
+          "fas fa-down-left-and-up-right-to-center"
+        );
+        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        // $("html").addClass("remove-overflow");
+        this.executionLogExpanded = true;
+      }
     },
     extendAllowlistEntry: function (rowId) {
       let row = this.allowlist[rowId - 1];
@@ -320,6 +365,7 @@ function getExecutionLogList() {
             { orderable: false, targets: [0, 1, 2] },
             { className: "dt-center", targets: [2] },
           ],
+          pageLength: 500,
           order: [[0, "desc"]],
         });
         $("#execution-log-list-table-paginate").html(
@@ -429,7 +475,7 @@ function getAllowlist() {
             { responsivePriority: 1, targets: 7 },
           ],
           order: [[6, "desc"]],
-          pageLength: 20,
+          pageLength: 500,
           rowGroup: {
             dataSrc: 6,
           },
