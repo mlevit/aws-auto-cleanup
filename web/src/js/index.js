@@ -496,6 +496,7 @@ function getAllowlist() {
           pageLength: 500,
         });
         $("#allowlist-paginate").html($("#allowlist_paginate"));
+        app.allowlistDataTables.column(6).search("Temporary").draw();
         app.showAllowlistLoadingGif = false;
       }, 10);
     })
