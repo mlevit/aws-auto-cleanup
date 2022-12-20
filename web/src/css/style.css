@@ -8,6 +8,7 @@ html {
 
 table.table {
   width: 100%;
+  background-color: inherit !important;
 }
 
 tr .button {
@@ -60,4 +61,12 @@ tr.dtrg-group {
 
 .remove-overflow {
   overflow: hidden;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.message-header {
+  font-weight: normal !important;
 }

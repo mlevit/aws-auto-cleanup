@@ -322,6 +322,9 @@ function getExecutionLogList() {
           ],
           order: [[0, "desc"]],
         });
+        $("#execution-log-list-table-paginate").html(
+          $("#execution-log-list-table_paginate")
+        );
       }, 10);
       app.showExecutionLogListLoadingGif = false;
     })
@@ -431,9 +434,9 @@ function getAllowlist() {
             dataSrc: 6,
           },
         });
+        $("#allowlist-paginate").html($("#allowlist_paginate"));
+        app.showAllowlistLoadingGif = false;
       }, 10);
-
-      app.showAllowlistLoadingGif = false;
     })
     .catch((error) => {
       iziToast.error({

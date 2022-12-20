@@ -143,91 +143,97 @@
 
       <!-- Body -->
       <div class="container body-container">
-        <nav class="level">
-          <div class="level-left">
-            <h3 class="title is-3 mb-0 mr-2">Allowlist</h3>
-            <!-- <h2 class="title">Allowlist</h2> -->
-            <button
-              class="button is-warning"
-              v-on:click="openAllowlistInsertPopup()"
-            >
-              <span class="icon"> <i class="fas fa-plus"></i> </span>
-              <span>New Entry</span>
-            </button>
-          </div>
-          <div class="level-right">
-            <div class="control has-icons-left is-right">
-              <input
-                class="input"
-                placeholder="Search"
-                type="text"
-                v-model="allowlistSearchTerm"
-                v-on:keyup="searchAllowlist()"
-              />
-              <span class="icon is-left">
-                <i class="fas fa-search"></i>
-              </span>
+        <article class="message">
+          <div class="message-header">
+            <p class="modal-card-title" style="color: white;">Allowlist</p>
+            <div class="field is-grouped">
+              <p class="control is-expanded">
+                <div class="control has-icons-left is-right">
+                  <input
+                    class="input"
+                    placeholder="Search"
+                    type="text"
+                    v-model="allowlistSearchTerm"
+                    v-on:keyup="searchAllowlist()"
+                  />
+                  <span class="icon is-left">
+                    <i class="fas fa-search"></i>
+                  </span>
+                </div>
+              </p>
+              <p class="control" id="allowlist-paginate"></p>
+              <p class="control">
+                <button
+                  class="button is-white"
+                  v-on:click="openAllowlistInsertPopup()"
+                >
+                  <span class="icon"> <i class="fas fa-plus"></i> </span>
+                </button>
+              </p>
             </div>
           </div>
-        </nav>
-        <table
-          id="allowlist"
-          class="table is-striped responsive nowrap"
-          style="width: 100%"
-        >
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Resource</th>
-              <th>ID</th>
-              <th>Expiration</th>
-              <th class="none">Owner</th>
-              <th class="none">Comment</th>
-              <th>Type</th>
-              <th style="text-align: center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in allowlist" :key="item.row_id">
-              <td>{{ item.service }}</td>
-              <td>{{ item.resource }}</td>
-              <td>{{ item.id }}</td>
-              <td>
-                <span
-                  v-if="item.expiration < '4102444800'"
-                  :title="item.expiration_tooltip"
-                  >{{ item.expiration_readable }}</span
-                >
-              </td>
-              <td>{{ item.owner }}</td>
-              <td>{{ item.comment }}</td>
-              <td>
-                <span v-if="item.expiration < '4102444800'">Temporary</span>
-                <span v-if="item.expiration >= '4102444800'">Permanent</span>
-              </td>
-              <td style="text-align: center">
-                <button
-                  class="button is-warning"
-                  v-if="item.expiration < '4102444800'"
-                  v-on:click="extendAllowlistEntry( item.row_id )"
-                >
-                  <span class="icon">
-                    <i class="far fa-calendar-plus"></i>
-                  </span>
-                </button>
-                <button
-                  class="button is-danger"
-                  v-if="item.expiration < '4102444800'"
-                  v-on:click="openAllowlistDeletePopup( item.resource_id )"
-                >
-                  <span class="icon">
-                    <i class="far fa-trash-alt"></i>
-                  </span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          <div class="message-body" style="max-height: calc(100vh - 64vh); overflow-y:auto">
+            <table
+              id="allowlist"
+              class="table is-striped responsive nowrap"
+              style="width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Resource</th>
+                  <th>ID</th>
+                  <th>Expiration</th>
+                  <th class="none">Owner</th>
+                  <th class="none">Comment</th>
+                  <th>Type</th>
+                  <th style="text-align: center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in allowlist" :key="item.row_id">
+                  <td>{{ item.service }}</td>
+                  <td>{{ item.resource }}</td>
+                  <td>{{ item.id }}</td>
+                  <td>
+                    <span
+                      v-if="item.expiration < '4102444800'"
+                      :title="item.expiration_tooltip"
+                      >{{ item.expiration_readable }}</span
+                    >
+                  </td>
+                  <td>{{ item.owner }}</td>
+                  <td>{{ item.comment }}</td>
+                  <td>
+                    <span v-if="item.expiration < '4102444800'">Temporary</span>
+                    <span v-if="item.expiration >= '4102444800'">Permanent</span>
+                  </td>
+                  <td style="text-align: center">
+                    <button
+                      class="button is-warning"
+                      v-if="item.expiration < '4102444800'"
+                      v-on:click="extendAllowlistEntry( item.row_id )"
+                    >
+                      <span class="icon">
+                        <i class="far fa-calendar-plus"></i>
+                      </span>
+                    </button>
+                    <button
+                      class="button is-danger"
+                      v-if="item.expiration < '4102444800'"
+                      v-on:click="openAllowlistDeletePopup( item.resource_id )"
+                    >
+                      <span class="icon">
+                        <i class="far fa-trash-alt"></i>
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        
         <!-- Refreshing Animation -->
         <div
           class="container has-text-centered"
@@ -238,36 +244,42 @@
         <br />
 
         <!-- Execution Log -->
-        <nav class="level">
-          <div class="level-left">
-            <h3 class="title is-3 mt-2 mb-0 mr-2">Execution Logs</h3>
+        <article class="message">
+          <div class="message-header" style="height: 64px;">
+            <p class="modal-card-title" style="color: white;">Execution Log</p>
+            <div class="field is-grouped">
+              <p class="control" id="execution-log-list-table-paginate"></p>
+            </div>
           </div>
-        </nav>
+          <div class="message-body" style="max-height: calc(100vh - 64vh); overflow-y:auto">
+            <table id="execution-log-list-table" class="table">
+              <thead>
+                <th>Log</th>
+                <th>Date</th>
+                <th>View</th>
+              </thead>
+              <tbody>
+                <tr v-for="item in executionLogList" :value="item" :key="item.key">
+                  <td>{{ item.key }}</td>
+                  <td>{{ item.local_date }}</td>
+                  <td>
+                    <button
+                      v-on:click="openExecutionLog( item.key_escape )"
+                      target="_blank"
+                      class="button"
+                    >
+                      <span class="icon">
+                        <i class="fas fa-arrow-up-right-from-square"></i>
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
 
-        <table id="execution-log-list-table" class="table">
-          <thead>
-            <th>Log</th>
-            <th>Date</th>
-            <th>View</th>
-          </thead>
-          <tbody>
-            <tr v-for="item in executionLogList" :value="item" :key="item.key">
-              <td>{{ item.key }}</td>
-              <td>{{ item.local_date }}</td>
-              <td>
-                <button
-                  v-on:click="openExecutionLog( item.key_escape )"
-                  target="_blank"
-                  class="button"
-                >
-                  <span class="icon">
-                    <i class="fas fa-arrow-up-right-from-square"></i>
-                  </span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        
         <!-- Refreshing Animation -->
         <div
           class="container has-text-centered"
