@@ -147,6 +147,22 @@
           <div class="message-header">
             <p class="modal-card-title" style="color: white;">Allowlist</p>
             <div class="field is-grouped">
+              <div class="field has-addons" style="margin-bottom: 0% !important;">
+                <p class="control">
+                  <button
+                    class="button is-link"
+                    id="show-temporary-allowlist-button"
+                    v-on:click="showTemporaryAllowlist()"
+                  >Temporary</button>
+                </p>
+                <p class="control">
+                  <button
+                    class="button is-white"
+                    id="show-permanent-allowlist-button"
+                    v-on:click="showPermanentAllowlist()"
+                  >Permanent</button>
+                </p>
+              </div>
               <p class="control is-expanded">
                 <div class="control has-icons-left is-right">
                   <input
@@ -180,10 +196,10 @@
               </p>
             </div>
           </div>
-          <div class="message-body" id="allowlist-message-body" style="max-height: calc(100vh / 3); overflow-y:auto">
+          <div class="message-body" id="allowlist-message-body" style="max-height: calc(36vh); overflow-y:auto">
             <table
               id="allowlist"
-              class="table is-striped responsive nowrap"
+              class="table responsive nowrap"
               style="width: 100%"
             >
               <thead>
@@ -267,7 +283,7 @@
               </p>
             </div>
           </div>
-          <div class="message-body" id="execution-log-message-body" style="max-height: calc(100vh / 3); overflow-y:auto">
+          <div class="message-body" id="execution-log-message-body" style="max-height: calc(36vh); overflow-y:auto">
             <table id="execution-log-list-table" class="table">
               <thead>
                 <th>Log</th>

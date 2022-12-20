@@ -33,6 +33,7 @@ td.dtr-control:before {
   font-family: inherit !important;
   line-height: 0.89em !important;
   border-radius: 4px !important;
+  border-color: inherit;
 }
 
 .execution-log-modal {

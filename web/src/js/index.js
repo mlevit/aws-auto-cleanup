@@ -115,8 +115,8 @@ var app = new Vue({
         // $("html").removeClass("remove-overflow");
         this.allowlistExpanded = false;
       } else {
-        $("#allowlist-message-body").css({ "max-height": "calc(88vh)" });
-        $("#allowlist-message-body").css({ "min-height": "calc(88vh)" });
+        $("#allowlist-message-body").css({ "max-height": "calc(90vh)" });
+        $("#allowlist-message-body").css({ "min-height": "calc(90vh)" });
         $("#allowlist-expand-icon").attr(
           "class",
           "fas fa-down-left-and-up-right-to-center"
@@ -140,8 +140,8 @@ var app = new Vue({
         // $("html").removeClass("remove-overflow");
         this.executionLogExpanded = false;
       } else {
-        $("#execution-log-message-body").css({ "max-height": "calc(88vh)" });
-        $("#execution-log-message-body").css({ "min-height": "calc(88vh)" });
+        $("#execution-log-message-body").css({ "max-height": "calc(90vh)" });
+        $("#execution-log-message-body").css({ "min-height": "calc(90vh)" });
         $("#execution-log-expand-icon").attr(
           "class",
           "fas fa-down-left-and-up-right-to-center"
@@ -193,6 +193,16 @@ var app = new Vue({
     },
     searchAllowlist: function () {
       this.allowlistDataTables.search(this.allowlistSearchTerm).draw();
+    },
+    showTemporaryAllowlist: function () {
+      this.allowlistDataTables.column(6).search("Temporary").draw();
+      $("#show-temporary-allowlist-button").addClass("is-link");
+      $("#show-permanent-allowlist-button").removeClass("is-link");
+    },
+    showPermanentAllowlist: function () {
+      this.allowlistDataTables.column(6).search("Permanent").draw();
+      $("#show-permanent-allowlist-button").addClass("is-link");
+      $("#show-temporary-allowlist-button").removeClass("is-link");
     },
     // Execution Log
     closeExecutionLogPopup: function () {
@@ -479,15 +489,11 @@ function getAllowlist() {
             {
               targets: [6],
               visible: false,
-              searchable: false,
             },
             { responsivePriority: 1, targets: 7 },
           ],
           order: [[6, "desc"]],
           pageLength: 500,
-          rowGroup: {
-            dataSrc: 6,
-          },
         });
         $("#allowlist-paginate").html($("#allowlist_paginate"));
         app.showAllowlistLoadingGif = false;
