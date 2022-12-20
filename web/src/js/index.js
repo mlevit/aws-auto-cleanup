@@ -115,13 +115,17 @@ var app = new Vue({
         // $("html").removeClass("remove-overflow");
         this.allowlistExpanded = false;
       } else {
-        $("#allowlist-message-body").css({ "max-height": "calc(83vh)" });
-        $("#allowlist-message-body").css({ "min-height": "calc(83vh)" });
+        $("#allowlist-message-body").css({ "max-height": "calc(88vh)" });
+        $("#allowlist-message-body").css({ "min-height": "calc(88vh)" });
         $("#allowlist-expand-icon").attr(
           "class",
           "fas fa-down-left-and-up-right-to-center"
         );
         // $("html").addClass("remove-overflow");
+        $("html, body").animate(
+          { scrollTop: $("#allowlist-message").offset().top - 20 },
+          500
+        );
         this.allowlistExpanded = true;
       }
     },
@@ -142,7 +146,12 @@ var app = new Vue({
           "class",
           "fas fa-down-left-and-up-right-to-center"
         );
-        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        // $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        $("html, body").animate(
+          { scrollTop: $("#execution-log-message").offset().top - 20 },
+          500
+        );
+
         // $("html").addClass("remove-overflow");
         this.executionLogExpanded = true;
       }

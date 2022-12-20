@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="overflow: hidden;">
+<html lang="en">
   <head>
     <!-- Primary Meta Tags -->
     <title>AWS Auto Cleanup</title>
@@ -143,7 +143,7 @@
 
       <!-- Body -->
       <div class="container body-container">
-        <article class="message">
+        <article class="message" id="allowlist-message">
           <div class="message-header">
             <p class="modal-card-title" style="color: white;">Allowlist</p>
             <div class="field is-grouped">
@@ -180,7 +180,7 @@
               </p>
             </div>
           </div>
-          <div class="message-body" id="allowlist-message-body" style="max-height: calc(36vh); overflow-y:auto">
+          <div class="message-body" id="allowlist-message-body" style="max-height: calc(100vh / 3); overflow-y:auto">
             <table
               id="allowlist"
               class="table is-striped responsive nowrap"
@@ -252,7 +252,7 @@
         <br />
 
         <!-- Execution Log -->
-        <article class="message">
+        <article class="message" id="execution-log-message">
           <div class="message-header" style="height: 64px;">
             <p class="modal-card-title" style="color: white;">Execution Log</p>
             <div class="field is-grouped">
@@ -267,7 +267,7 @@
               </p>
             </div>
           </div>
-          <div class="message-body" id="execution-log-message-body" style="max-height: calc(36vh); overflow-y:auto">
+          <div class="message-body" id="execution-log-message-body" style="max-height: calc(100vh / 3); overflow-y:auto">
             <table id="execution-log-list-table" class="table">
               <thead>
                 <th>Log</th>
