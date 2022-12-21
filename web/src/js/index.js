@@ -20,6 +20,8 @@ var app = new Vue({
   data: {
     accountId: "",
     apiKey: "",
+    allowlistExpanded: false,
+    executionLogExpanded: false,
     executionLogActionStats: {},
     executionLogDataTables: "",
     executionLogKey: "",
@@ -102,6 +104,58 @@ var app = new Vue({
 
       sendApiRequest(convertJsonToGet(formData), "DELETE");
     },
+    expandAllowlist: function () {
+      if (this.allowlistExpanded) {
+        $("#allowlist-message-body").css({ "max-height": "calc(36vh)" });
+        $("#allowlist-message-body").css({ "min-height": "" });
+        $("#allowlist-expand-icon").attr(
+          "class",
+          "fas fa-up-right-and-down-left-from-center"
+        );
+        // $("html").removeClass("remove-overflow");
+        this.allowlistExpanded = false;
+      } else {
+        $("#allowlist-message-body").css({ "max-height": "calc(90vh)" });
+        $("#allowlist-message-body").css({ "min-height": "calc(90vh)" });
+        $("#allowlist-expand-icon").attr(
+          "class",
+          "fas fa-down-left-and-up-right-to-center"
+        );
+        // $("html").addClass("remove-overflow");
+        $("html, body").animate(
+          { scrollTop: $("#allowlist-message").offset().top - 20 },
+          500
+        );
+        this.allowlistExpanded = true;
+      }
+    },
+    expandExecutionLog: function () {
+      if (this.executionLogExpanded) {
+        $("#execution-log-message-body").css({ "max-height": "calc(36vh)" });
+        $("#execution-log-message-body").css({ "min-height": "" });
+        $("#execution-log-expand-icon").attr(
+          "class",
+          "fas fa-up-right-and-down-left-from-center"
+        );
+        // $("html").removeClass("remove-overflow");
+        this.executionLogExpanded = false;
+      } else {
+        $("#execution-log-message-body").css({ "max-height": "calc(90vh)" });
+        $("#execution-log-message-body").css({ "min-height": "calc(90vh)" });
+        $("#execution-log-expand-icon").attr(
+          "class",
+          "fas fa-down-left-and-up-right-to-center"
+        );
+        // $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        $("html, body").animate(
+          { scrollTop: $("#execution-log-message").offset().top - 20 },
+          500
+        );
+
+        // $("html").addClass("remove-overflow");
+        this.executionLogExpanded = true;
+      }
+    },
     extendAllowlistEntry: function (rowId) {
       let row = this.allowlist[rowId - 1];
       let formData = {
@@ -139,6 +193,16 @@ var app = new Vue({
     },
     searchAllowlist: function () {
       this.allowlistDataTables.search(this.allowlistSearchTerm).draw();
+    },
+    showTemporaryAllowlist: function () {
+      this.allowlistDataTables.column(6).search("Temporary").draw();
+      $("#show-temporary-allowlist-button").addClass("is-link");
+      $("#show-permanent-allowlist-button").removeClass("is-link");
+    },
+    showPermanentAllowlist: function () {
+      this.allowlistDataTables.column(6).search("Permanent").draw();
+      $("#show-permanent-allowlist-button").addClass("is-link");
+      $("#show-temporary-allowlist-button").removeClass("is-link");
     },
     // Execution Log
     closeExecutionLogPopup: function () {
@@ -320,8 +384,12 @@ function getExecutionLogList() {
             { orderable: false, targets: [0, 1, 2] },
             { className: "dt-center", targets: [2] },
           ],
+          pageLength: 500,
           order: [[0, "desc"]],
         });
+        $("#execution-log-list-table-paginate").html(
+          $("#execution-log-list-table_paginate")
+        );
       }, 10);
       app.showExecutionLogListLoadingGif = false;
     })
@@ -421,19 +489,16 @@ function getAllowlist() {
             {
               targets: [6],
               visible: false,
-              searchable: false,
             },
             { responsivePriority: 1, targets: 7 },
           ],
           order: [[6, "desc"]],
-          pageLength: 20,
-          rowGroup: {
-            dataSrc: 6,
-          },
+          pageLength: 500,
         });
+        $("#allowlist-paginate").html($("#allowlist_paginate"));
+        app.allowlistDataTables.column(6).search("Temporary").draw();
+        app.showAllowlistLoadingGif = false;
       }, 10);
-
-      app.showAllowlistLoadingGif = false;
     })
     .catch((error) => {
       iziToast.error({

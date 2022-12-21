@@ -8,6 +8,7 @@ html {
 
 table.table {
   width: 100%;
+  background-color: inherit !important;
 }
 
 tr .button {
@@ -32,6 +33,7 @@ td.dtr-control:before {
   font-family: inherit !important;
   line-height: 0.89em !important;
   border-radius: 4px !important;
+  border-color: inherit;
 }
 
 .execution-log-modal {
@@ -60,4 +62,12 @@ tr.dtrg-group {
 
 .remove-overflow {
   overflow: hidden;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.message-header {
+  font-weight: normal !important;
 }
