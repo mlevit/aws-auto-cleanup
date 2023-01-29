@@ -4,7 +4,7 @@
       "S": "version"
     },
     "value": {
-      "N": "10"
+      "N": "11"
     }
   },
   {
@@ -552,6 +552,23 @@
                 },
                 "id": {
                   "S": "Stream Name"
+                },
+                "ttl": {
+                  "N": "7"
+                }
+              }
+            }
+          }
+        },
+        "kms": {
+          "M": {
+            "key": {
+              "M": {
+                "clean": {
+                  "BOOL": true
+                },
+                "id": {
+                  "S": "Key ID (e.g., 1234abcd-12ab-34cd-56ef-1234567890ab)"
                 },
                 "ttl": {
                   "N": "7"

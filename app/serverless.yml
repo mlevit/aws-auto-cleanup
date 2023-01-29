@@ -201,6 +201,12 @@ provider:
           Resource: "*"
         - Effect: Allow
           Action:
+            - kms:DescribeKey
+            - kms:DisableKey
+            - kms:ListKeys
+          Resource: "*"
+        - Effect: Allow
+          Action:
             - lambda:DeleteFunction
             - lambda:ListFunctions
           Resource: "*"
