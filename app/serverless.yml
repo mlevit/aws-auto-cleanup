@@ -202,8 +202,8 @@ provider:
         - Effect: Allow
           Action:
             - kms:DescribeKey
-            - kms:DisableKey
             - kms:ListKeys
+            - kms:ScheduleKeyDeletion
           Resource: "*"
         - Effect: Allow
           Action:

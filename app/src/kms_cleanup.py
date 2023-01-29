@@ -69,17 +69,19 @@ class KMSCleanup:
                         ):
                             try:
                                 if not self.is_dry_run:
-                                    self.client_kms.disable_key(KeyId=resource_id)
+                                    self.client_kms.schedule_key_deletion(
+                                        KeyId=resource_id, PendingWindowInDays=7
+                                    )
                             except:
                                 self.logging.error(
-                                    f"Could not disable KMS Key '{resource_id}'."
+                                    f"Could not scheduled deletion of KMS Key '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
                             else:
                                 self.logging.info(
                                     f"KMS Key '{resource_id}' was last modified {resource_age} days ago "
-                                    "and has been disabled."
+                                    "and has been scheduled for deletion."
                                 )
                                 resource_action = "DELETE"
                         else:
@@ -87,12 +89,12 @@ class KMSCleanup:
                     else:
                         self.logging.debug(
                             f"KMS Key '{resource_id}' was last modified {resource_age} days ago "
-                            "(less than TTL setting) and has not been disabled."
+                            "(less than TTL setting) and has not been scheduled for deletion."
                         )
                         resource_action = "SKIP - TTL"
                 else:
                     self.logging.debug(
-                        f"KMS Key '{resource_id}' has been allowlisted and has not been disabled."
+                        f"KMS Key '{resource_id}' has been allowlisted and has not been scheduled for deletion."
                     )
                     resource_action = "SKIP - ALLOWLIST"
 
