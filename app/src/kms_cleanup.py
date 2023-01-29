@@ -74,7 +74,7 @@ class KMSCleanup:
                                     )
                             except:
                                 self.logging.error(
-                                    f"Could not scheduled deletion of KMS Key '{resource_id}'."
+                                    f"Could not schedule deletion of KMS Key '{resource_id}'."
                                 )
                                 self.logging.error(sys.exc_info()[1])
                                 resource_action = "ERROR"
