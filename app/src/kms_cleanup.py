@@ -61,12 +61,12 @@ class KMSCleanup:
                 resource_age = Helper.get_day_delta(resource_date).days
                 resource_action = None
 
+                if resource_manager == "AWS":
+                    continue
+
                 if Helper.not_allowlisted(resource_id, resource_allowlist):
                     if resource_age > resource_maximum_age:
-                        if (
-                            resource_state == "Enabled"
-                            and resource_manager == "CUSTOMER"
-                        ):
+                        if resource_state == "Enabled":
                             try:
                                 if not self.is_dry_run:
                                     self.client_kms.schedule_key_deletion(
@@ -85,6 +85,9 @@ class KMSCleanup:
                                 )
                                 resource_action = "DELETE"
                         else:
+                            self.logging.info(
+                                f"KMS Key '{resource_id}' in state '{resource_state}' has not been scheduled for deletion."
+                            )
                             resource_action = "SKIP - STATE"
                     else:
                         self.logging.debug(
