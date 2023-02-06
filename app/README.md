@@ -166,7 +166,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | RDS Cluster Snapshots          | DB Cluster Snapshot Name | `rds:cluster_snapshot:db_cluster_snapshot_identifier`|
 | RDS Instances                  | DB Instance Identifier   | `rds:instance:db_instance_identifier`                |
 | RDS Snapshots                  | DB Snapshot Name         | `rds:snapshot:db_snapshot_identifier`                |
-| Redshift Instances             | Cluster Identifier       | `redshift:instance:cluster_identifier`               |
+| Redshift Clusters              | Cluster Identifier       | `redshift:instance:cluster_identifier`               |
 | Redshift Snapshots             | Snapshot Identifier      | `redshift:snapshot:snapshot_identifier`              |
 | S3 Buckets                     | Bucket Name              | `s3:bucket:bucket_name`                              |
 | SageMaker Apps                 | App Name                 | `sagemaker:app:app_name`                             |
@@ -224,7 +224,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | CloudFormation        | Stacks                  | True  | 7   | Deletes Stack if not allowlisted or not part of a allowlisted nested Stack.                                                                                                         |
 | CloudWatch            | Log Groups              | True  | 30  |                                                                                                                                                                                     |
 | DynamoDB              | Tables                  | True  | 7   |                                                                                                                                                                                     |
-| EC2                   | Addresses               | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                             |
+| EC2                   | Elastic IPs             | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                             |
 | EC2                   | Images                  | True  | 7   |                                                                                                                                                                                     |
 | EC2                   | Instances               | True  | 7   |                                                                                                                                                                                     |
 | EC2                   | NAT Gateways            | True  | 7   |                                                                                                                                                                                     |
