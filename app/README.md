@@ -326,7 +326,7 @@ List actions that may be taken on the resources.
 | DELETE - NOT CONFIRMED      | Assigned to CloudFormation stacks that will be deleted, but which the cleanup is not able to confirm deletion for due to how long they can potentially take to  delete.                                                             |
 | SKIP - TTL                  | Resource will not be deleted since it is lower than the time to live (TTL) set for the resource.       |
 | SKIP - ALLOWLIST            | Resource will not be deleted since it is part of the allowlist.                                        |
-| SKIP - IN USE               | Resource will not be delete since it is in use by another resource.                                    |
+| SKIP - IN USE               | Resource will not be deleted since it is in use by another resource.                                    |
 | SKIP - STATE                | Assigned to KMS keys that are in a state other than Enabled.                                           |
 | ERROR                       | There was an error detecting / deleting the resource.                                                  |
 
