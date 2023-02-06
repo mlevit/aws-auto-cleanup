@@ -316,6 +316,20 @@ Post every Auto Cleanup run, an execution log is generated and stored as a flat 
 | dry_run_flag | boolean   | Dry run activated                                                                                                                      |
 | execution_id | string    | Lambda execution ID                                                                                                                    |
 
+#### Execution Log Actions
+
+List actions that may be taken on the resources.
+
+| Action                      | Description                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------ |
+| DELETE                      | Resource will be deleted.                                                                              |
+| DELETE - NOT CONFIRMED      | Assigned to CloudFormation stacks that will be deleted, but which the cleanup is not able to confirm deletion for due to how long they can potentially take to  delete.                                                             |
+| SKIP - TTL                  | Resource will not be deleted since it is lower than the time to live (TTL) set for the resource.       |
+| SKIP - ALLOWLIST            | Resource will not be deleted since it is part of the allowlist.                                        |
+| SKIP - IN USE               | Resource will not be delete since it is in use by another resource.                                    |
+| SKIP - STATE                | Assigned to KMS keys that are in a state other than Enabled.                                           |
+| ERROR                       | There was an error detecting / deleting the resource.                                                  |
+
 #### Athena
 
 To enable analytical access to the generated execution logs, a Glue Database and Glue Table are provisioned based on the S3 Bucket and file schema of the execution log. This database and table can be accessed directly from within Athena enabling the logs to be queried using SQL.
