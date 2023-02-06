@@ -162,8 +162,8 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | KMS Keys                       | Key ID                   | `kms:key:key_id`                                     |
 | Kinesis Streams                | Stream Name              | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name            | `lambda:function:function_name`                      |
-| RDS Clusters                   | DB Cluster Identifier    | `rds:cluster:db_cluster_identifier`                 |
-| RDS Cluster Snapshots          | DB Cluster Snapshot Name | `rds:cluster_snapshot:db_cluster_snapshot_identifier`        |
+| RDS Clusters                   | DB Cluster Identifier    | `rds:cluster:db_cluster_identifier`                  |
+| RDS Cluster Snapshots          | DB Cluster Snapshot Name | `rds:cluster_snapshot:db_cluster_snapshot_identifier`|
 | RDS Instances                  | DB Instance Identifier   | `rds:instance:db_instance_identifier`                |
 | RDS Snapshots                  | DB Snapshot Name         | `rds:snapshot:db_snapshot_identifier`                |
 | Redshift Instances             | Cluster Identifier       | `redshift:instance:cluster_identifier`               |
