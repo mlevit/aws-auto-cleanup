@@ -159,6 +159,7 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | IAM Roles                      | Role Name                | `iam:role:role_name`                                 |
 | IAM Users                      | User Name                | `iam:user:user_name`                                 |
 | Kafka Clusters                 | Cluster Name             | `kafka:cluster:cluster_name`                         |
+| KMS Keys                       | Key ID                   | `kms:key:key_id`                                     |
 | Kinesis Streams                | Stream Name              | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name            | `lambda:function:function_name`                      |
 | RDS Clusters                   | DB Cluster Identifier    | `rds:cluster:db_cluster_identifier`                 |
