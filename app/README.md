@@ -311,7 +311,7 @@ Post every Auto Cleanup run, an execution log is generated and stored as a flat 
 | service      | string    | Service (e.g., `s3`)                                                                                                                   |
 | resource     | string    | Resource (e.g., `bucket`)                                                                                                              |
 | resource_id  | string    | Resource ID (e.g., Instance ID)                                                                                                        |
-| action       | string    | Action taken on the resource (e.g., `DELETE`, `DELETE - NOT CONFIRMED`, `SKIP - TTL`, `SKIP - WHITELIST`, `SKIP - IN USE`, OR `ERROR`) |
+| action       | string    | Action taken on the resource (e.g., `DELETE`, `DELETE - NOT CONFIRMED`, `SKIP - TTL`, `SKIP - ALLOWLIST`, `SKIP - IN USE`, `SKIP - STATE`, OR `ERROR`) |
 | timestamp    | timestamp | Timestamp when action was performed                                                                                                    |
 | dry_run_flag | boolean   | Dry run activated                                                                                                                      |
 | execution_id | string    | Lambda execution ID                                                                                                                    |
