@@ -159,13 +159,14 @@ The below table indicates AWS resources that are supported by Auto Cleanup along
 | IAM Roles                      | Role Name                | `iam:role:role_name`                                 |
 | IAM Users                      | User Name                | `iam:user:user_name`                                 |
 | Kafka Clusters                 | Cluster Name             | `kafka:cluster:cluster_name`                         |
+| KMS Keys                       | Key ID                   | `kms:key:key_id`                                     |
 | Kinesis Streams                | Stream Name              | `kinesis:stream:stream_name`                         |
 | Lambda Functions               | Function Name            | `lambda:function:function_name`                      |
-| RDS Clusters                   | DB Cluster Identifier    | `rds:cluster:db_cluster_identifier`                 |
-| RDS Cluster Snapshots          | DB Cluster Snapshot Name | `rds:cluster_snapshot:db_cluster_snapshot_identifier`        |
+| RDS Clusters                   | DB Cluster Identifier    | `rds:cluster:db_cluster_identifier`                  |
+| RDS Cluster Snapshots          | DB Cluster Snapshot Name | `rds:cluster_snapshot:db_cluster_snapshot_identifier`|
 | RDS Instances                  | DB Instance Identifier   | `rds:instance:db_instance_identifier`                |
 | RDS Snapshots                  | DB Snapshot Name         | `rds:snapshot:db_snapshot_identifier`                |
-| Redshift Instances             | Cluster Identifier       | `redshift:instance:cluster_identifier`               |
+| Redshift Clusters              | Cluster Identifier       | `redshift:instance:cluster_identifier`               |
 | Redshift Snapshots             | Snapshot Identifier      | `redshift:snapshot:snapshot_identifier`              |
 | S3 Buckets                     | Bucket Name              | `s3:bucket:bucket_name`                              |
 | SageMaker Apps                 | App Name                 | `sagemaker:app:app_name`                             |
@@ -223,7 +224,7 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | CloudFormation        | Stacks                  | True  | 7   | Deletes Stack if not allowlisted or not part of a allowlisted nested Stack.                                                                                                         |
 | CloudWatch            | Log Groups              | True  | 30  |                                                                                                                                                                                     |
 | DynamoDB              | Tables                  | True  | 7   |                                                                                                                                                                                     |
-| EC2                   | Addresses               | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                             |
+| EC2                   | Elastic IPs             | True  | N/A | Deletes Address if not associated with an EC2 instance.                                                                                                                             |
 | EC2                   | Images                  | True  | 7   |                                                                                                                                                                                     |
 | EC2                   | Instances               | True  | 7   |                                                                                                                                                                                     |
 | EC2                   | NAT Gateways            | True  | 7   |                                                                                                                                                                                     |
@@ -234,17 +235,14 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | ECR                   | Repositories            | True  | 7   | Deletes Repository if no Images exist.                                                                                                                                              |
 | ECS                   | Clusters                | True  | N/A | Deletes Cluster if no running Services or Tasks.                                                                                                                                    |
 | ECS                   | Services                | True  | 7   |                                                                                                                                                                                     |
-| EFS                   | Clusters                | True  | 7   |                                                                                                                                                                                     |
-| EFS                   | Fargate Profiles        | True  | 7   |                                                                                                                                                                                     |
-| EFS                   | File Systems            | True  | 7   |                                                                                                                                                                                     |
-| EFS                   | Node Groups             | True  | 7   |                                                                                                                                                                                     |
-| EKS                   | Clusters                | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist.                                                                                                                        |
-| EKS                   | Fargate Profiles        | True  | 7   |                                                                                                                                                                                     |
+| EFS                   | File Systems             | True  | 7   |                                                                                                                                                                                     |
+| EKS                   | Clusters        | True  | 7   | Deletes Cluster if no Fargate Profiles or Node Groups exist. |                                                                                                                                                                                      |
+| EKS                   | Fargate Profiles            | True  | 7   |                                                                                                                                                                                     |
 | EKS                   | Node Groups             | True  | 7   |                                                                                                                                                                                     |
-| ElastCache            | Clusters                | True  | 7   |                                                                                                                                                                                     |
-| ElastCache            | Replication Groups      | True  | 7   |                                                                                                                                                                                     |
-| Elastic Beanstalk     | Applications            | True  | 7   |                                                                                                                                                                                     |
-| Elasticsearch Service | Domain Name             | True  | 7   |                                                                                                                                                                                     |
+| Elastic Beanstalk     | Applications                | True  | 7 |
+| ElastiCache           | Clusters        | True  | 7   |                                                                                                                                                                                     |
+| ElastiCache           | Replication Groups      | True  | 7   |                                                                                                                                                                                     |
+| Elasticsearch Service | Domain Name                | True  | 7   |                                                                                                                                      
 | ELB                   | Load Balancers          | True  | 7   |                                                                                                                                                                                     |
 | EMR                   | Clusters                | True  | 7   |                                                                                                                                                                                     |
 | Glue                  | Crawlers                | True  | 7   |                                                                                                                                                                                     |
@@ -256,9 +254,10 @@ Service-specific settings indicating the supported AWS services, resources, and 
 | IAM                   | Users                   | True  | 30  |                                                                                                                                                                                     |
 | Kafka                 | Clusters                | True  | 7   |                                                                                                                                                                                     |
 | Kinesis               | Streams                 | True  | 7   |                                                                                                                                                                                     |
+| KMS                   | Keys :new:                | True  | 7   |                                                                                                                                                                                     |
 | Lambda                | Functions               | True  | 30  |                                                                                                                                                                                     |
-| RDS                   | Clusters :new:          | True  | 7   | Deletes Cluster and all DB Instances present within the Cluster.                                                                                                                    |
-| RDS                   | Cluster Snapshots :new: | True  | 7   |                                                                                                                                                                                     |
+| RDS                   | Clusters          | True  | 7   | Deletes Cluster and all DB Instances present within the Cluster.                                                                                                                    |
+| RDS                   | Cluster Snapshots | True  | 7   |                                                                                                                                                                                     |
 | RDS                   | Instances               | True  | 7   |                                                                                                                                                                                     |
 | RDS                   | Snapshots               | True  | 7   |                                                                                                                                                                                     |
 | Redshift              | Clusters                | True  | 7   |                                                                                                                                                                                     |
@@ -312,10 +311,24 @@ Post every Auto Cleanup run, an execution log is generated and stored as a flat 
 | service      | string    | Service (e.g., `s3`)                                                                                                                   |
 | resource     | string    | Resource (e.g., `bucket`)                                                                                                              |
 | resource_id  | string    | Resource ID (e.g., Instance ID)                                                                                                        |
-| action       | string    | Action taken on the resource (e.g., `DELETE`, `DELETE - NOT CONFIRMED`, `SKIP - TTL`, `SKIP - WHITELIST`, `SKIP - IN USE`, OR `ERROR`) |
+| action       | string    | Action taken on the resource (e.g., `DELETE`, `DELETE - NOT CONFIRMED`, `SKIP - TTL`, `SKIP - ALLOWLIST`, `SKIP - IN USE`, `SKIP - STATE`, OR `ERROR`) |
 | timestamp    | timestamp | Timestamp when action was performed                                                                                                    |
 | dry_run_flag | boolean   | Dry run activated                                                                                                                      |
 | execution_id | string    | Lambda execution ID                                                                                                                    |
+
+#### Execution Log Actions
+
+List actions that may be taken on the resources.
+
+| Action                      | Description                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------ |
+| DELETE                      | Resource will be deleted.                                                                              |
+| DELETE - NOT CONFIRMED      | Assigned to CloudFormation stacks that will be deleted, but which the cleanup is not able to confirm deletion for due to how long they can potentially take to  delete.                                                             |
+| SKIP - TTL                  | Resource will not be deleted since it is lower than the time to live (TTL) set for the resource.       |
+| SKIP - ALLOWLIST            | Resource will not be deleted since it is part of the allowlist.                                        |
+| SKIP - IN USE               | Resource will not be deleted since it is in use by another resource.                                    |
+| SKIP - STATE                | Assigned to KMS keys that are in a state other than Enabled.                                           |
+| ERROR                       | There was an error detecting / deleting the resource.                                                  |
 
 #### Athena
 
