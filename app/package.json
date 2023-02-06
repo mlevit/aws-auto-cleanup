@@ -16,6 +16,10 @@
     "deploy": "serverless deploy",
     "invoke": "serverless invoke --function AutoCleanup --type Event",
     "logs": "serverless logs --function AutoCleanup",
-    "remove": "serverless remove"
+    "remove": "serverless remove",
+    "deploy-dev": "serverless deploy --stage dev --aws-profile saml",
+    "invoke-dev": "serverless invoke --function AutoCleanup --type Event --stage dev --aws-profile saml",
+    "logs-dev": "serverless logs --function AutoCleanup --stage dev --aws-profile saml",
+    "remove-dev": "serverless remove --stage dev --aws-profile saml"
   }
 }

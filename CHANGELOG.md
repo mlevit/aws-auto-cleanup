@@ -1,5 +1,9 @@
 # Changelog
 
+## UNRELEASED
+
+- Added KMS Key cleanup.
+
 ## 2.4.0
 
 - Updated Allowlist display hiding Owner and Comment columns behind a expand button. This will allow for a more clean display of resources and their ID's.

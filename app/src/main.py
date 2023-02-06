@@ -32,6 +32,7 @@ from src.helper import Helper
 from src.iam_cleanup import IAMCleanup
 from src.kafka_cleanup import KafkaCleanup
 from src.kinesis_cleanup import KinesisCleanup
+from src.kms_cleanup import KMSCleanup
 from src.lambda_cleanup import LambdaCleanup
 from src.rds_cleanup import RDSCleanup
 from src.redshift_cleanup import RedshiftCleanup
@@ -254,6 +255,16 @@ class Cleanup:
                     region,
                 )
                 threads.append(threading.Thread(target=kinesis_class.run, args=()))
+
+                # KMS
+                kms_class = KMSCleanup(
+                    self.logging,
+                    self.allowlist,
+                    self.settings,
+                    self.execution_log,
+                    region,
+                )
+                threads.append(threading.Thread(target=kms_class.run, args=()))
 
                 # Lambda
                 lambda_class = LambdaCleanup(
