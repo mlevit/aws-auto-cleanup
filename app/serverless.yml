@@ -44,6 +44,7 @@ provider:
             - cloudformation:DescribeStacks
             - cloudformation:DescribeStackResources
             - cloudformation:ListStackResources
+            - cloudformation:ListStacks
             - cloudformation:UpdateTerminationProtection
           Resource: "*"
         - Effect: Allow
